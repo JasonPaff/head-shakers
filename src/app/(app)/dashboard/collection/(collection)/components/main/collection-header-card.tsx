@@ -15,8 +15,8 @@ import { formatCurrency } from '@/lib/utils/currency.utils';
 
 export type CollectionHeaderCardProps = {
   bobbleheadCount: number;
-  coverImageUrl: string;
-  description: string;
+  coverImageUrl: null | string;
+  description: null | string;
   featuredCount: number;
   likeCount: number;
   name: string;
@@ -24,7 +24,7 @@ export type CollectionHeaderCardProps = {
   onEdit?: () => void;
   onSettings?: () => void;
   onShare?: () => void;
-  totalValue: number;
+  totalValue: null | number;
   viewCount: number;
 };
 
@@ -51,7 +51,7 @@ export const CollectionHeaderCard = ({
           <div className={'flex items-start gap-4'}>
             {/* Cover Image */}
             <Avatar className={'size-20 rounded-lg'}>
-              <AvatarImage alt={name} src={coverImageUrl} />
+              <AvatarImage alt={name} src={coverImageUrl ?? undefined} />
               <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
             </Avatar>
 

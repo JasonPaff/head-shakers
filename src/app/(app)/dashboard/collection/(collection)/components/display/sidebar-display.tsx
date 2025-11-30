@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryStates } from 'nuqs';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
@@ -13,6 +14,7 @@ import { useUserPreferences } from '@/hooks/use-user-preferences';
 
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
 
+import { collectionDashboardParsers } from '../../search-params';
 import { NoCollections } from '../empty-states/no-collections';
 import { NoFilteredCollections } from '../empty-states/no-filtered-collections';
 import { CollectionCardCompact } from '../sidebar/cards/collection-card-compact';
@@ -44,11 +46,17 @@ export const SidebarDisplay = ({
   initialSelectedId,
   initialSortOption = 'name-asc',
 }: SidebarDisplayProps) => {
+  const [{ collectionId }, setParams] = useQueryStates(
+    { collectionId: collectionDashboardParsers.collectionId },
+    { shallow: false },
+  );
+
   const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(initialCardStyle);
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
   const [searchValue, setSearchValue] = useState('');
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(initialSelectedId);
   const [sortOption, setSortOptionState] = useState<CollectionSortOption>(initialSortOption);
+
+  const selectedCollectionId = collectionId ?? initialSelectedId;
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
@@ -113,13 +121,11 @@ export const SidebarDisplay = ({
   };
 
   const handleCollectionCreated = (newCollection: ComboboxItem) => {
-    setSelectedCollectionId(newCollection.id);
+    void setParams({ collectionId: newCollection.id });
   };
 
   const handleCollectionSelect = (id: string) => {
-    setSelectedCollectionId(id);
-    // TODO: Update URL params with nuqs or navigate
-    console.log('Selected collection:', id);
+    void setParams({ collectionId: id });
   };
 
   const handleEditCollection = (id: string) => {

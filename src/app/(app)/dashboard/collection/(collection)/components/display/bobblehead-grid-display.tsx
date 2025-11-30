@@ -1,12 +1,15 @@
 'use client';
 
-import { Fragment, useMemo, useState } from 'react';
+import { useQueryStates } from 'nuqs';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 
 import type { BobbleheadData } from '../async/bobblehead-grid-async';
 
+import { collectionDashboardParsers } from '../../search-params';
 import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
 import { BobbleheadCard } from '../main/bobblehead-card';
@@ -25,21 +28,40 @@ export const BobbleheadGridDisplay = ({
   categories,
   conditions,
 }: BobbleheadGridDisplayProps) => {
+  // URL state for filters - shallow: false triggers server re-render
+  const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
+    {
+      condition: collectionDashboardParsers.condition,
+      featured: collectionDashboardParsers.featured,
+      search: collectionDashboardParsers.search,
+      sortBy: collectionDashboardParsers.sortBy,
+    },
+    { shallow: false },
+  );
+
+  // Local search input with debounce for better UX
+  const [searchInput, setSearchInput] = useState(search);
+  const [debouncedSearch] = useDebounce(searchInput, 300);
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    if (debouncedSearch !== search) {
+      void setParams({ search: debouncedSearch || null });
+    }
+  }, [debouncedSearch, search, setParams]);
+
+  // Local-only state (not in URL)
   const [filterCategory, setFilterCategory] = useState('all');
-  const [filterCondition, setFilterCondition] = useState('all');
-  const [filterFeatured, setFilterFeatured] = useState('all');
   const [gridDensity, setGridDensity] = useState<'comfortable' | 'compact'>('compact');
   const [isSelectionMode, setIsSelectionMode] = useToggle();
-  const [searchValue, setSearchValue] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = useState('newest');
 
   const filteredBobbleheads = useMemo(() => {
     let result = [...bobbleheads];
 
-    // Search filter
-    if (searchValue.trim()) {
-      const query = searchValue.toLowerCase();
+    // Search filter (use local searchInput for immediate filtering)
+    if (searchInput.trim()) {
+      const query = searchInput.toLowerCase();
       result = result.filter(
         (b) =>
           b.name.toLowerCase().includes(query) ||
@@ -55,14 +77,14 @@ export const BobbleheadGridDisplay = ({
     // }
 
     // Condition filter
-    if (filterCondition !== 'all') {
-      result = result.filter((b) => b.condition === filterCondition);
+    if (condition !== 'all') {
+      result = result.filter((b) => b.condition === condition);
     }
 
     // Featured filter
-    if (filterFeatured === 'featured') {
+    if (featured === 'featured') {
       result = result.filter((b) => b.isFeatured);
-    } else if (filterFeatured === 'not-featured') {
+    } else if (featured === 'not-featured') {
       result = result.filter((b) => !b.isFeatured);
     }
 
@@ -86,7 +108,7 @@ export const BobbleheadGridDisplay = ({
     }
 
     return result;
-  }, [bobbleheads, searchValue, filterCondition, filterFeatured, sortBy]);
+  }, [bobbleheads, searchInput, condition, featured, sortBy]);
 
   const handleSelectionModeToggle = () => {
     setIsSelectionMode.toggle();
@@ -133,15 +155,19 @@ export const BobbleheadGridDisplay = ({
   };
 
   const handleClearFilters = () => {
-    setSearchValue('');
+    setSearchInput('');
     setFilterCategory('all');
-    setFilterCondition('all');
-    setFilterFeatured('all');
+    void setParams({
+      condition: 'all',
+      featured: 'all',
+      search: null,
+      sortBy: 'newest',
+    });
   };
 
   const _hasBobbleheads = filteredBobbleheads.length > 0;
   const _hasNoResults =
-    !_hasBobbleheads && (!!searchValue || filterCategory !== 'all' || filterCondition !== 'all');
+    !_hasBobbleheads && (!!searchInput || filterCategory !== 'all' || condition !== 'all');
   const _hasSelection = selectedIds.size > 0;
   const _isAllSelected = selectedIds.size === filteredBobbleheads.length && filteredBobbleheads.length > 0;
 
@@ -152,23 +178,23 @@ export const BobbleheadGridDisplay = ({
         categories={categories}
         conditions={conditions}
         filterCategory={filterCategory}
-        filterCondition={filterCondition}
-        filterFeatured={filterFeatured}
+        filterCondition={condition}
+        filterFeatured={featured}
         gridDensity={gridDensity}
         isSelectionMode={isSelectionMode}
         onFilterCategoryChange={setFilterCategory}
-        onFilterConditionChange={setFilterCondition}
-        onFilterFeaturedChange={setFilterFeatured}
+        onFilterConditionChange={(value) => void setParams({ condition: value as typeof condition })}
+        onFilterFeaturedChange={(value) => void setParams({ featured: value as typeof featured })}
         onGridDensityToggle={() => {
           setGridDensity((prev) => (prev === 'compact' ? 'comfortable' : 'compact'));
         }}
-        onSearchChange={setSearchValue}
+        onSearchChange={setSearchInput}
         onSearchClear={() => {
-          setSearchValue('');
+          setSearchInput('');
         }}
         onSelectionModeToggle={handleSelectionModeToggle}
-        onSortChange={setSortBy}
-        searchValue={searchValue}
+        onSortChange={(value) => void setParams({ sortBy: value as typeof sortBy })}
+        searchValue={searchInput}
         sortBy={sortBy}
       />
 
