@@ -114,7 +114,6 @@ export const FooterNewsletterSubscribe = withFocusManagement(
                     <field.TextField
                       autoComplete={'email'}
                       className={cn(
-                        'h-9 text-sm',
                         'bg-white/50 dark:bg-slate-800/50',
                         'border-slate-200 dark:border-slate-700',
                       )}
