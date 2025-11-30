@@ -88,26 +88,12 @@ export const updateCollectionAction = authActionClient
         userId: ctx.userId,
       },
       async () => {
-        const currentCollection = await CollectionsFacade.getById(
-          collectionData.collectionId,
-          ctx.userId,
-          ctx.db,
-        );
-
-        if (!currentCollection) {
-          throw createNotFoundError(ERROR_MESSAGES.COLLECTION.NOT_FOUND, collectionData.collectionId, {
-            ctx,
-            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
-            operation: OPERATIONS.COLLECTIONS.UPDATE,
-          });
-        }
-
         const updatedCollection = await CollectionsFacade.updateAsync(collectionData, ctx.userId, ctx.db);
 
         if (!updatedCollection) {
-          throw createInternalError(ERROR_MESSAGES.COLLECTION.UPDATE_FAILED, {
+          throw createNotFoundError(ERROR_MESSAGES.COLLECTION.NOT_FOUND, collectionData.collectionId, {
             ctx,
-            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_UPDATE_FAILED,
+            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
             operation: OPERATIONS.COLLECTIONS.UPDATE,
           });
         }
