@@ -6,17 +6,13 @@ import { MailIcon } from 'lucide-react';
 import { useAppForm } from '@/components/ui/form';
 import { useFocusManagement } from '@/components/ui/form/focus-management/use-focus-management';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
-import { useServerAction } from '@/hooks/use-server-action';
-import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
 import { generateTestId } from '@/lib/test-ids';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 import { cn } from '@/utils/tailwind-utils';
 
 interface FooterNewsletterSubscribeProps {
-  currentEmail: null | string;
-  isAuthenticated: boolean;
-  onError: (errorMessage: string, previousEmail: null | string) => void;
-  onOptimisticSubscribe: (email: string) => void;
+  isPending: boolean;
+  onSubscribe: (email: string) => void;
 }
 
 /**
@@ -24,62 +20,23 @@ interface FooterNewsletterSubscribeProps {
  *
  * For public users:
  * - Shows email input + subscribe button
- * - Displays success toast on successful subscription
+ * - Success toast shown by parent hook on completion
  *
  * For authenticated users:
- * - Shows the same form (allows subscribing with any email)
- * - Optimistically updates UI via onOptimisticSubscribe callback
- * - No success toast (optimistic UI is the feedback)
- * - Error toast via onError callback on failure
+ * - Shows the same form
+ * - Optimistic UI switch to unsubscribe view handled by parent
  */
 export const FooterNewsletterSubscribe = withFocusManagement(
-  ({ currentEmail, isAuthenticated, onError, onOptimisticSubscribe }: FooterNewsletterSubscribeProps) => {
+  ({ isPending, onSubscribe }: FooterNewsletterSubscribeProps) => {
     const { focusFirstError } = useFocusManagement();
-    const containerTestId = generateTestId('layout', 'app-footer', 'newsletter-subscribe');
-
-    // For public users: show toasts
-    // For authenticated users: disable toasts, use optimistic updates
-    const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
-      breadcrumbContext: {
-        action: 'newsletter-subscribe',
-        component: 'footer-newsletter',
-      },
-      isDisableToast: isAuthenticated,
-      loadingMessage: 'Subscribing to newsletter...',
-    });
 
     const form = useAppForm({
       defaultValues: {
         email: '',
       },
-      onSubmit: async ({ value }) => {
-        const email = value.email;
-
-        if (isAuthenticated) {
-          // Capture previous email state before optimistic update for rollback
-          const previousEmail = currentEmail;
-
-          // Optimistically update UI for authenticated users
-          onOptimisticSubscribe(email);
-
-          try {
-            await executeAsync(value);
-            // Success - UI already shows unsubscribe view
-            form.reset();
-          } catch (error) {
-            // Error - roll back the optimistic update using captured previous state
-            const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe';
-            onError(errorMessage, previousEmail);
-          }
-        } else {
-          // Public users - let the toast handle success/error
-          try {
-            await executeAsync(value);
-            form.reset();
-          } catch {
-            // Error toast already shown by useServerAction
-          }
-        }
+      onSubmit: ({ value }) => {
+        onSubscribe(value.email);
+        form.reset();
       },
       onSubmitInvalid: ({ formApi }) => {
         focusFirstError(formApi);
@@ -91,7 +48,10 @@ export const FooterNewsletterSubscribe = withFocusManagement(
     });
 
     return (
-      <div className={'flex flex-col gap-3'} data-testid={containerTestId}>
+      <div
+        className={'flex flex-col gap-3'}
+        data-testid={generateTestId('layout', 'app-footer', 'newsletter-subscribe')}
+      >
         <div className={'flex flex-col gap-1'}>
           <h4 className={'text-sm font-semibold text-slate-800 dark:text-slate-200'}>Stay Updated</h4>
           <p className={'text-xs text-slate-500 dark:text-slate-400'}>
@@ -117,7 +77,7 @@ export const FooterNewsletterSubscribe = withFocusManagement(
                         'bg-white/50 dark:bg-slate-800/50',
                         'border-slate-200 dark:border-slate-700',
                       )}
-                      disabled={isExecuting}
+                      disabled={isPending}
                       icon={<MailIcon className={'size-4'} />}
                       label={''}
                       placeholder={'Enter your email'}

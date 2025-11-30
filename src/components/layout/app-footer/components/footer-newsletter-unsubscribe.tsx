@@ -1,7 +1,6 @@
 'use client';
 
 import { CheckCircleIcon } from 'lucide-react';
-import { useRef, useState } from 'react';
 
 import {
   AlertDialog,
@@ -15,63 +14,40 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useServerAction } from '@/hooks/use-server-action';
-import { unsubscribeFromNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
+import { useToggle } from '@/hooks/use-toggle';
 import { generateTestId } from '@/lib/test-ids';
 import { maskEmail } from '@/lib/utils/email-utils';
 
 interface FooterNewsletterUnsubscribeProps {
   email: string;
-  onError: (errorMessage: string, previousEmail: null | string) => void;
-  onOptimisticUnsubscribe: () => void;
+  isPending: boolean;
+  onUnsubscribe: () => void;
 }
 
 /**
  * Newsletter unsubscribe component shown for authenticated subscribed users.
  *
- * Shows subscription status with a subtle unsubscribe button.
- * Uses optimistic updates - immediately shows subscribe form on click,
- * rolls back with error toast if the action fails.
+ * Shows subscription status with a confirmation dialog for unsubscribing.
+ * Optimistic updates are handled by the parent hook - UI immediately
+ * switches to subscribe form on confirm, with automatic rollback on error.
  */
 export const FooterNewsletterUnsubscribe = ({
   email,
-  onError,
-  onOptimisticUnsubscribe,
+  isPending,
+  onUnsubscribe,
 }: FooterNewsletterUnsubscribeProps) => {
-  const containerTestId = generateTestId('layout', 'app-footer', 'newsletter-unsubscribe');
-  const previousEmailRef = useRef<null | string>(email);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useToggle();
 
-  const { executeAsync, isExecuting } = useServerAction(unsubscribeFromNewsletterAction, {
-    breadcrumbContext: {
-      action: 'newsletter-unsubscribe',
-      component: 'footer-newsletter',
-    },
-    isDisableToast: true,
-  });
-
-  const handleUnsubscribe = async () => {
-    // Close dialog immediately
-    setIsDialogOpen(false);
-
-    // Store email before optimistic update
-    previousEmailRef.current = email;
-
-    // Optimistically update UI
-    onOptimisticUnsubscribe();
-
-    try {
-      await executeAsync({ email });
-      // Success - UI already shows subscribe form
-    } catch (error) {
-      // Error - roll back the optimistic update
-      const errorMessage = error instanceof Error ? error.message : 'Failed to unsubscribe';
-      onError(errorMessage, previousEmailRef.current);
-    }
+  const handleUnsubscribe = () => {
+    setIsDialogOpen.off();
+    onUnsubscribe();
   };
 
   return (
-    <div className={'flex flex-col gap-3'} data-testid={containerTestId}>
+    <div
+      className={'flex flex-col gap-3'}
+      data-testid={generateTestId('layout', 'app-footer', 'newsletter-unsubscribe')}
+    >
       <div className={'flex items-center gap-2'}>
         <CheckCircleIcon aria-hidden className={'size-4 text-green-600 dark:text-green-500'} />
         <span className={'text-sm font-medium text-slate-700 dark:text-slate-300'}>
@@ -84,16 +60,20 @@ export const FooterNewsletterUnsubscribe = ({
         <span className={'font-medium text-slate-600 dark:text-slate-300'}>{maskEmail(email)}</span>
       </p>
 
-      <AlertDialog onOpenChange={setIsDialogOpen} open={isDialogOpen} trackingName={'newsletter-unsubscribe'}>
+      <AlertDialog
+        onOpenChange={setIsDialogOpen.update}
+        open={isDialogOpen}
+        trackingName={'newsletter-unsubscribe'}
+      >
         <AlertDialogTrigger asChild>
           <Button
             className={'w-fit text-xs'}
-            disabled={isExecuting}
+            disabled={isPending}
             size={'sm'}
             testId={generateTestId('layout', 'app-footer', 'newsletter-unsubscribe-button')}
             variant={'ghost'}
           >
-            {isExecuting ? 'Unsubscribing...' : 'Unsubscribe'}
+            {isPending ? 'Unsubscribing...' : 'Unsubscribe'}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent testId={generateTestId('layout', 'app-footer', 'newsletter-unsubscribe-dialog')}>
@@ -106,7 +86,7 @@ export const FooterNewsletterUnsubscribe = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void handleUnsubscribe()}>Unsubscribe</AlertDialogAction>
+            <AlertDialogAction onClick={handleUnsubscribe}>Unsubscribe</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
