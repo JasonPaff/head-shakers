@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 
-import { OffCanvasDrawerDashboard } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-mock-up';
+import { CollectionLayout } from './components/layout/collection-layout';
+import { MainContent } from './components/main/main-content';
+import { SidebarContent } from './components/sidebar/sidebar-content';
 
-export default function DashboardCollectionPage() {
-  return <OffCanvasDrawerDashboard />;
+export default function CollectionPage() {
+  return <CollectionLayout main={<MainContent />} sidebar={<SidebarContent />} />;
 }
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
-    title: 'Collection',
+    description: 'Manage your bobblehead collections',
+    title: 'My Collection',
   };
 }
