@@ -1082,8 +1082,10 @@ export class CollectionsFacade extends BaseFacade {
         userId,
       },
       async () => {
-        const context = this.getUserContext(userId, dbInstance);
-        return await CollectionsQuery.getDashboardListByUserId(userId, context);
+        return CacheService.collections.dashboard(async () => {
+          const context = this.getUserContext(userId, dbInstance);
+          return await CollectionsQuery.getDashboardListByUserId(userId, context);
+        }, userId);
       },
     );
   }

@@ -2,6 +2,8 @@ import type { MouseEvent } from 'react';
 
 import { EditIcon, GripVerticalIcon, HeartIcon, StarIcon } from 'lucide-react';
 
+import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -10,46 +12,28 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/utils/tailwind-utils';
 
 export type CollectionCardDetailedProps = {
-  bobbleheadCount: number;
-  commentCount: number;
-  coverImageUrl: null | string;
-  description: null | string;
-  featuredCount: number;
-  id: string;
+  collection: CollectionDashboardListData;
   isActive: boolean;
-  likeCount: number;
-  name: string;
   onClick: (id: string) => void;
   onEdit: (id: string) => void;
-  totalValue: number;
-  viewCount: number;
 };
 
 export const CollectionCardDetailed = ({
-  bobbleheadCount,
-  commentCount,
-  coverImageUrl,
-  description,
-  featuredCount,
-  id,
+  collection,
   isActive,
-  likeCount,
-  name,
   onClick,
   onEdit,
-  totalValue,
-  viewCount,
 }: CollectionCardDetailedProps) => {
   const formattedValue = new Intl.NumberFormat('en-US', {
     currency: 'USD',
     style: 'currency',
-  }).format(totalValue);
+  }).format(collection.totalValue ?? 0);
 
-  const handleClick = () => onClick(id);
+  const handleClick = () => onClick(collection.id);
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
-    onEdit(id);
+    onEdit(collection.id);
   };
 
   return (
@@ -76,18 +60,21 @@ export const CollectionCardDetailed = ({
           <div className={'flex items-start gap-3'} data-slot={'card-content'}>
             {/* Collection Thumbnail */}
             <Avatar className={'size-16 rounded-md'}>
-              <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
-              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                alt={collection.name}
+                src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+              />
+              <AvatarFallback>{collection.name.charAt(0)}</AvatarFallback>
             </Avatar>
 
             {/* Collection Info */}
             <div className={'min-w-0 flex-1'} data-slot={'collection-info'}>
-              <h3 className={'truncate text-sm font-semibold'}>{name}</h3>
-              <p className={'mt-0.5 line-clamp-2 text-xs text-muted-foreground'}>{description}</p>
+              <h3 className={'truncate text-sm font-semibold'}>{collection.name}</h3>
+              <p className={'mt-0.5 line-clamp-2 text-xs text-muted-foreground'}>{collection.description}</p>
 
               {/* Stats Row */}
               <div className={'mt-2 flex items-center gap-3 text-xs text-muted-foreground'}>
-                <span className={'font-medium'}>{bobbleheadCount} items</span>
+                <span className={'font-medium'}>{collection.bobbleheadCount} items</span>
                 <span className={'font-medium text-primary'}>{formattedValue}</span>
               </div>
 
@@ -95,11 +82,11 @@ export const CollectionCardDetailed = ({
               <div className={'mt-1.5 flex items-center gap-3 text-xs text-muted-foreground'}>
                 <span className={'flex items-center gap-1'}>
                   <HeartIcon aria-hidden className={'size-3'} />
-                  {likeCount}
+                  {collection.likeCount}
                 </span>
                 <span className={'flex items-center gap-1'}>
                   <StarIcon aria-hidden className={'size-3'} />
-                  {featuredCount}
+                  {collection.featuredCount}
                 </span>
               </div>
             </div>
@@ -134,12 +121,15 @@ export const CollectionCardDetailed = ({
         <div className={'space-y-3'}>
           <div className={'flex items-start gap-3'}>
             <Avatar className={'size-12 rounded-md'}>
-              <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
-              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                alt={collection.name}
+                src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+              />
+              <AvatarFallback>{collection.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h4 className={'font-semibold'}>{name}</h4>
-              <p className={'text-xs text-muted-foreground'}>{bobbleheadCount} bobbleheads</p>
+              <h4 className={'font-semibold'}>{collection.name}</h4>
+              <p className={'text-xs text-muted-foreground'}>{collection.bobbleheadCount} bobbleheads</p>
             </div>
           </div>
 
@@ -152,22 +142,22 @@ export const CollectionCardDetailed = ({
             </div>
             <div>
               <span className={'text-muted-foreground'}>Featured:</span>
-              <p className={'font-medium'}>{featuredCount}</p>
+              <p className={'font-medium'}>{collection.featuredCount}</p>
             </div>
             <div>
               <span className={'text-muted-foreground'}>Views:</span>
-              <p className={'font-medium'}>{viewCount}</p>
+              <p className={'font-medium'}>{collection.viewCount}</p>
             </div>
             <div>
               <span className={'text-muted-foreground'}>Likes:</span>
-              <p className={'font-medium'}>{likeCount}</p>
+              <p className={'font-medium'}>{collection.likeCount}</p>
             </div>
           </div>
 
           <Separator />
 
           <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
-            <span>{commentCount} comments</span>
+            <span>{collection.commentCount} comments</span>
           </div>
         </div>
       </HoverCardContent>

@@ -2,42 +2,36 @@ import type { MouseEvent } from 'react';
 
 import { EditIcon } from 'lucide-react';
 
+import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 
 export type CollectionCardCompactProps = {
-  bobbleheadCount: number;
-  coverImageUrl: null | string;
-  id: string;
+  collection: CollectionDashboardListData;
   isActive: boolean;
-  name: string;
   onClick: (id: string) => void;
   onEdit: (id: string) => void;
-  totalValue: number;
 };
 
 export const CollectionCardCompact = ({
-  bobbleheadCount,
-  coverImageUrl,
-  id,
+  collection,
   isActive,
-  name,
   onClick,
   onEdit,
-  totalValue,
 }: CollectionCardCompactProps) => {
   const formattedValue = new Intl.NumberFormat('en-US', {
     currency: 'USD',
     style: 'currency',
-  }).format(totalValue);
+  }).format(collection.totalValue ?? 0);
 
-  const handleClick = () => onClick(id);
+  const handleClick = () => onClick(collection.id);
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
-    onEdit(id);
+    onEdit(collection.id);
   };
 
   return (
@@ -62,15 +56,18 @@ export const CollectionCardCompact = ({
       <div className={'flex items-start gap-3 sm:gap-4'} data-slot={'item-content'}>
         {/* Collection Thumbnail */}
         <Avatar className={'size-14 rounded-md sm:size-16 md:size-12'}>
-          <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+          <AvatarImage
+            alt={collection.name}
+            src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+          />
+          <AvatarFallback>{collection.name.charAt(0)}</AvatarFallback>
         </Avatar>
 
         {/* Collection Info */}
         <div className={'min-w-0 flex-1'} data-slot={'collection-info'}>
-          <h3 className={'truncate text-sm font-semibold sm:text-base md:text-sm'}>{name}</h3>
+          <h3 className={'truncate text-sm font-semibold sm:text-base md:text-sm'}>{collection.name}</h3>
           <div className={'mt-1 flex items-center gap-2 text-xs text-muted-foreground'}>
-            <span>{bobbleheadCount} items</span>
+            <span>{collection.bobbleheadCount} items</span>
             <span>•</span>
             <span className={'font-medium text-primary'}>{formattedValue}</span>
           </div>

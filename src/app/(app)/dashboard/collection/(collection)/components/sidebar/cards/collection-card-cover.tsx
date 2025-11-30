@@ -2,45 +2,30 @@ import type { MouseEvent } from 'react';
 
 import { EditIcon, HeartIcon } from 'lucide-react';
 
+import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 
 export type CollectionCardCoverProps = {
-  bobbleheadCount: number;
-  coverImageUrl: null | string;
-  description: null | string;
-  id: string;
+  collection: CollectionDashboardListData;
   isActive: boolean;
-  likeCount: number;
-  name: string;
   onClick: (id: string) => void;
   onEdit: (id: string) => void;
-  totalValue: number;
 };
 
-export const CollectionCardCover = ({
-  bobbleheadCount,
-  coverImageUrl,
-  description,
-  id,
-  isActive,
-  likeCount,
-  name,
-  onClick,
-  onEdit,
-  totalValue,
-}: CollectionCardCoverProps) => {
+export const CollectionCardCover = ({ collection, isActive, onClick, onEdit }: CollectionCardCoverProps) => {
   const formattedValue = new Intl.NumberFormat('en-US', {
     currency: 'USD',
     style: 'currency',
-  }).format(totalValue);
+  }).format(collection.totalValue ?? 0);
 
-  const handleClick = () => onClick(id);
+  const handleClick = () => onClick(collection.id);
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
-    onEdit(id);
+    onEdit(collection.id);
   };
 
   return (
@@ -65,10 +50,10 @@ export const CollectionCardCover = ({
       {/* Cover Image with Gradient Overlay */}
       <div className={'relative aspect-[4/3] overflow-hidden bg-muted'}>
         <img
-          alt={name}
+          alt={collection.name}
           className={'size-full object-cover transition-transform group-hover:scale-105'}
           data-slot={'collection-cover'}
-          src={coverImageUrl ?? '/collection-cover-placeholder.png'}
+          src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
         />
 
         {/* Gradient Overlay */}
@@ -76,17 +61,17 @@ export const CollectionCardCover = ({
 
         {/* Collection Info Overlay */}
         <div className={'absolute right-0 bottom-0 left-0 p-4 text-white'}>
-          <h3 className={'mb-1 text-base leading-tight font-bold'}>{name}</h3>
-          <p className={'line-clamp-2 text-xs opacity-90'}>{description}</p>
+          <h3 className={'mb-1 text-base leading-tight font-bold'}>{collection.name}</h3>
+          <p className={'line-clamp-2 text-xs opacity-90'}>{collection.description}</p>
 
           {/* Stats */}
           <div className={'mt-2 flex items-center gap-3 text-xs font-medium'}>
-            <span>{bobbleheadCount} items</span>
+            <span>{collection.bobbleheadCount} items</span>
             <span>•</span>
             <span>{formattedValue}</span>
             <span>•</span>
             <span className={'flex items-center gap-1'}>
-              <HeartIcon aria-hidden className={'size-3'} /> {likeCount}
+              <HeartIcon aria-hidden className={'size-3'} /> {collection.likeCount}
             </span>
           </div>
         </div>

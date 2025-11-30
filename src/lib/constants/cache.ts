@@ -86,29 +86,29 @@ export const CACHE_CONFIG = {
    * cache TTL configurations (in seconds)
    */
   TTL: {
-    // daily cache for aggregated data
-    DAILY: 86400, // 24 hours
+    // 24-hours
+    DAILY: 86400,
 
-    // extended cache for rarely changing data
-    EXTENDED: 14400, // 4 hours
+    // 4-hours
+    EXTENDED: 14400,
 
-    // long cache for relatively stable data
-    LONG: 3600, // 1 hour
+    // 1-hour
+    LONG: 3600,
 
-    // medium cache for semi-static data
-    MEDIUM: 1800, // 30 minutes
+    // 30-minute cache
+    MEDIUM: 1800,
 
-    // public search results cache (balance between freshness and performance)
-    PUBLIC_SEARCH: 600, // 10 minutes
+    // 10-minute cache
+    PUBLIC_SEARCH: 600,
 
-    // ultra-short cache for frequently changing data
-    REALTIME: 30, // 30 seconds
+    // 30-second cache
+    REALTIME: 30,
 
-    // short cache for user-specific data
-    SHORT: 300, // 5 minutes
+    // 5-minute cache
+    SHORT: 300,
 
-    // weekly cache for statistical data
-    WEEKLY: 604800, // 7 days
+    // weekly cache
+    WEEKLY: 604800,
   },
 } as const;
 

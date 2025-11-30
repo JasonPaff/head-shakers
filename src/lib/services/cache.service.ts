@@ -448,10 +448,14 @@ export class CacheService {
     },
 
     /**
-     * cache collection dashboard data
+     * cache dashboard data for a user
+     * @param fn - The async function that performs the dashboard query
+     * @param userId - The ID of the user whose dashboard data to cache
+     * @param options - Cache options (TTL defaults to 1 hour)
      */
     dashboard: async <T>(fn: () => Promise<T>, userId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
       const key = CACHE_KEYS.COLLECTIONS.DASHBOARD(userId);
+      // Investigate these cache tags
       const tags = [
         CACHE_CONFIG.TAGS.USER(userId),
         CACHE_CONFIG.TAGS.USER_COLLECTIONS(userId),
@@ -460,9 +464,14 @@ export class CacheService {
 
       return CacheService.cached(fn, key, {
         ...options,
-        context: { ...options.context, entityType: 'collection', operation: 'collection:dashboard', userId },
+        context: {
+          ...options.context,
+          entityType: CACHE_ENTITY_TYPE.COLLECTION,
+          operation: `${CACHE_ENTITY_TYPE.COLLECTION}:dashboard`,
+          userId,
+        },
         tags,
-        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
       });
     },
 

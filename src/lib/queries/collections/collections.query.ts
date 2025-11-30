@@ -949,61 +949,76 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
-  static async getDashboardDataAsync(
-    userId: string,
-    context: QueryContext,
-  ): Promise<Array<CollectionWithRelations>> {
-    const dbInstance = this.getDbInstance(context);
-
-    // get user's collections with all relations for dashboard
-    return await dbInstance.query.collections.findMany({
-      orderBy: [sql`lower(${collections.name}) asc`],
-      where: eq(collections.userId, userId),
-      with: {
-        bobbleheads: {
-          columns: {
-            id: true,
-            isFeatured: true,
-            updatedAt: true,
-          },
-          where: isNull(bobbleheads.deletedAt),
-        },
-      },
-    });
-  }
-
   static async getDashboardListByUserId(
     userId: string,
     context: QueryContext,
   ): Promise<Array<CollectionDashboardListData>> {
     const dbInstance = this.getDbInstance(context);
 
+    const bobbleheadStats = dbInstance
+      .select({
+        bobbleheadCount: count(bobbleheads.id).as('bobblehead_count'),
+        collectionId: bobbleheads.collectionId,
+        featuredCount: count(bobbleheads.isFeatured).as('featured_count'),
+        totalValue: sum(bobbleheads.purchasePrice).as('total_value'),
+      })
+      .from(bobbleheads)
+      .groupBy(bobbleheads.collectionId)
+      .as('bobblehead_stats');
+
+    const commentStats = dbInstance
+      .select({
+        commentCount: count(comments.id).as('comment_count'),
+        targetId: comments.targetId,
+      })
+      .from(comments)
+      .where(eq(comments.targetType, 'collection'))
+      .groupBy(comments.targetId)
+      .as('comment_stats');
+
+    const likeStats = dbInstance
+      .select({
+        likeCount: count(likes.id).as('like_count'),
+        targetId: likes.targetId,
+      })
+      .from(likes)
+      .where(eq(likes.targetType, 'collection'))
+      .groupBy(likes.targetId)
+      .as('like_stats');
+
+    const viewStats = dbInstance
+      .select({
+        targetId: contentViews.targetId,
+        viewCount: count(contentViews.id).as('view_count'),
+      })
+      .from(contentViews)
+      .where(eq(contentViews.targetType, 'collection'))
+      .groupBy(contentViews.targetId)
+      .as('view_stats');
+
     const result = await dbInstance
       .select({
-        bobbleheadCount: count(bobbleheads.id),
-        commentCount: count(comments.id),
+        bobbleheadCount: sql<number>`COALESCE(${bobbleheadStats.bobbleheadCount}, 0)`,
+        commentCount: sql<number>`COALESCE(${commentStats.commentCount}, 0)`,
         coverImageUrl: collections.coverImageUrl,
         description: collections.description,
-        featuredCount: count(bobbleheads.isFeatured),
+        featuredCount: sql<number>`COALESCE(${bobbleheadStats.featuredCount}, 0)`,
         id: collections.id,
         isPublic: collections.isPublic,
-        likeCount: count(likes.id),
+        likeCount: sql<number>`COALESCE(${likeStats.likeCount}, 0)`,
         name: collections.name,
-        totalValue: sum(bobbleheads.purchasePrice).mapWith(Number),
-        viewCount: count(contentViews.id),
+        totalValue: sql<number>`COALESCE(${bobbleheadStats.totalValue}, 0)`,
+        viewCount: sql<number>`COALESCE(${viewStats.viewCount}, 0)`,
       })
       .from(collections)
-      .leftJoin(bobbleheads, eq(bobbleheads.collectionId, collections.id))
-      .leftJoin(comments, and(eq(comments.targetId, collections.id), eq(comments.targetType, 'collection')))
-      .leftJoin(likes, and(eq(likes.targetId, collections.id), eq(likes.targetType, 'collection')))
-      .leftJoin(
-        contentViews,
-        and(eq(contentViews.targetId, collections.id), eq(contentViews.targetType, 'collection')),
-      )
+      .leftJoin(bobbleheadStats, eq(bobbleheadStats.collectionId, collections.id))
+      .leftJoin(commentStats, eq(commentStats.targetId, collections.id))
+      .leftJoin(likeStats, eq(likeStats.targetId, collections.id))
+      .leftJoin(viewStats, eq(viewStats.targetId, collections.id))
       .where(
         this.combineFilters(
           eq(collections.userId, userId),
-          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
+          this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
         ),
       );
 
