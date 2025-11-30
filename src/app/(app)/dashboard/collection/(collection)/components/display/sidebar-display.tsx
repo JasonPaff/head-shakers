@@ -13,6 +13,7 @@ import { useUserPreferences } from '@/hooks/use-user-preferences';
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
 
 import { NoCollections } from '../empty-states/no-collections';
+import { NoFilteredCollections } from '../empty-states/no-filtered-collections';
 import { CollectionCardCompact } from '../sidebar/cards/collection-card-compact';
 import { CollectionCardCover } from '../sidebar/cards/collection-card-cover';
 import { CollectionCardDetailed } from '../sidebar/cards/collection-card-detailed';
@@ -102,7 +103,8 @@ export const SidebarDisplay = ({
     setEditingCollection(null);
   };
 
-  const _hasCollections = filteredCollections.length > 0;
+  const hasAnyCollections = collections.length > 0;
+  const hasFilteredResults = filteredCollections.length > 0;
 
   return (
     <Fragment>
@@ -112,6 +114,7 @@ export const SidebarDisplay = ({
       {/* Search Bar */}
       <SidebarSearch
         cardStyle={cardStyle}
+        disabled={!hasAnyCollections}
         onCardStyleChange={setCardStyle}
         onSearchChange={setSearchValue}
         onSearchClear={() => {
@@ -122,7 +125,7 @@ export const SidebarDisplay = ({
 
       {/* Collection List */}
       <SidebarCollectionList cardStyle={cardStyle}>
-        {_hasCollections ?
+        {hasFilteredResults ?
           filteredCollections.map((collection) => (
             <CollectionCardMapper
               cardStyle={cardStyle}
@@ -133,6 +136,8 @@ export const SidebarDisplay = ({
               selectedCollectionId={selectedCollectionId}
             />
           ))
+        : hasAnyCollections ?
+          <NoFilteredCollections onClearSearch={() => setSearchValue('')} />
         : <NoCollections onCreateClick={handleCreateCollection} />}
       </SidebarCollectionList>
 
