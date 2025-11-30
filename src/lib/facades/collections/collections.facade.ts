@@ -1119,22 +1119,6 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getUserCollectionsForDashboard(
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<Array<CollectionDashboardData>> {
-    return CacheService.collections.dashboard(
-      async () => {
-        const context = createProtectedQueryContext(userId, { dbInstance });
-        return CollectionsQuery.getDashboardDataAsync(userId, context).then((collections) =>
-          collections.map((collection) => this.transformForDashboard(collection)),
-        );
-      },
-      userId,
-      { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'dashboard', userId } },
-    );
-  }
-
   /**
    * Record a view for a collection
    */

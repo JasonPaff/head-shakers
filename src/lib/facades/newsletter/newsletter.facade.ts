@@ -12,7 +12,7 @@ import { maskEmail, normalizeEmail } from '@/lib/utils/email-utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 import { captureFacadeWarning, facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
-const facadeName = 'NewsletterFacade';
+const facadeName = 'NEWSLETTER_FACADE';
 
 /**
  * Result type for newsletter subscription operations
