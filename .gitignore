@@ -65,3 +65,5 @@ playwright-report
 
 # testing
 /test-results/
+
+.eslintcache
