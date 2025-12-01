@@ -7,6 +7,7 @@ import type { CollectionCreatedResult } from '@/components/feature/collections/h
 import type { CollectionSortOption, UserPreferences } from '@/hooks/use-user-preferences';
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
@@ -15,7 +16,6 @@ import { sortCollections } from '@/lib/utils/collection.utils';
 
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
 
-import { collectionDashboardParsers } from '../../search-params';
 import { NoCollections } from '../empty-states/no-collections';
 import { NoFilteredCollections } from '../empty-states/no-filtered-collections';
 import { CollectionCardCompact } from '../sidebar/cards/collection-card-compact';

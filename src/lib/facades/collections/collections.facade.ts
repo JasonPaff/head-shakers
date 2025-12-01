@@ -548,7 +548,7 @@ export class CollectionsFacade extends BaseFacade {
       async () => {
         const context = this.getUserContext(userId, dbInstance);
 
-        const existingSlugs = await CollectionsQuery.getCollectionSlugsByUserId(userId, context);
+        const existingSlugs = await CollectionsQuery.getCollectionSlugsByUserIdAsync(userId, context);
 
         const baseSlug = generateSlug(collection.name);
         const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
@@ -1106,7 +1106,7 @@ export class CollectionsFacade extends BaseFacade {
       async () => {
         return CacheService.collections.dashboard(async () => {
           const context = this.getUserContext(userId, dbInstance);
-          return await CollectionsQuery.getDashboardListByUserId(userId, context);
+          return await CollectionsQuery.getDashboardListByUserIdAsync(userId, context);
         }, userId);
       },
     );
@@ -1124,7 +1124,7 @@ export class CollectionsFacade extends BaseFacade {
     name: string,
     userId: string,
     excludeCollectionId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<boolean> {
     // TODO: add caching service
     const context = this.getUserContext(userId, dbInstance);

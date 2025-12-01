@@ -950,7 +950,10 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
-  static async getCollectionSlugsByUserId(userId: string, context: QueryContext): Promise<Array<string>> {
+  static async getCollectionSlugsByUserIdAsync(
+    userId: string,
+    context: QueryContext,
+  ): Promise<Array<string>> {
     const dbInstance = this.getDbInstance(context);
 
     return await dbInstance
@@ -960,7 +963,7 @@ export class CollectionsQuery extends BaseQuery {
       .then((results) => results.map((r) => r.slug));
   }
 
-  static async getDashboardListByUserId(
+  static async getDashboardListByUserIdAsync(
     userId: string,
     context: QueryContext,
   ): Promise<Array<CollectionDashboardListData>> {

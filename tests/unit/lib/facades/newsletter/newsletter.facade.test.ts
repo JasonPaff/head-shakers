@@ -10,7 +10,7 @@ vi.mock('@/lib/queries/newsletter/newsletter.queries', () => ({
   NewsletterQuery: {
     createSignupAsync: vi.fn(),
     findByEmailAsync: vi.fn(),
-    getIsActiveSubscriberAsync: vi.fn(),
+    getIsActiveSubscriberByEmailAsync: vi.fn(),
     resubscribeAsync: vi.fn(),
     unsubscribeAsync: vi.fn(),
     updateUserIdAsync: vi.fn(),
@@ -508,7 +508,7 @@ describe('NewsletterFacade', () => {
       // Verify warning was logged
       expect(vi.mocked(captureFacadeWarning)).toHaveBeenCalledWith(
         emailError,
-        'NewsletterFacade',
+        'NEWSLETTER_FACADE',
         OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
         expect.objectContaining({
           signupId: newSignup.id,

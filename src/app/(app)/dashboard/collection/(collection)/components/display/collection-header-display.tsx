@@ -4,7 +4,9 @@ import { useQueryStates } from 'nuqs';
 import { Fragment, useState } from 'react';
 
 import type { CollectionForUpsert } from '@/components/feature/collections/collection-upsert-dialog.types';
+import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
 
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
@@ -12,13 +14,10 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 
-import type { CollectionHeaderData } from '../async/collection-header-async';
-
-import { collectionDashboardParsers } from '../../search-params';
 import { CollectionHeaderCard } from '../main/collection-header-card';
 
 type CollectionHeaderDisplayProps = {
-  collection: CollectionHeaderData | null;
+  collection: CollectionDashboardHeaderRecord;
 };
 
 export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayProps) => {
@@ -37,10 +36,6 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
       void setParams({ collectionSlug: null });
     },
   });
-
-  if (!collection) {
-    return null;
-  }
 
   const handleEdit = () => {
     setEditingCollection({
@@ -68,21 +63,10 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
 
   return (
     <Fragment>
-      <CollectionHeaderCard
-        bobbleheadCount={collection.bobbleheadCount}
-        collectionSlug={collection.slug}
-        commentCount={collection.commentCount}
-        coverImageUrl={collection.coverImageUrl}
-        description={collection.description}
-        featuredCount={collection.featuredCount}
-        likeCount={collection.likeCount}
-        name={collection.name}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-        totalValue={collection.totalValue}
-        viewCount={collection.viewCount}
-      />
+      {/* Collection Header Card */}
+      <CollectionHeaderCard collection={collection} onDelete={handleDelete} onEdit={handleEdit} />
 
+      {/* Delete Collection Confirmation Dialog */}
       <ConfirmDeleteAlertDialog
         confirmationText={collection.name}
         isOpen={isConfirmDeleteDialogOpen}
@@ -92,6 +76,7 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
         This will permanently delete this collection and all bobbleheads within.
       </ConfirmDeleteAlertDialog>
 
+      {/* Edit Collection Details Dialog */}
       <Conditional isCondition={!!editingCollection}>
         <CollectionUpsertDialog
           collection={editingCollection!}

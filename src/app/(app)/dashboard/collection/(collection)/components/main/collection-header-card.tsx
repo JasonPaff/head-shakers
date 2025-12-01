@@ -1,5 +1,7 @@
 import { EditIcon, HeartIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react';
 
+import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
+
 import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,35 +16,13 @@ import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils/currency.utils';
 
 export type CollectionHeaderCardProps = {
-  bobbleheadCount: number;
-  collectionSlug: string;
-  commentCount: number;
-  coverImageUrl: null | string;
-  description: null | string;
-  featuredCount: number;
-  likeCount: number;
-  name: string;
-  onDelete?: () => void;
-  onEdit?: () => void;
-  totalValue: null | number;
-  viewCount: number;
+  collection: CollectionDashboardHeaderRecord;
+  onDelete: () => void;
+  onEdit: () => void;
 };
 
-export const CollectionHeaderCard = ({
-  bobbleheadCount,
-  collectionSlug,
-  commentCount,
-  coverImageUrl,
-  description,
-  featuredCount,
-  likeCount,
-  name,
-  onDelete,
-  onEdit,
-  totalValue,
-  viewCount,
-}: CollectionHeaderCardProps) => {
-  const formattedValue = formatCurrency(totalValue);
+export const CollectionHeaderCard = ({ collection, onDelete, onEdit }: CollectionHeaderCardProps) => {
+  const formattedValue = formatCurrency(collection.totalValue);
 
   return (
     <Card className={'m-4 mb-0 hidden lg:block'} data-slot={'collection-header-card'}>
@@ -51,27 +31,27 @@ export const CollectionHeaderCard = ({
           <div className={'flex items-start gap-4'}>
             {/* Cover Image */}
             <Avatar className={'size-20 rounded-lg'}>
-              <AvatarImage alt={name} src={coverImageUrl ?? undefined} />
-              <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+              <AvatarImage alt={collection.name} src={collection.coverImageUrl ?? undefined} />
+              <AvatarFallback>{collection.name?.charAt(0)}</AvatarFallback>
             </Avatar>
 
             {/* Collection Info */}
             <div className={'flex-1 space-y-2'}>
-              <CardTitle className={'text-2xl'}>{name}</CardTitle>
-              <CardDescription>{description}</CardDescription>
+              <CardTitle className={'text-2xl'}>{collection.name}</CardTitle>
+              <CardDescription>{collection.description}</CardDescription>
 
               {/* Quick Stats */}
               <div className={'flex items-center gap-4 text-sm text-muted-foreground'}>
-                <span className={'font-medium'}>{bobbleheadCount} items</span>
-                <span>{featuredCount} featured</span>
+                <span className={'font-medium'}>{collection.bobbleheadCount} items</span>
+                <span>{collection.featuredCount} featured</span>
                 <span className={'font-semibold text-primary'}>{formattedValue} total value</span>
                 <Separator className={'h-4'} orientation={'vertical'} />
                 <span>
-                  <HeartIcon aria-hidden className={'inline size-3.5'} /> {likeCount}
+                  <HeartIcon aria-hidden className={'inline size-3.5'} /> {collection.likeCount}
                 </span>
-                <span>{viewCount} views</span>
+                <span>{collection.viewCount} views</span>
                 <span>
-                  {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
+                  {collection.commentCount} {collection.commentCount === 1 ? 'comment' : 'comments'}
                 </span>
               </div>
             </div>
@@ -79,16 +59,21 @@ export const CollectionHeaderCard = ({
 
           {/* Collection Actions */}
           <div className={'flex items-center gap-2'}>
+            {/* Edit Button */}
             <Button onClick={onEdit} size={'sm'} variant={'outline'}>
               <EditIcon aria-hidden className={'size-4'} />
               Edit
             </Button>
-            <CollectionShareMenu collectionSlug={collectionSlug}>
+
+            {/* Share Menu */}
+            <CollectionShareMenu collectionSlug={collection.slug}>
               <Button size={'sm'} variant={'outline'}>
                 <ShareIcon aria-hidden className={'size-4'} />
                 Share
               </Button>
             </CollectionShareMenu>
+
+            {/* Delete Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size={'icon'} variant={'ghost'}>

@@ -54,6 +54,7 @@ export const OPERATIONS = {
     GET_BY_ID: 'get_collection_by_id',
     GET_BY_USER: 'get_collections_by_user',
     GET_CATEGORIES: 'get_categories',
+    GET_COLLECTION_HEADER_FOR_USER_BY_SLUG: 'get_collection_header_for_user_by_slug',
     GET_DASHBOARD_LIST_BY_USER_ID: 'get_dashboard_list_by_user_id',
     UPDATE: 'update_collection',
   },

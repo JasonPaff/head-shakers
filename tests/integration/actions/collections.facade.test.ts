@@ -57,6 +57,36 @@ vi.mock('@/lib/services/cache.service', () => ({
   },
 }));
 
+// Mock Next.js revalidation
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
+}));
+
+// Mock cache revalidation service
+vi.mock('@/lib/services/cache-revalidation.service', () => ({
+  CacheRevalidationService: {
+    collections: {
+      onCreate: vi.fn(),
+      onDelete: vi.fn(),
+      onUpdate: vi.fn(),
+    },
+  },
+}));
+
+// Mock SEO cache utils
+vi.mock('@/lib/seo/cache.utils', () => ({
+  invalidateMetadataCache: vi.fn(),
+}));
+
+// Mock Cloudinary service
+vi.mock('@/lib/services/cloudinary.service', () => ({
+  CloudinaryService: {
+    deletePhotosFromCloudinary: vi.fn(),
+    extractPublicIdFromUrl: vi.fn(),
+  },
+}));
+
 // Mock Redis client to avoid connection issues in tests
 vi.mock('@/lib/utils/redis-client', () => ({
   getRedisClient: vi.fn(() => ({
@@ -112,11 +142,31 @@ describe('CollectionsFacade Integration Tests', () => {
       );
 
       const collection2 = await CollectionsFacade.createCollectionAsync(
+        { description: null, isPublic: true, name: 'Another Collection' },
+        user!.id,
+      );
+
+      // Each collection should have a unique slug derived from its name
+      expect(collection1!.slug).toContain('test-collection');
+      expect(collection2!.slug).toContain('another-collection');
+      expect(collection1!.slug).not.toBe(collection2!.slug);
+    });
+
+    it('should reject duplicate collection names for the same user', async () => {
+      const user = await createTestUser();
+
+      await CollectionsFacade.createCollectionAsync(
         { description: null, isPublic: true, name: 'Test Collection' },
         user!.id,
       );
 
-      expect(collection1!.slug).not.toBe(collection2!.slug);
+      // Creating a second collection with the same name should fail
+      await expect(
+        CollectionsFacade.createCollectionAsync(
+          { description: null, isPublic: true, name: 'Test Collection' },
+          user!.id,
+        ),
+      ).rejects.toThrow();
     });
 
     it('should create a private collection when isPublic is false', async () => {

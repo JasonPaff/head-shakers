@@ -1,11 +1,11 @@
 import 'server-only';
 
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ENUMS } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
-import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { BobbleheadGridDisplay } from '../display/bobblehead-grid-display';
 
 // Type for bobblehead data from the server

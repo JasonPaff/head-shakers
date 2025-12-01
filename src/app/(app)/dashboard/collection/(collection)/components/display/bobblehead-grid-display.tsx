@@ -6,13 +6,13 @@ import { useDebounce } from 'use-debounce';
 
 import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
 
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 
 import type { BobbleheadData } from '../async/bobblehead-grid-async';
 
-import { collectionDashboardParsers } from '../../search-params';
 import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
 import { BobbleheadCard } from '../main/bobblehead-card';

@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
-import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { CollectionHeaderDisplay } from '../display/collection-header-display';
 
 export type CollectionHeaderData = {
@@ -27,33 +27,14 @@ export type CollectionHeaderData = {
  */
 export async function CollectionHeaderAsync() {
   const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
-
-  if (!collectionSlug) {
-    return <CollectionHeaderDisplay collection={null} />;
-  }
+  if (!collectionSlug) return null;
 
   const userId = await getRequiredUserIdAsync();
 
-  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
-  const collection = collections.find((collection) => collection.slug === collectionSlug);
+  const collection = await CollectionsDashboardFacade.getCollectionHeaderForUserBySlug(
+    userId,
+    collectionSlug,
+  );
 
-  const headerData: CollectionHeaderData | null =
-    collection ?
-      {
-        bobbleheadCount: collection.bobbleheadCount,
-        commentCount: collection.commentCount,
-        coverImageUrl: collection.coverImageUrl,
-        description: collection.description,
-        featuredCount: collection.featuredCount,
-        id: collection.id,
-        isPublic: collection.isPublic,
-        likeCount: collection.likeCount,
-        name: collection.name,
-        slug: collection.slug,
-        totalValue: collection.totalValue,
-        viewCount: collection.viewCount,
-      }
-    : null;
-
-  return <CollectionHeaderDisplay collection={headerData} />;
+  return <CollectionHeaderDisplay collection={collection} />;
 }

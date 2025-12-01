@@ -6,6 +6,7 @@ import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { sortCollections } from '@/lib/utils/collection.utils';
@@ -20,7 +21,6 @@ import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-cont
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';
 import { Route } from './route-type';
-import { collectionDashboardSearchParamsCache } from './search-params';
 
 type CollectionPageProps = PageProps;
 

@@ -52,8 +52,12 @@ export abstract class BaseContextHelpers {
   /**
    * Create a QueryContext for authenticated user access
    */
-  protected static getUserContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
-    return createUserQueryContext(userId, { dbInstance });
+  protected static getUserContext(
+    userId: string,
+    dbInstance: DatabaseExecutor,
+    overrides: Omit<Partial<QueryContext>, 'dbInstance' | 'requiredUserId' | 'userId'> = {},
+  ): QueryContext {
+    return createUserQueryContext(userId, { ...overrides, dbInstance });
   }
 
   /**
