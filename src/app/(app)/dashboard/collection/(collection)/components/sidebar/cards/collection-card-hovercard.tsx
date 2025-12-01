@@ -19,7 +19,7 @@ export const CollectionHoverCardContent = ({ collection }: CollectionHoverCardCo
           <Avatar className={'size-12 rounded-md'}>
             <AvatarImage
               alt={collection.name}
-              src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+              src={collection.coverImageUrl ?? '/images/placeholders/collection-cover-placeholder.png'}
             />
             <AvatarFallback>{collection.name.charAt(0)}</AvatarFallback>
           </Avatar>

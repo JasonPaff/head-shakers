@@ -63,7 +63,7 @@ export const CollectionCardCover = ({
               alt={collection.name}
               className={'size-full object-cover transition-transform group-hover:scale-105'}
               data-slot={'collection-cover'}
-              src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+              src={collection.coverImageUrl ?? '/images/placeholders/collection-cover-placeholder.png'}
             />
 
             {/* Gradient Overlay */}

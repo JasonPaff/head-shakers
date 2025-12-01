@@ -8,7 +8,7 @@ import type { PageProps } from '@/app/(app)/dashboard/collection/(collection)/ro
 
 import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
-import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { sortCollections } from '@/lib/utils/collection.utils';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
@@ -38,7 +38,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
   // This respects the user's saved sort preference for consistent behavior
   if (!params.collectionSlug) {
     const [userId, preferences] = await Promise.all([getRequiredUserIdAsync(), getUserPreferences()]);
-    const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+    const collections = await CollectionsDashboardFacade.getDashboardListByUserIdAsync(userId);
 
     if (collections.length > 0) {
       const sortOption = preferences.collectionSidebarSort ?? 'name-asc';

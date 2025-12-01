@@ -2,6 +2,7 @@ import 'server-only';
 
 import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ENUMS } from '@/lib/constants';
+import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
@@ -49,7 +50,7 @@ export async function BobbleheadGridAsync() {
   const userId = await getRequiredUserIdAsync();
 
   // Look up the collection by slug to get the ID for querying bobbleheads
-  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+  const collections = await CollectionsDashboardFacade.getDashboardListByUserIdAsync(userId);
   const collection = collections.find((c) => c.slug === collectionSlug);
 
   if (!collection) {

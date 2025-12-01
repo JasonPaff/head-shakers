@@ -31,7 +31,7 @@ export async function CollectionHeaderAsync() {
 
   const userId = await getRequiredUserIdAsync();
 
-  const collection = await CollectionsDashboardFacade.getCollectionHeaderForUserBySlug(
+  const collection = await CollectionsDashboardFacade.getCollectionHeaderForUserBySlugAsync(
     userId,
     collectionSlug,
   );

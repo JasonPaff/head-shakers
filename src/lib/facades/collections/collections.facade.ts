@@ -9,7 +9,6 @@ import type {
   BrowseCategoriesResult,
   BrowseCollectionsResult,
   CategoryRecord,
-  CollectionDashboardListData,
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
@@ -1087,27 +1086,6 @@ export class CollectionsFacade extends BaseFacade {
           operation: 'getWithRelations',
           userId: viewerUserId,
         },
-      },
-    );
-  }
-
-  static async getDashboardListByUserId(
-    userId: string,
-    dbInstance: DatabaseExecutor = db,
-  ): Promise<Array<CollectionDashboardListData>> {
-    return executeFacadeOperation(
-      {
-        data: { userId },
-        facade: facadeName,
-        method: 'getDashboardListByUserId',
-        operation: OPERATIONS.COLLECTIONS.GET_DASHBOARD_LIST_BY_USER_ID,
-        userId,
-      },
-      async () => {
-        return CacheService.collections.dashboard(async () => {
-          const context = this.getUserContext(userId, dbInstance);
-          return await CollectionsQuery.getDashboardListByUserIdAsync(userId, context);
-        }, userId);
       },
     );
   }

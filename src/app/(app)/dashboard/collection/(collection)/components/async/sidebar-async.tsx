@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
@@ -14,7 +14,7 @@ export async function SidebarAsync() {
   const userId = await getRequiredUserIdAsync();
 
   const [collections, preferences] = await Promise.all([
-    CollectionsFacade.getDashboardListByUserId(userId),
+    CollectionsDashboardFacade.getDashboardListByUserIdAsync(userId),
     getUserPreferences(),
   ]);
 

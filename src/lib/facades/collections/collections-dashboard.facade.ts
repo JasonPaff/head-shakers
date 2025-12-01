@@ -1,4 +1,5 @@
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
+import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { OPERATIONS } from '@/lib/constants';
@@ -38,6 +39,27 @@ export class CollectionsDashboardFacade extends BaseFacade {
             },
           },
         );
+      },
+    );
+  }
+
+  static async getDashboardListByUserIdAsync(
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<CollectionDashboardListData>> {
+    return executeFacadeOperation(
+      {
+        data: { userId },
+        facade,
+        method: 'getDashboardListByUserId',
+        operation: OPERATIONS.COLLECTIONS.GET_DASHBOARD_LIST_BY_USER_ID,
+        userId,
+      },
+      async () => {
+        return CacheService.collections.dashboard(async () => {
+          const context = this.getUserContext(userId, dbInstance);
+          return await CollectionsDashboardQuery.getDashboardListByUserIdAsync(userId, context);
+        }, userId);
       },
     );
   }

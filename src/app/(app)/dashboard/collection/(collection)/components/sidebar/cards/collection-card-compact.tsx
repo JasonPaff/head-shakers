@@ -63,7 +63,7 @@ export const CollectionCardCompact = ({
             <Avatar className={'size-14 rounded-md sm:size-16 md:size-12'}>
               <AvatarImage
                 alt={collection.name}
-                src={collection.coverImageUrl ?? '/collection-cover-placeholder.png'}
+                src={collection.coverImageUrl ?? '/images/placeholders/collection-cover-placeholder.png'}
               />
               <AvatarFallback>{collection.name.charAt(0)}</AvatarFallback>
             </Avatar>
