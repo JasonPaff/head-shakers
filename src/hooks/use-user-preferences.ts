@@ -24,6 +24,8 @@ export type UserPreferences = {
   collectionGridDensity?: CollectionGridDensity;
   collectionSidebarSort?: CollectionSortOption;
   collectionSidebarView?: CollectionCardStyle;
+  isBobbleheadHoverCardEnabled?: boolean;
+  isCollectionHoverCardEnabled?: boolean;
 };
 
 const COOKIE_CONFIG = cookieConstants.userPreferences;

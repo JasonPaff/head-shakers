@@ -18,11 +18,5 @@ export async function SidebarAsync() {
     getUserPreferences(),
   ]);
 
-  return (
-    <SidebarDisplay
-      collections={collections}
-      initialCardStyle={preferences.collectionSidebarView ?? 'compact'}
-      initialSortOption={preferences.collectionSidebarSort ?? 'name-asc'}
-    />
-  );
+  return <SidebarDisplay collections={collections} userPreferences={preferences} />;
 }

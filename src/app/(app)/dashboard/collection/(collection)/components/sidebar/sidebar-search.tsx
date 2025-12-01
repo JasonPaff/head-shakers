@@ -2,6 +2,7 @@ import {
   ArrowDownAZIcon,
   ArrowUpAZIcon,
   ArrowUpDownIcon,
+  EyeIcon,
   LayoutListIcon,
   SearchIcon,
   SquareIcon,
@@ -20,13 +21,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 export type CollectionCardStyle = 'compact' | 'cover' | 'detailed';
 
 type SidebarSearchProps = {
   cardStyle: CollectionCardStyle;
   isDisabled?: boolean;
+  isHoverCardEnabled: boolean;
   onCardStyleChange: (style: CollectionCardStyle) => void;
+  onHoverCardToggle: () => void;
   onSearchChange?: (value: string) => void;
   onSearchClear?: () => void;
   onSortChange: (sort: CollectionSortOption) => void;
@@ -37,7 +42,9 @@ type SidebarSearchProps = {
 export const SidebarSearch = ({
   cardStyle,
   isDisabled = false,
+  isHoverCardEnabled,
   onCardStyleChange,
+  onHoverCardToggle,
   onSearchChange,
   onSearchClear,
   onSortChange,
@@ -159,6 +166,22 @@ export const SidebarSearch = ({
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Hover Card Toggle */}
+      <div className={'flex items-center justify-between rounded-md border bg-background/50 px-3 py-2'}>
+        <Label
+          className={'flex cursor-pointer items-center gap-2 text-xs'}
+          htmlFor={'collection-hovercard-toggle'}
+        >
+          <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
+          Quick preview on hover
+        </Label>
+        <Switch
+          checked={isHoverCardEnabled}
+          id={'collection-hovercard-toggle'}
+          onCheckedChange={onHoverCardToggle}
+        />
+      </div>
     </div>
   );
 };

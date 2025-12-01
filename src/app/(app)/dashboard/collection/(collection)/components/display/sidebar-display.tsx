@@ -4,7 +4,7 @@ import { useQueryStates } from 'nuqs';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
-import type { CollectionSortOption } from '@/hooks/use-user-preferences';
+import type { CollectionSortOption, UserPreferences } from '@/hooks/use-user-preferences';
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
@@ -36,22 +36,22 @@ type CollectionForEdit = {
 
 type SidebarDisplayProps = {
   collections: Array<CollectionDashboardListData>;
-  initialCardStyle?: CollectionCardStyle;
-  initialSortOption?: CollectionSortOption;
+  userPreferences: UserPreferences;
 };
 
-export const SidebarDisplay = ({
-  collections,
-  initialCardStyle = 'compact',
-  initialSortOption = 'name-asc',
-}: SidebarDisplayProps) => {
-  const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(initialCardStyle);
+export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayProps) => {
+  const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(
+    userPreferences?.collectionSidebarView ?? 'compact',
+  );
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
   const [searchValue, setSearchValue] = useState('');
-  const [sortOption, setSortOptionState] = useState<CollectionSortOption>(initialSortOption);
+  const [sortOption, setSortOptionState] = useState<CollectionSortOption>(
+    userPreferences.collectionSidebarSort ?? 'name-asc',
+  );
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
+  const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isCollectionHoverCardEnabled);
 
   const [{ collectionSlug }, setParams] = useQueryStates(
     { collectionSlug: collectionDashboardParsers.collectionSlug },
@@ -93,6 +93,14 @@ export const SidebarDisplay = ({
     },
     [setPreference],
   );
+
+  const handleHoverCardToggle = useCallback(() => {
+    setHoverCardEnabled.update((prev) => {
+      const isEnabled = !prev;
+      setPreference('isCollectionHoverCardEnabled', isEnabled);
+      return isEnabled;
+    });
+  }, [setPreference, setHoverCardEnabled]);
 
   const handleCreateCollection = () => {
     setIsCreateDialogOpen.on();
@@ -137,7 +145,9 @@ export const SidebarDisplay = ({
       <SidebarSearch
         cardStyle={cardStyle}
         isDisabled={!hasAnyCollections}
+        isHoverCardEnabled={isHoverCardEnabled}
         onCardStyleChange={setCardStyle}
+        onHoverCardToggle={handleHoverCardToggle}
         onSearchChange={setSearchValue}
         onSearchClear={() => {
           setSearchValue('');
@@ -154,6 +164,7 @@ export const SidebarDisplay = ({
             <CollectionCardMapper
               cardStyle={cardStyle}
               collection={collection}
+              isHoverCardEnabled={isHoverCardEnabled}
               key={collection.id}
               onCollectionSelect={handleCollectionSelect}
               onEditCollection={handleEditCollection}
@@ -190,6 +201,7 @@ export const SidebarDisplay = ({
 interface CollectionCardMapperProps {
   cardStyle: CollectionCardStyle;
   collection: CollectionDashboardListData;
+  isHoverCardEnabled: boolean;
   onCollectionSelect: (slug: string) => void;
   onEditCollection: (id: string) => void;
   selectedCollectionSlug?: string;
@@ -198,6 +210,7 @@ interface CollectionCardMapperProps {
 const CollectionCardMapper = ({
   cardStyle,
   collection,
+  isHoverCardEnabled,
   onCollectionSelect,
   onEditCollection,
   selectedCollectionSlug,
@@ -209,6 +222,7 @@ const CollectionCardMapper = ({
       <CollectionCardCover
         collection={collection}
         isActive={isActive}
+        isHoverCardEnabled={isHoverCardEnabled}
         onClick={onCollectionSelect}
         onEdit={onEditCollection}
       />
@@ -220,6 +234,7 @@ const CollectionCardMapper = ({
       <CollectionCardDetailed
         collection={collection}
         isActive={isActive}
+        isHoverCardEnabled={isHoverCardEnabled}
         onClick={onCollectionSelect}
         onEdit={onEditCollection}
       />
@@ -229,6 +244,7 @@ const CollectionCardMapper = ({
     <CollectionCardCompact
       collection={collection}
       isActive={isActive}
+      isHoverCardEnabled={isHoverCardEnabled}
       onClick={onCollectionSelect}
       onEdit={onEditCollection}
     />

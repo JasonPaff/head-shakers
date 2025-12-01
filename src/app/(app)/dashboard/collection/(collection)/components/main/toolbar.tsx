@@ -1,4 +1,12 @@
-import { CheckIcon, FilterIcon, GripVerticalIcon, LayoutListIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import {
+  CheckIcon,
+  EyeIcon,
+  FilterIcon,
+  GripVerticalIcon,
+  LayoutListIcon,
+  PlusIcon,
+  SearchIcon,
+} from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
@@ -13,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 export type ToolbarProps = {
   categories?: Array<string>;
@@ -22,11 +32,13 @@ export type ToolbarProps = {
   filterCondition: string;
   filterFeatured: string;
   gridDensity: 'comfortable' | 'compact';
+  isHoverCardEnabled: boolean;
   isSelectionMode: boolean;
   onFilterCategoryChange: (value: string) => void;
   onFilterConditionChange: (value: string) => void;
   onFilterFeaturedChange: (value: string) => void;
   onGridDensityToggle: () => void;
+  onHoverCardToggle: () => void;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
   onSelectionModeToggle: () => void;
@@ -43,11 +55,13 @@ export const Toolbar = ({
   filterCondition,
   filterFeatured,
   gridDensity,
+  isHoverCardEnabled,
   isSelectionMode,
   onFilterCategoryChange,
   onFilterConditionChange,
   onFilterFeaturedChange,
   onGridDensityToggle,
+  onHoverCardToggle,
   onSearchChange,
   onSearchClear,
   onSelectionModeToggle,
@@ -149,6 +163,22 @@ export const Toolbar = ({
 
       {/* Right Side - Actions (Desktop) */}
       <div className={'hidden items-center gap-2 lg:flex'}>
+        {/* Hover Card Toggle */}
+        <div className={'flex items-center gap-2 rounded-md border bg-background/50 px-3 py-1.5'}>
+          <Label
+            className={'flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground'}
+            htmlFor={'bobblehead-hovercard-toggle'}
+          >
+            <EyeIcon aria-hidden className={'size-3.5'} />
+            Quick preview
+          </Label>
+          <Switch
+            checked={isHoverCardEnabled}
+            id={'bobblehead-hovercard-toggle'}
+            onCheckedChange={onHoverCardToggle}
+          />
+        </div>
+
         {/* Grid Density Toggle */}
         <Button onClick={onGridDensityToggle} size={'icon'} variant={'outline'}>
           {gridDensity === 'compact' ?

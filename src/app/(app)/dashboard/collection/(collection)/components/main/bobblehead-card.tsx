@@ -24,6 +24,7 @@ export type BobbleheadCardProps = {
   id: string;
   imageUrl?: string;
   isFeatured: boolean;
+  isHoverCardEnabled?: boolean;
   isSelected: boolean;
   isSelectionMode: boolean;
   likeCount: number;
@@ -48,6 +49,7 @@ export const BobbleheadCard = ({
   id,
   imageUrl,
   isFeatured,
+  isHoverCardEnabled = false,
   isSelected,
   isSelectionMode,
   likeCount,
@@ -96,6 +98,8 @@ export const BobbleheadCard = ({
     }
   };
 
+  const _isHoverCardDisabled = isSelectionMode || !isHoverCardEnabled;
+
   return (
     <div
       className={cn(
@@ -104,7 +108,7 @@ export const BobbleheadCard = ({
       )}
       data-slot={'bobblehead-card'}
     >
-      <HoverCard open={isSelectionMode ? false : undefined} openDelay={200}>
+      <HoverCard open={_isHoverCardDisabled ? false : undefined} openDelay={200}>
         <HoverCardTrigger asChild>
           <div
             aria-checked={isSelectionMode ? isSelected : undefined}

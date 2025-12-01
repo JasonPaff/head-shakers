@@ -41,7 +41,7 @@ export async function BobbleheadGridAsync() {
         bobbleheads={[]}
         categories={[]}
         conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
-        initialGridDensity={preferences.collectionGridDensity}
+        userPreferences={preferences}
       />
     );
   }
@@ -58,7 +58,7 @@ export async function BobbleheadGridAsync() {
         bobbleheads={[]}
         categories={[]}
         conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
-        initialGridDensity={preferences.collectionGridDensity}
+        userPreferences={preferences}
       />
     );
   }
@@ -91,7 +91,7 @@ export async function BobbleheadGridAsync() {
       categories={categories}
       collectionId={collection.id}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
-      initialGridDensity={preferences.collectionGridDensity}
+      userPreferences={preferences}
     />
   );
 }

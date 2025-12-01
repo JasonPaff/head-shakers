@@ -15,11 +15,18 @@ import { CollectionHoverCardContent } from './collection-card-hovercard';
 export type CollectionCardCoverProps = {
   collection: CollectionDashboardListData;
   isActive: boolean;
+  isHoverCardEnabled?: boolean;
   onClick: (slug: string) => void;
   onEdit: (id: string) => void;
 };
 
-export const CollectionCardCover = ({ collection, isActive, onClick, onEdit }: CollectionCardCoverProps) => {
+export const CollectionCardCover = ({
+  collection,
+  isActive,
+  isHoverCardEnabled = false,
+  onClick,
+  onEdit,
+}: CollectionCardCoverProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
   const handleClick = () => onClick(collection.slug);
@@ -30,7 +37,7 @@ export const CollectionCardCover = ({ collection, isActive, onClick, onEdit }: C
   };
 
   return (
-    <HoverCard openDelay={300}>
+    <HoverCard open={isHoverCardEnabled ? undefined : false} openDelay={300}>
       <HoverCardTrigger asChild>
         <div
           className={cn(

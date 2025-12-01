@@ -16,6 +16,7 @@ import { CollectionHoverCardContent } from './collection-card-hovercard';
 export type CollectionCardCompactProps = {
   collection: CollectionDashboardListData;
   isActive: boolean;
+  isHoverCardEnabled?: boolean;
   onClick: (slug: string) => void;
   onEdit: (id: string) => void;
 };
@@ -23,6 +24,7 @@ export type CollectionCardCompactProps = {
 export const CollectionCardCompact = ({
   collection,
   isActive,
+  isHoverCardEnabled = false,
   onClick,
   onEdit,
 }: CollectionCardCompactProps) => {
@@ -36,7 +38,7 @@ export const CollectionCardCompact = ({
   };
 
   return (
-    <HoverCard openDelay={300}>
+    <HoverCard open={isHoverCardEnabled ? undefined : false} openDelay={300}>
       <HoverCardTrigger asChild>
         <div
           className={cn(

@@ -4,7 +4,7 @@ import { useQueryStates } from 'nuqs';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
-import type { CollectionGridDensity } from '@/hooks/use-user-preferences';
+import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
 
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
@@ -25,7 +25,7 @@ type BobbleheadGridDisplayProps = {
   categories: Array<string>;
   collectionId?: string;
   conditions: Array<string>;
-  initialGridDensity?: CollectionGridDensity;
+  userPreferences: UserPreferences;
 };
 
 export const BobbleheadGridDisplay = ({
@@ -33,7 +33,7 @@ export const BobbleheadGridDisplay = ({
   categories,
   collectionId,
   conditions,
-  initialGridDensity,
+  userPreferences,
 }: BobbleheadGridDisplayProps) => {
   const { setPreference } = useUserPreferences();
   const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
@@ -47,12 +47,15 @@ export const BobbleheadGridDisplay = ({
   );
 
   const [filterCategory, setFilterCategory] = useState('all');
-  const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(initialGridDensity ?? 'compact');
+  const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
+    userPreferences.collectionGridDensity ?? 'compact',
+  );
   const [searchInput, setSearchInput] = useState(search);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [debouncedSearch] = useDebounce(searchInput, 300);
 
+  const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
 
   // Sync debounced search to URL
@@ -179,6 +182,14 @@ export const BobbleheadGridDisplay = ({
     });
   }, [setPreference]);
 
+  const handleHoverCardToggle = useCallback(() => {
+    setHoverCardEnabled.update((prev) => {
+      const isEnabled = !prev;
+      setPreference('isBobbleheadHoverCardEnabled', isEnabled);
+      return isEnabled;
+    });
+  }, [setPreference, setHoverCardEnabled]);
+
   const _hasBobbleheads = filteredBobbleheads.length > 0;
   const _hasNoResults =
     !_hasBobbleheads && (!!searchInput || filterCategory !== 'all' || condition !== 'all');
@@ -196,11 +207,13 @@ export const BobbleheadGridDisplay = ({
         filterCondition={condition}
         filterFeatured={featured}
         gridDensity={gridDensity}
+        isHoverCardEnabled={isHoverCardEnabled}
         isSelectionMode={isSelectionMode}
         onFilterCategoryChange={setFilterCategory}
         onFilterConditionChange={(value) => void setParams({ condition: value as typeof condition })}
         onFilterFeaturedChange={(value) => void setParams({ featured: value as typeof featured })}
         onGridDensityToggle={handleGridDensityToggle}
+        onHoverCardToggle={handleHoverCardToggle}
         onSearchChange={setSearchInput}
         onSearchClear={() => {
           setSearchInput('');
@@ -234,6 +247,7 @@ export const BobbleheadGridDisplay = ({
               id={bobblehead.id}
               imageUrl={bobblehead.imageUrl}
               isFeatured={bobblehead.isFeatured}
+              isHoverCardEnabled={isHoverCardEnabled}
               isSelected={selectedIds.has(bobblehead.id)}
               isSelectionMode={isSelectionMode}
               key={bobblehead.id}
