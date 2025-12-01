@@ -476,6 +476,35 @@ export class CacheService {
     },
 
     /**
+     * cache collection dashboard header by user and slug
+     */
+    dashboardHeader: async <T>(
+      fn: () => Promise<T>,
+      userId: string,
+      slug: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.COLLECTIONS.DASHBOARD_HEADER(userId, slug);
+      const tags = [
+        CACHE_CONFIG.TAGS.USER(userId),
+        CACHE_CONFIG.TAGS.USER_COLLECTIONS(userId),
+        CACHE_CONFIG.TAGS.USER_STATS(userId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: CACHE_ENTITY_TYPE.COLLECTION,
+          operation: `${CACHE_ENTITY_TYPE.COLLECTION}:dashboard-header`,
+          userId,
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
      * cache collection metrics
      */
     metrics: async <T>(

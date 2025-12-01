@@ -5,12 +5,13 @@ import { OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { CollectionsDashboardQuery } from '@/lib/queries/collections/collections-dashboard.query';
+import { CacheService } from '@/lib/services/cache.service';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 
 const facade = 'COLLECTIONS_DASHBOARD_FACADE';
 
 export class CollectionsDashboardFacade extends BaseFacade {
-  static async getCollectionHeaderForUserBySlug(
+  static async getCollectionHeaderForUserBySlugAsync(
     userId: string,
     slug: string,
     dbInstance: DatabaseExecutor = db,
@@ -23,9 +24,20 @@ export class CollectionsDashboardFacade extends BaseFacade {
         operation: OPERATIONS.COLLECTIONS.GET_COLLECTION_HEADER_FOR_USER_BY_SLUG,
       },
       async () => {
-        // TODO: add caching
-        const context = this.getUserContext(userId, dbInstance);
-        return await CollectionsDashboardQuery.getCollectionHeaderForUserBySlugAsync(slug, context);
+        return CacheService.collections.dashboardHeader(
+          async () => {
+            const context = this.getUserContext(userId, dbInstance);
+            return await CollectionsDashboardQuery.getCollectionHeaderForUserBySlugAsync(slug, context);
+          },
+          userId,
+          slug,
+          {
+            context: {
+              facade,
+              operation: 'getCollectionHeaderForUserBySlug',
+            },
+          },
+        );
       },
     );
   }

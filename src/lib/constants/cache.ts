@@ -164,6 +164,8 @@ export const CACHE_KEYS = {
     BY_USER: (userId: string, options?: string) =>
       `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:by-user:${userId}${options ? `:${options}` : ''}`,
     DASHBOARD: (userId: string) => `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:dashboard:${userId}`,
+    DASHBOARD_HEADER: (userId: string, slug: string) =>
+      `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:dashboard-header:${userId}:${slug}`,
     METRICS: (collectionId: string) => `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:metrics:${collectionId}`,
     PUBLIC: (options?: string) =>
       `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:public${options ? `:${options}` : ''}`,
