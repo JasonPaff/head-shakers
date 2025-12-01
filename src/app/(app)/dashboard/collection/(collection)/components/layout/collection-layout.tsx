@@ -18,7 +18,7 @@ export const CollectionLayout = ({ main, sidebar }: CollectionLayoutProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useToggle();
 
   return (
-    <div className={cn('flex h-screen overflow-hidden bg-background')} data-slot={'collection-layout'}>
+    <div className={cn('flex min-h-0 bg-background')} data-slot={'collection-layout'}>
       {/* Desktop Sidebar - visible on lg+ */}
       <CollectionDesktopSidebar>{sidebar}</CollectionDesktopSidebar>
 
@@ -32,7 +32,7 @@ export const CollectionLayout = ({ main, sidebar }: CollectionLayoutProps) => {
       </Sheet>
 
       {/* Main Content Area */}
-      <div className={'flex flex-1 flex-col overflow-hidden'} data-slot={'main-content'}>
+      <div className={'flex flex-1 flex-col'} data-slot={'main-content'}>
         {/* Mobile Header - visible on < lg */}
         <CollectionMobileHeader onMenuClick={setIsDrawerOpen.toggle} />
 

@@ -17,7 +17,7 @@ export const CollectionMobileHeader = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-30 flex items-center gap-3 border-b bg-background/95 p-4 backdrop-blur-sm',
+        'sticky top-[var(--header-height)] z-30 flex items-center gap-3 border-b bg-background/95 p-4 backdrop-blur-sm',
         'lg:hidden',
       )}
       data-slot={'mobile-header'}
