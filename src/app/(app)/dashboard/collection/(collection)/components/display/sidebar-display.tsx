@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryStates } from 'nuqs';
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { CollectionSortOption } from '@/hooks/use-user-preferences';
@@ -44,11 +44,6 @@ export const SidebarDisplay = ({
   initialCardStyle = 'compact',
   initialSortOption = 'name-asc',
 }: SidebarDisplayProps) => {
-  const [{ collectionSlug }, setParams] = useQueryStates(
-    { collectionSlug: collectionDashboardParsers.collectionSlug },
-    { shallow: false },
-  );
-
   const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(initialCardStyle);
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -56,6 +51,11 @@ export const SidebarDisplay = ({
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
+
+  const [{ collectionSlug }, setParams] = useQueryStates(
+    { collectionSlug: collectionDashboardParsers.collectionSlug },
+    { shallow: false },
+  );
 
   const { setPreference } = useUserPreferences();
 
@@ -97,6 +97,22 @@ export const SidebarDisplay = ({
   }, [collections, searchValue, sortOption]);
 
   const selectedCollectionSlug = collectionSlug ?? filteredCollections?.[0]?.slug;
+
+  // Auto-select the first collection when no valid collection is selected
+  useEffect(() => {
+    // Nothing to do if no collections exist
+    if (collections.length === 0) return;
+
+    // Check if the current selection is valid (exists in collections)
+    const isCurrentSelectionValid =
+      collectionSlug !== null && collections.some((c) => c.slug === collectionSlug);
+
+    // Auto-select the first collection (respecting sort order) if no valid selection
+    const firstCollection = filteredCollections[0];
+    if (!isCurrentSelectionValid && firstCollection) {
+      void setParams({ collectionSlug: firstCollection.slug }, { history: 'replace' });
+    }
+  }, [collectionSlug, collections, filteredCollections, setParams]);
 
   const setCardStyle = useCallback(
     (newStyle: CollectionCardStyle) => {

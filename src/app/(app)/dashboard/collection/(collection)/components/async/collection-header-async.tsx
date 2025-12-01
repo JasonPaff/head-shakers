@@ -8,6 +8,7 @@ import { CollectionHeaderDisplay } from '../display/collection-header-display';
 
 export type CollectionHeaderData = {
   bobbleheadCount: number;
+  commentCount: number;
   coverImageUrl: null | string;
   description: null | string;
   featuredCount: number;
@@ -40,6 +41,7 @@ export async function CollectionHeaderAsync() {
     collection ?
       {
         bobbleheadCount: collection.bobbleheadCount,
+        commentCount: collection.commentCount,
         coverImageUrl: collection.coverImageUrl,
         description: collection.description,
         featuredCount: collection.featuredCount,

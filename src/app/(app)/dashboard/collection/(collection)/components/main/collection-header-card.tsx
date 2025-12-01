@@ -16,6 +16,7 @@ import { formatCurrency } from '@/lib/utils/currency.utils';
 export type CollectionHeaderCardProps = {
   bobbleheadCount: number;
   collectionSlug: string;
+  commentCount: number;
   coverImageUrl: null | string;
   description: null | string;
   featuredCount: number;
@@ -30,6 +31,7 @@ export type CollectionHeaderCardProps = {
 export const CollectionHeaderCard = ({
   bobbleheadCount,
   collectionSlug,
+  commentCount,
   coverImageUrl,
   description,
   featuredCount,
@@ -68,6 +70,9 @@ export const CollectionHeaderCard = ({
                   <HeartIcon aria-hidden className={'inline size-3.5'} /> {likeCount}
                 </span>
                 <span>{viewCount} views</span>
+                <span>
+                  {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
+                </span>
               </div>
             </div>
           </div>

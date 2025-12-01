@@ -71,6 +71,7 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
       <CollectionHeaderCard
         bobbleheadCount={collection.bobbleheadCount}
         collectionSlug={collection.slug}
+        commentCount={collection.commentCount}
         coverImageUrl={collection.coverImageUrl}
         description={collection.description}
         featuredCount={collection.featuredCount}
