@@ -24,7 +24,7 @@ export const CollectionLayout = ({ main, sidebar }: CollectionLayoutProps) => {
 
       {/* Mobile Drawer - Sheet component */}
       <Sheet onOpenChange={setIsDrawerOpen.update} open={isDrawerOpen}>
-        <SheetContent className={'w-[85%] max-w-sm p-0'} side={'left'}>
+        <SheetContent accessibleTitle={'Collection sidebar'} className={'w-[85%] max-w-sm p-0'} side={'left'}>
           <div className={'flex h-full flex-col'} data-slot={'mobile-drawer-content'}>
             {sidebar}
           </div>

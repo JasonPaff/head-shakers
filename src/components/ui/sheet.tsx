@@ -3,12 +3,19 @@
 import type { ComponentProps } from 'react';
 
 import { Close, Content, Description, Overlay, Portal, Root, Title, Trigger } from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { XIcon } from 'lucide-react';
 
 import { cn } from '@/utils/tailwind-utils';
 
 type SheetCloseProps = ComponentProps<typeof Close>;
 type SheetContentProps = ComponentProps<typeof Content> & {
+  /**
+   * Accessible title for screen readers. When provided, rendered as visually hidden.
+   * Required for accessibility if SheetTitle is not used.
+   * @default 'Sheet'
+   */
+  accessibleTitle?: string;
   side?: 'bottom' | 'left' | 'right' | 'top';
 };
 type SheetDescriptionProps = ComponentProps<typeof Description>;
@@ -36,11 +43,18 @@ export const SheetClose = ({ children, ...props }: SheetCloseProps) => {
   );
 };
 
-export const SheetContent = ({ children, className, side = 'right', ...props }: SheetContentProps) => {
+export const SheetContent = ({
+  accessibleTitle = 'Sheet',
+  children,
+  className,
+  side = 'right',
+  ...props
+}: SheetContentProps) => {
   return (
     <SheetPortal>
       <SheetOverlay />
       <Content
+        aria-describedby={undefined}
         className={cn(
           'fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out',
           'data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500',
@@ -57,6 +71,9 @@ export const SheetContent = ({ children, className, side = 'right', ...props }: 
         data-slot={'sheet-content'}
         {...props}
       >
+        <VisuallyHidden.Root asChild>
+          <Title>{accessibleTitle}</Title>
+        </VisuallyHidden.Root>
         {children}
         <Close
           className={
