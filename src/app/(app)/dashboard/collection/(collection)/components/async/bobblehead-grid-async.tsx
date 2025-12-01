@@ -3,6 +3,7 @@ import 'server-only';
 import { ENUMS } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+import { getUserPreferences } from '@/utils/server-cookies';
 
 import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { BobbleheadGridDisplay } from '../display/bobblehead-grid-display';
@@ -32,10 +33,16 @@ export type BobbleheadData = {
  */
 export async function BobbleheadGridAsync() {
   const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
+  const preferences = await getUserPreferences();
 
   if (!collectionSlug) {
     return (
-      <BobbleheadGridDisplay bobbleheads={[]} categories={[]} conditions={[...ENUMS.BOBBLEHEAD.CONDITION]} />
+      <BobbleheadGridDisplay
+        bobbleheads={[]}
+        categories={[]}
+        conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+        initialGridDensity={preferences.collectionGridDensity}
+      />
     );
   }
 
@@ -47,7 +54,12 @@ export async function BobbleheadGridAsync() {
 
   if (!collection) {
     return (
-      <BobbleheadGridDisplay bobbleheads={[]} categories={[]} conditions={[...ENUMS.BOBBLEHEAD.CONDITION]} />
+      <BobbleheadGridDisplay
+        bobbleheads={[]}
+        categories={[]}
+        conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+        initialGridDensity={preferences.collectionGridDensity}
+      />
     );
   }
 
@@ -79,6 +91,7 @@ export async function BobbleheadGridAsync() {
       categories={categories}
       collectionId={collection.id}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+      initialGridDensity={preferences.collectionGridDensity}
     />
   );
 }

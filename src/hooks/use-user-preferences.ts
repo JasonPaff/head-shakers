@@ -7,6 +7,8 @@ import { cookieConstants } from '@/constants/cookies';
 
 export type CollectionCardStyle = 'compact' | 'cover' | 'detailed';
 
+export type CollectionGridDensity = 'comfortable' | 'compact';
+
 export type CollectionSortOption =
   | 'comments-desc'
   | 'count-asc'
@@ -19,6 +21,7 @@ export type CollectionSortOption =
   | 'views-desc';
 
 export type UserPreferences = {
+  collectionGridDensity?: CollectionGridDensity;
   collectionSidebarSort?: CollectionSortOption;
   collectionSidebarView?: CollectionCardStyle;
 };

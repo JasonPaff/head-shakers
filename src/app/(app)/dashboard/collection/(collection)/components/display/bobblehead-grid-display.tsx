@@ -1,11 +1,14 @@
 'use client';
 
 import { useQueryStates } from 'nuqs';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
+
+import type { CollectionGridDensity } from '@/hooks/use-user-preferences';
 
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
+import { useUserPreferences } from '@/hooks/use-user-preferences';
 
 import type { BobbleheadData } from '../async/bobblehead-grid-async';
 
@@ -22,6 +25,7 @@ type BobbleheadGridDisplayProps = {
   categories: Array<string>;
   collectionId?: string;
   conditions: Array<string>;
+  initialGridDensity?: CollectionGridDensity;
 };
 
 export const BobbleheadGridDisplay = ({
@@ -29,7 +33,9 @@ export const BobbleheadGridDisplay = ({
   categories,
   collectionId,
   conditions,
+  initialGridDensity,
 }: BobbleheadGridDisplayProps) => {
+  const { setPreference } = useUserPreferences();
   const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
     {
       condition: collectionDashboardParsers.condition,
@@ -41,7 +47,7 @@ export const BobbleheadGridDisplay = ({
   );
 
   const [filterCategory, setFilterCategory] = useState('all');
-  const [gridDensity, setGridDensity] = useState<'comfortable' | 'compact'>('compact');
+  const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(initialGridDensity ?? 'compact');
   const [searchInput, setSearchInput] = useState(search);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -165,6 +171,14 @@ export const BobbleheadGridDisplay = ({
     });
   };
 
+  const handleGridDensityToggle = useCallback(() => {
+    setGridDensity((prev) => {
+      const newDensity = prev === 'compact' ? 'comfortable' : 'compact';
+      setPreference('collectionGridDensity', newDensity);
+      return newDensity;
+    });
+  }, [setPreference]);
+
   const _hasBobbleheads = filteredBobbleheads.length > 0;
   const _hasNoResults =
     !_hasBobbleheads && (!!searchInput || filterCategory !== 'all' || condition !== 'all');
@@ -186,9 +200,7 @@ export const BobbleheadGridDisplay = ({
         onFilterCategoryChange={setFilterCategory}
         onFilterConditionChange={(value) => void setParams({ condition: value as typeof condition })}
         onFilterFeaturedChange={(value) => void setParams({ featured: value as typeof featured })}
-        onGridDensityToggle={() => {
-          setGridDensity((prev) => (prev === 'compact' ? 'comfortable' : 'compact'));
-        }}
+        onGridDensityToggle={handleGridDensityToggle}
         onSearchChange={setSearchInput}
         onSearchClear={() => {
           setSearchInput('');
