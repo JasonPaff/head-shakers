@@ -36,14 +36,12 @@ type CollectionForEdit = {
 type SidebarDisplayProps = {
   collections: Array<CollectionDashboardListData>;
   initialCardStyle?: CollectionCardStyle;
-  initialSelectedSlug?: string;
   initialSortOption?: CollectionSortOption;
 };
 
 export const SidebarDisplay = ({
   collections,
   initialCardStyle = 'compact',
-  initialSelectedSlug,
   initialSortOption = 'name-asc',
 }: SidebarDisplayProps) => {
   const [{ collectionSlug }, setParams] = useQueryStates(
@@ -55,8 +53,6 @@ export const SidebarDisplay = ({
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [sortOption, setSortOptionState] = useState<CollectionSortOption>(initialSortOption);
-
-  const selectedCollectionSlug = collectionSlug ?? initialSelectedSlug;
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
@@ -99,6 +95,8 @@ export const SidebarDisplay = ({
       }
     });
   }, [collections, searchValue, sortOption]);
+
+  const selectedCollectionSlug = collectionSlug ?? filteredCollections?.[0]?.slug;
 
   const setCardStyle = useCallback(
     (newStyle: CollectionCardStyle) => {

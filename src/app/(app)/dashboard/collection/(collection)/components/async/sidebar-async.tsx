@@ -4,7 +4,6 @@ import { CollectionsFacade } from '@/lib/facades/collections/collections.facade'
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
-import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { SidebarDisplay } from '../display/sidebar-display';
 
 /**
@@ -19,16 +18,10 @@ export async function SidebarAsync() {
     getUserPreferences(),
   ]);
 
-  const urlCollectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
-
-  const validCollectionSlug = collections.find((collection) => collection.slug === urlCollectionSlug)?.slug;
-  const effectiveCollectionSlug = validCollectionSlug ?? collections[0]?.slug;
-
   return (
     <SidebarDisplay
       collections={collections}
       initialCardStyle={preferences.collectionSidebarView ?? 'compact'}
-      initialSelectedSlug={effectiveCollectionSlug}
       initialSortOption={preferences.collectionSidebarSort ?? 'name-asc'}
     />
   );
