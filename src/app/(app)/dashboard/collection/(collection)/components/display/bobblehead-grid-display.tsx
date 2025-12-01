@@ -20,15 +20,16 @@ import { Toolbar } from '../main/toolbar';
 type BobbleheadGridDisplayProps = {
   bobbleheads: Array<BobbleheadData>;
   categories: Array<string>;
+  collectionId?: string;
   conditions: Array<string>;
 };
 
 export const BobbleheadGridDisplay = ({
   bobbleheads,
   categories,
+  collectionId,
   conditions,
 }: BobbleheadGridDisplayProps) => {
-  // URL state for filters - shallow: false triggers server re-render
   const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
     {
       condition: collectionDashboardParsers.condition,
@@ -39,9 +40,14 @@ export const BobbleheadGridDisplay = ({
     { shallow: false },
   );
 
-  // Local search input with debounce for better UX
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [gridDensity, setGridDensity] = useState<'comfortable' | 'compact'>('compact');
   const [searchInput, setSearchInput] = useState(search);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const [debouncedSearch] = useDebounce(searchInput, 300);
+
+  const [isSelectionMode, setIsSelectionMode] = useToggle();
 
   // Sync debounced search to URL
   useEffect(() => {
@@ -49,12 +55,6 @@ export const BobbleheadGridDisplay = ({
       void setParams({ search: debouncedSearch || null });
     }
   }, [debouncedSearch, search, setParams]);
-
-  // Local-only state (not in URL)
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [gridDensity, setGridDensity] = useState<'comfortable' | 'compact'>('compact');
-  const [isSelectionMode, setIsSelectionMode] = useToggle();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filteredBobbleheads = useMemo(() => {
     let result = [...bobbleheads];
@@ -176,6 +176,7 @@ export const BobbleheadGridDisplay = ({
       {/* Toolbar */}
       <Toolbar
         categories={categories}
+        collectionId={collectionId}
         conditions={conditions}
         filterCategory={filterCategory}
         filterCondition={condition}
@@ -245,7 +246,7 @@ export const BobbleheadGridDisplay = ({
         </Conditional>
 
         <Conditional isCondition={!_hasBobbleheads && !_hasNoResults}>
-          <NoBobbleheads />
+          <NoBobbleheads collectionId={collectionId} />
         </Conditional>
       </BobbleheadGrid>
     </Fragment>

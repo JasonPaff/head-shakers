@@ -41,7 +41,7 @@ export async function BobbleheadGridAsync() {
 
   const userId = await getRequiredUserIdAsync();
 
-  // Look up collection by slug to get the ID for querying bobbleheads
+  // Look up the collection by slug to get the ID for querying bobbleheads
   const collections = await CollectionsFacade.getDashboardListByUserId(userId);
   const collection = collections.find((c) => c.slug === collectionSlug);
 
@@ -77,6 +77,7 @@ export async function BobbleheadGridAsync() {
     <BobbleheadGridDisplay
       bobbleheads={bobbleheads}
       categories={categories}
+      collectionId={collection.id}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
     />
   );

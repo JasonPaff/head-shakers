@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 
 export type ToolbarProps = {
   categories?: Array<string>;
+  collectionId?: string;
   conditions?: Array<string>;
   filterCategory: string;
   filterCondition: string;
@@ -36,6 +37,7 @@ export type ToolbarProps = {
 
 export const Toolbar = ({
   categories = [],
+  collectionId,
   conditions = [],
   filterCategory,
   filterCondition,
@@ -162,7 +164,7 @@ export const Toolbar = ({
 
         {/* Add New Button */}
         <Button asChild size={'sm'}>
-          <Link href={$path({ route: '/bobbleheads/add' })}>
+          <Link href={$path({ route: '/bobbleheads/add', searchParams: { collectionId } })}>
             <PlusIcon aria-hidden className={'size-4'} />
             Add Bobblehead
           </Link>
