@@ -54,9 +54,12 @@ export const OPERATIONS = {
     GET_BY_ID: 'get_collection_by_id',
     GET_BY_USER: 'get_collections_by_user',
     GET_CATEGORIES: 'get_categories',
-    GET_COLLECTION_HEADER_FOR_USER_BY_SLUG: 'get_collection_header_for_user_by_slug',
-    GET_DASHBOARD_LIST_BY_USER_ID: 'get_dashboard_list_by_user_id',
     UPDATE: 'update_collection',
+  },
+  COLLECTIONS_DASHBOARD: {
+    GET_BOBBLEHEADS_BY_COLLECTION_SLUG: 'get_bobbleheads_header_by_collection_slug',
+    GET_HEADER_BY_COLLECTION_SLUG: 'get_header_by_collection_slug',
+    GET_LIST_BY_USER_ID: 'get_list_by_user_id',
   },
   COMMENTS: {
     CREATE_COMMENT: 'create_comment',

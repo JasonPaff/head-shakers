@@ -5,13 +5,12 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
+import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
 
 import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
-
-import type { BobbleheadData } from '../async/bobblehead-grid-async';
 
 import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
@@ -21,7 +20,14 @@ import { BulkActionsBar } from '../main/bulk-actions-bar';
 import { Toolbar } from '../main/toolbar';
 
 type BobbleheadGridDisplayProps = {
-  bobbleheads: Array<BobbleheadData>;
+  bobbleheads: Array<
+    BobbleheadListRecord & {
+      collectionId: string;
+      collectionSlug: string;
+      featurePhoto?: null | string;
+      likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+    }
+  >;
   categories: Array<string>;
   collectionId?: string;
   conditions: Array<string>;
@@ -35,7 +41,15 @@ export const BobbleheadGridDisplay = ({
   conditions,
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
-  const { setPreference } = useUserPreferences();
+  const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
+  const [isSelectionMode, setIsSelectionMode] = useToggle();
+
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
+    userPreferences.collectionGridDensity ?? 'compact',
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
     {
       condition: collectionDashboardParsers.condition,
@@ -46,17 +60,10 @@ export const BobbleheadGridDisplay = ({
     { shallow: false },
   );
 
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
-    userPreferences.collectionGridDensity ?? 'compact',
-  );
   const [searchInput, setSearchInput] = useState(search);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
   const [debouncedSearch] = useDebounce(searchInput, 300);
 
-  const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
-  const [isSelectionMode, setIsSelectionMode] = useToggle();
+  const { setPreference } = useUserPreferences();
 
   // Sync debounced search to URL
   useEffect(() => {
@@ -73,7 +80,7 @@ export const BobbleheadGridDisplay = ({
       const query = searchInput.toLowerCase();
       result = result.filter(
         (b) =>
-          b.name.toLowerCase().includes(query) ||
+          b.name?.toLowerCase().includes(query) ||
           b.characterName?.toLowerCase().includes(query) ||
           b.manufacturer?.toLowerCase().includes(query),
       );
@@ -100,10 +107,10 @@ export const BobbleheadGridDisplay = ({
     // Sort
     switch (sortBy) {
       case 'name-asc':
-        result.sort((a, b) => a.name.localeCompare(b.name));
+        result.sort((a, b) => a.name!.localeCompare(b.name!));
         break;
       case 'name-desc':
-        result.sort((a, b) => b.name.localeCompare(a.name));
+        result.sort((a, b) => b.name!.localeCompare(a.name!));
         break;
       case 'value-high':
         result.sort((a, b) => (b.purchasePrice || 0) - (a.purchasePrice || 0));
@@ -191,9 +198,11 @@ export const BobbleheadGridDisplay = ({
   }, [setPreference, setHoverCardEnabled]);
 
   const _hasBobbleheads = filteredBobbleheads.length > 0;
-  const _hasNoResults =
-    !_hasBobbleheads && (!!searchInput || filterCategory !== 'all' || condition !== 'all');
+  const _isFiltered = !!searchInput || filterCategory !== 'all' || condition !== 'all';
+  const _hasNoResults = !_hasBobbleheads && _isFiltered;
+  const _hasNoBobbleheads = !_hasBobbleheads && !_hasNoResults;
   const _hasSelection = selectedIds.size > 0;
+
   const _isAllSelected = selectedIds.size === filteredBobbleheads.length && filteredBobbleheads.length > 0;
 
   return (
@@ -263,7 +272,7 @@ export const BobbleheadGridDisplay = ({
           <NoResults onClearFilters={handleClearFilters} />
         </Conditional>
 
-        <Conditional isCondition={!_hasBobbleheads && !_hasNoResults}>
+        <Conditional isCondition={_hasNoBobbleheads}>
           <NoBobbleheads collectionId={collectionId} />
         </Conditional>
       </BobbleheadGrid>

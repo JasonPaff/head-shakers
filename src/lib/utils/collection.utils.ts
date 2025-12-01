@@ -1,14 +1,14 @@
 import type { CollectionSortOption } from '@/hooks/use-user-preferences';
-import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 /**
  * Sorts collections based on the given sort option.
  * Used by both server-side auto-selection and client-side sidebar display.
  */
 export function sortCollections(
-  collections: Array<CollectionDashboardListData>,
+  collections: Array<CollectionDashboardListRecord>,
   sortOption: CollectionSortOption,
-): Array<CollectionDashboardListData> {
+): Array<CollectionDashboardListRecord> {
   return [...collections].sort((a, b) => {
     switch (sortOption) {
       case 'comments-desc':

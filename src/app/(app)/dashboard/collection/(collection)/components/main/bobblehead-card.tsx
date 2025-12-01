@@ -1,7 +1,9 @@
-import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
-import { useMemo } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 
-import type { BobbleheadData } from '@/app/(app)/dashboard/collection/(collection)/components/async/bobblehead-grid-async';
+import { cva } from 'class-variance-authority';
+import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
+
+import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,8 +20,33 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/utils/tailwind-utils';
 
+const conditionVariants = cva('inline-block rounded-md px-2 py-0.5 text-xs font-medium', {
+  defaultVariants: {
+    condition: 'good',
+  },
+  variants: {
+    condition: {
+      excellent: 'bg-primary text-primary-foreground',
+      fair: 'bg-muted text-muted-foreground',
+      good: 'bg-secondary text-secondary-foreground',
+      mint: 'bg-gradient-to-r from-success to-new text-new-foreground',
+      'near-mint': 'bg-gradient-to-r from-warning to-yellow-500 text-warning-foreground',
+      poor: 'bg-destructive text-white',
+    },
+  },
+});
+
 export type BobbleheadCardProps = {
-  bobblehead: BobbleheadData;
+  bobblehead: BobbleheadListRecord & {
+    collectionId: string;
+    collectionSlug: string;
+    featurePhoto?: null | string;
+    likeData?: {
+      isLiked: boolean;
+      likeCount: number;
+      likeId: null | string;
+    };
+  };
   isHoverCardEnabled?: boolean;
   isSelected: boolean;
   isSelectionMode: boolean;
@@ -28,6 +55,8 @@ export type BobbleheadCardProps = {
   onFeatureToggle: (id: string) => void;
   onSelectionChange: (id: string, checked: boolean) => void;
 };
+
+type ConditionVariantProps = VariantProps<typeof conditionVariants>;
 
 export const BobbleheadCard = ({
   bobblehead,
@@ -39,25 +68,6 @@ export const BobbleheadCard = ({
   onFeatureToggle,
   onSelectionChange,
 }: BobbleheadCardProps) => {
-  const conditionColor = useMemo(() => {
-    switch (bobblehead.condition) {
-      case 'excellent':
-        return 'bg-primary text-primary-foreground';
-      case 'fair':
-        return 'bg-muted text-muted-foreground';
-      case 'good':
-        return 'bg-secondary text-secondary-foreground';
-      case 'mint':
-        return 'bg-gradient-to-r from-success to-new text-new-foreground';
-      case 'near-mint':
-        return 'bg-gradient-to-r from-warning to-yellow-500 text-warning-foreground';
-      case 'poor':
-        return 'bg-destructive text-white';
-      default:
-        return 'bg-secondary text-secondary-foreground';
-    }
-  }, [bobblehead]);
-
   const handleCheckboxChange = (checked: boolean) => {
     onSelectionChange(bobblehead.id, checked);
   };
@@ -99,12 +109,12 @@ export const BobbleheadCard = ({
           >
             {/* Image Container */}
             <div className={'relative aspect-square overflow-hidden bg-muted'}>
-              {bobblehead.imageUrl && (
+              {bobblehead.featurePhoto && (
                 <img
-                  alt={bobblehead.name}
+                  alt={bobblehead.name!}
                   className={'size-full object-cover transition-transform group-hover:scale-105'}
                   data-slot={'bobblehead-image'}
-                  src={bobblehead.imageUrl}
+                  src={bobblehead.featurePhoto}
                 />
               )}
 
@@ -179,9 +189,11 @@ export const BobbleheadCard = ({
               <h3 className={'truncate text-sm font-semibold'}>{bobblehead.name}</h3>
               <div className={'mt-1'}>
                 <span
-                  className={cn('inline-block rounded-md px-2 py-0.5 text-xs font-medium', conditionColor)}
+                  className={conditionVariants({
+                    condition: bobblehead.condition as ConditionVariantProps['condition'],
+                  })}
                 >
-                  {bobblehead.condition.replace('-', ' ').toUpperCase()}
+                  {bobblehead.condition?.replace('-', ' ').toUpperCase()}
                 </span>
               </div>
             </div>
@@ -247,9 +259,9 @@ export const BobbleheadCard = ({
             <Separator />
 
             <div className={'flex items-center gap-4 text-xs text-muted-foreground'}>
-              <span>{bobblehead.likeCount} likes</span>
-              <span>{bobblehead.commentCount} comments</span>
-              <span>{bobblehead.viewCount} views</span>
+              <span>{bobblehead.likeData?.likeCount} likes</span>
+              <span>0 comments</span>
+              <span>0 views</span>
             </div>
           </div>
         </HoverCardContent>

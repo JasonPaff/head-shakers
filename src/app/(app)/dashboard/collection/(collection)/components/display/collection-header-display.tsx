@@ -22,6 +22,7 @@ type CollectionHeaderDisplayProps = {
 
 export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayProps) => {
   const [editingCollection, setEditingCollection] = useState<CollectionForUpsert | null>(null);
+
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 

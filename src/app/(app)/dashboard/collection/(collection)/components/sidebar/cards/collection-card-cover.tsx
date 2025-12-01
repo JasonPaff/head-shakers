@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react';
 
 import { EditIcon, GlobeIcon, HeartIcon, LockIcon } from 'lucide-react';
 
-import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -13,7 +13,7 @@ import { cn } from '@/utils/tailwind-utils';
 import { CollectionHoverCardContent } from './collection-card-hovercard';
 
 export type CollectionCardCoverProps = {
-  collection: CollectionDashboardListData;
+  collection: CollectionDashboardListRecord;
   isActive: boolean;
   isHoverCardEnabled?: boolean;
   onClick: (slug: string) => void;

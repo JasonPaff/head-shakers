@@ -14,7 +14,7 @@ export async function SidebarAsync() {
   const userId = await getRequiredUserIdAsync();
 
   const [collections, preferences] = await Promise.all([
-    CollectionsDashboardFacade.getDashboardListByUserIdAsync(userId),
+    CollectionsDashboardFacade.getListByUserIdAsync(userId),
     getUserPreferences(),
   ]);
 

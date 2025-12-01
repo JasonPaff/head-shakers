@@ -1,4 +1,4 @@
-import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HoverCardContent } from '@/components/ui/hover-card';
@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils/currency.utils';
 
 export type CollectionHoverCardContentProps = {
-  collection: CollectionDashboardListData;
+  collection: CollectionDashboardListRecord;
 };
 
 export const CollectionHoverCardContent = ({ collection }: CollectionHoverCardContentProps) => {

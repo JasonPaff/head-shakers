@@ -2,7 +2,7 @@ import { count, eq, sql, sum } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type {
-  CollectionDashboardListData,
+  CollectionDashboardListRecord,
   CollectionRecord,
 } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -23,7 +23,7 @@ export type CollectionDashboardHeaderRecord = Pick<
 };
 
 export class CollectionsDashboardQuery extends BaseQuery {
-  static async getCollectionHeaderForUserBySlugAsync(
+  static async getHeaderByCollectionSlugAsync(
     slug: string,
     context: QueryContext,
   ): Promise<CollectionDashboardHeaderRecord> {
@@ -65,10 +65,7 @@ export class CollectionsDashboardQuery extends BaseQuery {
     return result[0]!;
   }
 
-  static async getDashboardListByUserIdAsync(
-    userId: string,
-    context: QueryContext,
-  ): Promise<Array<CollectionDashboardListData>> {
+  static async getListByUserIdAsync(context: QueryContext): Promise<Array<CollectionDashboardListRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const bobbleheadStats = this._buildBobbleheadStatsSubquery(dbInstance);
@@ -98,7 +95,7 @@ export class CollectionsDashboardQuery extends BaseQuery {
       .leftJoin(viewStats, eq(viewStats.targetId, collections.id))
       .where(
         this.combineFilters(
-          eq(collections.userId, userId),
+          eq(collections.userId, context.userId!),
           this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
         ),
       );

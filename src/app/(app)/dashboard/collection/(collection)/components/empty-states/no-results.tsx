@@ -3,7 +3,7 @@ import { SearchIcon, XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type NoResultsProps = {
-  onClearFilters?: () => void;
+  onClearFilters: () => void;
 };
 
 export const NoResults = ({ onClearFilters }: NoResultsProps) => {

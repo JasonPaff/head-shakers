@@ -93,7 +93,7 @@ export type CategoryRecord = {
   name: string;
 };
 
-export type CollectionDashboardListData = {
+export type CollectionDashboardListRecord = {
   bobbleheadCount: number;
   commentCount: number;
   coverImageUrl: null | string;

@@ -38,7 +38,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
   // This respects the user's saved sort preference for consistent behavior
   if (!params.collectionSlug) {
     const [userId, preferences] = await Promise.all([getRequiredUserIdAsync(), getUserPreferences()]);
-    const collections = await CollectionsDashboardFacade.getDashboardListByUserIdAsync(userId);
+    const collections = await CollectionsDashboardFacade.getListByUserIdAsync(userId);
 
     if (collections.length > 0) {
       const sortOption = preferences.collectionSidebarSort ?? 'name-asc';

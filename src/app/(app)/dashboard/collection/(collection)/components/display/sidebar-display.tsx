@@ -5,7 +5,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { CollectionSortOption, UserPreferences } from '@/hooks/use-user-preferences';
-import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
+import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
@@ -35,7 +35,7 @@ type CollectionForEdit = {
 };
 
 type SidebarDisplayProps = {
-  collections: Array<CollectionDashboardListData>;
+  collections: Array<CollectionDashboardListRecord>;
   userPreferences: UserPreferences;
 };
 
@@ -200,7 +200,7 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
 
 interface CollectionCardMapperProps {
   cardStyle: CollectionCardStyle;
-  collection: CollectionDashboardListData;
+  collection: CollectionDashboardListRecord;
   isHoverCardEnabled: boolean;
   onCollectionSelect: (slug: string) => void;
   onEditCollection: (id: string) => void;
