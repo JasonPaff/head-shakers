@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
 
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
+import { redirect } from 'next/navigation';
 import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { sortCollections } from '@/lib/utils/collection.utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+import { getUserPreferences } from '@/utils/server-cookies';
 
 import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
@@ -27,7 +32,32 @@ export function generateMetadata(): Metadata {
 }
 
 async function CollectionPage({ searchParams }: CollectionPageProps) {
-  await collectionDashboardSearchParamsCache.parse(searchParams);
+  const params = await collectionDashboardSearchParamsCache.parse(searchParams);
+
+  // Server-side auto-selection: If no collection is selected, redirect to the first one
+  // This respects the user's saved sort preference for consistent behavior
+  if (!params.collectionSlug) {
+    const [userId, preferences] = await Promise.all([getRequiredUserIdAsync(), getUserPreferences()]);
+    const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+
+    if (collections.length > 0) {
+      const sortOption = preferences.collectionSidebarSort ?? 'name-asc';
+      const sortedCollections = sortCollections(collections, sortOption);
+      const firstCollection = sortedCollections[0]!;
+
+      // Redirect to the first collection, preserving any other search params
+      const url = new URL('/dashboard/collection', 'http://localhost');
+      url.searchParams.set('collectionSlug', firstCollection.slug);
+
+      // Preserve other params if they differ from defaults
+      if (params.search) url.searchParams.set('search', params.search);
+      if (params.condition !== 'all') url.searchParams.set('condition', params.condition);
+      if (params.featured !== 'all') url.searchParams.set('featured', params.featured);
+      if (params.sortBy !== 'newest') url.searchParams.set('sortBy', params.sortBy);
+
+      redirect(`${url.pathname}${url.search}`);
+    }
+  }
 
   return (
     <CollectionLayout

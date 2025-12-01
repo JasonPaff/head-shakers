@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryStates } from 'nuqs';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { CollectionSortOption } from '@/hooks/use-user-preferences';
@@ -11,6 +11,7 @@ import { CollectionUpsertDialog } from '@/components/feature/collections/collect
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { sortCollections } from '@/lib/utils/collection.utils';
 
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
 
@@ -59,7 +60,7 @@ export const SidebarDisplay = ({
 
   const { setPreference } = useUserPreferences();
 
-  // Filter and sort collections
+  // Filter and sort collections using the shared utility
   const filteredCollections = useMemo(() => {
     const filtered =
       searchValue.trim() ?
@@ -70,49 +71,12 @@ export const SidebarDisplay = ({
         )
       : collections;
 
-    return [...filtered].sort((a, b) => {
-      switch (sortOption) {
-        case 'comments-desc':
-          return b.commentCount - a.commentCount;
-        case 'count-asc':
-          return a.bobbleheadCount - b.bobbleheadCount;
-        case 'count-desc':
-          return b.bobbleheadCount - a.bobbleheadCount;
-        case 'likes-desc':
-          return b.likeCount - a.likeCount;
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'value-asc':
-          return (a.totalValue ?? 0) - (b.totalValue ?? 0);
-        case 'value-desc':
-          return (b.totalValue ?? 0) - (a.totalValue ?? 0);
-        case 'views-desc':
-          return b.viewCount - a.viewCount;
-        default:
-          return 0;
-      }
-    });
+    return sortCollections(filtered, sortOption);
   }, [collections, searchValue, sortOption]);
 
-  const selectedCollectionSlug = collectionSlug ?? filteredCollections?.[0]?.slug;
-
-  // Auto-select the first collection when no valid collection is selected
-  useEffect(() => {
-    // Nothing to do if no collections exist
-    if (collections.length === 0) return;
-
-    // Check if the current selection is valid (exists in collections)
-    const isCurrentSelectionValid =
-      collectionSlug !== null && collections.some((c) => c.slug === collectionSlug);
-
-    // Auto-select the first collection (respecting sort order) if no valid selection
-    const firstCollection = filteredCollections[0];
-    if (!isCurrentSelectionValid && firstCollection) {
-      void setParams({ collectionSlug: firstCollection.slug }, { history: 'replace' });
-    }
-  }, [collectionSlug, collections, filteredCollections, setParams]);
+  // Server-side auto-selection ensures collectionSlug is always set when collections exist
+  // This fallback handles edge cases like deleted collections or race conditions
+  const selectedCollectionSlug = collectionSlug ?? filteredCollections[0]?.slug;
 
   const setCardStyle = useCallback(
     (newStyle: CollectionCardStyle) => {
