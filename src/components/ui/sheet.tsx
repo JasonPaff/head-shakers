@@ -12,8 +12,7 @@ type SheetCloseProps = ComponentProps<typeof Close>;
 type SheetContentProps = ComponentProps<typeof Content> & {
   /**
    * Accessible title for screen readers. When provided, rendered as visually hidden.
-   * Required for accessibility if SheetTitle is not used.
-   * @default 'Sheet'
+   * Use this when SheetContent does not contain a visible SheetTitle component.
    */
   accessibleTitle?: string;
   side?: 'bottom' | 'left' | 'right' | 'top';
@@ -44,7 +43,7 @@ export const SheetClose = ({ children, ...props }: SheetCloseProps) => {
 };
 
 export const SheetContent = ({
-  accessibleTitle = 'Sheet',
+  accessibleTitle,
   children,
   className,
   side = 'right',
@@ -71,9 +70,11 @@ export const SheetContent = ({
         data-slot={'sheet-content'}
         {...props}
       >
-        <VisuallyHidden.Root asChild>
-          <Title>{accessibleTitle}</Title>
-        </VisuallyHidden.Root>
+        {accessibleTitle && (
+          <VisuallyHidden.Root asChild>
+            <Title>{accessibleTitle}</Title>
+          </VisuallyHidden.Root>
+        )}
         {children}
         <Close
           className={

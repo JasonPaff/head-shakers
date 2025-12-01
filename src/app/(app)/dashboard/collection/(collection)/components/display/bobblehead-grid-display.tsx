@@ -210,8 +210,12 @@ export const BobbleheadGridDisplay = ({
         isHoverCardEnabled={isHoverCardEnabled}
         isSelectionMode={isSelectionMode}
         onFilterCategoryChange={setFilterCategory}
-        onFilterConditionChange={(value) => void setParams({ condition: value as typeof condition })}
-        onFilterFeaturedChange={(value) => void setParams({ featured: value as typeof featured })}
+        onFilterConditionChange={(value) => {
+          void setParams({ condition: value as typeof condition });
+        }}
+        onFilterFeaturedChange={(value) => {
+          void setParams({ featured: value as typeof featured });
+        }}
         onGridDensityToggle={handleGridDensityToggle}
         onHoverCardToggle={handleHoverCardToggle}
         onSearchChange={setSearchInput}
@@ -219,7 +223,9 @@ export const BobbleheadGridDisplay = ({
           setSearchInput('');
         }}
         onSelectionModeToggle={handleSelectionModeToggle}
-        onSortChange={(value) => void setParams({ sortBy: value as typeof sortBy })}
+        onSortChange={(value) => {
+          void setParams({ sortBy: value as typeof sortBy });
+        }}
         searchValue={searchInput}
         sortBy={sortBy}
       />
@@ -240,29 +246,15 @@ export const BobbleheadGridDisplay = ({
         <Conditional isCondition={_hasBobbleheads}>
           {filteredBobbleheads.map((bobblehead) => (
             <BobbleheadCard
-              characterName={bobblehead.characterName}
-              commentCount={bobblehead.commentCount}
-              condition={bobblehead.condition}
-              height={bobblehead.height}
-              id={bobblehead.id}
-              imageUrl={bobblehead.imageUrl}
-              isFeatured={bobblehead.isFeatured}
+              bobblehead={bobblehead}
               isHoverCardEnabled={isHoverCardEnabled}
               isSelected={selectedIds.has(bobblehead.id)}
               isSelectionMode={isSelectionMode}
               key={bobblehead.id}
-              likeCount={bobblehead.likeCount}
-              manufacturer={bobblehead.manufacturer}
-              material={bobblehead.material}
-              name={bobblehead.name}
               onDelete={handleDeleteBobblehead}
               onEdit={handleEditBobblehead}
               onFeatureToggle={handleFeatureToggle}
               onSelectionChange={handleSelectionChange}
-              purchasePrice={bobblehead.purchasePrice}
-              series={bobblehead.series}
-              viewCount={bobblehead.viewCount}
-              year={bobblehead.year}
             />
           ))}
         </Conditional>

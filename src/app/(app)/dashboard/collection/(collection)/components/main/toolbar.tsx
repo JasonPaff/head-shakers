@@ -6,6 +6,7 @@ import {
   LayoutListIcon,
   PlusIcon,
   SearchIcon,
+  SettingsIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
@@ -203,6 +204,45 @@ export const Toolbar = ({
 
       {/* Mobile Actions Row */}
       <div className={'flex items-center gap-2 lg:hidden'}>
+        {/* View Options Dropdown (Mobile) */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size={'sm'} variant={'outline'}>
+              <SettingsIcon aria-hidden className={'size-4'} />
+              <span className={'sr-only'}>View options</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={'end'}>
+            <DropdownMenuLabel>View Options</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+
+            {/* Hover Preview Toggle */}
+            <div className={'flex items-center justify-between gap-4 px-2 py-1.5'}>
+              <span className={'flex items-center gap-2 text-sm'}>
+                <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
+                Quick preview
+              </span>
+              <Switch checked={isHoverCardEnabled} onCheckedChange={onHoverCardToggle} />
+            </div>
+
+            <DropdownMenuSeparator />
+
+            {/* Grid Density Toggle */}
+            <div className={'flex items-center justify-between gap-4 px-2 py-1.5'}>
+              <span className={'flex items-center gap-2 text-sm'}>
+                {gridDensity === 'compact' ?
+                  <GripVerticalIcon aria-hidden className={'size-4 text-muted-foreground'} />
+                : <LayoutListIcon aria-hidden className={'size-4 text-muted-foreground'} />}
+                {gridDensity === 'compact' ? 'Compact grid' : 'Comfortable grid'}
+              </span>
+              <Button onClick={onGridDensityToggle} size={'sm'} variant={'ghost'}>
+                Toggle
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Selection Mode Toggle */}
         <Button onClick={onSelectionModeToggle} size={'sm'} variant={isSelectionMode ? 'default' : 'outline'}>
           <CheckIcon aria-hidden className={'size-4'} />
           {isSelectionMode ? 'Cancel' : 'Select'}
