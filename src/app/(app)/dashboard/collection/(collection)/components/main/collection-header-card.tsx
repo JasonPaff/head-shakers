@@ -1,4 +1,4 @@
-import { EditIcon, HeartIcon, MoreVerticalIcon, SettingsIcon, ShareIcon, TrashIcon } from 'lucide-react';
+import { EditIcon, HeartIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react';
 
 import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,7 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
@@ -24,7 +23,6 @@ export type CollectionHeaderCardProps = {
   name: string;
   onDelete?: () => void;
   onEdit?: () => void;
-  onSettings?: () => void;
   totalValue: null | number;
   viewCount: number;
 };
@@ -39,7 +37,6 @@ export const CollectionHeaderCard = ({
   name,
   onDelete,
   onEdit,
-  onSettings,
   totalValue,
   viewCount,
 }: CollectionHeaderCardProps) => {
@@ -94,11 +91,6 @@ export const CollectionHeaderCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={'end'}>
-                <DropdownMenuItem onClick={onSettings}>
-                  <SettingsIcon aria-hidden className={'size-4'} />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onDelete} variant={'destructive'}>
                   <TrashIcon aria-hidden className={'size-4'} />
                   Delete Collection

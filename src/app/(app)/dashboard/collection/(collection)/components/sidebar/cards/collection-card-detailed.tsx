@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, GlobeIcon, GripVerticalIcon, HeartIcon, LockIcon, StarIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, HeartIcon, LockIcon, StarIcon } from 'lucide-react';
 
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
@@ -102,7 +102,6 @@ export const CollectionCardDetailed = ({
               <Button onClick={handleEdit} size={'icon'} variant={'ghost'}>
                 <EditIcon aria-hidden className={'size-3.5'} />
               </Button>
-              <GripVerticalIcon aria-hidden className={'size-4 cursor-grab text-muted-foreground'} />
             </div>
           </div>
 

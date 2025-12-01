@@ -66,10 +66,6 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
     await executeAsync({ collectionId: collection.id });
   };
 
-  const handleSettings = () => {
-    console.log('Collection settings:', collection.id);
-  };
-
   return (
     <Fragment>
       <CollectionHeaderCard
@@ -82,7 +78,6 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
         name={collection.name}
         onDelete={handleDelete}
         onEdit={handleEdit}
-        onSettings={handleSettings}
         totalValue={collection.totalValue}
         viewCount={collection.viewCount}
       />
