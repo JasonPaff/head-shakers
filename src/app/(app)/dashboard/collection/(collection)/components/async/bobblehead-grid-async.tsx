@@ -31,7 +31,7 @@ export async function BobbleheadGridAsync() {
 
   const data = await CollectionsDashboardFacade.getBobbleheadsByCollectionSlugAsync(collectionSlug, userId);
 
-  const categories = [...new Set(data.bobbleheads.map((b) => b.category).filter(Boolean))] as Array<string>;
+  const categories = [...new Set(data.bobbleheads?.map((b) => b.category).filter(Boolean))] as Array<string>;
 
   return (
     <BobbleheadGridDisplay

@@ -8,6 +8,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import { OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
+import { BobbleheadsDashboardQuery } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 import { CollectionsDashboardQuery } from '@/lib/queries/collections/collections-dashboard.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
@@ -16,7 +17,6 @@ import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 const facade = 'COLLECTIONS_DASHBOARD_FACADE';
 
 export class CollectionsDashboardFacade extends BaseFacade {
-  static async getCollectionHeaderForUserBySlugAsync(
   static async getBobbleheadsByCollectionSlugAsync(
     collectionSlug: string,
     userId: string,
@@ -26,7 +26,6 @@ export class CollectionsDashboardFacade extends BaseFacade {
     bobbleheads: Array<
       BobbleheadListRecord & {
         collectionId: string;
-        collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
       }
@@ -46,29 +45,13 @@ export class CollectionsDashboardFacade extends BaseFacade {
           async () => {
             const context = this.getUserContext(userId, dbInstance);
             //
-            // const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
-            //   collectionId,
-            //   context,
-            //   options,
-            // );
-            // if (bobbleheads.length === 0) {
-            //   return bobbleheads;
-            // }
-            //
-            // const bobbleheadIds = bobbleheads.map((b) => b.id);
-            // const likesMap = await SocialFacade.getLikesForMultipleContentItems(
-            //   bobbleheadIds,
-            //   'bobblehead',
-            //   userId,
-            //   dbInstance,
-            // );
-            //
-            // return bobbleheads.map((bobblehead) => ({
-            //   ...bobblehead,
-            //   likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
-            // }));
+            const bobbleheads = await BobbleheadsDashboardQuery.getListAsync(
+              collectionSlug,
+              context,
+              options,
+            );
 
-            return { bobbleheads: [], collectionId: '' };
+            return { bobbleheads, collectionId: bobbleheads[0]?.collectionId ?? 'unknown' };
           },
           collectionSlug,
           optionsHash,

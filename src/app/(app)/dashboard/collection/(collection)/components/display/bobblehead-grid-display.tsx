@@ -23,7 +23,6 @@ type BobbleheadGridDisplayProps = {
   bobbleheads: Array<
     BobbleheadListRecord & {
       collectionId: string;
-      collectionSlug: string;
       featurePhoto?: null | string;
       likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
     }

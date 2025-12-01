@@ -39,7 +39,6 @@ const conditionVariants = cva('inline-block rounded-md px-2 py-0.5 text-xs font-
 export type BobbleheadCardProps = {
   bobblehead: BobbleheadListRecord & {
     collectionId: string;
-    collectionSlug: string;
     featurePhoto?: null | string;
     likeData?: {
       isLiked: boolean;
