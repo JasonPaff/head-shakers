@@ -40,7 +40,10 @@ export const BobbleheadPagination = ({
   }
 
   return (
-    <div className={'flex flex-col items-center justify-between gap-4 p-2 sm:flex-row'}>
+    <div
+      className={`sticky bottom-0 z-10 flex flex-col items-center justify-between gap-4
+        border-t bg-background/95 p-4 backdrop-blur-sm sm:flex-row`}
+    >
       {/* Results info */}
       <div className={'text-sm text-muted-foreground'}>
         Showing <span className={'font-medium text-foreground'}>{startItem}</span> to{' '}
