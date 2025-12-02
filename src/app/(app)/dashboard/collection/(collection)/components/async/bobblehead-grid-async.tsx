@@ -29,8 +29,12 @@ export async function BobbleheadGridAsync() {
     );
   }
 
-  const data = await CollectionsDashboardFacade.getBobbleheadsByCollectionSlugAsync(collectionSlug, userId);
+  const data = await CollectionsDashboardFacade.getBobbleheadListByCollectionSlugAsync(
+    collectionSlug,
+    userId,
+  );
 
+  // TODO: fix this up
   const categories = [...new Set(data.bobbleheads?.map((b) => b.category).filter(Boolean))] as Array<string>;
 
   return (

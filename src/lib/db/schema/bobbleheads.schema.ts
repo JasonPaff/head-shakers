@@ -148,6 +148,7 @@ export const bobbleheads = pgTable(
 
     // search and performance indexes
     index('bobbleheads_name_search_idx').using('gin', sql`${table.name} gin_trgm_ops`),
+    index('bobbleheads_character_name_search_idx').using('gin', sql`${table.characterName} gin_trgm_ops`),
     index('bobbleheads_description_search_idx').using('gin', sql`${table.description} gin_trgm_ops`),
     index('bobbleheads_custom_fields_gin_idx').using('gin', table.customFields),
     index('bobbleheads_custom_fields_path_idx').using('gin', sql`(${table.customFields} jsonb_path_ops)`),

@@ -37,14 +37,13 @@ const conditionVariants = cva('inline-block rounded-md px-2 py-0.5 text-xs font-
 });
 
 export type BobbleheadCardProps = {
+  // TODO: fix this type
   bobblehead: BobbleheadListRecord & {
     collectionId: string;
+    commentCount: number;
     featurePhoto?: null | string;
-    likeData?: {
-      isLiked: boolean;
-      likeCount: number;
-      likeId: null | string;
-    };
+    likeCount: number;
+    viewCount: number;
   };
   isHoverCardEnabled?: boolean;
   isSelected: boolean;
@@ -258,9 +257,9 @@ export const BobbleheadCard = ({
             <Separator />
 
             <div className={'flex items-center gap-4 text-xs text-muted-foreground'}>
-              <span>{bobblehead.likeData?.likeCount} likes</span>
-              <span>0 comments</span>
-              <span>0 views</span>
+              <span>{bobblehead.likeCount} likes</span>
+              <span>{bobblehead.commentCount} comments</span>
+              <span>{bobblehead.viewCount} views</span>
             </div>
           </div>
         </HoverCardContent>

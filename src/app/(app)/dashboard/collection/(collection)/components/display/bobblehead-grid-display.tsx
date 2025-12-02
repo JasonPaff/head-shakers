@@ -21,10 +21,13 @@ import { Toolbar } from '../main/toolbar';
 
 type BobbleheadGridDisplayProps = {
   bobbleheads: Array<
+    // TODO: fix this type
     BobbleheadListRecord & {
       collectionId: string;
+      commentCount: number;
       featurePhoto?: null | string;
-      likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+      likeCount: number;
+      viewCount: number;
     }
   >;
   categories: Array<string>;

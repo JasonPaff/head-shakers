@@ -1,4 +1,4 @@
-import type { QueryContext } from '@/lib/queries/base/query-context';
+import type { QueryContext, UserQueryContext } from '@/lib/queries/base/query-context';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import {
@@ -55,8 +55,8 @@ export abstract class BaseContextHelpers {
   protected static getUserContext(
     userId: string,
     dbInstance: DatabaseExecutor,
-    overrides: Omit<Partial<QueryContext>, 'dbInstance' | 'requiredUserId' | 'userId'> = {},
-  ): QueryContext {
+    overrides: Partial<Omit<UserQueryContext, 'userId'>> = {},
+  ): UserQueryContext {
     return createUserQueryContext(userId, { ...overrides, dbInstance });
   }
 

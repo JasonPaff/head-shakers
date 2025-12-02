@@ -24,7 +24,7 @@ export type CollectionDashboardHeaderRecord = Pick<
 
 export class CollectionsDashboardQuery extends BaseQuery {
   static async getHeaderByCollectionSlugAsync(
-    slug: string,
+    collectionSlug: string,
     context: QueryContext,
   ): Promise<CollectionDashboardHeaderRecord> {
     const dbInstance = this.getDbInstance(context);
@@ -36,18 +36,18 @@ export class CollectionsDashboardQuery extends BaseQuery {
 
     const result = await dbInstance
       .select({
-        bobbleheadCount: sql<number>`COALESCE(${bobbleheadStats.bobbleheadCount}, 0)`,
-        commentCount: sql<number>`COALESCE(${commentStats.commentCount}, 0)`,
+        bobbleheadCount: sql<number>`COALESCE("bobblehead_stats"."bobblehead_count", 0)`,
+        commentCount: sql<number>`COALESCE("comment_stats"."comment_count", 0)`,
         coverImageUrl: collections.coverImageUrl,
         description: collections.description,
-        featuredCount: sql<number>`COALESCE(${bobbleheadStats.featuredCount}, 0)`,
+        featuredCount: sql<number>`COALESCE("bobblehead_stats"."featured_count", 0)`,
         id: collections.id,
         isPublic: collections.isPublic,
-        likeCount: sql<number>`COALESCE(${likeStats.likeCount}, 0)`,
+        likeCount: sql<number>`COALESCE("like_stats"."like_count", 0)`,
         name: collections.name,
         slug: collections.slug,
-        totalValue: sql<number>`COALESCE(${bobbleheadStats.totalValue}, 0)`,
-        viewCount: sql<number>`COALESCE(${viewStats.viewCount}, 0)`,
+        totalValue: sql<number>`COALESCE("bobblehead_stats"."total_value", 0)`,
+        viewCount: sql<number>`COALESCE("view_stats"."view_count", 0)`,
       })
       .from(collections)
       .leftJoin(bobbleheadStats, eq(bobbleheadStats.collectionId, collections.id))
@@ -56,7 +56,7 @@ export class CollectionsDashboardQuery extends BaseQuery {
       .leftJoin(viewStats, eq(viewStats.targetId, collections.id))
       .where(
         this.combineFilters(
-          eq(collections.slug, slug),
+          eq(collections.slug, collectionSlug),
           eq(collections.userId, context.userId!),
           this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
@@ -75,18 +75,18 @@ export class CollectionsDashboardQuery extends BaseQuery {
 
     const result = await dbInstance
       .select({
-        bobbleheadCount: sql<number>`COALESCE(${bobbleheadStats.bobbleheadCount}, 0)`,
-        commentCount: sql<number>`COALESCE(${commentStats.commentCount}, 0)`,
+        bobbleheadCount: sql<number>`COALESCE("bobblehead_stats"."bobblehead_count", 0)`,
+        commentCount: sql<number>`COALESCE("comment_stats"."comment_count", 0)`,
         coverImageUrl: collections.coverImageUrl,
         description: collections.description,
-        featuredCount: sql<number>`COALESCE(${bobbleheadStats.featuredCount}, 0)`,
+        featuredCount: sql<number>`COALESCE("bobblehead_stats"."featured_count", 0)`,
         id: collections.id,
         isPublic: collections.isPublic,
-        likeCount: sql<number>`COALESCE(${likeStats.likeCount}, 0)`,
+        likeCount: sql<number>`COALESCE("like_stats"."like_count", 0)`,
         name: collections.name,
         slug: collections.slug,
-        totalValue: sql<number>`COALESCE(${bobbleheadStats.totalValue}, 0)`,
-        viewCount: sql<number>`COALESCE(${viewStats.viewCount}, 0)`,
+        totalValue: sql<number>`COALESCE("bobblehead_stats"."total_value", 0)`,
+        viewCount: sql<number>`COALESCE("view_stats"."view_count", 0)`,
       })
       .from(collections)
       .leftJoin(bobbleheadStats, eq(bobbleheadStats.collectionId, collections.id))

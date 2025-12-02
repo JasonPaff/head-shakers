@@ -5,7 +5,7 @@ import type {
 } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { OPERATIONS } from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsDashboardQuery } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
@@ -17,17 +17,22 @@ import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 const facade = 'COLLECTIONS_DASHBOARD_FACADE';
 
 export class CollectionsDashboardFacade extends BaseFacade {
-  static async getBobbleheadsByCollectionSlugAsync(
+  // TODO: move to bobbleheads facade
+  static async getBobbleheadListByCollectionSlugAsync(
     collectionSlug: string,
     userId: string,
     options?: { searchTerm?: string; sortBy?: string },
     dbInstance: DatabaseExecutor = db,
   ): Promise<{
+    // TODO: fix this type
     bobbleheads: Array<
       BobbleheadListRecord & {
         collectionId: string;
+        commentCount: number;
         featurePhoto?: null | string;
+        likeCount: number;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+        viewCount: number;
       }
     >;
     collectionId: string;
@@ -36,15 +41,16 @@ export class CollectionsDashboardFacade extends BaseFacade {
       {
         data: { collectionSlug, userId },
         facade,
-        method: 'getBobbleheadsByCollectionSlugAsync',
-        operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_BOBBLEHEADS_BY_COLLECTION_SLUG,
+        method: 'getBobbleheadListByCollectionSlugAsync',
+        operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_BOBBLEHEAD_LIST_BY_COLLECTION_SLUG,
       },
       async () => {
+        // TODO: fix caching
         const optionsHash = createHashFromObject({ options, photos: true, userId });
         return CacheService.bobbleheads.byCollection(
           async () => {
             const context = this.getUserContext(userId, dbInstance);
-            //
+
             const bobbleheads = await BobbleheadsDashboardQuery.getListAsync(
               collectionSlug,
               context,
@@ -58,9 +64,9 @@ export class CollectionsDashboardFacade extends BaseFacade {
           {
             context: {
               entityId: collectionSlug,
-              entityType: 'collection',
+              entityType: CACHE_ENTITY_TYPE.BOBBLEHEAD,
               facade,
-              operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_BOBBLEHEADS_BY_COLLECTION_SLUG,
+              operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_BOBBLEHEAD_LIST_BY_COLLECTION_SLUG,
               userId,
             },
           },

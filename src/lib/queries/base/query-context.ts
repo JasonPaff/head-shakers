@@ -70,6 +70,14 @@ export interface SearchOptions {
 }
 
 /**
+ * query context for authenticated user operations
+ * extends QueryContext with userId property
+ */
+export interface UserQueryContext extends QueryContext {
+  userId: string;
+}
+
+/**
  * create a QueryContext for admin/moderator access
  * admin users can see all content regardless of visibility
  */
@@ -113,7 +121,10 @@ export function createPublicQueryContext(overrides: Partial<QueryContext> = {}):
 /**
  * create a QueryContext for authenticated user access
  */
-export function createUserQueryContext(userId: string, overrides: Partial<QueryContext> = {}): QueryContext {
+export function createUserQueryContext(
+  userId: string,
+  overrides: Partial<Omit<UserQueryContext, 'userId'>> = {},
+): UserQueryContext {
   return {
     shouldIncludeDeleted: false,
     userId,

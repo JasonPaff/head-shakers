@@ -57,7 +57,7 @@ export const OPERATIONS = {
     UPDATE: 'update_collection',
   },
   COLLECTIONS_DASHBOARD: {
-    GET_BOBBLEHEADS_BY_COLLECTION_SLUG: 'get_bobbleheads_header_by_collection_slug',
+    GET_BOBBLEHEAD_LIST_BY_COLLECTION_SLUG: 'get_bobblehead_list_by_collection_slug',
     GET_HEADER_BY_COLLECTION_SLUG: 'get_header_by_collection_slug',
     GET_LIST_BY_USER_ID: 'get_list_by_user_id',
   },
