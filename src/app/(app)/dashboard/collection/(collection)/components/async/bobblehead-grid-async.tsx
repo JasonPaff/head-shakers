@@ -19,6 +19,8 @@ export async function BobbleheadGridAsync() {
   const category = collectionDashboardSearchParamsCache.get('category');
   const condition = collectionDashboardSearchParamsCache.get('condition');
   const featured = collectionDashboardSearchParamsCache.get('featured');
+  const page = collectionDashboardSearchParamsCache.get('page');
+  const pageSize = collectionDashboardSearchParamsCache.get('pageSize');
   const search = collectionDashboardSearchParamsCache.get('search');
   const sortBy = collectionDashboardSearchParamsCache.get('sortBy');
   const preferences = await getUserPreferences();
@@ -39,6 +41,8 @@ export async function BobbleheadGridAsync() {
       category: category !== 'all' ? category : undefined,
       condition: condition !== 'all' ? condition : undefined,
       featured: featured !== 'all' ? featured : undefined,
+      page,
+      pageSize,
       searchTerm: search || undefined,
       sortBy,
     }),
@@ -51,6 +55,7 @@ export async function BobbleheadGridAsync() {
       categories={categories}
       collectionId={data.collectionId}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+      pagination={data.pagination}
       userPreferences={preferences}
     />
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryStates } from 'nuqs';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
@@ -16,6 +16,7 @@ import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
 import { BobbleheadCard } from '../main/bobblehead-card';
 import { BobbleheadGrid } from '../main/bobblehead-grid';
+import { BobbleheadPagination } from '../main/bobblehead-pagination';
 import { BulkActionsBar } from '../main/bulk-actions-bar';
 import { Toolbar } from '../main/toolbar';
 
@@ -24,6 +25,12 @@ type BobbleheadGridDisplayProps = {
   categories: Array<string>;
   collectionId?: string;
   conditions: Array<string>;
+  pagination?: {
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
   userPreferences: UserPreferences;
 };
 
@@ -32,6 +39,7 @@ export const BobbleheadGridDisplay = ({
   categories,
   collectionId,
   conditions,
+  pagination,
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
@@ -47,6 +55,8 @@ export const BobbleheadGridDisplay = ({
       category: collectionDashboardParsers.category,
       condition: collectionDashboardParsers.condition,
       featured: collectionDashboardParsers.featured,
+      page: collectionDashboardParsers.page,
+      pageSize: collectionDashboardParsers.pageSize,
       search: collectionDashboardParsers.search,
       sortBy: collectionDashboardParsers.sortBy,
     },
@@ -65,19 +75,13 @@ export const BobbleheadGridDisplay = ({
     }
   }, [debouncedSearch, search, setParams]);
 
-  // Client-side search filtering for immediate UI feedback while typing
-  // Backend handles all filtering/sorting after debounced search is synced to URL
-  const filteredBobbleheads = useMemo(() => {
-    if (!searchInput.trim()) return bobbleheads;
+  const handlePageChange = (newPage: number) => {
+    void setParams({ page: newPage });
+  };
 
-    const query = searchInput.toLowerCase();
-    return bobbleheads.filter(
-      (b) =>
-        b.name?.toLowerCase().includes(query) ||
-        b.characterName?.toLowerCase().includes(query) ||
-        b.manufacturer?.toLowerCase().includes(query),
-    );
-  }, [bobbleheads, searchInput]);
+  const handlePageSizeChange = (newPageSize: number) => {
+    void setParams({ page: 1, pageSize: newPageSize });
+  };
 
   const handleSelectionModeToggle = () => {
     setIsSelectionMode.toggle();
@@ -88,7 +92,7 @@ export const BobbleheadGridDisplay = ({
 
   const handleSelectAll = () => {
     if (_isAllSelected) setSelectedIds(new Set());
-    else setSelectedIds(new Set(filteredBobbleheads.map((b) => b.id)));
+    else setSelectedIds(new Set(bobbleheads.map((b) => b.id)));
   };
 
   const handleSelectionChange = (id: string, checked: boolean) => {
@@ -129,6 +133,8 @@ export const BobbleheadGridDisplay = ({
       category: 'all',
       condition: 'all',
       featured: 'all',
+      page: 1,
+      pageSize: null,
       search: null,
       sortBy: 'newest',
     });
@@ -150,13 +156,13 @@ export const BobbleheadGridDisplay = ({
     });
   }, [setPreference, setHoverCardEnabled]);
 
-  const _hasBobbleheads = filteredBobbleheads.length > 0;
+  const _hasBobbleheads = bobbleheads.length > 0;
   const _isFiltered = !!searchInput || category !== 'all' || condition !== 'all' || featured !== 'all';
   const _hasNoResults = !_hasBobbleheads && _isFiltered;
   const _hasNoBobbleheads = !_hasBobbleheads && !_hasNoResults;
   const _hasSelection = selectedIds.size > 0;
 
-  const _isAllSelected = selectedIds.size === filteredBobbleheads.length && filteredBobbleheads.length > 0;
+  const _isAllSelected = selectedIds.size === bobbleheads.length && bobbleheads.length > 0;
 
   return (
     <Fragment>
@@ -173,13 +179,13 @@ export const BobbleheadGridDisplay = ({
         isSelectionMode={isSelectionMode}
         onClearFilters={handleClearFilters}
         onFilterCategoryChange={(value) => {
-          void setParams({ category: value });
+          void setParams({ category: value, page: 1 });
         }}
         onFilterConditionChange={(value) => {
-          void setParams({ condition: value as typeof condition });
+          void setParams({ condition: value as typeof condition, page: 1 });
         }}
         onFilterFeaturedChange={(value) => {
-          void setParams({ featured: value as typeof featured });
+          void setParams({ featured: value as typeof featured, page: 1 });
         }}
         onGridDensityToggle={handleGridDensityToggle}
         onHoverCardToggle={handleHoverCardToggle}
@@ -189,7 +195,7 @@ export const BobbleheadGridDisplay = ({
         }}
         onSelectionModeToggle={handleSelectionModeToggle}
         onSortChange={(value) => {
-          void setParams({ sortBy: value as typeof sortBy });
+          void setParams({ page: 1, sortBy: value as typeof sortBy });
         }}
         searchValue={searchInput}
         sortBy={sortBy}
@@ -209,7 +215,7 @@ export const BobbleheadGridDisplay = ({
       {/* Bobblehead Grid */}
       <BobbleheadGrid gridDensity={gridDensity} isEmpty={!_hasBobbleheads}>
         <Conditional isCondition={_hasBobbleheads}>
-          {filteredBobbleheads.map((bobblehead) => (
+          {bobbleheads.map((bobblehead) => (
             <BobbleheadCard
               bobblehead={bobblehead}
               isHoverCardEnabled={isHoverCardEnabled}
@@ -232,6 +238,18 @@ export const BobbleheadGridDisplay = ({
           <NoBobbleheads collectionId={collectionId} />
         </Conditional>
       </BobbleheadGrid>
+
+      {/* Pagination */}
+      <Conditional isCondition={pagination !== undefined && pagination.totalCount > 0}>
+        <BobbleheadPagination
+          currentPage={pagination?.currentPage ?? 1}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          pageSize={pagination?.pageSize ?? 24}
+          totalCount={pagination?.totalCount ?? 0}
+          totalPages={pagination?.totalPages ?? 1}
+        />
+      </Conditional>
     </Fragment>
   );
 };

@@ -1,6 +1,6 @@
 import type { DynamicRoute, InferPagePropsType } from 'next-typesafe-url';
 
-import { createSearchParamsCache, parseAsString, parseAsStringEnum } from 'nuqs/server';
+import { createSearchParamsCache, parseAsInteger, parseAsString, parseAsStringEnum } from 'nuqs/server';
 import { z } from 'zod';
 
 import { ENUMS } from '@/lib/constants';
@@ -28,6 +28,8 @@ export const Route = {
       .enum([...FEATURED_FILTER_OPTIONS] as [string, ...Array<string>])
       .optional()
       .default('all'),
+    page: z.coerce.number().int().positive().optional().default(1),
+    pageSize: z.coerce.number().int().positive().optional().default(24),
     search: z.string().optional().default(''),
     sortBy: z
       .enum([...BOBBLEHEAD_SORT_OPTIONS] as [string, ...Array<string>])
@@ -41,6 +43,8 @@ export const collectionDashboardParsers = {
   collectionSlug: parseAsString,
   condition: parseAsStringEnum([...CONDITION_FILTER_OPTIONS]).withDefault('all'),
   featured: parseAsStringEnum([...FEATURED_FILTER_OPTIONS]).withDefault('all'),
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(24),
   search: parseAsString.withDefault(''),
   sortBy: parseAsStringEnum([...BOBBLEHEAD_SORT_OPTIONS]).withDefault('newest'),
 };

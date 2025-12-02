@@ -360,6 +360,34 @@ export class CacheService {
     },
 
     /**
+     * cache bobblehead count by collection for pagination
+     */
+    countByCollection: async <T>(
+      fn: () => Promise<T>,
+      collectionId: string,
+      filtersHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.COUNT_BY_COLLECTION(collectionId, filtersHash);
+      const tags = [
+        ...CacheTagGenerators.collection.read(collectionId, options.context?.userId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionId,
+          entityType: 'collection',
+          operation: 'bobblehead:count-by-collection',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
      * cache bobblehead photos
      */
     photos: async <T>(

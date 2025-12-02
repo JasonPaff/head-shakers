@@ -152,6 +152,8 @@ export const CACHE_KEYS = {
       `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:by-user:${userId}${options ? `:${options}` : ''}`,
     CATEGORIES_BY_COLLECTION: (collectionSlug: string) =>
       `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:categories:${collectionSlug}`,
+    COUNT_BY_COLLECTION: (collectionId: string, filtersHash?: string) =>
+      `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:count:by-collection:${collectionId}${filtersHash ? `:${filtersHash}` : ''}`,
     PHOTOS: (bobbleheadId: string) => `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:photos:${bobbleheadId}`,
     SEARCH: (query: string, filters: string) =>
       `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:search:${query}:${filters}`,

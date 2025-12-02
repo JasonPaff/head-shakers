@@ -1,6 +1,6 @@
 import type { AnyColumn } from 'drizzle-orm';
 
-import { asc, desc, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
+import { asc, count, desc, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
 
 import type { UserQueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
@@ -20,6 +20,8 @@ export type BobbleheadDashboardQueryOptions = {
   category?: string;
   condition?: string;
   featured?: 'all' | 'featured' | 'not-featured';
+  page?: number;
+  pageSize?: number;
   searchTerm?: string;
   sortBy?: string;
 };
@@ -47,12 +49,45 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
     return result.map((r) => r.category).filter(Boolean) as Array<string>;
   }
 
+  /**
+   * Get total count of bobbleheads matching filters (without pagination)
+   */
+  static async getCountAsync(
+    collectionSlug: string,
+    context: UserQueryContext,
+    options?: Omit<BobbleheadDashboardQueryOptions, 'page' | 'pageSize'>,
+  ): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const countResult = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .where(
+        this.combineFilters(
+          eq(collections.slug, collectionSlug),
+          this._getSearchCondition(options?.searchTerm),
+          this._getCategoryCondition(options?.category),
+          this._getConditionFilter(options?.condition),
+          this._getFeaturedCondition(options?.featured),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
+        ),
+      );
+
+    return countResult[0]?.count || 0;
+  }
+
   static async getListAsync(
     collectionSlug: string,
     context: UserQueryContext,
     options?: BobbleheadDashboardQueryOptions,
   ): Promise<Array<BobbleheadDashboardListRecord>> {
     const dbInstance = this.getDbInstance(context);
+
+    // extract pagination parameters with defaults
+    const page = options?.page ?? 1;
+    const pageSize = options?.pageSize ?? 24;
+    const offset = (page - 1) * pageSize;
 
     return dbInstance
       .select({
@@ -103,7 +138,9 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
           this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
-      .orderBy(this._getSortOrder(options?.sortBy));
+      .orderBy(this._getSortOrder(options?.sortBy))
+      .limit(pageSize)
+      .offset(offset);
   }
 
   /**
