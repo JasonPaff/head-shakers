@@ -5,7 +5,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
-import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
+import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
 import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { Conditional } from '@/components/ui/conditional';
@@ -20,16 +20,7 @@ import { BulkActionsBar } from '../main/bulk-actions-bar';
 import { Toolbar } from '../main/toolbar';
 
 type BobbleheadGridDisplayProps = {
-  bobbleheads: Array<
-    // TODO: fix this type
-    BobbleheadListRecord & {
-      collectionId: string;
-      commentCount: number;
-      featurePhoto?: null | string;
-      likeCount: number;
-      viewCount: number;
-    }
-  >;
+  bobbleheads: Array<BobbleheadDashboardListRecord>;
   categories: Array<string>;
   collectionId?: string;
   conditions: Array<string>;

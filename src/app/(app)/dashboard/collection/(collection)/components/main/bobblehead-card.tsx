@@ -3,7 +3,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
 
-import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
+import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,14 +37,7 @@ const conditionVariants = cva('inline-block rounded-md px-2 py-0.5 text-xs font-
 });
 
 export type BobbleheadCardProps = {
-  // TODO: fix this type
-  bobblehead: BobbleheadListRecord & {
-    collectionId: string;
-    commentCount: number;
-    featurePhoto?: null | string;
-    likeCount: number;
-    viewCount: number;
-  };
+  bobblehead: BobbleheadDashboardListRecord;
   isHoverCardEnabled?: boolean;
   isSelected: boolean;
   isSelectionMode: boolean;

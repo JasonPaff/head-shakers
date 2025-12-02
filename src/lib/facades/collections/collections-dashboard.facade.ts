@@ -1,8 +1,6 @@
+import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
-import type {
-  BobbleheadListRecord,
-  CollectionDashboardListRecord,
-} from '@/lib/queries/collections/collections.query';
+import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
@@ -25,16 +23,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
     dbInstance: DatabaseExecutor = db,
   ): Promise<{
     // TODO: fix this type
-    bobbleheads: Array<
-      BobbleheadListRecord & {
-        collectionId: string;
-        commentCount: number;
-        featurePhoto?: null | string;
-        likeCount: number;
-        likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
-        viewCount: number;
-      }
-    >;
+    bobbleheads: Array<BobbleheadDashboardListRecord>;
     collectionId: string;
   }> {
     return await executeFacadeOperation(

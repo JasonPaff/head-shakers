@@ -8,24 +8,21 @@ import type { BobbleheadListRecord } from '@/lib/queries/collections/collections
 import { bobbleheadPhotos, bobbleheads, collections, comments, contentViews, likes } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
+export type BobbleheadDashboardListRecord = BobbleheadListRecord & {
+  collectionId: string;
+  commentCount: number;
+  featurePhoto?: null | string;
+  likeCount: number;
+  viewCount: number;
+};
+
 export class BobbleheadsDashboardQuery extends BaseQuery {
   static async getListAsync(
     collectionSlug: string,
     context: UserQueryContext,
     // TODO: fix search/filter/sort options
     options?: { searchTerm?: string; sortBy?: string },
-  ): Promise<
-    Array<
-      // TODO: fix this type
-      BobbleheadListRecord & {
-        collectionId: string;
-        commentCount: number;
-        featurePhoto?: null | string;
-        likeCount: number;
-        viewCount: number;
-      }
-    >
-  > {
+  ): Promise<Array<BobbleheadDashboardListRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
