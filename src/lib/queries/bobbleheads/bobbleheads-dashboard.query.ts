@@ -1,6 +1,6 @@
 import type { AnyColumn } from 'drizzle-orm';
 
-import { asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { asc, desc, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
 
 import type { UserQueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
@@ -25,6 +25,28 @@ export type BobbleheadDashboardQueryOptions = {
 };
 
 export class BobbleheadsDashboardQuery extends BaseQuery {
+  /**
+   * Get all distinct categories for a collection (independent of filters)
+   */
+  static async getCategoriesAsync(collectionSlug: string, context: UserQueryContext): Promise<Array<string>> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .selectDistinct({ category: bobbleheads.category })
+      .from(bobbleheads)
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .where(
+        this.combineFilters(
+          eq(collections.slug, collectionSlug),
+          isNotNull(bobbleheads.category),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
+        ),
+      )
+      .orderBy(asc(bobbleheads.category));
+
+    return result.map((r) => r.category).filter(Boolean) as Array<string>;
+  }
+
   static async getListAsync(
     collectionSlug: string,
     context: UserQueryContext,

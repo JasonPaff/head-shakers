@@ -58,6 +58,7 @@ export const OPERATIONS = {
   },
   COLLECTIONS_DASHBOARD: {
     GET_BOBBLEHEAD_LIST_BY_COLLECTION_SLUG: 'get_bobblehead_list_by_collection_slug',
+    GET_CATEGORIES_FOR_COLLECTION: 'get_categories_for_collection',
     GET_HEADER_BY_COLLECTION_SLUG: 'get_header_by_collection_slug',
     GET_LIST_BY_USER_ID: 'get_list_by_user_id',
   },

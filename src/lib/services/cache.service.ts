@@ -332,6 +332,34 @@ export class CacheService {
     },
 
     /**
+     * cache categories for a collection
+     */
+    categoriesByCollection: async <T>(
+      fn: () => Promise<T>,
+      collectionSlug: string,
+      userId?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.CATEGORIES_BY_COLLECTION(collectionSlug);
+      const tags = [
+        ...CacheTagGenerators.collection.read(collectionSlug, userId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionSlug),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionSlug,
+          entityType: 'collection',
+          operation: 'bobblehead:categories-by-collection',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
      * cache bobblehead photos
      */
     photos: async <T>(

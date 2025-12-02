@@ -7,14 +7,17 @@ import {
   PlusIcon,
   SearchIcon,
   SettingsIcon,
+  XIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
+import { Fragment } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -35,6 +38,7 @@ export type ToolbarProps = {
   gridDensity: 'comfortable' | 'compact';
   isHoverCardEnabled: boolean;
   isSelectionMode: boolean;
+  onClearFilters: () => void;
   onFilterCategoryChange: (value: string) => void;
   onFilterConditionChange: (value: string) => void;
   onFilterFeaturedChange: (value: string) => void;
@@ -58,6 +62,7 @@ export const Toolbar = ({
   gridDensity,
   isHoverCardEnabled,
   isSelectionMode,
+  onClearFilters,
   onFilterCategoryChange,
   onFilterConditionChange,
   onFilterFeaturedChange,
@@ -138,6 +143,16 @@ export const Toolbar = ({
               <DropdownMenuRadioItem value={'featured'}>Featured Only</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={'not-featured'}>Not Featured</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
+
+            {hasActiveFilters && (
+              <Fragment>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className={'text-destructive'} onClick={onClearFilters}>
+                  <XIcon aria-hidden className={'size-4'} />
+                  Clear All Filters
+                </DropdownMenuItem>
+              </Fragment>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 

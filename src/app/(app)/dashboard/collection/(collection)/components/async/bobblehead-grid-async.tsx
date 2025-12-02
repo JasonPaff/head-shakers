@@ -34,20 +34,16 @@ export async function BobbleheadGridAsync() {
     );
   }
 
-  const data = await CollectionsDashboardFacade.getBobbleheadListByCollectionSlugAsync(
-    collectionSlug,
-    userId,
-    {
+  const [data, categories] = await Promise.all([
+    CollectionsDashboardFacade.getBobbleheadListByCollectionSlugAsync(collectionSlug, userId, {
       category: category !== 'all' ? category : undefined,
       condition: condition !== 'all' ? condition : undefined,
-      featured: featured !== 'all' ? (featured) : undefined,
+      featured: featured !== 'all' ? featured : undefined,
       searchTerm: search || undefined,
       sortBy,
-    },
-  );
-
-  // TODO: fix this up
-  const categories = [...new Set(data.bobbleheads?.map((b) => b.category).filter(Boolean))] as Array<string>;
+    }),
+    CollectionsDashboardFacade.getCategoriesForCollectionAsync(collectionSlug, userId),
+  ]);
 
   return (
     <BobbleheadGridDisplay

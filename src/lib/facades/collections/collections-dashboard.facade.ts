@@ -67,6 +67,31 @@ export class CollectionsDashboardFacade extends BaseFacade {
     );
   }
 
+  static async getCategoriesForCollectionAsync(
+    collectionSlug: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<string>> {
+    return await executeFacadeOperation(
+      {
+        data: { collectionSlug, userId },
+        facade,
+        method: 'getCategoriesForCollectionAsync',
+        operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_CATEGORIES_FOR_COLLECTION,
+      },
+      async () => {
+        return CacheService.bobbleheads.categoriesByCollection(
+          async () => {
+            const context = this.getUserContext(userId, dbInstance);
+            return await BobbleheadsDashboardQuery.getCategoriesAsync(collectionSlug, context);
+          },
+          collectionSlug,
+          userId,
+        );
+      },
+    );
+  }
+
   static async getHeaderByCollectionSlugAsync(
     userId: string,
     collectionSlug: string,

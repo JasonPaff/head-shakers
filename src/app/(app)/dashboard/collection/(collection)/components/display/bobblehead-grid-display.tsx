@@ -171,6 +171,7 @@ export const BobbleheadGridDisplay = ({
         gridDensity={gridDensity}
         isHoverCardEnabled={isHoverCardEnabled}
         isSelectionMode={isSelectionMode}
+        onClearFilters={handleClearFilters}
         onFilterCategoryChange={(value) => {
           void setParams({ category: value });
         }}

@@ -150,6 +150,8 @@ export const CACHE_KEYS = {
     BY_ID: (id: string) => `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:by-id:${id}`,
     BY_USER: (userId: string, options?: string) =>
       `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:by-user:${userId}${options ? `:${options}` : ''}`,
+    CATEGORIES_BY_COLLECTION: (collectionSlug: string) =>
+      `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:categories:${collectionSlug}`,
     PHOTOS: (bobbleheadId: string) => `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:photos:${bobbleheadId}`,
     SEARCH: (query: string, filters: string) =>
       `${CACHE_CONFIG.NAMESPACES.BOBBLEHEADS}:search:${query}:${filters}`,
