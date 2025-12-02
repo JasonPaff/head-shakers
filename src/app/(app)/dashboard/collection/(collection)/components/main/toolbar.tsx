@@ -79,7 +79,8 @@ export const Toolbar = ({
 
   return (
     <div
-      className={'m-4 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}
+      className={`sticky top-[var(--header-height)] z-10 flex flex-col gap-4 border-b bg-background/95 p-4
+        backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between`}
       data-slot={'toolbar'}
     >
       {/* Left Side - Search and Filters */}
