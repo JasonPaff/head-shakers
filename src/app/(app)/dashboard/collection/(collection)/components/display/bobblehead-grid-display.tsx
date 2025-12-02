@@ -77,6 +77,7 @@ export const BobbleheadGridDisplay = ({
 
   const handlePageChange = (newPage: number) => {
     void setParams({ page: newPage });
+    window.scrollTo({ behavior: 'smooth', top: 0 });
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
