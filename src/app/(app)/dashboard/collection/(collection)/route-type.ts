@@ -18,6 +18,7 @@ const CONDITION_FILTER_OPTIONS = ['all', ...ENUMS.BOBBLEHEAD.CONDITION] as const
 
 export const Route = {
   searchParams: z.object({
+    category: z.string().optional().default('all'),
     collectionSlug: z.string().optional(),
     condition: z
       .enum([...CONDITION_FILTER_OPTIONS] as [string, ...Array<string>])
@@ -36,6 +37,7 @@ export const Route = {
 } satisfies DynamicRoute;
 
 export const collectionDashboardParsers = {
+  category: parseAsString.withDefault('all'),
   collectionSlug: parseAsString,
   condition: parseAsStringEnum([...CONDITION_FILTER_OPTIONS]).withDefault('all'),
   featured: parseAsStringEnum([...FEATURED_FILTER_OPTIONS]).withDefault('all'),

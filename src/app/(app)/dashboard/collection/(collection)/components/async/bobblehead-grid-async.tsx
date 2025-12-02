@@ -16,6 +16,11 @@ export async function BobbleheadGridAsync() {
   const userId = await getRequiredUserIdAsync();
 
   const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
+  const category = collectionDashboardSearchParamsCache.get('category');
+  const condition = collectionDashboardSearchParamsCache.get('condition');
+  const featured = collectionDashboardSearchParamsCache.get('featured');
+  const search = collectionDashboardSearchParamsCache.get('search');
+  const sortBy = collectionDashboardSearchParamsCache.get('sortBy');
   const preferences = await getUserPreferences();
 
   if (!collectionSlug) {
@@ -32,6 +37,13 @@ export async function BobbleheadGridAsync() {
   const data = await CollectionsDashboardFacade.getBobbleheadListByCollectionSlugAsync(
     collectionSlug,
     userId,
+    {
+      category: category !== 'all' ? category : undefined,
+      condition: condition !== 'all' ? condition : undefined,
+      featured: featured !== 'all' ? (featured) : undefined,
+      searchTerm: search || undefined,
+      sortBy,
+    },
   );
 
   // TODO: fix this up

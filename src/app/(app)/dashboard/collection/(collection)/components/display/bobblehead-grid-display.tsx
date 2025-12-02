@@ -37,14 +37,14 @@ export const BobbleheadGridDisplay = ({
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
 
-  const [filterCategory, setFilterCategory] = useState('all');
   const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
     userPreferences.collectionGridDensity ?? 'compact',
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const [{ condition, featured, search, sortBy }, setParams] = useQueryStates(
+  const [{ category, condition, featured, search, sortBy }, setParams] = useQueryStates(
     {
+      category: collectionDashboardParsers.category,
       condition: collectionDashboardParsers.condition,
       featured: collectionDashboardParsers.featured,
       search: collectionDashboardParsers.search,
@@ -65,59 +65,19 @@ export const BobbleheadGridDisplay = ({
     }
   }, [debouncedSearch, search, setParams]);
 
+  // Client-side search filtering for immediate UI feedback while typing
+  // Backend handles all filtering/sorting after debounced search is synced to URL
   const filteredBobbleheads = useMemo(() => {
-    let result = [...bobbleheads];
+    if (!searchInput.trim()) return bobbleheads;
 
-    // Search filter (use local searchInput for immediate filtering)
-    if (searchInput.trim()) {
-      const query = searchInput.toLowerCase();
-      result = result.filter(
-        (b) =>
-          b.name?.toLowerCase().includes(query) ||
-          b.characterName?.toLowerCase().includes(query) ||
-          b.manufacturer?.toLowerCase().includes(query),
-      );
-    }
-
-    // Category filter
-    // TODO: Add category to bobblehead data type
-    // if (filterCategory !== 'all') {
-    //   result = result.filter((b) => b.category === filterCategory);
-    // }
-
-    // Condition filter
-    if (condition !== 'all') {
-      result = result.filter((b) => b.condition === condition);
-    }
-
-    // Featured filter
-    if (featured === 'featured') {
-      result = result.filter((b) => b.isFeatured);
-    } else if (featured === 'not-featured') {
-      result = result.filter((b) => !b.isFeatured);
-    }
-
-    // Sort
-    switch (sortBy) {
-      case 'name-asc':
-        result.sort((a, b) => a.name!.localeCompare(b.name!));
-        break;
-      case 'name-desc':
-        result.sort((a, b) => b.name!.localeCompare(a.name!));
-        break;
-      case 'value-high':
-        result.sort((a, b) => (b.purchasePrice || 0) - (a.purchasePrice || 0));
-        break;
-      case 'value-low':
-        result.sort((a, b) => (a.purchasePrice || 0) - (b.purchasePrice || 0));
-        break;
-      // newest/oldest would need createdAt field
-      default:
-        break;
-    }
-
-    return result;
-  }, [bobbleheads, searchInput, condition, featured, sortBy]);
+    const query = searchInput.toLowerCase();
+    return bobbleheads.filter(
+      (b) =>
+        b.name?.toLowerCase().includes(query) ||
+        b.characterName?.toLowerCase().includes(query) ||
+        b.manufacturer?.toLowerCase().includes(query),
+    );
+  }, [bobbleheads, searchInput]);
 
   const handleSelectionModeToggle = () => {
     setIsSelectionMode.toggle();
@@ -165,8 +125,8 @@ export const BobbleheadGridDisplay = ({
 
   const handleClearFilters = () => {
     setSearchInput('');
-    setFilterCategory('all');
     void setParams({
+      category: 'all',
       condition: 'all',
       featured: 'all',
       search: null,
@@ -191,7 +151,7 @@ export const BobbleheadGridDisplay = ({
   }, [setPreference, setHoverCardEnabled]);
 
   const _hasBobbleheads = filteredBobbleheads.length > 0;
-  const _isFiltered = !!searchInput || filterCategory !== 'all' || condition !== 'all';
+  const _isFiltered = !!searchInput || category !== 'all' || condition !== 'all' || featured !== 'all';
   const _hasNoResults = !_hasBobbleheads && _isFiltered;
   const _hasNoBobbleheads = !_hasBobbleheads && !_hasNoResults;
   const _hasSelection = selectedIds.size > 0;
@@ -205,13 +165,15 @@ export const BobbleheadGridDisplay = ({
         categories={categories}
         collectionId={collectionId}
         conditions={conditions}
-        filterCategory={filterCategory}
+        filterCategory={category}
         filterCondition={condition}
         filterFeatured={featured}
         gridDensity={gridDensity}
         isHoverCardEnabled={isHoverCardEnabled}
         isSelectionMode={isSelectionMode}
-        onFilterCategoryChange={setFilterCategory}
+        onFilterCategoryChange={(value) => {
+          void setParams({ category: value });
+        }}
         onFilterConditionChange={(value) => {
           void setParams({ condition: value as typeof condition });
         }}

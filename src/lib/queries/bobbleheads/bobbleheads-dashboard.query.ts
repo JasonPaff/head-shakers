@@ -16,12 +16,19 @@ export type BobbleheadDashboardListRecord = BobbleheadListRecord & {
   viewCount: number;
 };
 
+export type BobbleheadDashboardQueryOptions = {
+  category?: string;
+  condition?: string;
+  featured?: 'all' | 'featured' | 'not-featured';
+  searchTerm?: string;
+  sortBy?: string;
+};
+
 export class BobbleheadsDashboardQuery extends BaseQuery {
   static async getListAsync(
     collectionSlug: string,
     context: UserQueryContext,
-    // TODO: fix search/filter/sort options
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: BobbleheadDashboardQueryOptions,
   ): Promise<Array<BobbleheadDashboardListRecord>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -33,7 +40,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         characterName: bobbleheads.characterName,
         collectionId: bobbleheads.collectionId,
         collectionSlug: collections.slug,
-        commentCount: this._buildCountSubquery(comments, comments.targetId, 'bobblehead'),
+        commentCount: this._buildCountSubquery(comments, bobbleheads.id, 'bobblehead'),
         condition: bobbleheads.currentCondition,
         customFields: bobbleheads.customFields,
         description: bobbleheads.description,
@@ -42,7 +49,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         id: bobbleheads.id,
         isFeatured: bobbleheads.isFeatured,
         isPublic: bobbleheads.isPublic,
-        likeCount: this._buildCountSubquery(likes, likes.targetId, 'bobblehead'),
+        likeCount: this._buildCountSubquery(likes, bobbleheads.id, 'bobblehead'),
         manufacturer: bobbleheads.manufacturer,
         material: bobbleheads.material,
         name: bobbleheads.name,
@@ -51,7 +58,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         series: bobbleheads.series,
         slug: bobbleheads.slug,
         status: bobbleheads.status,
-        viewCount: this._buildCountSubquery(contentViews, contentViews.targetId, 'bobblehead'),
+        viewCount: this._buildCountSubquery(contentViews, bobbleheads.id, 'bobblehead'),
         weight: bobbleheads.weight,
         year: bobbleheads.year,
       })
@@ -68,6 +75,9 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         this.combineFilters(
           eq(collections.slug, collectionSlug),
           this._getSearchCondition(options?.searchTerm),
+          this._getCategoryCondition(options?.category),
+          this._getConditionFilter(options?.condition),
+          this._getFeaturedCondition(options?.featured),
           this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
@@ -89,9 +99,24 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
   ) {
     return sql<number>`(
       SELECT COUNT(*) FROM ${table}
-      WHERE ${table}.target_id = ${targetIdColumn}
-      AND ${table}.target_type = ${targetType}
+      WHERE ${table.targetId} = ${targetIdColumn}
+      AND ${table.targetType} = ${targetType}
     )`;
+  }
+
+  private static _getCategoryCondition(category?: string) {
+    if (!category || category === 'all') return undefined;
+    return eq(bobbleheads.category, category);
+  }
+
+  private static _getConditionFilter(condition?: string) {
+    if (!condition || condition === 'all') return undefined;
+    return eq(bobbleheads.currentCondition, condition);
+  }
+
+  private static _getFeaturedCondition(featured?: BobbleheadDashboardQueryOptions['featured']) {
+    if (!featured || featured === 'all') return undefined;
+    return eq(bobbleheads.isFeatured, featured === 'featured');
   }
 
   private static _getSearchCondition(searchTerm?: string) {
@@ -100,17 +125,22 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
       ilike(bobbleheads.name, `%${searchTerm}%`),
       ilike(bobbleheads.description, `%${searchTerm}%`),
       ilike(bobbleheads.characterName, `%${searchTerm}%`),
+      ilike(bobbleheads.manufacturer, `%${searchTerm}%`),
     );
   }
 
   private static _getSortOrder(sortBy?: string) {
     switch (sortBy) {
-      case 'name_asc':
+      case 'name-asc':
         return asc(bobbleheads.name);
-      case 'name_desc':
+      case 'name-desc':
         return desc(bobbleheads.name);
       case 'oldest':
         return asc(bobbleheads.createdAt);
+      case 'value-high':
+        return sql`${bobbleheads.purchasePrice} DESC NULLS LAST`;
+      case 'value-low':
+        return sql`${bobbleheads.purchasePrice} ASC NULLS LAST`;
       case 'newest':
       default:
         return desc(bobbleheads.createdAt);

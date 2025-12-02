@@ -1,4 +1,7 @@
-import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
+import type {
+  BobbleheadDashboardListRecord,
+  BobbleheadDashboardQueryOptions,
+} from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -12,14 +15,14 @@ import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 
-const facade = 'COLLECTIONS_DASHBOARD_FACADE';
+const facade = 'colllection_dashboard_facade';
 
 export class CollectionsDashboardFacade extends BaseFacade {
   // TODO: move to bobbleheads facade
   static async getBobbleheadListByCollectionSlugAsync(
     collectionSlug: string,
     userId: string,
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: BobbleheadDashboardQueryOptions,
     dbInstance: DatabaseExecutor = db,
   ): Promise<{
     // TODO: fix this type
