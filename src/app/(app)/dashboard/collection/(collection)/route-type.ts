@@ -1,6 +1,12 @@
 import type { DynamicRoute, InferPagePropsType } from 'next-typesafe-url';
 
-import { createSearchParamsCache, parseAsInteger, parseAsString, parseAsStringEnum } from 'nuqs/server';
+import {
+  createSearchParamsCache,
+  parseAsBoolean,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringEnum,
+} from 'nuqs/server';
 import { z } from 'zod';
 
 import { ENUMS } from '@/lib/constants';
@@ -18,6 +24,7 @@ const CONDITION_FILTER_OPTIONS = ['all', ...ENUMS.BOBBLEHEAD.CONDITION] as const
 
 export const Route = {
   searchParams: z.object({
+    add: z.coerce.boolean().optional().default(false),
     category: z.string().optional().default('all'),
     collectionSlug: z.string().optional(),
     condition: z
@@ -39,6 +46,7 @@ export const Route = {
 } satisfies DynamicRoute;
 
 export const collectionDashboardParsers = {
+  add: parseAsBoolean.withDefault(false),
   category: parseAsString.withDefault('all'),
   collectionSlug: parseAsString,
   condition: parseAsStringEnum([...CONDITION_FILTER_OPTIONS]).withDefault('all'),

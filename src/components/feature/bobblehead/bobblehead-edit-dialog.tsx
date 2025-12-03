@@ -22,14 +22,14 @@ interface BobbleheadEditDialogProps extends ComponentTestIdProps {
   onSuccess?: () => void;
 }
 
-import { AcquisitionDetails } from '@/app/(app)/bobbleheads/add/components/acquisition-details';
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
-import { BasicInformation } from '@/app/(app)/bobbleheads/add/components/basic-information';
-import { CollectionAssignment } from '@/app/(app)/bobbleheads/add/components/collection-assignment';
-import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fields';
-import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
-import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
-import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
+import { AcquisitionDetails } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/acquisition-details';
+import { AnimatedMotivationalMessage } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/animated-motivational-message';
+import { BasicInformation } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/basic-information';
+import { CollectionAssignment } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/collection-assignment';
+import { CustomFields } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/custom-fields';
+import { ItemSettings } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/item-settings';
+import { ItemTags } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/item-tags';
+import { PhysicalAttributes } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/physical-attributes';
 import { PhotoManagementFallback } from '@/components/feature/bobblehead/photo-management-fallback';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

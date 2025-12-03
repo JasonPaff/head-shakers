@@ -1,19 +1,28 @@
+'use client';
+
 import { MenuIcon, PlusIcon } from 'lucide-react';
+import { useQueryStates } from 'nuqs';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/tailwind-utils';
 
+import { collectionDashboardParsers } from '../../route-type';
+
 type CollectionMobileHeaderProps = {
   collectionName?: string;
-  onAddClick?: () => void;
   onMenuClick: () => void;
 };
 
 export const CollectionMobileHeader = ({
   collectionName = 'My Collection',
-  onAddClick,
   onMenuClick,
 }: CollectionMobileHeaderProps) => {
+  const [, setParams] = useQueryStates({ add: collectionDashboardParsers.add }, { shallow: false });
+
+  const handleAddClick = () => {
+    void setParams({ add: true });
+  };
+
   return (
     <div
       className={cn(
@@ -29,7 +38,7 @@ export const CollectionMobileHeader = ({
 
       <h1 className={'flex-1 truncate text-lg font-semibold'}>{collectionName}</h1>
 
-      <Button onClick={onAddClick} size={'sm'}>
+      <Button onClick={handleAddClick} size={'sm'}>
         <PlusIcon aria-hidden className={'size-4'} />
         <span className={'sr-only'}>Add bobblehead</span>
       </Button>

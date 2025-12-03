@@ -6,12 +6,13 @@ import { CameraIcon, ImageIcon, StarIcon, UploadIcon } from 'lucide-react';
 
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
-import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
 import { Conditional } from '@/components/ui/conditional';
 import { withForm } from '@/components/ui/form';
+
+import { addItemFormOptions } from './add-item-form-options';
+import { AnimatedMotivationalMessage } from './animated-motivational-message';
 
 export const ItemPhotos = withForm({
   ...addItemFormOptions,

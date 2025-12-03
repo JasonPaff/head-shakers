@@ -56,7 +56,6 @@ const isProtectedRoute = createRouteMatcher([
 
   // creation routes - require auth
   '/collections/create(.*)',
-  '/bobbleheads/add(.*)', // updated from items to bobbleheads
 
   // edit routes - require auth + ownership check
   '/collections/:slug/edit(.*)',

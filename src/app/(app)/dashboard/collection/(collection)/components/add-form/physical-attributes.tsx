@@ -3,12 +3,13 @@
 
 import { RulerIcon, StarIcon } from 'lucide-react';
 
-import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
-import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { ENUMS } from '@/lib/constants';
+
+import { addItemFormOptions } from './add-item-form-options';
+import { AnimatedMotivationalMessage } from './animated-motivational-message';
+import { useMotivationalMessage } from './hooks/use-motivational-message';
 
 const conditionOptions = ENUMS.BOBBLEHEAD.CONDITION.map((condition) => ({
   label: condition,

@@ -9,7 +9,6 @@ declare module "@@@next-typesafe-url" {
   import type { InferRoute, StaticRoute } from "next-typesafe-url";
 
   interface DynamicRouter {
-    "/bobbleheads/add": InferRoute<import("./src/app/(app)/bobbleheads/add/route-type").RouteType>;
     "/bobbleheads/[bobbleheadSlug]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type").RouteType>;
     "/bobbleheads/[bobbleheadSlug]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
@@ -34,7 +33,6 @@ declare module "@@@next-typesafe-url" {
     "/collections/[collectionSlug]/edit": StaticRoute;
     "/collections/[collectionSlug]/settings": StaticRoute;
     "/collections/[collectionSlug]/share": StaticRoute;
-    "/dashboard/collection-demo": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;

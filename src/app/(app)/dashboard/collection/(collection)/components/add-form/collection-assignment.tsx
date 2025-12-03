@@ -6,13 +6,14 @@ import { useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
-import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
-import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
+
+import { addItemFormOptions } from './add-item-form-options';
+import { AnimatedMotivationalMessage } from './animated-motivational-message';
+import { useMotivationalMessage } from './hooks/use-motivational-message';
 
 export const CollectionAssignment = withForm({
   ...addItemFormOptions,

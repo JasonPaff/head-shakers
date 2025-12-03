@@ -1,16 +1,19 @@
 'use client';
 
 import { BoxIcon, PlusIcon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
+import { useQueryStates } from 'nuqs';
 
 import { Button } from '@/components/ui/button';
 
-interface NoBobbleheadsProps {
-  collectionId?: string;
-}
+import { collectionDashboardParsers } from '../../route-type';
 
-export const NoBobbleheads = ({ collectionId }: NoBobbleheadsProps) => {
+export const NoBobbleheads = () => {
+  const [, setParams] = useQueryStates({ add: collectionDashboardParsers.add }, { shallow: false });
+
+  const handleAddClick = () => {
+    void setParams({ add: true });
+  };
+
   return (
     <div
       className={`flex h-full min-h-[400px] w-full flex-col items-center justify-center
@@ -22,11 +25,9 @@ export const NoBobbleheads = ({ collectionId }: NoBobbleheadsProps) => {
       <p className={'mb-4 max-w-sm text-sm text-muted-foreground'}>
         Start building this collection by adding your first bobblehead
       </p>
-      <Button asChild>
-        <Link href={$path({ route: '/bobbleheads/add', searchParams: { collectionId } })}>
-          <PlusIcon aria-hidden className={'size-4'} />
-          Add Your First Bobblehead
-        </Link>
+      <Button onClick={handleAddClick}>
+        <PlusIcon aria-hidden className={'size-4'} />
+        Add Your First Bobblehead
       </Button>
     </div>
   );

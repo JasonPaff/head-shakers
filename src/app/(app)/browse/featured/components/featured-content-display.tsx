@@ -315,7 +315,9 @@ export const FeaturedContentDisplay = ({
               <Link href={$path({ route: '/dashboard/collection' })}>Create Collection</Link>
             </Button>
             <Button asChild variant={'outline'}>
-              <Link href={$path({ route: '/bobbleheads/add' })}>Add Bobblehead</Link>
+              <Link href={$path({ route: '/dashboard/collection', searchParams: { add: true } })}>
+                Add Bobblehead
+              </Link>
             </Button>
           </AuthContent>
         </div>

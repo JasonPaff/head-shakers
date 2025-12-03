@@ -31,7 +31,7 @@ const collectionNavItems: Array<NavItem> = [
     title: 'Dashboard',
   },
   {
-    href: $path({ route: '/bobbleheads/add' }),
+    href: $path({ route: '/dashboard/collection', searchParams: { add: true } }),
     icon: PackagePlusIcon,
     title: 'Add Bobblehead',
   },

@@ -67,7 +67,7 @@ const userNavItems = [
     label: 'Dashboard',
   },
   {
-    href: $path({ route: '/bobbleheads/add' }),
+    href: $path({ route: '/dashboard/collection', searchParams: { add: true } }),
     icon: PackagePlusIcon,
     label: 'Add Bobblehead',
   },

@@ -53,7 +53,6 @@ export async function BobbleheadGridAsync() {
     <BobbleheadGridDisplay
       bobbleheads={data.bobbleheads}
       categories={categories}
-      collectionId={data.collectionId}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
       pagination={data.pagination}
       userPreferences={preferences}

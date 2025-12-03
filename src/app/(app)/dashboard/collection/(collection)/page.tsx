@@ -13,6 +13,8 @@ import { sortCollections } from '@/lib/utils/collection.utils';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
+import { AddItemFormSkeleton } from './components/add-form/skeletons/add-item-form-skeleton';
+import { AddBobbleheadFormAsync } from './components/async/add-bobblehead-form-async';
 import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
 import { SidebarAsync } from './components/async/sidebar-async';
@@ -50,6 +52,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
       url.searchParams.set('collectionSlug', firstCollection.slug);
 
       // Preserve other params if they differ from defaults
+      if (params.add) url.searchParams.set('add', 'true');
       if (params.search) url.searchParams.set('search', params.search);
       if (params.condition !== 'all') url.searchParams.set('condition', params.condition);
       if (params.featured !== 'all') url.searchParams.set('featured', params.featured);
@@ -59,23 +62,32 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
     }
   }
 
+  const isAddMode = params.add === true;
+
   return (
     <CollectionLayout
       main={
         <Fragment>
-          {/* Collection Header */}
+          {/* Collection Header - always shown */}
           <ErrorBoundary name={'collection-header'}>
             <Suspense fallback={<CollectionHeaderSkeleton />}>
               <CollectionHeaderAsync />
             </Suspense>
           </ErrorBoundary>
 
-          {/* Bobblehead Grid */}
-          <ErrorBoundary name={'collection-bobbleheads'}>
-            <Suspense fallback={<BobbleheadContentSkeleton />}>
-              <BobbleheadGridAsync />
-            </Suspense>
-          </ErrorBoundary>
+          {/* Conditional: Add Form or Bobblehead Grid */}
+          {isAddMode ?
+            <ErrorBoundary name={'add-bobblehead-form'}>
+              <Suspense fallback={<AddItemFormSkeleton />}>
+                <AddBobbleheadFormAsync />
+              </Suspense>
+            </ErrorBoundary>
+          : <ErrorBoundary name={'collection-bobbleheads'}>
+              <Suspense fallback={<BobbleheadContentSkeleton />}>
+                <BobbleheadGridAsync />
+              </Suspense>
+            </ErrorBoundary>
+          }
         </Fragment>
       }
       sidebar={

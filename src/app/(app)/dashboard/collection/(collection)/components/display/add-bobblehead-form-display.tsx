@@ -4,20 +4,10 @@ import type { z } from 'zod';
 
 import { revalidateLogic } from '@tanstack/form-core';
 import { CheckCircle2Icon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import { useRouter } from 'next/navigation';
+import { useQueryStates } from 'nuqs';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
-import { AcquisitionDetails } from '@/app/(app)/bobbleheads/add/components/acquisition-details';
-import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
-import { BasicInformation } from '@/app/(app)/bobbleheads/add/components/basic-information';
-import { CollectionAssignment } from '@/app/(app)/bobbleheads/add/components/collection-assignment';
-import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fields';
-import { ItemPhotos } from '@/app/(app)/bobbleheads/add/components/item-photos';
-import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
-import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
-import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
@@ -27,27 +17,37 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
-interface AddItemFormClientProps {
+import { collectionDashboardParsers } from '../../route-type';
+import { AcquisitionDetails } from '../add-form/acquisition-details';
+import { addItemFormOptions } from '../add-form/add-item-form-options';
+import { AddItemHeader } from '../add-form/add-item-header';
+import { BasicInformation } from '../add-form/basic-information';
+import { CollectionAssignment } from '../add-form/collection-assignment';
+import { CustomFields } from '../add-form/custom-fields';
+import { ItemPhotos } from '../add-form/item-photos';
+import { ItemSettings } from '../add-form/item-settings';
+import { ItemTags } from '../add-form/item-tags';
+import { PhysicalAttributes } from '../add-form/physical-attributes';
+
+interface AddBobbleheadFormDisplayProps {
   collections: Array<ComboboxItem>;
   initialCollectionId?: string;
 }
 
-export const AddItemFormClient = withFocusManagement(
-  ({ collections, initialCollectionId }: AddItemFormClientProps) => {
-    const router = useRouter();
+export const AddBobbleheadFormDisplay = withFocusManagement(
+  ({ collections, initialCollectionId }: AddBobbleheadFormDisplayProps) => {
     const { focusFirstError } = useFocusContext();
+    const [, setParams] = useQueryStates({ add: collectionDashboardParsers.add }, { shallow: false });
+
+    const handleClose = () => {
+      void setParams({ add: null });
+    };
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
       loadingMessage: 'Adding your bobblehead to the collection...',
-      onSuccess: ({ data }) => {
-        if (data?.data?.collectionSlug) {
-          router.push(
-            $path({
-              route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: data.data.collectionSlug },
-            }),
-          );
-        }
+      onSuccess: () => {
+        // Return to grid view after successful creation
+        handleClose();
       },
     });
 
@@ -73,10 +73,6 @@ export const AddItemFormClient = withFocusManagement(
       },
     });
 
-    const handleCancel = () => {
-      router.back();
-    };
-
     return (
       <form
         onSubmit={(e) => {
@@ -85,7 +81,8 @@ export const AddItemFormClient = withFocusManagement(
           void form.handleSubmit();
         }}
       >
-        <div className={'space-y-8'}>
+        <div className={'space-y-8 p-6'}>
+          <AddItemHeader />
           <CollectionAssignment collections={collections} form={form} />
           <BasicInformation form={form} />
           <ItemPhotos form={form} />
@@ -104,7 +101,12 @@ export const AddItemFormClient = withFocusManagement(
               <div className={'flex items-center justify-end'}>
                 {/* Form actions */}
                 <div className={'flex items-center gap-4'}>
-                  <Button className={'min-w-[100px]'} onClick={handleCancel} variant={'outline'}>
+                  <Button
+                    className={'min-w-[100px]'}
+                    onClick={handleClose}
+                    type={'button'}
+                    variant={'outline'}
+                  >
                     Cancel
                   </Button>
                   <form.SubmitButton isDisabled={isExecuting}>

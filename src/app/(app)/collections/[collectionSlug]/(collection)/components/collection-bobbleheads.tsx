@@ -71,8 +71,8 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
           <Button asChild variant={'outline'}>
             <Link
               href={$path({
-                route: '/bobbleheads/add',
-                searchParams: { collectionId: collection.id },
+                route: '/dashboard/collection',
+                searchParams: { add: true },
               })}
             >
               <PlusIcon aria-hidden className={'mr-2 size-4'} />
@@ -106,8 +106,8 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
                 <Button asChild>
                   <Link
                     href={$path({
-                      route: '/bobbleheads/add',
-                      searchParams: { collectionId: collection.id },
+                      route: '/dashboard/collection',
+                      searchParams: { add: true },
                     })}
                   >
                     <PlusIcon aria-hidden className={'mr-2 size-4'} />

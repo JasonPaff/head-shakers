@@ -23,7 +23,6 @@ import { Toolbar } from '../main/toolbar';
 type BobbleheadGridDisplayProps = {
   bobbleheads: Array<BobbleheadDashboardListRecord>;
   categories: Array<string>;
-  collectionId?: string;
   conditions: Array<string>;
   pagination?: {
     currentPage: number;
@@ -37,7 +36,6 @@ type BobbleheadGridDisplayProps = {
 export const BobbleheadGridDisplay = ({
   bobbleheads,
   categories,
-  collectionId,
   conditions,
   pagination,
   userPreferences,
@@ -52,6 +50,7 @@ export const BobbleheadGridDisplay = ({
 
   const [{ category, condition, featured, search, sortBy }, setParams] = useQueryStates(
     {
+      add: collectionDashboardParsers.add,
       category: collectionDashboardParsers.category,
       condition: collectionDashboardParsers.condition,
       featured: collectionDashboardParsers.featured,
@@ -157,6 +156,10 @@ export const BobbleheadGridDisplay = ({
     });
   }, [setPreference, setHoverCardEnabled]);
 
+  const handleAddClick = useCallback(() => {
+    void setParams({ add: true });
+  }, [setParams]);
+
   const _hasBobbleheads = bobbleheads.length > 0;
   const _isFiltered = !!searchInput || category !== 'all' || condition !== 'all' || featured !== 'all';
   const _hasNoResults = !_hasBobbleheads && _isFiltered;
@@ -170,7 +173,6 @@ export const BobbleheadGridDisplay = ({
       {/* Toolbar */}
       <Toolbar
         categories={categories}
-        collectionId={collectionId}
         conditions={conditions}
         filterCategory={category}
         filterCondition={condition}
@@ -178,6 +180,7 @@ export const BobbleheadGridDisplay = ({
         gridDensity={gridDensity}
         isHoverCardEnabled={isHoverCardEnabled}
         isSelectionMode={isSelectionMode}
+        onAddClick={handleAddClick}
         onClearFilters={handleClearFilters}
         onFilterCategoryChange={(value) => {
           void setParams({ category: value, page: 1 });
@@ -236,7 +239,7 @@ export const BobbleheadGridDisplay = ({
         </Conditional>
 
         <Conditional isCondition={_hasNoBobbleheads}>
-          <NoBobbleheads collectionId={collectionId} />
+          <NoBobbleheads />
         </Conditional>
       </BobbleheadGrid>
 

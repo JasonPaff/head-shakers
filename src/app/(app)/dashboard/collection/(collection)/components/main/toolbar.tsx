@@ -9,8 +9,6 @@ import {
   SettingsIcon,
   XIcon,
 } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
 import { Fragment } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -30,7 +28,6 @@ import { Switch } from '@/components/ui/switch';
 
 export type ToolbarProps = {
   categories?: Array<string>;
-  collectionId?: string;
   conditions?: Array<string>;
   filterCategory: string;
   filterCondition: string;
@@ -38,6 +35,7 @@ export type ToolbarProps = {
   gridDensity: 'comfortable' | 'compact';
   isHoverCardEnabled: boolean;
   isSelectionMode: boolean;
+  onAddClick: () => void;
   onClearFilters: () => void;
   onFilterCategoryChange: (value: string) => void;
   onFilterConditionChange: (value: string) => void;
@@ -54,7 +52,6 @@ export type ToolbarProps = {
 
 export const Toolbar = ({
   categories = [],
-  collectionId,
   conditions = [],
   filterCategory,
   filterCondition,
@@ -62,6 +59,7 @@ export const Toolbar = ({
   gridDensity,
   isHoverCardEnabled,
   isSelectionMode,
+  onAddClick,
   onClearFilters,
   onFilterCategoryChange,
   onFilterConditionChange,
@@ -210,11 +208,9 @@ export const Toolbar = ({
         </Button>
 
         {/* Add New Button */}
-        <Button asChild size={'sm'}>
-          <Link href={$path({ route: '/bobbleheads/add', searchParams: { collectionId } })}>
-            <PlusIcon aria-hidden className={'size-4'} />
-            Add Bobblehead
-          </Link>
+        <Button onClick={onAddClick} size={'sm'}>
+          <PlusIcon aria-hidden className={'size-4'} />
+          Add Bobblehead
         </Button>
       </div>
 
