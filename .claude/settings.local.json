@@ -75,7 +75,9 @@
       "mcp__chrome-devtools__click",
       "Bash(npm run db:info:*)",
       "Bash(git show:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Skill(server-actions)",
+      "Skill(facade-layer)"
     ],
     "deny": [],
     "ask": []
