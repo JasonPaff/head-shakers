@@ -66,6 +66,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
       const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
       const userId = ctx.userId;
 
+      // TODO: wrap in action wrapper
       Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
       try {

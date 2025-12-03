@@ -28,9 +28,12 @@ export type BobbleheadDashboardQueryOptions = {
 
 export class BobbleheadsDashboardQuery extends BaseQuery {
   /**
-   * Get all distinct categories for a collection (independent of filters)
+   * Get all distinct categories for a collection
    */
-  static async getCategoriesAsync(collectionSlug: string, context: UserQueryContext): Promise<Array<string>> {
+  static async getCategoriesByCollectionSlugAsync(
+    collectionSlug: string,
+    context: UserQueryContext,
+  ): Promise<Array<string>> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance

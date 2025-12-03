@@ -10,11 +10,9 @@ export async function AddBobbleheadFormAsync() {
   const userId = await getRequiredUserIdAsync();
   const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
 
+  // TODO: use dedicated facade method for this data
   const userCollections = (await CollectionsFacade.getCollectionsByUser(userId, {}, userId)) ?? [];
-
-  // Find the current collection ID from the slug
   const currentCollection = userCollections.find((c) => c.slug === collectionSlug);
-
   const collectionsData = userCollections.map((collection) => ({
     id: collection.id,
     name: collection.name,

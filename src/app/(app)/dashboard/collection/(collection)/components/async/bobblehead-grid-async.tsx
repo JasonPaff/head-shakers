@@ -2,7 +2,7 @@ import 'server-only';
 
 import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ENUMS } from '@/lib/constants';
-import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
+import { BobbleheadsDashboardFacade } from '@/lib/facades/bobbleheads/bobbleheads-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
@@ -37,7 +37,7 @@ export async function BobbleheadGridAsync() {
   }
 
   const [data, categories] = await Promise.all([
-    CollectionsDashboardFacade.getBobbleheadListByCollectionSlugAsync(collectionSlug, userId, {
+    BobbleheadsDashboardFacade.getListByCollectionSlugAsync(collectionSlug, userId, {
       category: category !== 'all' ? category : undefined,
       condition: condition !== 'all' ? condition : undefined,
       featured: featured !== 'all' ? featured : undefined,
@@ -46,7 +46,7 @@ export async function BobbleheadGridAsync() {
       searchTerm: search || undefined,
       sortBy,
     }),
-    CollectionsDashboardFacade.getCategoriesForCollectionAsync(collectionSlug, userId),
+    BobbleheadsDashboardFacade.getCategoriesByCollectionSlugAsync(collectionSlug, userId),
   ]);
 
   return (
