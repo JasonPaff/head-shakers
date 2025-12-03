@@ -607,6 +607,31 @@ export class CacheService {
     },
 
     /**
+     * cache collection selectors (minimal data for dropdowns/comboboxes)
+     * Uses MEDIUM TTL as user collection list changes infrequently
+     */
+    selectorsByUser: async <T>(
+      fn: () => Promise<T>,
+      userId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:selectors:by-user:${userId}`;
+      const tags = [CACHE_CONFIG.TAGS.USER(userId), CACHE_CONFIG.TAGS.USER_COLLECTIONS(userId)];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: CACHE_ENTITY_TYPE.COLLECTION,
+          operation: 'collection:selectors-by-user',
+          userId,
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
      * cache collection with relations
      */
     withRelations: async <T>(

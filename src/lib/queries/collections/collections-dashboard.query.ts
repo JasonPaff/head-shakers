@@ -22,6 +22,11 @@ export type CollectionDashboardHeaderRecord = Pick<
   viewCount: number;
 };
 
+/**
+ * Minimal collection data for selector/dropdown components
+ */
+export type CollectionSelectorRecord = Pick<CollectionRecord, 'id' | 'name' | 'slug'>;
+
 export class CollectionsDashboardQuery extends BaseQuery {
   static async getHeaderByCollectionSlugAsync(
     collectionSlug: string,
@@ -99,6 +104,34 @@ export class CollectionsDashboardQuery extends BaseQuery {
           this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
         ),
       );
+
+    return result || [];
+  }
+
+  /**
+   * Get minimal collection data for selector/dropdown components.
+   * Returns only id, name, and slug - optimized for combobox usage.
+   *
+   * @param context - Query context with userId for permission filtering
+   * @returns Array of collection selectors ordered by name (case-insensitive)
+   */
+  static async getSelectorsByUserIdAsync(context: QueryContext): Promise<Array<CollectionSelectorRecord>> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        id: collections.id,
+        name: collections.name,
+        slug: collections.slug,
+      })
+      .from(collections)
+      .where(
+        this.combineFilters(
+          eq(collections.userId, context.userId!),
+          this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
+        ),
+      )
+      .orderBy(sql`lower(${collections.name}) asc`);
 
     return result || [];
   }

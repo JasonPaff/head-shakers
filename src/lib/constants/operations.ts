@@ -46,6 +46,9 @@ export const OPERATIONS = {
     UPDATE_PHOTO_METADATA: 'update_bobblehead_photo_metadata',
     UPLOAD_PHOTO: 'upload_bobblehead_photo',
   },
+  BOBBLEHEADS_DASHBOARD: {
+    GET_USER_COLLECTION_SELECTORS: 'get_user_collection_selectors',
+  },
   COLLECTIONS: {
     BROWSE: 'browse_collections',
     BROWSE_CATEGORIES: 'browse_categories',

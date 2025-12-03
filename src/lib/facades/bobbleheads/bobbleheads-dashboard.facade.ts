@@ -2,12 +2,14 @@ import type {
   BobbleheadDashboardListRecord,
   BobbleheadDashboardQueryOptions,
 } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
+import type { CollectionSelectorRecord } from '@/lib/queries/collections/collections-dashboard.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsDashboardQuery } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
+import { CollectionsDashboardQuery } from '@/lib/queries/collections/collections-dashboard.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
@@ -166,6 +168,51 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
             totalPages,
           },
         };
+      },
+    );
+  }
+
+  /**
+   * Get user's collection selectors for dropdown/combobox components.
+   * Returns minimal data: {id, name, slug}[] for efficient rendering.
+   *
+   * Caching: Uses MEDIUM TTL (30 minutes) as user collections change infrequently.
+   * Cache invalidation triggers:
+   * - Collection created
+   * - Collection deleted
+   * - Collection renamed (name/slug change)
+   *
+   * @param userId - The user ID to fetch collections for
+   * @param dbInstance - Optional database instance for transaction support
+   * @returns Array of collection selectors ordered by name
+   */
+  static async getUserCollectionSelectorsAsync(
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<CollectionSelectorRecord>> {
+    return await executeFacadeOperation(
+      {
+        data: { userId },
+        facade,
+        method: 'getUserCollectionSelectorsAsync',
+        operation: OPERATIONS.BOBBLEHEADS_DASHBOARD.GET_USER_COLLECTION_SELECTORS,
+      },
+      async () => {
+        return CacheService.collections.selectorsByUser(
+          async () => {
+            const context = this.getUserContext(userId, dbInstance);
+            return await CollectionsDashboardQuery.getSelectorsByUserIdAsync(context);
+          },
+          userId,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.COLLECTION,
+              facade,
+              operation: OPERATIONS.BOBBLEHEADS_DASHBOARD.GET_USER_COLLECTION_SELECTORS,
+              userId,
+            },
+          },
+        );
       },
     );
   }
