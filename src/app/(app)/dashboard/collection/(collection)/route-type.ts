@@ -31,6 +31,7 @@ export const Route = {
       .enum([...CONDITION_FILTER_OPTIONS] as [string, ...Array<string>])
       .optional()
       .default('all'),
+    edit: z.string().optional(),
     featured: z
       .enum([...FEATURED_FILTER_OPTIONS] as [string, ...Array<string>])
       .optional()
@@ -50,6 +51,7 @@ export const collectionDashboardParsers = {
   category: parseAsString.withDefault('all'),
   collectionSlug: parseAsString,
   condition: parseAsStringEnum([...CONDITION_FILTER_OPTIONS]).withDefault('all'),
+  edit: parseAsString,
   featured: parseAsStringEnum([...FEATURED_FILTER_OPTIONS]).withDefault('all'),
   page: parseAsInteger.withDefault(1),
   pageSize: parseAsInteger.withDefault(24),

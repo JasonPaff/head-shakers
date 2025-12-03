@@ -4,7 +4,6 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import type { CollectionSearchParams } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionBobbleheadControls } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls';
@@ -37,17 +36,6 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
     currentUserId || undefined,
     options,
   );
-
-  // Fetch user collections for edit dialog (only if owner)
-  let collections: Array<ComboboxItem> = [];
-  if (isOwner && currentUserId) {
-    const userCollections =
-      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
-    collections = userCollections.map((c) => ({
-      id: c.id,
-      name: c.name,
-    }));
-  }
 
   const isEmpty = bobbleheads.length === 0;
   const hasActiveFilters = searchTerm || sortBy !== 'newest';
@@ -128,34 +116,6 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
           {bobbleheads.map((bobblehead) => (
             <BobbleheadGalleryCard
               bobblehead={bobblehead}
-              bobbleheadForEdit={
-                isOwner ?
-                  {
-                    acquisitionDate: bobblehead.acquisitionDate,
-                    acquisitionMethod: bobblehead.acquisitionMethod,
-                    category: bobblehead.category,
-                    characterName: bobblehead.characterName,
-                    collectionId: bobblehead.collectionId,
-                    currentCondition: bobblehead.condition,
-                    customFields: bobblehead.customFields,
-                    description: bobblehead.description,
-                    height: bobblehead.height,
-                    id: bobblehead.id,
-                    isFeatured: bobblehead.isFeatured,
-                    isPublic: bobblehead.isPublic,
-                    manufacturer: bobblehead.manufacturer,
-                    material: bobblehead.material,
-                    name: bobblehead.name,
-                    purchaseLocation: bobblehead.purchaseLocation,
-                    purchasePrice: bobblehead.purchasePrice,
-                    series: bobblehead.series,
-                    status: bobblehead.status,
-                    weight: bobblehead.weight,
-                    year: bobblehead.year,
-                  }
-                : undefined
-              }
-              collections={isOwner ? collections : undefined}
               isOwner={isOwner}
               key={bobblehead.id}
               navigationContext={{ collectionId: collection.id }}

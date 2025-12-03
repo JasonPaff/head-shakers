@@ -2,6 +2,7 @@ import type {
   BobbleheadDashboardListRecord,
   BobbleheadDashboardQueryOptions,
 } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
+import type { BobbleheadRecord } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { CollectionSelectorRecord } from '@/lib/queries/collections/collections-dashboard.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
@@ -9,14 +10,66 @@ import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsDashboardQuery } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsDashboardQuery } from '@/lib/queries/collections/collections-dashboard.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 
+export type BobbleheadForEdit = BobbleheadRecord & {
+  tags: Array<{ id: string; name: string }>;
+};
+
 const facade = 'bobbleheads_dashboard_facade';
 
 export class BobbleheadsDashboardFacade extends BaseFacade {
+  /**
+   * Get a bobblehead by ID for editing purposes.
+   * Returns bobblehead data with tags. Photos are fetched separately client-side.
+   *
+   * Permission: Only the owner can fetch bobblehead for editing.
+   *
+   * @param bobbleheadId - The bobblehead ID to fetch
+   * @param userId - The user ID (must be the owner)
+   * @param dbInstance - Optional database instance for transaction support
+   * @returns Bobblehead data with tags, or null if not found or not owner
+   */
+  static async getBobbleheadForEditAsync(
+    bobbleheadId: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<BobbleheadForEdit | null> {
+    return await executeFacadeOperation(
+      {
+        data: { bobbleheadId, userId },
+        facade,
+        method: 'getBobbleheadForEditAsync',
+        operation: OPERATIONS.BOBBLEHEADS_DASHBOARD.GET_BOBBLEHEAD_FOR_EDIT,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+        const bobbleheadWithRelations = await BobbleheadsQuery.findByIdWithRelationsAsync(
+          bobbleheadId,
+          context,
+        );
+
+        // Return null if not found or user doesn't own it
+        if (!bobbleheadWithRelations || bobbleheadWithRelations.userId !== userId) {
+          return null;
+        }
+
+        // Return bobblehead with tags only (photos are fetched client-side)
+        return {
+          ...bobbleheadWithRelations,
+          tags: bobbleheadWithRelations.tags.map((tag) => ({
+            id: tag.id,
+            name: tag.name,
+          })),
+        };
+      },
+    );
+  }
+
   static async getCategoriesByCollectionSlugAsync(
     collectionSlug: string,
     userId: string,

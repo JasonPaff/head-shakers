@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
@@ -15,10 +14,8 @@ interface BobbleheadPageClientWrapperProps {
   bobbleheadId: string;
   bobbleheadSlug: string;
   canDelete: boolean;
-  canEdit: boolean;
   children: ReactNode;
   collectionId?: string;
-  collections: Array<ComboboxItem>;
   isOwner: boolean;
   likeData: ContentLikeData | null;
 }
@@ -28,10 +25,8 @@ export function BobbleheadPageClientWrapper({
   bobbleheadId,
   bobbleheadSlug,
   canDelete,
-  canEdit,
   children,
   collectionId,
-  collections,
   isOwner,
   likeData,
 }: BobbleheadPageClientWrapperProps) {
@@ -49,9 +44,7 @@ export function BobbleheadPageClientWrapper({
               <BobbleheadStickyHeader
                 bobblehead={bobblehead}
                 canDelete={canDelete}
-                canEdit={canEdit}
                 collectionName={bobblehead.collectionName || ''}
-                collections={collections}
                 collectionSlug={bobblehead.collectionSlug || ''}
                 commentCount={bobblehead.commentCount ?? 0}
                 isLiked={likeData?.isLiked ?? false}

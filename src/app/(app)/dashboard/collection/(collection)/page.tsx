@@ -17,6 +17,7 @@ import { AddItemFormSkeleton } from './components/add-form/skeletons/add-item-fo
 import { AddBobbleheadFormAsync } from './components/async/add-bobblehead-form-async';
 import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
+import { EditBobbleheadFormAsync } from './components/async/edit-bobblehead-form-async';
 import { SidebarAsync } from './components/async/sidebar-async';
 import { CollectionLayout } from './components/layout/collection-layout';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
@@ -53,6 +54,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
 
       // Preserve other params if they differ from defaults
       if (params.add) url.searchParams.set('add', 'true');
+      if (params.edit) url.searchParams.set('edit', params.edit);
       if (params.search) url.searchParams.set('search', params.search);
       if (params.condition !== 'all') url.searchParams.set('condition', params.condition);
       if (params.featured !== 'all') url.searchParams.set('featured', params.featured);
@@ -63,6 +65,39 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
   }
 
   const isAddMode = params.add === true;
+  const isEditMode = !!params.edit;
+
+  // Render the appropriate main content based on mode
+  // Add mode takes precedence over edit mode if both are set
+  const renderMainContent = () => {
+    if (isAddMode) {
+      return (
+        <ErrorBoundary name={'add-bobblehead-form'}>
+          <Suspense fallback={<AddItemFormSkeleton />}>
+            <AddBobbleheadFormAsync />
+          </Suspense>
+        </ErrorBoundary>
+      );
+    }
+
+    if (isEditMode) {
+      return (
+        <ErrorBoundary name={'edit-bobblehead-form'}>
+          <Suspense fallback={<AddItemFormSkeleton />}>
+            <EditBobbleheadFormAsync />
+          </Suspense>
+        </ErrorBoundary>
+      );
+    }
+
+    return (
+      <ErrorBoundary name={'collection-bobbleheads'}>
+        <Suspense fallback={<BobbleheadContentSkeleton />}>
+          <BobbleheadGridAsync />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  };
 
   return (
     <CollectionLayout
@@ -75,19 +110,8 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
             </Suspense>
           </ErrorBoundary>
 
-          {/* Conditional: Add Form or Bobblehead Grid */}
-          {isAddMode ?
-            <ErrorBoundary name={'add-bobblehead-form'}>
-              <Suspense fallback={<AddItemFormSkeleton />}>
-                <AddBobbleheadFormAsync />
-              </Suspense>
-            </ErrorBoundary>
-          : <ErrorBoundary name={'collection-bobbleheads'}>
-              <Suspense fallback={<BobbleheadContentSkeleton />}>
-                <BobbleheadGridAsync />
-              </Suspense>
-            </ErrorBoundary>
-          }
+          {/* Conditional: Add Form, Edit Form, or Bobblehead Grid */}
+          {renderMainContent()}
         </Fragment>
       }
       sidebar={

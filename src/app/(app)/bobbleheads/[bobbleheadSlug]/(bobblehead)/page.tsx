@@ -23,7 +23,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { Conditional } from '@/components/ui/conditional';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
@@ -118,19 +117,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
 
   // Compute permission flags
   const isOwner = await getIsOwnerAsync(bobblehead.userId);
-  const canEdit = isOwner;
   const canDelete = isOwner;
-
-  // Fetch user collections for edit dialog (only if owner)
-  let collections: Array<{ id: string; name: string }> = [];
-  if (isOwner && currentUserId) {
-    const userCollections =
-      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
-    collections = userCollections.map((collection) => ({
-      id: collection.id,
-      name: collection.name,
-    }));
-  }
 
   // Fetch SEO metadata for JSON-LD schemas
   const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
@@ -181,9 +168,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         bobbleheadId={bobbleheadId}
         bobbleheadSlug={bobbleheadSlug}
         canDelete={canDelete}
-        canEdit={canEdit}
         collectionId={basicBobblehead.collectionId ?? undefined}
-        collections={collections}
         isOwner={isOwner}
         likeData={likeData}
       >

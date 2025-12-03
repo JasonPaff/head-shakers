@@ -3,25 +3,16 @@
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  MoreVerticalIcon,
-  PencilIcon,
-  ShareIcon,
-  TrashIcon,
-} from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import { BobbleheadDeleteDialog } from '@/components/feature/bobblehead/bobblehead-delete-dialog';
-import { BobbleheadEditDialog } from '@/components/feature/bobblehead/bobblehead-edit-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -29,7 +20,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LikeCompactButton } from '@/components/ui/like-button';
@@ -43,31 +33,6 @@ import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
-
-interface BobbleheadForEdit {
-  acquisitionDate: Date | null;
-  acquisitionMethod: null | string;
-  category: null | string;
-  characterName: null | string;
-  collectionId: string;
-  currentCondition: null | string;
-  customFields: Array<Record<string, string>> | null;
-  description: null | string;
-  height: null | number;
-  id: string;
-  isFeatured: boolean;
-  isPublic: boolean;
-  manufacturer: null | string;
-  material: null | string;
-  name: null | string;
-  purchaseLocation: null | string;
-  purchasePrice: null | number;
-  series: null | string;
-  status: null | string;
-  tags?: Array<{ id: string; name: string }>;
-  weight: null | number;
-  year: null | number;
-}
 
 interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
@@ -84,8 +49,6 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
     name: null | string;
     slug: string;
   };
-  bobbleheadForEdit?: BobbleheadForEdit;
-  collections?: Array<ComboboxItem>;
   isOwner: boolean;
   navigationContext?: {
     collectionId?: string;
@@ -94,8 +57,6 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
 
 export const BobbleheadGalleryCard = ({
   bobblehead,
-  bobbleheadForEdit,
-  collections,
   isOwner,
   navigationContext,
   testId,
@@ -119,7 +80,6 @@ export const BobbleheadGalleryCard = ({
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useToggle();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   // Touch swipe refs
   const touchStartXRef = useRef<number>(0);
@@ -489,17 +449,7 @@ export const BobbleheadGalleryCard = ({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align={'end'}>
-                {/* Edit */}
-                <DropdownMenuItem
-                  disabled={!bobbleheadForEdit || !collections}
-                  onClick={setIsEditDialogOpen.on}
-                >
-                  <PencilIcon aria-hidden className={'mr-2 size-4'} />
-                  Edit
-                </DropdownMenuItem>
-
                 {/* Delete */}
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={setIsDeleteDialogOpen.on} variant={'destructive'}>
                   <TrashIcon aria-hidden className={'mr-2 size-4'} />
                   Delete
@@ -527,16 +477,6 @@ export const BobbleheadGalleryCard = ({
           collectionSlug={bobblehead.collectionSlug!}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
-        />
-      </Conditional>
-
-      {/* Edit Dialog */}
-      <Conditional isCondition={isEditDialogOpen && !!bobbleheadForEdit && !!collections}>
-        <BobbleheadEditDialog
-          bobblehead={bobbleheadForEdit!}
-          collections={collections!}
-          isOpen={isEditDialogOpen}
-          onClose={setIsEditDialogOpen.off}
         />
       </Conditional>
     </Card>

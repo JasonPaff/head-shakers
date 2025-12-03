@@ -1,28 +1,23 @@
 'use client';
 
-import { ArrowLeftIcon, MessageCircleIcon, PencilIcon, ShareIcon } from 'lucide-react';
+import { ArrowLeftIcon, MessageCircleIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-delete';
-import { BobbleheadEditDialog } from '@/components/feature/bobblehead/bobblehead-edit-dialog';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
-import { useToggle } from '@/hooks/use-toggle';
 
 interface BobbleheadStickyHeaderProps {
   bobblehead: BobbleheadWithRelations;
   canDelete: boolean;
-  canEdit: boolean;
   collectionName: string;
-  collections: Array<ComboboxItem>;
   collectionSlug: string;
   commentCount: number;
   isLiked: boolean;
@@ -35,9 +30,7 @@ interface BobbleheadStickyHeaderProps {
 export const BobbleheadStickyHeader = ({
   bobblehead,
   canDelete,
-  canEdit,
   collectionName,
-  collections,
   collectionSlug,
   commentCount,
   isLiked,
@@ -46,14 +39,6 @@ export const BobbleheadStickyHeader = ({
   thumbnailUrl,
   title,
 }: BobbleheadStickyHeaderProps) => {
-  // useState hooks
-  const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
-
-  // event handlers
-  const handleEditClick = () => {
-    setIsEditDialogOpen.on();
-  };
-
   const handleCommentsClick = () => {
     const commentsSection = document.getElementById('comments-section');
     if (commentsSection) {
@@ -152,29 +137,15 @@ export const BobbleheadStickyHeader = ({
 
               {/* Owner Actions */}
               <Conditional isCondition={isOwner}>
-                <Fragment>
-                  {/* Edit Button */}
-                  <Conditional isCondition={canEdit}>
-                    <Button
-                      aria-label={'Edit bobblehead'}
-                      onClick={handleEditClick}
-                      size={'icon'}
-                      variant={'ghost'}
-                    >
-                      <PencilIcon aria-hidden className={'size-4'} />
-                    </Button>
-                  </Conditional>
-
-                  {/* Delete Button */}
-                  <Conditional isCondition={canDelete}>
-                    <BobbleheadHeaderDelete
-                      bobbleheadId={bobblehead.id}
-                      collectionSlug={collectionSlug}
-                      size={'icon'}
-                      variant={'ghost'}
-                    />
-                  </Conditional>
-                </Fragment>
+                {/* Delete Button */}
+                <Conditional isCondition={canDelete}>
+                  <BobbleheadHeaderDelete
+                    bobbleheadId={bobblehead.id}
+                    collectionSlug={collectionSlug}
+                    size={'icon'}
+                    variant={'ghost'}
+                  />
+                </Conditional>
               </Conditional>
 
               {/* Non-Owner Report Button */}
@@ -185,16 +156,6 @@ export const BobbleheadStickyHeader = ({
           </div>
         </div>
       </header>
-
-      {/* Edit Dialog */}
-      <Conditional isCondition={isEditDialogOpen}>
-        <BobbleheadEditDialog
-          bobblehead={bobblehead}
-          collections={collections}
-          isOpen={isEditDialogOpen}
-          onClose={setIsEditDialogOpen.off}
-        />
-      </Conditional>
     </Fragment>
   );
 };

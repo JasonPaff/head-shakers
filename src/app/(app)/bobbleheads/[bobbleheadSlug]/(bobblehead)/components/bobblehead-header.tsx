@@ -6,7 +6,6 @@ import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-delete';
-import { BobbleheadHeaderEdit } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-edit';
 import { CollectionBreadcrumb } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb';
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
@@ -17,7 +16,6 @@ import { LikeIconButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
-  collections: Array<{ id: string; name: string }>;
   currentUserId: null | string;
   isOwner?: boolean;
   likeData: ContentLikeData;
@@ -25,7 +23,6 @@ interface BobbleheadHeaderProps {
 
 export const BobbleheadHeader = ({
   bobblehead,
-  collections,
   currentUserId,
   isOwner = false,
   likeData,
@@ -56,18 +53,13 @@ export const BobbleheadHeader = ({
 
           {/* Owner Actions */}
           <Conditional isCondition={isOwner}>
-            <Fragment>
-              {/* Edit Bobblehead Button */}
-              <BobbleheadHeaderEdit bobblehead={bobblehead} collections={collections} />
-
-              {/* Delete Bobblehead Button */}
-              <BobbleheadHeaderDelete
-                bobbleheadId={bobblehead.id}
-                collectionSlug={bobblehead.collectionSlug ?? undefined}
-              >
-                Delete
-              </BobbleheadHeaderDelete>
-            </Fragment>
+            {/* Delete Bobblehead Button */}
+            <BobbleheadHeaderDelete
+              bobbleheadId={bobblehead.id}
+              collectionSlug={bobblehead.collectionSlug ?? undefined}
+            >
+              Delete
+            </BobbleheadHeaderDelete>
           </Conditional>
 
           {/* Non-Owner Actions */}

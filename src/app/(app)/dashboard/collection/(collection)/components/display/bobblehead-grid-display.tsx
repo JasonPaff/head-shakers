@@ -53,6 +53,7 @@ export const BobbleheadGridDisplay = ({
       add: collectionDashboardParsers.add,
       category: collectionDashboardParsers.category,
       condition: collectionDashboardParsers.condition,
+      edit: collectionDashboardParsers.edit,
       featured: collectionDashboardParsers.featured,
       page: collectionDashboardParsers.page,
       pageSize: collectionDashboardParsers.pageSize,
@@ -115,9 +116,12 @@ export const BobbleheadGridDisplay = ({
     console.log('Bulk feature:', Array.from(selectedIds));
   };
 
-  const handleEditBobblehead = (id: string) => {
-    console.log('Edit bobblehead:', id);
-  };
+  const handleEditBobblehead = useCallback(
+    (id: string) => {
+      void setParams({ edit: id });
+    },
+    [setParams],
+  );
 
   const handleDeleteBobblehead = (id: string) => {
     console.log('Delete bobblehead:', id);
