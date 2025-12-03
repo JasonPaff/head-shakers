@@ -19,8 +19,9 @@ import type {
   UpdateBobblehead,
   UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
+import type { CloudinaryPhoto } from '@/lib/validations/photo-upload.validation';
 
-import { OPERATIONS } from '@/lib/constants';
+import { CloudinaryPathBuilder, OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
@@ -41,10 +42,20 @@ import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeCacheKey, createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
-import { facadeBreadcrumb, trackFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import {
+  captureFacadeWarning,
+  facadeBreadcrumb,
+  trackFacadeWarning,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 const facade = 'bobbleheads_facade';
+
+export interface CreateBobbleheadResult {
+  bobblehead: BobbleheadRecord;
+  collectionSlug: null | string;
+  photos: Array<typeof bobbleheadPhotos.$inferSelect>;
+}
 
 export class BobbleheadsFacade extends BaseFacade {
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
@@ -81,6 +92,76 @@ export class BobbleheadsFacade extends BaseFacade {
         const uniqueSlug = ensureUniqueSlug(generateSlug(data.name), existingSlugs);
 
         return BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, context);
+      },
+    );
+  }
+
+  /**
+   * Create a bobblehead with optional photos.
+   * Handles photo movement from temp to permanent Cloudinary location.
+   *
+   * @param data - Bobblehead data to create
+   * @param photos - Optional array of temp photos to process
+   * @param userId - User creating the bobblehead
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Created bobblehead with photos and collection slug
+   */
+  static async createWithPhotosAsync(
+    data: InsertBobblehead,
+    photos: Array<CloudinaryPhoto> | undefined,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CreateBobbleheadResult | null> {
+    return await executeFacadeOperation(
+      {
+        data: { collectionId: data.collectionId, name: data.name, userId },
+        facade,
+        method: 'createWithPhotosAsync',
+        operation: OPERATIONS.BOBBLEHEADS.CREATE_WITH_PHOTOS,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+
+        // Generate unique slug and create bobblehead
+        const existingSlugs = await BobbleheadsQuery.getSlugsAsync(context);
+        const uniqueSlug = ensureUniqueSlug(generateSlug(data.name), existingSlugs);
+        const newBobblehead = await BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, context);
+
+        if (!newBobblehead) {
+          return null;
+        }
+
+        // Process photos if provided
+        let uploadedPhotos: Array<typeof bobbleheadPhotos.$inferSelect> = [];
+        if (photos && photos.length > 0) {
+          uploadedPhotos = await this.processPhotosForBobbleheadAsync(
+            photos,
+            newBobblehead.id,
+            newBobblehead.collectionId,
+            userId,
+            dbInstance,
+          );
+        }
+
+        // Fetch collection slug for navigation
+        const collection = await CollectionsFacade.getByIdAsync(
+          newBobblehead.collectionId,
+          userId,
+          dbInstance,
+        );
+        const collectionSlug = collection?.slug ?? null;
+
+        facadeBreadcrumb('Created bobblehead with photos', {
+          bobbleheadId: newBobblehead.id,
+          collectionSlug,
+          photosCount: uploadedPhotos.length,
+        });
+
+        return {
+          bobblehead: newBobblehead,
+          collectionSlug,
+          photos: uploadedPhotos,
+        };
       },
     );
   }
@@ -930,6 +1011,133 @@ export class BobbleheadsFacade extends BaseFacade {
         userId,
       };
       throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Process photos for a bobblehead - moves from temp to permanent location and creates DB records.
+   * Handles failures gracefully - will save with temp URLs as fallback if move fails.
+   *
+   * @param photos - Array of temp photos to process
+   * @param bobbleheadId - ID of the bobblehead to attach photos to
+   * @param collectionId - ID of the collection for the Cloudinary path
+   * @param userId - User ID for the Cloudinary path
+   * @param dbInstance - Database instance for transactions
+   * @returns Array of created photo records
+   */
+  private static async processPhotosForBobbleheadAsync(
+    photos: Array<CloudinaryPhoto>,
+    bobbleheadId: string,
+    collectionId: string,
+    userId: string,
+    dbInstance: DatabaseExecutor,
+  ): Promise<Array<typeof bobbleheadPhotos.$inferSelect>> {
+    try {
+      // Move photos from temp folder to permanent location in Cloudinary
+      const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(userId, collectionId, bobbleheadId);
+      const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
+        photos.map((photo) => ({
+          publicId: photo.publicId,
+          url: photo.url,
+        })),
+        permanentFolder,
+      );
+
+      // Create a map of old publicId to new values for quick lookup
+      const movedPhotosMap = new Map(
+        movedPhotos.map((moved) => [
+          moved.oldPublicId,
+          { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
+        ]),
+      );
+
+      // Update photo records with new URLs and public IDs
+      const photoRecords = photos.map((photo) => {
+        const movedPhoto = movedPhotosMap.get(photo.publicId);
+        return {
+          altText: photo.altText,
+          bobbleheadId: bobbleheadId,
+          caption: photo.caption,
+          fileSize: photo.bytes,
+          height: photo.height,
+          isPrimary: photo.isPrimary,
+          sortOrder: photo.sortOrder,
+          url: movedPhoto?.newUrl || photo.url, // Use new URL if move succeeded
+          width: photo.width,
+        };
+      });
+
+      // Insert photos into the database with permanent URLs
+      const uploadedPhotos = await Promise.all(
+        photoRecords.map((record) =>
+          BobbleheadsQuery.addPhotoAsync(record, this.getPublicContext(dbInstance)),
+        ),
+      );
+
+      // Log warning for any failed moves (photos saved with temp URLs)
+      const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
+      if (failedMoves.length > 0) {
+        trackFacadeWarning(
+          facade,
+          'processPhotosForBobbleheadAsync',
+          `Failed to move ${failedMoves.length} photos to permanent location`,
+          { bobbleheadId, failedCount: failedMoves.length },
+        );
+      }
+
+      // Filter out any null results from failed inserts
+      return uploadedPhotos.filter((photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== null);
+    } catch (photoError) {
+      // Photo processing failed, but we still want to keep the bobblehead
+      // Try to save photos with temp URLs as fallback
+      captureFacadeWarning(photoError, facade, OPERATIONS.BOBBLEHEADS.UPLOAD_PHOTO, {
+        bobbleheadId,
+        photoCount: photos.length,
+      });
+
+      try {
+        const fallbackRecords = photos.map((photo) => ({
+          altText: photo.altText,
+          bobbleheadId: bobbleheadId,
+          caption: photo.caption,
+          fileSize: photo.bytes,
+          height: photo.height,
+          isPrimary: photo.isPrimary,
+          sortOrder: photo.sortOrder,
+          url: photo.url, // Keep temp URL as fallback
+          width: photo.width,
+        }));
+
+        const fallbackPhotos = await Promise.all(
+          fallbackRecords.map((record) =>
+            BobbleheadsQuery.addPhotoAsync(record, this.getPublicContext(dbInstance)),
+          ),
+        );
+
+        // Filter out any null results from failed inserts
+        const validPhotos = fallbackPhotos.filter(
+          (photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== null,
+        );
+
+        trackFacadeWarning(
+          facade,
+          'processPhotosForBobbleheadAsync',
+          'Saved photos with temp URLs as fallback',
+          {
+            bobbleheadId,
+            photoCount: validPhotos.length,
+          },
+        );
+
+        return validPhotos;
+      } catch (fallbackError) {
+        // Fallback also failed - log and return empty array
+        captureFacadeWarning(fallbackError, facade, OPERATIONS.BOBBLEHEADS.UPLOAD_PHOTO, {
+          bobbleheadId,
+          context: 'fallback-save-failed',
+        });
+        return [];
+      }
     }
   }
 }

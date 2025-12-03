@@ -74,3 +74,5 @@ export const cloudinaryPhotosValidationSchema = z
     `Maximum ${CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD} photos allowed`,
   )
   .optional();
+
+export type CloudinaryPhoto = z.infer<typeof cloudinaryPhotoSchema>;
