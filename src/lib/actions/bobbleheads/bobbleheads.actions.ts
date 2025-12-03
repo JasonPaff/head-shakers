@@ -60,17 +60,14 @@ export const createBobbleheadWithPhotosAction = authActionClient
         bobblehead: unknown;
         collectionSlug: null | string;
         photos: Array<unknown>;
-        tags: Array<unknown>;
       }>
     > => {
-      const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
-      const userId = ctx.userId;
+      const { photos, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
 
-      // TODO: wrap in action wrapper
       Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
       try {
-        const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.db);
+        const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, ctx.userId, ctx.db);
 
         if (!newBobblehead) {
           throw new ActionError(
@@ -89,7 +86,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
           try {
             // move photos from temp folder to permanent location in Cloudinary
             const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
-              userId,
+              ctx.userId,
               newBobblehead.collectionId,
               newBobblehead.id,
             );
@@ -171,40 +168,14 @@ export const createBobbleheadWithPhotosAction = authActionClient
           }
         }
 
-        // process tags if provided
-        let createdTags: Array<unknown> = [];
-        if (tags && tags.length > 0) {
-          try {
-            // create or get existing tags for the user
-            const tagPromises = tags.map(async (tagName) => {
-              const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
-              return existingTag;
-            });
-
-            const tagRecords = await Promise.all(tagPromises);
-            const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
-
-            // attach tags to the bobblehead
-            if (tagIds.length > 0) {
-              await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.db);
-              createdTags = tagRecords.filter(Boolean);
-            }
-          } catch (tagError) {
-            // iff tag processing fails, we still want to keep the bobblehead
-            console.error('Tag processing failed:', tagError);
-            Sentry.captureException(tagError);
-          }
-        }
-
         Sentry.addBreadcrumb({
           category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
           data: {
             bobblehead: newBobblehead,
             photosCount: uploadedPhotos.length,
-            tagsCount: createdTags.length,
           },
           level: SENTRY_LEVELS.INFO,
-          message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
+          message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos`,
         });
 
         // invalidate metadata cache for the new bobblehead
@@ -212,27 +183,30 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
         CacheRevalidationService.bobbleheads.onCreate(
           newBobblehead.id,
-          userId,
+          ctx.userId,
           newBobblehead.collectionId,
           newBobblehead.slug,
         );
 
         // fetch collection slug for navigation
-        const collection = await CollectionsFacade.getByIdAsync(newBobblehead.collectionId, userId, ctx.db);
+        const collection = await CollectionsFacade.getByIdAsync(
+          newBobblehead.collectionId,
+          ctx.userId,
+          ctx.db,
+        );
         const collectionSlug = collection?.slug ?? null;
 
         return actionSuccess({
           bobblehead: newBobblehead,
           collectionSlug,
           photos: uploadedPhotos,
-          tags: createdTags,
         });
       } catch (error) {
         return handleActionError(error, {
           input: parsedInput,
           metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.CREATE },
           operation: OPERATIONS.BOBBLEHEADS.CREATE_WITH_PHOTOS,
-          userId,
+          userId: ctx.userId,
         });
       }
     },

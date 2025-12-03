@@ -25,6 +25,7 @@ import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
@@ -39,60 +40,49 @@ import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeCacheKey, createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 import { facadeBreadcrumb, trackFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
-const facadeName = 'BobbleheadsFacade';
+const facade = 'bobbleheads_facade';
 
-export class BobbleheadsFacade {
-  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
-    try {
-      const context = createPublicQueryContext({ dbInstance });
-      return BobbleheadsQuery.addPhotoAsync(data, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { bobbleheadId: data.bobbleheadId, url: data.url },
-        facade: facadeName,
+export class BobbleheadsFacade extends BaseFacade {
+  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
+    return await executeFacadeOperation(
+      {
+        data: { data },
+        facade,
         method: 'addPhotoAsync',
-        operation: 'addPhoto',
-      };
-      throw createFacadeError(context, error);
-    }
+        operation: OPERATIONS.BOBBLEHEADS.UPLOAD_PHOTO,
+      },
+      async () => {
+        const context = this.getPublicContext(dbInstance);
+        return BobbleheadsQuery.addPhotoAsync(data, context);
+      },
+    );
   }
 
   static async createAsync(
     data: InsertBobblehead,
     userId: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<BobbleheadRecord | null> {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const dbInst = context.dbInstance ?? db;
-
-      // generate slug from name
-      const baseSlug = generateSlug(data.name);
-
-      // query all existing bobblehead slugs to check for collisions
-      const existingSlugs = await dbInst
-        .select({ slug: bobbleheads.slug })
-        .from(bobbleheads)
-        .then((results) => results.map((r) => r.slug));
-
-      // ensure slug is unique across all bobbleheads
-      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-
-      // create bobblehead with unique slug
-      return BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, userId, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { manufacturer: data.manufacturer, name: data.name },
-        facade: facadeName,
+    return await executeFacadeOperation(
+      {
+        data: { data, userId },
+        facade,
         method: 'createAsync',
         operation: OPERATIONS.BOBBLEHEADS.CREATE,
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+
+        const existingSlugs = await BobbleheadsQuery.getSlugsAsync(context);
+        const uniqueSlug = ensureUniqueSlug(generateSlug(data.name), existingSlugs);
+
+        return BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, context);
+      },
+    );
   }
 
   static async deleteAsync(
@@ -130,7 +120,7 @@ export class BobbleheadsFacade {
 
           if (failedDeletions.length > 0) {
             trackFacadeWarning(
-              facadeName,
+              facade,
               'deleteAsync',
               `Failed to delete ${failedDeletions.length} photos from Cloudinary`,
               { bobbleheadId: bobblehead.id, count: failedDeletions.length, failures: failedDeletions },
@@ -149,7 +139,7 @@ export class BobbleheadsFacade {
       const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
 
       if (!wasTagRemovalSuccessful) {
-        trackFacadeWarning(facadeName, 'deleteAsync', 'Failed to remove tags during bobblehead deletion', {
+        trackFacadeWarning(facade, 'deleteAsync', 'Failed to remove tags during bobblehead deletion', {
           bobbleheadId: bobblehead.id,
         });
       }
@@ -158,7 +148,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId },
-        facade: facadeName,
+        facade: facade,
         method: 'deleteAsync',
         operation: OPERATIONS.BOBBLEHEADS.DELETE,
         userId,
@@ -191,7 +181,7 @@ export class BobbleheadsFacade {
         const failedDeletions = deletionResults.filter((result) => !result.success);
 
         if (failedDeletions.length > 0) {
-          trackFacadeWarning(facadeName, 'deletePhotoAsync', 'Failed to delete photo from Cloudinary', {
+          trackFacadeWarning(facade, 'deletePhotoAsync', 'Failed to delete photo from Cloudinary', {
             failures: failedDeletions,
             photoId: deletedPhoto.id,
           });
@@ -211,7 +201,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId, photoId: data.photoId },
-        facade: facadeName,
+        facade: facade,
         method: 'deletePhotoAsync',
         operation: OPERATIONS.BOBBLEHEADS.DELETE_PHOTO,
         userId,
@@ -260,7 +250,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { slug },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadBySlug',
         operation: 'getBySlug',
         userId: viewerUserId,
@@ -283,7 +273,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { slug },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadBySlugWithRelations',
         operation: 'getBySlugWithRelations',
         userId: viewerUserId,
@@ -310,7 +300,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadIds },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadContentPerformanceAsync',
         operation: 'getContentPerformance',
         userId: viewerUserId,
@@ -337,7 +327,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadIds },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadEngagementMetricsAsync',
         operation: 'getEngagementMetrics',
         userId: viewerUserId,
@@ -447,7 +437,7 @@ export class BobbleheadsFacade {
           context: {
             entityId: bobbleheadId,
             entityType: 'bobblehead',
-            facade: facadeName,
+            facade: facade,
             operation: 'getNavigationData',
             userId: viewerUserId,
           },
@@ -458,7 +448,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { bobbleheadId, collectionId },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadNavigationData',
         operation: 'getNavigationData',
         userId: viewerUserId,
@@ -495,7 +485,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadPhotos',
         operation: OPERATIONS.BOBBLEHEADS.GET_PHOTOS,
         userId: viewerUserId,
@@ -535,7 +525,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId, options },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadsByCollection',
         operation: OPERATIONS.BOBBLEHEADS.FIND_BY_COLLECTION,
         userId: viewerUserId,
@@ -569,7 +559,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadsByUser',
         operation: OPERATIONS.BOBBLEHEADS.GET_BY_USER,
         userId: viewerUserId || userId,
@@ -642,7 +632,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadViewCountAsync',
         operation: 'getViewCount',
         userId: viewerUserId,
@@ -674,7 +664,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId, options },
-        facade: facadeName,
+        facade: facade,
         method: 'getBobbleheadViewStatsAsync',
         operation: 'getViewStats',
         userId: viewerUserId,
@@ -731,7 +721,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options },
-        facade: facadeName,
+        facade: facade,
         method: 'getTrendingBobbleheadsAsync',
         operation: 'getTrendingContent',
         userId: viewerUserId,
@@ -775,7 +765,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
-        facade: facadeName,
+        facade: facade,
         method: 'recordBobbleheadViewAsync',
         operation: 'recordView',
         userId: viewerUserId,
@@ -805,7 +795,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId, photoCount: data.photoOrder.length },
-        facade: facadeName,
+        facade: facade,
         method: 'reorderPhotosAsync',
         operation: OPERATIONS.BOBBLEHEADS.REORDER_PHOTOS,
         userId,
@@ -853,7 +843,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { filters, options, searchTerm },
-        facade: facadeName,
+        facade: facade,
         method: 'searchBobbleheads',
         operation: OPERATIONS.BOBBLEHEADS.SEARCH,
         userId: viewerUserId,
@@ -900,7 +890,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id: data.id, name: data.name },
-        facade: facadeName,
+        facade: facade,
         method: 'updateAsync',
         operation: OPERATIONS.BOBBLEHEADS.UPDATE,
         userId,
@@ -934,7 +924,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId, photoId: data.photoId },
-        facade: facadeName,
+        facade: facade,
         method: 'updatePhotoMetadataAsync',
         operation: OPERATIONS.BOBBLEHEADS.UPDATE_PHOTO_METADATA,
         userId,

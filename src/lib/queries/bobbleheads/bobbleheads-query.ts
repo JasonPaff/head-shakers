@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, gt, gte, isNull, like, lt, ne, or } from 'drizzle-orm';
 
-import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
+import type { FindOptions, QueryContext, UserQueryContext } from '@/lib/queries/base/query-context';
 import type {
   DeleteBobblehead,
   DeleteBobbleheadPhoto,
@@ -67,9 +67,7 @@ export class BobbleheadsQuery extends BaseQuery {
    */
   static async addPhotoAsync(data: InsertBobbleheadPhoto, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
-
     const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
-
     return result?.[0] || null;
   }
 
@@ -140,14 +138,13 @@ export class BobbleheadsQuery extends BaseQuery {
    */
   static async createAsync(
     data: InsertBobblehead & { slug: string },
-    userId: string,
-    context: QueryContext,
+    context: UserQueryContext,
   ): Promise<BobbleheadRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
       .insert(bobbleheads)
-      .values({ ...data, userId })
+      .values({ ...data, userId: context.userId })
       .returning();
 
     return result?.[0] || null;
@@ -719,6 +716,14 @@ export class BobbleheadsQuery extends BaseQuery {
       .from(bobbleheadPhotos)
       .where(eq(bobbleheadPhotos.bobbleheadId, bobbleheadId))
       .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
+  }
+
+  static async getSlugsAsync(context: UserQueryContext): Promise<Array<string>> {
+    const dbInstance = this.getDbInstance(context);
+    return await dbInstance
+      .select({ slug: bobbleheads.slug })
+      .from(bobbleheads)
+      .then((results) => results.map((r) => r.slug));
   }
 
   /**
