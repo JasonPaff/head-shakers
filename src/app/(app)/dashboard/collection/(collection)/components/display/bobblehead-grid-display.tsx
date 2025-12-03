@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useQueryStates } from 'nuqs';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
@@ -8,9 +9,12 @@ import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-pr
 import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
 import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 
 import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
@@ -40,8 +44,10 @@ export const BobbleheadGridDisplay = ({
   pagination,
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
+  const router = useRouter();
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
+  const [deleteTarget, setDeleteTarget] = useState<null | string>(null);
 
   const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
     userPreferences.collectionGridDensity ?? 'compact',
@@ -67,6 +73,14 @@ export const BobbleheadGridDisplay = ({
   const [debouncedSearch] = useDebounce(searchInput, 300);
 
   const { setPreference } = useUserPreferences();
+
+  const { executeAsync: executeDeleteAsync } = useServerAction(deleteBobbleheadAction, {
+    loadingMessage: 'Deleting bobblehead...',
+    onAfterSuccess: () => {
+      setDeleteTarget(null);
+      router.refresh();
+    },
+  });
 
   // Sync debounced search to URL
   useEffect(() => {
@@ -123,8 +137,17 @@ export const BobbleheadGridDisplay = ({
     [setParams],
   );
 
-  const handleDeleteBobblehead = (id: string) => {
-    console.log('Delete bobblehead:', id);
+  const handleDeleteBobblehead = useCallback((id: string) => {
+    setDeleteTarget(id);
+  }, []);
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    await executeDeleteAsync({ bobbleheadId: deleteTarget });
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteTarget(null);
   };
 
   const handleFeatureToggle = (id: string) => {
@@ -258,6 +281,15 @@ export const BobbleheadGridDisplay = ({
           totalPages={pagination?.totalPages ?? 1}
         />
       </Conditional>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteAlertDialog
+        isOpen={deleteTarget !== null}
+        onClose={handleDeleteCancel}
+        onDeleteAsync={handleDeleteConfirm}
+      >
+        This will permanently delete all information and photos attached to this bobblehead.
+      </ConfirmDeleteAlertDialog>
     </Fragment>
   );
 };
