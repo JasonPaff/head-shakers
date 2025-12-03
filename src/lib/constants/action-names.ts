@@ -42,6 +42,7 @@ export const ACTION_NAMES = {
   },
   BOBBLEHEADS: {
     ADD_TAG: 'addTagToBobblehead',
+    BATCH_UPDATE_FEATURE: 'batchUpdateBobbleheadFeature',
     CREATE: 'createBobblehead',
     DELETE: 'deleteBobblehead',
     DELETE_BULK: 'deleteBobbleheads',
@@ -54,6 +55,7 @@ export const ACTION_NAMES = {
     REORDER_PHOTOS: 'reorderBobbleheadPhotos',
     SEARCH: 'searchBobbleheads',
     UPDATE: 'updateBobblehead',
+    UPDATE_FEATURE: 'updateBobbleheadFeature',
     UPDATE_PHOTO: 'updateBobbleheadPhoto',
     UPDATE_PHOTO_METADATA: 'updateBobbleheadPhotoMetadata',
     UPLOAD_PHOTO: 'uploadBobbleheadPhoto',

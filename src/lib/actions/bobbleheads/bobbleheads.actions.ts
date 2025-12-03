@@ -26,10 +26,12 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
+  batchUpdateBobbleheadFeatureSchema,
   createBobbleheadWithPhotosSchema,
   deleteBobbleheadPhotoSchema,
   deleteBobbleheadSchema,
   reorderBobbleheadPhotosSchema,
+  updateBobbleheadFeatureSchema,
   updateBobbleheadPhotoMetadataSchema,
   updateBobbleheadWithPhotosSchema,
 } from '@/lib/validations/bobbleheads.validation';
@@ -512,3 +514,110 @@ export const updateBobbleheadPhotoMetadataAction = authActionClient
       });
     }
   });
+
+export const updateBobbleheadFeatureAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_FEATURE,
+    isTransactionRequired: true,
+  })
+  .inputSchema(updateBobbleheadFeatureSchema)
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<unknown>> => {
+    const data = updateBobbleheadFeatureSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
+      bobbleheadId: data.id,
+      isFeatured: data.isFeatured,
+      userId: ctx.userId,
+    });
+
+    try {
+      const result = await BobbleheadsFacade.updateFeaturedAsync(
+        data.id,
+        data.isFeatured,
+        ctx.userId,
+        dbInstance,
+      );
+
+      if (!result) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.BOBBLEHEADS.UPDATE_FAILED,
+          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.UPDATE_FEATURED },
+          true,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          bobbleheadId: data.id,
+          isFeatured: data.isFeatured,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `${data.isFeatured ? 'Featured' : 'Unfeatured'} bobblehead ${data.id}`,
+      });
+
+      // Cache invalidation is handled by the facade
+
+      return actionSuccess({ bobblehead: result });
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_FEATURE },
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE_FEATURED,
+        userId: ctx.userId,
+      });
+    }
+  });
+
+export const batchUpdateBobbleheadFeatureAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.BATCH_UPDATE_FEATURE,
+    isTransactionRequired: true,
+  })
+  .inputSchema(batchUpdateBobbleheadFeatureSchema)
+  .action(
+    async ({ ctx, parsedInput }): Promise<ActionResponse<{ bobbleheads: Array<unknown>; count: number }>> => {
+      const data = batchUpdateBobbleheadFeatureSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
+
+      Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
+        bobbleheadCount: data.ids.length,
+        isFeatured: data.isFeatured,
+        userId: ctx.userId,
+      });
+
+      try {
+        const result = await BobbleheadsFacade.batchUpdateFeaturedAsync(
+          data.ids,
+          data.isFeatured,
+          ctx.userId,
+          dbInstance,
+        );
+
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            count: result.length,
+            isFeatured: data.isFeatured,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Batch ${data.isFeatured ? 'featured' : 'unfeatured'} ${result.length} bobbleheads`,
+        });
+
+        // Cache invalidation is handled by the facade
+
+        return actionSuccess({ bobbleheads: result, count: result.length });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.BATCH_UPDATE_FEATURE },
+          operation: OPERATIONS.BOBBLEHEADS.BATCH_UPDATE_FEATURED,
+          userId: ctx.userId,
+        });
+      }
+    },
+  );

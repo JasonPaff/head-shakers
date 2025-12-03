@@ -32,6 +32,7 @@ export const OPERATIONS = {
     RECORD_VIEW: 'record_view',
   },
   BOBBLEHEADS: {
+    BATCH_UPDATE_FEATURED: 'batch_update_bobblehead_featured',
     CREATE: 'create_bobblehead',
     CREATE_WITH_PHOTOS: 'create_bobblehead_with_photos',
     DELETE: 'delete_bobblehead',
@@ -43,6 +44,7 @@ export const OPERATIONS = {
     REORDER_PHOTOS: 'reorder_bobblehead_photos',
     SEARCH: 'search_bobbleheads',
     UPDATE: 'update_bobblehead',
+    UPDATE_FEATURED: 'update_bobblehead_featured',
     UPDATE_PHOTO_METADATA: 'update_bobblehead_photo_metadata',
     UPLOAD_PHOTO: 'upload_bobblehead_photo',
   },

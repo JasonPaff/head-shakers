@@ -128,6 +128,45 @@ export class BobbleheadsFacade extends BaseFacade {
     );
   }
 
+  /**
+   * Batch update the featured status of multiple bobbleheads.
+   * Requires ownership verification for all bobbleheads.
+   *
+   * Cache invalidation: Calls invalidateOnUpdate for each successfully updated bobblehead.
+   *
+   * @param ids - Array of bobblehead IDs to update
+   * @param isFeatured - New featured status (true or false)
+   * @param userId - User ID for ownership verification
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Array of updated bobblehead records (only owned by user)
+   */
+  static async batchUpdateFeaturedAsync(
+    ids: Array<string>,
+    isFeatured: boolean,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<BobbleheadRecord>> {
+    return await executeFacadeOperation(
+      {
+        data: { count: ids.length, isFeatured, userId },
+        facade,
+        method: 'batchUpdateFeaturedAsync',
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE_FEATURED,
+      },
+      async () => {
+        const context = createUserQueryContext(userId, { dbInstance });
+        const results = await BobbleheadsQuery.batchUpdateFeaturedAsync(ids, isFeatured, context);
+
+        // Invalidate cache for each updated bobblehead
+        results.forEach((bobblehead) => {
+          this.invalidateOnUpdate(bobblehead, userId);
+        });
+
+        return results;
+      },
+    );
+  }
+
   static async createAsync(
     data: InsertBobblehead,
     userId: string,
@@ -1062,6 +1101,44 @@ export class BobbleheadsFacade extends BaseFacade {
       };
       throw createFacadeError(context, error);
     }
+  }
+
+  /**
+   * Update the featured status of a single bobblehead.
+   * Requires ownership verification.
+   *
+   * Cache invalidation: Calls invalidateOnUpdate after successful update.
+   *
+   * @param id - ID of the bobblehead to update
+   * @param isFeatured - New featured status (true or false)
+   * @param userId - User ID for ownership verification
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Updated bobblehead record or null if not found/unauthorized
+   */
+  static async updateFeaturedAsync(
+    id: string,
+    isFeatured: boolean,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
+    return await executeFacadeOperation(
+      {
+        data: { id, isFeatured, userId },
+        facade,
+        method: 'updateFeaturedAsync',
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE_FEATURED,
+      },
+      async () => {
+        const context = createUserQueryContext(userId, { dbInstance });
+        const result = await BobbleheadsQuery.updateFeaturedAsync(id, isFeatured, context);
+
+        if (result) {
+          this.invalidateOnUpdate(result, userId);
+        }
+
+        return result;
+      },
+    );
   }
 
   /**

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, gte, isNull, like, lt, ne, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, isNull, like, lt, ne, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext, UserQueryContext } from '@/lib/queries/base/query-context';
 import type {
@@ -69,6 +69,27 @@ export class BobbleheadsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
     const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
     return result?.[0] || null;
+  }
+
+  /**
+   * batch update isFeatured status for multiple bobbleheads with ownership verification
+   */
+  static async batchUpdateFeaturedAsync(
+    ids: Array<string>,
+    isFeatured: boolean,
+    context: UserQueryContext,
+  ): Promise<Array<BobbleheadRecord>> {
+    const dbInstance = this.getDbInstance(context);
+
+    if (ids.length === 0) {
+      return [];
+    }
+
+    return dbInstance
+      .update(bobbleheads)
+      .set({ isFeatured })
+      .where(this.combineFilters(inArray(bobbleheads.id, ids), eq(bobbleheads.userId, context.userId)))
+      .returning();
   }
 
   /**
@@ -806,6 +827,25 @@ export class BobbleheadsQuery extends BaseQuery {
       .update(bobbleheads)
       .set(updateData)
       .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, userId)))
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * update isFeatured status for a single bobblehead with ownership verification
+   */
+  static async updateFeaturedAsync(
+    id: string,
+    isFeatured: boolean,
+    context: UserQueryContext,
+  ): Promise<BobbleheadRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(bobbleheads)
+      .set({ isFeatured })
+      .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, context.userId)))
       .returning();
 
     return result?.[0] || null;

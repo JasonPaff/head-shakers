@@ -14,7 +14,11 @@ import { Conditional } from '@/components/ui/conditional';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
-import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
+import {
+  batchUpdateBobbleheadFeatureAction,
+  deleteBobbleheadAction,
+  updateBobbleheadFeatureAction,
+} from '@/lib/actions/bobbleheads/bobbleheads.actions';
 
 import { NoBobbleheads } from '../empty-states/no-bobbleheads';
 import { NoResults } from '../empty-states/no-results';
@@ -82,6 +86,21 @@ export const BobbleheadGridDisplay = ({
     },
   });
 
+  const { executeAsync: executeFeatureToggleAsync } = useServerAction(updateBobbleheadFeatureAction, {
+    loadingMessage: 'Updating featured status...',
+    onAfterSuccess: () => {
+      router.refresh();
+    },
+  });
+
+  const { executeAsync: executeBulkFeatureAsync } = useServerAction(batchUpdateBobbleheadFeatureAction, {
+    loadingMessage: 'Updating featured status...',
+    onAfterSuccess: () => {
+      setSelectedIds(new Set());
+      router.refresh();
+    },
+  });
+
   // Sync debounced search to URL
   useEffect(() => {
     if (debouncedSearch !== search) {
@@ -126,8 +145,8 @@ export const BobbleheadGridDisplay = ({
     setSelectedIds(new Set());
   };
 
-  const handleBulkFeature = () => {
-    console.log('Bulk feature:', Array.from(selectedIds));
+  const handleBulkFeature = async () => {
+    await executeBulkFeatureAsync({ ids: Array.from(selectedIds), isFeatured: true });
   };
 
   const handleEditBobblehead = useCallback(
@@ -150,8 +169,12 @@ export const BobbleheadGridDisplay = ({
     setDeleteTarget(null);
   };
 
-  const handleFeatureToggle = (id: string) => {
-    console.log('Toggle feature:', id);
+  const handleFeatureToggle = async (id: string) => {
+    const bobblehead = bobbleheads.find((b) => b.id === id);
+    if (!bobblehead) return;
+
+    const isFeaturedNew = !bobblehead.isFeatured;
+    await executeFeatureToggleAsync({ id, isFeatured: isFeaturedNew });
   };
 
   const handleClearFilters = () => {

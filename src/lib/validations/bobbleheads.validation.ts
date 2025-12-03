@@ -10,6 +10,7 @@ import { cloudinaryPhotosValidationSchema } from '@/lib/validations/photo-upload
 export const customFieldsSchema = z.record(z.string(), z.string());
 
 export type AddBobbleheadFormSchema = z.input<typeof createBobbleheadWithPhotosSchema>;
+export type BatchUpdateBobbleheadFeature = z.infer<typeof batchUpdateBobbleheadFeatureSchema>;
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
 export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
@@ -21,6 +22,7 @@ export type SelectBobblehead = z.infer<typeof selectBobbleheadSchema>;
 export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
 export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
+export type UpdateBobbleheadFeature = z.infer<typeof updateBobbleheadFeatureSchema>;
 export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
 export type UpdateBobbleheadPhotoMetadata = z.infer<typeof updateBobbleheadPhotoMetadataSchema>;
 export type UpdateBobbleheadWithPhotos = z.infer<typeof updateBobbleheadWithPhotosSchema>;
@@ -172,4 +174,16 @@ export const updateBobbleheadPhotoMetadataSchema = z.object({
   bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
   caption: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.CAPTION.MAX).trim().optional(),
   photoId: z.uuid({ message: 'Photo ID is required' }),
+});
+
+export const updateBobbleheadFeatureSchema = z.object({
+  id: z.uuid({ message: 'Bobblehead ID is required' }),
+  isFeatured: z.boolean(),
+});
+
+export const batchUpdateBobbleheadFeatureSchema = z.object({
+  ids: z
+    .array(z.uuid({ message: 'Bobblehead ID is required' }))
+    .min(1, { message: 'At least one bobblehead ID is required' }),
+  isFeatured: z.boolean(),
 });
