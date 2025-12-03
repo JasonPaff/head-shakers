@@ -8,7 +8,6 @@ import type { ActionResponse } from '@/lib/utils/action-response';
 
 import {
   ACTION_NAMES,
-  CloudinaryPathBuilder,
   CONFIG,
   ERROR_CODES,
   ERROR_MESSAGES,
@@ -20,15 +19,11 @@ import {
 import { BobbleheadsFacade, type CreateBobbleheadResult } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
-import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
 import { createInternalError } from '@/lib/utils/error-builders';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
-import { isTempPhoto } from '@/lib/utils/photo-transform.utils';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
   createBobbleheadWithPhotosSchema,
@@ -79,14 +74,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
           });
         }
 
-        // Cache invalidation
-        invalidateMetadataCache('bobblehead', result.bobblehead.id);
-        CacheRevalidationService.bobbleheads.onCreate(
-          result.bobblehead.id,
-          ctx.userId,
-          result.bobblehead.collectionId,
-          result.bobblehead.slug,
-        );
+        // Cache invalidation is handled by the facade
 
         return actionSuccess(result);
       },
@@ -129,15 +117,7 @@ export const deleteBobbleheadAction = authActionClient
         message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
 
-      // invalidate metadata cache for the deleted bobblehead
-      invalidateMetadataCache('bobblehead', bobbleheadData.bobbleheadId);
-
-      CacheRevalidationService.bobbleheads.onDelete(
-        bobbleheadData.bobbleheadId,
-        ctx.userId,
-        deletedBobblehead?.collectionId,
-        deletedBobblehead?.slug,
-      );
+      // Cache invalidation is handled by the facade
 
       return actionSuccess(null);
     } catch (error) {
@@ -200,98 +180,17 @@ export const updateBobbleheadWithPhotosAction = authActionClient
           );
         }
 
-        // if photos are provided, only process NEW photos (filter out existing ones)
+        // if photos are provided, process new photos via facade
+        // (facade handles filtering, Cloudinary moves, and cache invalidation)
         let uploadedPhotos: Array<unknown> = [];
         if (photos && photos.length > 0) {
-          // separate new photos (temp- IDs) from existing photos (UUID IDs)
-          // existing photos are already in the database and should not be re-inserted
-          const newPhotos = photos.filter(isTempPhoto);
-
-          if (newPhotos.length > 0) {
-            try {
-              // move photos from temp folder to permanent location in Cloudinary
-              const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
-                userId,
-                updatedBobblehead.collectionId,
-                updatedBobblehead.id,
-              );
-              const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
-                newPhotos.map((photo) => ({
-                  publicId: photo.publicId,
-                  url: photo.url,
-                })),
-                permanentFolder,
-              );
-
-              // create a map of old publicId to new values for a quick lookup
-              const movedPhotosMap = new Map(
-                movedPhotos.map((moved) => [
-                  moved.oldPublicId,
-                  { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
-                ]),
-              );
-
-              // update photo records with new URLs and public IDs
-              const photoRecords = newPhotos.map((photo) => {
-                const movedPhoto = movedPhotosMap.get(photo.publicId);
-                return {
-                  altText: photo.altText,
-                  bobbleheadId: updatedBobblehead.id,
-                  caption: photo.caption,
-                  fileSize: photo.bytes,
-                  height: photo.height,
-                  isPrimary: photo.isPrimary,
-                  sortOrder: photo.sortOrder,
-                  url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
-                  width: photo.width,
-                };
-              });
-
-              // insert photos into the database with permanent URLs
-              uploadedPhotos = await Promise.all(
-                photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
-              );
-
-              // clean up any temp photos that failed to move
-              const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
-              if (failedMoves.length > 0) {
-                console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
-                Sentry.addBreadcrumb({
-                  category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-                  data: { failedMoves },
-                  level: SENTRY_LEVELS.WARNING,
-                  message: 'Some photos failed to move to permanent location',
-                });
-              }
-            } catch (photoError) {
-              // if photo processing fails, we still want to keep the update,
-              // but we should log this for debugging
-              console.error('Photo processing failed:', photoError);
-              Sentry.captureException(photoError);
-
-              // still try to save photos with temp URLs as fallback
-              try {
-                const photoRecords = newPhotos.map((photo) => ({
-                  altText: photo.altText,
-                  bobbleheadId: updatedBobblehead.id,
-                  caption: photo.caption,
-                  fileSize: photo.bytes,
-                  height: photo.height,
-                  isPrimary: photo.isPrimary,
-                  sortOrder: photo.sortOrder,
-                  url: photo.url,
-                  width: photo.width,
-                }));
-
-                uploadedPhotos = await Promise.all(
-                  photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
-                );
-              } catch (fallbackError) {
-                console.error('Fallback photo save also failed:', fallbackError);
-                Sentry.captureException(fallbackError);
-              }
-            }
-          }
+          uploadedPhotos = await BobbleheadsFacade.addPhotosToExistingBobbleheadAsync(
+            updatedBobblehead.id,
+            updatedBobblehead.collectionId,
+            photos,
+            userId,
+            ctx.db,
+          );
         }
 
         // process tags if provided
@@ -333,15 +232,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
           message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
         });
 
-        // invalidate metadata cache for the updated bobblehead
-        invalidateMetadataCache('bobblehead', updatedBobblehead.id);
-
-        CacheRevalidationService.bobbleheads.onUpdate(
-          updatedBobblehead.id,
-          userId,
-          updatedBobblehead.collectionId,
-          updatedBobblehead.slug,
-        );
+        // Cache invalidation is handled by the facades (updateAsync and addPhotosToExistingBobbleheadAsync)
 
         return actionSuccess({
           bobblehead: updatedBobblehead,
@@ -493,10 +384,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
         message: `Deleted photo ${deletedPhoto.id} from bobblehead ${photoData.bobbleheadId}`,
       });
 
-      // invalidate metadata cache for the bobblehead (photo change affects metadata)
-      invalidateMetadataCache('bobblehead', photoData.bobbleheadId);
-
-      CacheRevalidationService.bobbleheads.onPhotoChange(photoData.bobbleheadId, userId, 'delete');
+      // Cache invalidation is handled by the facade
 
       return actionSuccess(deletedPhoto);
     } catch (error) {
@@ -554,10 +442,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
         message: `Reordered ${updatedPhotos.length} photos for bobblehead ${reorderData.bobbleheadId}`,
       });
 
-      // invalidate metadata cache for the bobblehead (photo order affects metadata)
-      invalidateMetadataCache('bobblehead', reorderData.bobbleheadId);
-
-      CacheRevalidationService.bobbleheads.onPhotoChange(reorderData.bobbleheadId, userId, 'reorder');
+      // Cache invalidation is handled by the facade
 
       return actionSuccess(updatedPhotos);
     } catch (error) {
@@ -615,10 +500,7 @@ export const updateBobbleheadPhotoMetadataAction = authActionClient
         message: `Updated metadata for photo ${metadataData.photoId} in bobblehead ${metadataData.bobbleheadId}`,
       });
 
-      // invalidate metadata cache for the bobblehead (photo metadata affects SEO)
-      invalidateMetadataCache('bobblehead', metadataData.bobbleheadId);
-
-      CacheRevalidationService.bobbleheads.onPhotoChange(metadataData.bobbleheadId, userId, 'update');
+      // Cache invalidation is handled by the facade
 
       return actionSuccess(updatedPhoto);
     } catch (error) {
