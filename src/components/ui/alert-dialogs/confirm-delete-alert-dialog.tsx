@@ -70,7 +70,6 @@ export const ConfirmDeleteAlertDialog = withFocusManagement(
       onDelete?.();
       await onDeleteAsync?.();
       form.reset();
-      onClose();
     };
 
     const handleOpenChange = (isOpenValue: boolean) => {

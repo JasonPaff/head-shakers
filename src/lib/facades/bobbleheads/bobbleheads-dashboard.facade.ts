@@ -147,6 +147,7 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
           pageSize: options?.pageSize,
           photos: true,
           searchTerm: options?.searchTerm,
+          sortBy: options?.sortBy,
           userId,
         });
 
