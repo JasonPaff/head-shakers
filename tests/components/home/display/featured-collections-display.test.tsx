@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { FeaturedCollection } from '@/app/(app)/(home)/components/display/featured-collections-display';
+import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content-query';
 
 import { FeaturedCollectionsDisplay } from '@/app/(app)/(home)/components/display/featured-collections-display';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
@@ -51,7 +51,7 @@ vi.mock('@/lib/utils/cloudinary.utils', () => ({
 }));
 
 describe('FeaturedCollectionsDisplay', () => {
-  const mockCollections: Array<FeaturedCollection> = [
+  const mockCollections: Array<FeaturedCollectionData> = [
     {
       comments: 12,
       contentId: 'collection-1',
@@ -67,7 +67,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector1',
       title: 'Vintage Baseball Collection',
       totalItems: 45,
-      totalValue: 12500,
+      totalValue: '12500',
       viewCount: 1543,
     },
     {
@@ -85,7 +85,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector2',
       title: 'Movie Stars',
       totalItems: 28,
-      totalValue: 8900,
+      totalValue: '8900',
       viewCount: 987,
     },
     {
@@ -103,7 +103,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector3',
       title: 'Sports Heroes',
       totalItems: 15,
-      totalValue: 4500,
+      totalValue: '4500',
       viewCount: 432,
     },
   ];
@@ -213,7 +213,7 @@ describe('FeaturedCollectionsDisplay', () => {
   });
 
   it('should handle zero values correctly', () => {
-    const zeroValuesCollection: Array<FeaturedCollection> = [
+    const zeroValuesCollection: Array<FeaturedCollectionData> = [
       {
         comments: 0,
         contentId: 'collection-4',
@@ -222,12 +222,14 @@ describe('FeaturedCollectionsDisplay', () => {
         id: 'col-4',
         imageUrl: null,
         isLiked: false,
+        isTrending: false,
         likeId: null,
         likes: 0,
+        ownerAvatarUrl: null,
         ownerDisplayName: 'newcollector',
         title: 'New Collection',
         totalItems: 0,
-        totalValue: 0,
+        totalValue: '0',
         viewCount: 0,
       },
     ];

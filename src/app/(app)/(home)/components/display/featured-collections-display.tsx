@@ -6,6 +6,7 @@ import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids/types';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,27 +17,8 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-export interface FeaturedCollection {
-  comments: number;
-  contentId: string;
-  contentSlug: string;
-  description: string;
-  id: string;
-  imageUrl: null | string;
-  isLiked: boolean;
-  isTrending?: boolean;
-  likeId: null | string;
-  likes: number;
-  ownerAvatarUrl?: null | string;
-  ownerDisplayName: string;
-  title: string;
-  totalItems?: number;
-  totalValue?: number;
-  viewCount: number;
-}
-
 export interface FeaturedCollectionsDisplayProps extends ComponentTestIdProps {
-  collections: Array<FeaturedCollection>;
+  collections: Array<FeaturedCollectionData>;
 }
 
 export const FeaturedCollectionsDisplay = ({ collections, testId }: FeaturedCollectionsDisplayProps) => {
@@ -75,7 +57,7 @@ export const FeaturedCollectionsDisplay = ({ collections, testId }: FeaturedColl
 
 type FeaturedCollectionCardProps = ClassName<
   ComponentTestIdProps & {
-    collection: FeaturedCollection;
+    collection: FeaturedCollectionData;
   }
 >;
 
@@ -111,7 +93,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
       >
         <Conditional isCondition={_hasImage}>
           <CldImage
-            alt={collection.title}
+            alt={collection.title ?? 'image'}
             blurDataURL={blurDataUrl}
             className={
               'absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110'
@@ -190,7 +172,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
         <div className={'flex items-center justify-between'} data-slot={'featured-collection-owner-section'}>
           <div className={'flex items-center gap-3'}>
             <Image
-              alt={collection.ownerDisplayName}
+              alt={collection.ownerDisplayName ?? 'image'}
               className={'size-9 rounded-full object-cover ring-2 ring-primary/20'}
               height={36}
               src={avatarUrl}
