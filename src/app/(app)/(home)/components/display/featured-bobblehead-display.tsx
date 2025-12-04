@@ -5,6 +5,7 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import type { HeroFeaturedBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
@@ -13,20 +14,12 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 
 interface FeaturedBobbleheadDisplayProps extends ComponentTestIdProps {
-  bobblehead: {
-    description: null | string;
-    id: string;
-    likeCount: number;
-    name: string;
-    photoUrl: null | string;
-    userId: string;
-    viewCount: number;
-  };
+  bobblehead: HeroFeaturedBobbleheadData;
 }
 
 export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobbleheadDisplayProps) => {
-  const _hasPhoto = Boolean(bobblehead.photoUrl);
-  const _publicId = _hasPhoto ? extractPublicIdFromCloudinaryUrl(bobblehead.photoUrl!) : null;
+  const _hasPhoto = Boolean(bobblehead.imageUrl);
+  const _publicId = _hasPhoto ? extractPublicIdFromCloudinaryUrl(bobblehead.imageUrl ?? '') : null;
   const _blurDataUrl = _publicId ? generateBlurDataUrl(_publicId) : undefined;
   const _hasPhotoAndPublicId = _hasPhoto && Boolean(_publicId);
 
@@ -49,7 +42,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
           data-testid={cardTestId}
           href={$path({
             route: '/bobbleheads/[bobbleheadSlug]',
-            routeParams: { bobbleheadSlug: bobblehead.id },
+            routeParams: { bobbleheadSlug: bobblehead.contentSlug ?? '' },
           })}
         >
           <div className={'relative aspect-square overflow-hidden rounded-2xl'}>
@@ -66,7 +59,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
               isCondition={_hasPhotoAndPublicId}
             >
               <CldImage
-                alt={bobblehead.name}
+                alt={bobblehead.contentName ?? 'bobblehead image'}
                 blurDataURL={_blurDataUrl}
                 className={
                   'absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110'
@@ -94,7 +87,9 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
                 Editor&apos;s Pick
               </Badge>
 
-              <h3 className={'mt-3 text-2xl font-bold text-white drop-shadow-lg'}>{bobblehead.name}</h3>
+              <h3 className={'mt-3 text-2xl font-bold text-white drop-shadow-lg'}>
+                {bobblehead.contentName}
+              </h3>
 
               {/* Description */}
               <Conditional isCondition={Boolean(bobblehead.description)}>
@@ -105,7 +100,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
               <div className={'mt-4 flex items-center gap-4 text-sm text-slate-300'}>
                 <span className={'flex items-center gap-1'}>
                   <HeartIcon aria-hidden className={'size-4 text-red-400'} />
-                  {bobblehead.likeCount.toLocaleString()}
+                  {bobblehead.likes.toLocaleString()}
                 </span>
                 <span className={'flex items-center gap-1'}>
                   <EyeIcon aria-hidden className={'size-4'} />

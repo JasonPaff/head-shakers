@@ -5,6 +5,7 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import type { TrendingBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
@@ -14,21 +15,8 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-export interface TrendingBobblehead {
-  badge: 'editor_pick' | 'new_badge' | 'popular' | 'trending';
-  category: string;
-  characterName: string;
-  contentId: string;
-  contentSlug: string;
-  id: string;
-  imageUrl: null | string;
-  likeCount: number;
-  viewCount: number;
-  year: number;
-}
-
 export interface TrendingBobbleheadsDisplayProps extends ComponentTestIdProps {
-  bobbleheads: Array<TrendingBobblehead>;
+  bobbleheads: Array<TrendingBobbleheadData>;
 }
 
 export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobbleheadsDisplayProps) => {
@@ -64,7 +52,7 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobb
 };
 
 interface TrendingBobbleheadCardProps extends ComponentTestIdProps {
-  bobblehead: TrendingBobblehead;
+  bobblehead: TrendingBobbleheadData;
 }
 
 const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardProps) => {
@@ -76,9 +64,9 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
 
   // Map badge value to display text
   const _badgeText =
-    bobblehead.badge === 'editor_pick' ? 'Pick'
-    : bobblehead.badge === 'new_badge' ? 'New'
-    : bobblehead.badge.charAt(0).toUpperCase() + bobblehead.badge.slice(1);
+    bobblehead.featureType === 'editor_pick' ?
+      'Pick'
+    : bobblehead.featureType.charAt(0).toUpperCase() + bobblehead.featureType.slice(1);
 
   const cardTestId = testId || generateTestId('feature', 'trending-bobblehead-card', bobblehead.id);
 
@@ -93,7 +81,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       data-testid={cardTestId}
       href={$path({
         route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug: bobblehead.contentSlug },
+        routeParams: { bobbleheadSlug: bobblehead.contentSlug ?? '' },
       })}
     >
       {/* Image Section */}
@@ -105,7 +93,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       >
         <Conditional isCondition={_hasImage}>
           <CldImage
-            alt={bobblehead.characterName}
+            alt={bobblehead.title ?? bobblehead.name ?? 'Bobblehead'}
             blurDataURL={blurDataUrl}
             className={
               'absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110'
@@ -125,7 +113,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
 
         {/* Badge */}
         <div className={'absolute top-2 left-2'} data-slot={'trending-bobblehead-badge'}>
-          <Badge variant={bobblehead.badge}>{_badgeText}</Badge>
+          <Badge variant={bobblehead.featureType}>{_badgeText}</Badge>
         </div>
 
         {/* Gradient Overlay */}
@@ -163,14 +151,14 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
           className={'line-clamp-1 text-sm font-semibold text-foreground'}
           data-slot={'trending-bobblehead-name'}
         >
-          {bobblehead.characterName}
+          {bobblehead.title ?? bobblehead.name ?? 'Bobblehead'}
         </h3>
         <div
           className={'mt-1 flex items-center justify-between text-xs text-muted-foreground'}
           data-slot={'trending-bobblehead-meta'}
         >
-          <span data-slot={'trending-bobblehead-category'}>{bobblehead.category}</span>
-          <span data-slot={'trending-bobblehead-year'}>{bobblehead.year}</span>
+          <span data-slot={'trending-bobblehead-category'}>{bobblehead.category ?? 'Bobblehead'}</span>
+          <span data-slot={'trending-bobblehead-year'}>{bobblehead.year ?? new Date().getFullYear()}</span>
         </div>
       </div>
     </Link>

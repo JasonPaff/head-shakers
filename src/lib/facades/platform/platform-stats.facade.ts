@@ -10,7 +10,7 @@ import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 
-const facadeName = 'PlatformStatsFacade';
+const facade = 'platform_stats_facade';
 
 export interface PlatformStats {
   totalBobbleheads: number;
@@ -37,7 +37,7 @@ export class PlatformStatsFacade extends BaseFacade {
   static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
     return executeFacadeOperation(
       {
-        facade: facadeName,
+        facade,
         method: 'getPlatformStatsAsync',
         operation: OPERATIONS.PLATFORM.GET_STATS,
       },
@@ -61,7 +61,7 @@ export class PlatformStatsFacade extends BaseFacade {
           {
             context: {
               entityType: CACHE_ENTITY_TYPE.PLATFORM,
-              facade: facadeName,
+              facade,
               operation: OPERATIONS.PLATFORM.GET_STATS,
             },
             ttl: CACHE_CONFIG.TTL.EXTENDED,

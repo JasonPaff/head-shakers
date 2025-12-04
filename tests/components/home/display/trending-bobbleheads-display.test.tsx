@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { TrendingBobblehead } from '@/app/(app)/(home)/components/display/trending-bobbleheads-display';
+import type { TrendingBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
 
 import { TrendingBobbleheadsDisplay } from '@/app/(app)/(home)/components/display/trending-bobbleheads-display';
 
@@ -43,52 +43,56 @@ vi.mock('@/lib/utils/cloudinary.utils', () => ({
 }));
 
 describe('TrendingBobbleheadsDisplay', () => {
-  const mockBobbleheads: Array<TrendingBobblehead> = [
+  const mockBobbleheads: Array<TrendingBobbleheadData> = [
     {
-      badge: 'trending',
       category: 'Sports',
-      characterName: 'Baseball Star',
       contentId: 'content-1',
       contentSlug: 'baseball-star',
+      featureType: 'trending',
       id: 'bobblehead-1',
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo1.jpg',
       likeCount: 125,
+      name: 'Baseball Star',
+      title: 'Baseball Star',
       viewCount: 543,
       year: 2023,
     },
     {
-      badge: 'editor_pick',
       category: 'Movies',
-      characterName: 'Action Hero',
       contentId: 'content-2',
       contentSlug: 'action-hero',
+      featureType: 'editor_pick',
       id: 'bobblehead-2',
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo2.jpg',
       likeCount: 234,
+      name: 'Action Hero',
+      title: 'Action Hero',
       viewCount: 876,
       year: 2022,
     },
     {
-      badge: 'new_badge',
       category: 'TV',
-      characterName: 'Detective',
       contentId: 'content-3',
       contentSlug: 'detective',
+      featureType: 'editor_pick',
       id: 'bobblehead-3',
       imageUrl: null,
       likeCount: 89,
+      name: 'Detective',
+      title: 'Detective',
       viewCount: 321,
       year: 2024,
     },
     {
-      badge: 'popular',
       category: 'Games',
-      characterName: 'Hero Character',
       contentId: 'content-4',
       contentSlug: 'hero-character',
+      featureType: 'trending',
       id: 'bobblehead-4',
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo4.jpg',
       likeCount: 456,
+      name: 'Hero Character',
+      title: 'Hero Character',
       viewCount: 1234,
       year: 2021,
     },
@@ -166,16 +170,17 @@ describe('TrendingBobbleheadsDisplay', () => {
   });
 
   it('should format like counts and view counts with toLocaleString', () => {
-    const largeCounts: Array<TrendingBobblehead> = [
+    const largeCounts: Array<TrendingBobbleheadData> = [
       {
-        badge: 'trending',
         category: 'Sports',
-        characterName: 'Popular Star',
         contentId: 'content-5',
         contentSlug: 'popular-star',
+        featureType: 'trending',
         id: 'bobblehead-5',
         imageUrl: null,
         likeCount: 15234,
+        name: 'Popular Star',
+        title: 'Popular Star',
         viewCount: 98765,
         year: 2023,
       },
@@ -198,16 +203,17 @@ describe('TrendingBobbleheadsDisplay', () => {
   });
 
   it('should handle missing imageUrl gracefully', () => {
-    const noImageBobblehead: Array<TrendingBobblehead> = [
+    const noImageBobblehead: Array<TrendingBobbleheadData> = [
       {
-        badge: 'new_badge',
         category: 'Music',
-        characterName: 'Rock Star',
         contentId: 'content-6',
         contentSlug: 'rock-star',
+        featureType: 'trending',
         id: 'bobblehead-6',
         imageUrl: null,
         likeCount: 50,
+        name: 'Rock Star',
+        title: 'Rock Star',
         viewCount: 200,
         year: 2024,
       },
