@@ -26,7 +26,7 @@ import { createFacadeError } from '@/lib/utils/error-builders';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
-const facadeName = 'FeaturedContentFacade';
+const facade = 'featured_content_facade';
 
 /**
  * unified Featured Content Facade
@@ -48,7 +48,7 @@ export class FeaturedContentFacade extends BaseFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { contentId: data.contentId, contentType: data.contentType },
-        facade: facadeName,
+        facade: facade,
         method: 'createAsync',
         operation: 'create',
         userId: curatorId,
@@ -67,7 +67,7 @@ export class FeaturedContentFacade extends BaseFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },
-        facade: facadeName,
+        facade: facade,
         method: 'deleteAsync',
         operation: 'delete',
       };
@@ -81,7 +81,7 @@ export class FeaturedContentFacade extends BaseFacade {
   static async getActiveFeaturedContentAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FeaturedContentData>> {
-    trackFacadeEntry(facadeName, 'getActiveFeaturedContentAsync');
+    trackFacadeEntry(facade, 'getActiveFeaturedContentAsync');
 
     try {
       return await CacheService.featured.content(
@@ -89,7 +89,7 @@ export class FeaturedContentFacade extends BaseFacade {
           const context = this.getPublicContext(dbInstance);
           const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
 
-          trackFacadeSuccess(facadeName, 'getActiveFeaturedContentAsync');
+          trackFacadeSuccess(facade, 'getActiveFeaturedContentAsync');
 
           return FeaturedContentTransformer.transformFeaturedContent(rawData);
         },
@@ -97,7 +97,7 @@ export class FeaturedContentFacade extends BaseFacade {
         {
           context: {
             entityType: CACHE_ENTITY_TYPE.FEATURED,
-            facade: facadeName,
+            facade: facade,
             operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
           },
         },
@@ -105,7 +105,7 @@ export class FeaturedContentFacade extends BaseFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: {},
-        facade: facadeName,
+        facade: facade,
         method: 'getActiveFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
       };
@@ -140,22 +140,22 @@ export class FeaturedContentFacade extends BaseFacade {
   }
 
   /**
-   * get hero featured bobblehead for homepage display
+   * get the featured bobblehead for homepage display
    *
    * returns the single highest-priority featured bobblehead with only the fields
-   * needed for the hero section. uses Redis caching for fast access.
+   * needed for the featured bobblehead section. uses Redis caching for fast access.
    *
    * @param dbInstance - optional database executor for transactions
-   * @returns the hero featured bobblehead data or null if none exists
+   * @returns the featured bobblehead data or null if none exists
    */
   static async getFeaturedBobbleheadAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<HeroFeaturedBobbleheadData | null> {
     return executeFacadeOperation(
       {
-        facade: facadeName,
+        facade,
         method: 'getFeaturedBobbleheadAsync',
-        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+        operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_BOBBLEHEAD,
       },
       async () => {
         return await CacheService.featured.featuredBobblehead(
@@ -166,8 +166,8 @@ export class FeaturedContentFacade extends BaseFacade {
           {
             context: {
               entityType: CACHE_ENTITY_TYPE.FEATURED,
-              facade: facadeName,
-              operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+              facade,
+              operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_BOBBLEHEAD,
             },
           },
         );
@@ -196,7 +196,7 @@ export class FeaturedContentFacade extends BaseFacade {
   ): Promise<Array<FeaturedCollectionData>> {
     return executeFacadeOperation(
       {
-        facade: facadeName,
+        facade: facade,
         method: 'getFeaturedCollectionsAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
         userId: userId ?? undefined,
@@ -211,7 +211,7 @@ export class FeaturedContentFacade extends BaseFacade {
           {
             context: {
               entityType: CACHE_ENTITY_TYPE.FEATURED,
-              facade: facadeName,
+              facade: facade,
               operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
             },
           },
@@ -250,7 +250,7 @@ export class FeaturedContentFacade extends BaseFacade {
   ): Promise<Array<FooterFeaturedContentData>> {
     return executeFacadeOperation(
       {
-        facade: facadeName,
+        facade: facade,
         method: 'getFooterFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
       },
@@ -264,7 +264,7 @@ export class FeaturedContentFacade extends BaseFacade {
           {
             context: {
               entityType: CACHE_ENTITY_TYPE.FEATURED,
-              facade: facadeName,
+              facade: facade,
               operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
             },
           },
@@ -299,7 +299,7 @@ export class FeaturedContentFacade extends BaseFacade {
   ): Promise<Array<TrendingBobbleheadData>> {
     return executeFacadeOperation(
       {
-        facade: facadeName,
+        facade: facade,
         method: 'getTrendingBobbleheadsAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
       },
@@ -312,7 +312,7 @@ export class FeaturedContentFacade extends BaseFacade {
           {
             context: {
               entityType: CACHE_ENTITY_TYPE.FEATURED,
-              facade: facadeName,
+              facade: facade,
               operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
             },
           },
@@ -358,7 +358,7 @@ export class FeaturedContentFacade extends BaseFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id, isActive },
-        facade: facadeName,
+        facade: facade,
         method: 'toggleActiveAsync',
         operation: 'toggle',
       };
@@ -380,7 +380,7 @@ export class FeaturedContentFacade extends BaseFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },
-        facade: facadeName,
+        facade: facade,
         method: 'updateAsync',
         operation: 'update',
       };

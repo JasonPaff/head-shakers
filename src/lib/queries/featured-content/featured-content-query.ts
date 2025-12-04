@@ -372,7 +372,7 @@ export class FeaturedContentQuery extends BaseQuery {
         and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
-        and(
+        this.combineFilters(
           eq(featuredContent.contentType, 'bobblehead'),
           eq(featuredContent.isActive, true),
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
