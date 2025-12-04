@@ -2,6 +2,8 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import type { FeaturedBobblehead } from '@/lib/queries/featured-content/featured-content-query';
+
 import { FeaturedBobbleheadDisplay } from '@/app/(app)/(home)/components/display/featured-bobblehead-display';
 
 import { render, screen } from '../../../setup/test-utils';
@@ -37,17 +39,14 @@ vi.mock('@/lib/utils/cloudinary.utils', () => ({
 }));
 
 describe('FeaturedBobbleheadDisplay', () => {
-  const mockBobblehead = {
+  const mockBobblehead: FeaturedBobblehead = {
     contentId: '00000000-0000-0000-0000-000000000000',
     contentName: 'Vintage Baseball Player',
     contentSlug: 'bobblehead-1',
     description: 'A rare collectible bobblehead',
-    id: 'bobblehead-1',
     imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/bobbleheads/photo.jpg',
     likes: 125,
-    name: 'Vintage Baseball Player',
     owner: '@jason-paff',
-    userId: 'user-1',
     viewCount: 1543,
   };
 
@@ -66,9 +65,9 @@ describe('FeaturedBobbleheadDisplay', () => {
   });
 
   it('should show trophy icon when no image', () => {
-    const bobbleheadNoImage = {
+    const bobbleheadNoImage: FeaturedBobblehead = {
       ...mockBobblehead,
-      photoUrl: null,
+      imageUrl: null,
     };
 
     const { container } = render(<FeaturedBobbleheadDisplay bobblehead={bobbleheadNoImage} />);
@@ -121,7 +120,7 @@ describe('FeaturedBobbleheadDisplay', () => {
   });
 
   it('should not render description when null', () => {
-    const bobbleheadNoDesc = {
+    const bobbleheadNoDesc: FeaturedBobblehead = {
       ...mockBobblehead,
       description: null,
     };
@@ -141,9 +140,9 @@ describe('FeaturedBobbleheadDisplay', () => {
   });
 
   it('should format large numbers with toLocaleString', () => {
-    const popularBobblehead = {
+    const popularBobblehead: FeaturedBobblehead = {
       ...mockBobblehead,
-      likeCount: 15234,
+      likes: 15234,
       viewCount: 98765,
     };
 

@@ -67,7 +67,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector1',
       title: 'Vintage Baseball Collection',
       totalItems: 45,
-      totalValue: '12500',
+      totalValue: 12500,
       viewCount: 1543,
     },
     {
@@ -85,7 +85,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector2',
       title: 'Movie Stars',
       totalItems: 28,
-      totalValue: '8900',
+      totalValue: 8900,
       viewCount: 987,
     },
     {
@@ -103,7 +103,7 @@ describe('FeaturedCollectionsDisplay', () => {
       ownerDisplayName: 'collector3',
       title: 'Sports Heroes',
       totalItems: 15,
-      totalValue: '4500',
+      totalValue: 4500,
       viewCount: 432,
     },
   ];
@@ -229,7 +229,7 @@ describe('FeaturedCollectionsDisplay', () => {
         ownerDisplayName: 'newcollector',
         title: 'New Collection',
         totalItems: 0,
-        totalValue: '0',
+        totalValue: 0,
         viewCount: 0,
       },
     ];

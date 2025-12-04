@@ -149,13 +149,13 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
           category: 'business_logic',
-          message: 'FeaturedContentFacade.getFeaturedBobbleheadAsync started',
+          message: 'featured_content_facade.getFeaturedBobbleheadAsync started',
         }),
       );
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
           category: 'business_logic',
-          message: 'FeaturedContentFacade.getFeaturedBobbleheadAsync completed',
+          message: 'featured_content_facade.getFeaturedBobbleheadAsync completed',
         }),
       );
     });
@@ -670,14 +670,14 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
           category: 'business_logic',
-          message: 'FeaturedContentFacade.getFeaturedCollectionsAsync started',
+          message: 'featured_content_facade.getFeaturedCollectionsAsync started',
         }),
       );
 
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
           category: 'business_logic',
-          message: 'FeaturedContentFacade.getFeaturedCollectionsAsync completed',
+          message: 'featured_content_facade.getFeaturedCollectionsAsync completed',
         }),
       );
     });

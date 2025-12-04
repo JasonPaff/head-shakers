@@ -64,8 +64,8 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
 
   // Map badge value to display text
   const _badgeText =
-    bobblehead.featureType === 'editor_pick' ?
-      'Pick'
+    bobblehead.featureType === 'editor_pick' ? 'Pick'
+    : bobblehead.featureType === 'new_badge' ? 'New'
     : bobblehead.featureType.charAt(0).toUpperCase() + bobblehead.featureType.slice(1);
 
   const cardTestId = testId || generateTestId('feature', 'trending-bobblehead-card', bobblehead.id);

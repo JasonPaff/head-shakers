@@ -53,7 +53,7 @@ export type FeaturedCollectionData = {
   ownerDisplayName: null | string;
   title: null | string;
   totalItems: number;
-  totalValue: null | string;
+  totalValue: null | number;
   viewCount: number;
 };
 
@@ -98,7 +98,7 @@ export interface TrendingBobblehead {
   category: null | string;
   contentId: string;
   contentSlug: null | string;
-  featureType: 'editor_pick' | 'trending';
+  featureType: 'editor_pick' | 'new_badge' | 'popular' | 'trending';
   id: string;
   imageUrl: null | string;
   likeCount: number;
@@ -430,7 +430,7 @@ export class FeaturedContentQuery extends BaseQuery {
                                  FROM ${bobbleheads}
                                  WHERE ${bobbleheads.collectionId} = ${collections.id}
                                    AND ${bobbleheads.deletedAt} IS NULL)`.as('total_items'),
-        totalValue: sql<null | string>`(SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+        totalValue: sql<null | number>`(SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
                                         FROM ${bobbleheads}
                                         WHERE ${bobbleheads.collectionId} = ${collections.id}
                                           AND ${bobbleheads.deletedAt} IS NULL)`,
