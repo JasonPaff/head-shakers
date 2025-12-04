@@ -1,8 +1,7 @@
-import { EditIcon, HeartIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react';
+import { EditIcon, HeartIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
 
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
 
-import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,21 +58,6 @@ export const CollectionHeaderCard = ({ collection, onDelete, onEdit }: Collectio
 
           {/* Collection Actions */}
           <div className={'flex items-center gap-2'}>
-            {/* Edit Button */}
-            <Button onClick={onEdit} size={'sm'} variant={'outline'}>
-              <EditIcon aria-hidden className={'size-4'} />
-              Edit
-            </Button>
-
-            {/* Share Menu */}
-            <CollectionShareMenu collectionSlug={collection.slug}>
-              <Button size={'sm'} variant={'outline'}>
-                <ShareIcon aria-hidden className={'size-4'} />
-                Share
-              </Button>
-            </CollectionShareMenu>
-
-            {/* Delete Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size={'icon'} variant={'ghost'}>
@@ -81,6 +65,10 @@ export const CollectionHeaderCard = ({ collection, onDelete, onEdit }: Collectio
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={'end'}>
+                <DropdownMenuItem onClick={onEdit}>
+                  <EditIcon aria-hidden className={'size-4'} />
+                  Edit Collection
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={onDelete} variant={'destructive'}>
                   <TrashIcon aria-hidden className={'size-4'} />
                   Delete Collection
