@@ -84,7 +84,6 @@ export const BobbleheadGridDisplay = ({
     loadingMessage: 'Deleting bobblehead...',
     onAfterSuccess: () => {
       setDeleteTarget(null);
-      router.refresh();
     },
   });
 
