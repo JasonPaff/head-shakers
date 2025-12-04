@@ -101,7 +101,7 @@ export class CollectionsDashboardQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(collections.userId, context.userId!),
-          this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       );
 

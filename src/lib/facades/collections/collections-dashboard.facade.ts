@@ -21,7 +21,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
       {
         data: { collectionSlug, userId },
         facade,
-        method: 'getCollectionHeaderForUserBySlug',
+        method: 'getHeaderByCollectionSlugAsync',
         operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_HEADER_BY_COLLECTION_SLUG,
       },
       async () => {
@@ -35,7 +35,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
           {
             context: {
               facade,
-              operation: 'getCollectionHeaderForUserBySlug',
+              operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_HEADER_BY_COLLECTION_SLUG,
             },
           },
         );
@@ -51,7 +51,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
       {
         data: { userId },
         facade,
-        method: 'getDashboardListByUserId',
+        method: 'getListByUserIdAsync',
         operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_LIST_BY_USER_ID,
         userId,
       },
