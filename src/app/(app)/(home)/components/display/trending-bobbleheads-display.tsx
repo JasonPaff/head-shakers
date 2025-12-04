@@ -5,7 +5,7 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
-import type { TrendingBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
+import type { TrendingBobblehead } from '@/lib/queries/featured-content/featured-content-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,7 @@ import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/uti
 import { cn } from '@/utils/tailwind-utils';
 
 export interface TrendingBobbleheadsDisplayProps extends ComponentTestIdProps {
-  bobbleheads: Array<TrendingBobbleheadData>;
+  bobbleheads: Array<TrendingBobblehead>;
 }
 
 export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobbleheadsDisplayProps) => {
@@ -52,7 +52,7 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobb
 };
 
 interface TrendingBobbleheadCardProps extends ComponentTestIdProps {
-  bobblehead: TrendingBobbleheadData;
+  bobblehead: TrendingBobblehead;
 }
 
 const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardProps) => {

@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { TrendingBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
+import type { TrendingBobblehead } from '@/lib/queries/featured-content/featured-content-query';
 
 import { TrendingBobbleheadsDisplay } from '@/app/(app)/(home)/components/display/trending-bobbleheads-display';
 
@@ -43,7 +43,7 @@ vi.mock('@/lib/utils/cloudinary.utils', () => ({
 }));
 
 describe('TrendingBobbleheadsDisplay', () => {
-  const mockBobbleheads: Array<TrendingBobbleheadData> = [
+  const mockBobbleheads: Array<TrendingBobblehead> = [
     {
       category: 'Sports',
       contentId: 'content-1',
@@ -170,7 +170,7 @@ describe('TrendingBobbleheadsDisplay', () => {
   });
 
   it('should format like counts and view counts with toLocaleString', () => {
-    const largeCounts: Array<TrendingBobbleheadData> = [
+    const largeCounts: Array<TrendingBobblehead> = [
       {
         category: 'Sports',
         contentId: 'content-5',
@@ -203,7 +203,7 @@ describe('TrendingBobbleheadsDisplay', () => {
   });
 
   it('should handle missing imageUrl gracefully', () => {
-    const noImageBobblehead: Array<TrendingBobbleheadData> = [
+    const noImageBobblehead: Array<TrendingBobblehead> = [
       {
         category: 'Music',
         contentId: 'content-6',

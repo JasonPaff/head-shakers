@@ -22,6 +22,20 @@ import {
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 /**
+ * minimal data needed for hero featured bobblehead display
+ */
+export interface FeaturedBobblehead {
+  contentId: string;
+  contentName: null | string;
+  contentSlug: null | string;
+  description: null | string;
+  imageUrl: null | string;
+  likes: number;
+  owner: null | string;
+  viewCount: number;
+}
+
+/**
  * data needed for featured collections display
  */
 export type FeaturedCollectionData = {
@@ -78,23 +92,9 @@ export interface FooterFeaturedContentData {
 }
 
 /**
- * minimal data needed for hero featured bobblehead display
- */
-export interface HeroFeaturedBobbleheadData {
-  contentId: string;
-  contentName: null | string;
-  contentSlug: null | string;
-  description: null | string;
-  imageUrl: null | string;
-  likes: number;
-  owner: null | string;
-  viewCount: number;
-}
-
-/**
  * data needed for trending bobbleheads display on homepage
  */
-export interface TrendingBobbleheadData {
+export interface TrendingBobblehead {
   category: null | string;
   contentId: string;
   contentSlug: null | string;
@@ -350,7 +350,7 @@ export class FeaturedContentQuery extends BaseQuery {
    * returns the single highest-priority active featured bobblehead with only the fields
    * needed for the hero display component. uses innerJoin to ensure bobblehead exists.
    */
-  static async getFeaturedBobbleheadAsync(context: QueryContext): Promise<HeroFeaturedBobbleheadData | null> {
+  static async getFeaturedBobbleheadAsync(context: QueryContext): Promise<FeaturedBobblehead | null> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
@@ -518,7 +518,7 @@ export class FeaturedContentQuery extends BaseQuery {
    * @param context - query context with database instance
    * @returns array of trending bobblehead data (limit 12, ordered by priority asc)
    */
-  static async getTrendingBobbleheadsAsync(context: QueryContext): Promise<Array<TrendingBobbleheadData>> {
+  static async getTrendingBobbleheadsAsync(context: QueryContext): Promise<Array<TrendingBobblehead>> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 

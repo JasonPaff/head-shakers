@@ -5,7 +5,7 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
-import type { HeroFeaturedBobbleheadData } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedBobblehead } from '@/lib/queries/featured-content/featured-content-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 
 interface FeaturedBobbleheadDisplayProps extends ComponentTestIdProps {
-  bobblehead: HeroFeaturedBobbleheadData;
+  bobblehead: FeaturedBobblehead;
 }
 
 export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobbleheadDisplayProps) => {

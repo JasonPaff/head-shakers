@@ -1,9 +1,9 @@
 import type {
+  FeaturedBobblehead,
   FeaturedCollectionData,
   FeaturedContentRecord,
   FooterFeaturedContentData,
-  HeroFeaturedBobbleheadData,
-  TrendingBobbleheadData,
+  TrendingBobblehead,
 } from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -150,7 +150,7 @@ export class FeaturedContentFacade extends BaseFacade {
    */
   static async getFeaturedBobbleheadAsync(
     dbInstance: DatabaseExecutor = db,
-  ): Promise<HeroFeaturedBobbleheadData | null> {
+  ): Promise<FeaturedBobblehead | null> {
     return executeFacadeOperation(
       {
         facade,
@@ -296,7 +296,7 @@ export class FeaturedContentFacade extends BaseFacade {
    */
   static async getTrendingBobbleheadsAsync(
     dbInstance: DatabaseExecutor = db,
-  ): Promise<Array<TrendingBobbleheadData>> {
+  ): Promise<Array<TrendingBobblehead>> {
     return executeFacadeOperation(
       {
         facade: facade,
