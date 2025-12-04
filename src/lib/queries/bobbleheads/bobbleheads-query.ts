@@ -72,6 +72,40 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
+   * batch delete multiple bobbleheads with ownership verification
+   * returns deleted bobbleheads and their photo URLs for Cloudinary cleanup
+   */
+  static async batchDeleteAsync(
+    ids: Array<string>,
+    context: UserQueryContext,
+  ): Promise<{ deletedBobbleheads: Array<BobbleheadRecord>; photoUrls: Array<string> }> {
+    const dbInstance = this.getDbInstance(context);
+
+    if (ids.length === 0) {
+      return { deletedBobbleheads: [], photoUrls: [] };
+    }
+
+    // get all photos for these bobbleheads before deletion
+    const photos = await dbInstance
+      .select()
+      .from(bobbleheadPhotos)
+      .where(inArray(bobbleheadPhotos.bobbleheadId, ids));
+
+    const photoUrls = photos.map((photo) => photo.url);
+
+    // delete bobbleheads with ownership verification (cascade will handle photo records)
+    const deletedBobbleheads = await dbInstance
+      .delete(bobbleheads)
+      .where(this.combineFilters(inArray(bobbleheads.id, ids), eq(bobbleheads.userId, context.userId)))
+      .returning();
+
+    return {
+      deletedBobbleheads,
+      photoUrls,
+    };
+  }
+
+  /**
    * batch update isFeatured status for multiple bobbleheads with ownership verification
    */
   static async batchUpdateFeaturedAsync(

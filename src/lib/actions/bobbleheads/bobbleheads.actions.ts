@@ -26,6 +26,7 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
+  batchDeleteBobbleheadsSchema,
   batchUpdateBobbleheadFeatureSchema,
   createBobbleheadWithPhotosSchema,
   deleteBobbleheadPhotoSchema,
@@ -582,7 +583,6 @@ export const batchUpdateBobbleheadFeatureAction = authActionClient
   .action(
     async ({ ctx, parsedInput }): Promise<ActionResponse<{ bobbleheads: Array<unknown>; count: number }>> => {
       const data = batchUpdateBobbleheadFeatureSchema.parse(ctx.sanitizedInput);
-      const dbInstance = ctx.db;
 
       Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
         bobbleheadCount: data.ids.length,
@@ -595,7 +595,7 @@ export const batchUpdateBobbleheadFeatureAction = authActionClient
           data.ids,
           data.isFeatured,
           ctx.userId,
-          dbInstance,
+          ctx.db,
         );
 
         Sentry.addBreadcrumb({
@@ -621,3 +621,40 @@ export const batchUpdateBobbleheadFeatureAction = authActionClient
       }
     },
   );
+
+export const batchDeleteBobbleheadsAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_BULK,
+    isTransactionRequired: true,
+  })
+  .inputSchema(batchDeleteBobbleheadsSchema)
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ count: number }>> => {
+    const data = batchDeleteBobbleheadsSchema.parse(ctx.sanitizedInput);
+
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
+      bobbleheadCount: data.ids.length,
+      userId: ctx.userId,
+    });
+
+    try {
+      const result = await BobbleheadsFacade.batchDeleteAsync(data.ids, ctx.userId, ctx.db);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          count: result.count,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Batch deleted ${result.count} bobbleheads`,
+      });
+
+      return actionSuccess({ count: result.count });
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_BULK },
+        operation: OPERATIONS.BOBBLEHEADS.BATCH_DELETE,
+        userId: ctx.userId,
+      });
+    }
+  });

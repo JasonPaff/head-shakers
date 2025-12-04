@@ -129,6 +129,108 @@ export class BobbleheadsFacade extends BaseFacade {
   }
 
   /**
+   * Batch delete multiple bobbleheads with ownership verification.
+   * Handles Cloudinary cleanup and tag removal for all deleted bobbleheads.
+   *
+   * Cache invalidation: Calls invalidateOnDelete for each successfully deleted bobblehead.
+   *
+   * @param ids - Array of bobblehead IDs to delete
+   * @param userId - User ID for ownership verification
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Object with count of deleted bobbleheads and array of deleted records
+   */
+  static async batchDeleteAsync(
+    ids: Array<string>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ count: number; deletedBobbleheads: Array<BobbleheadRecord> }> {
+    return await executeFacadeOperation(
+      {
+        data: { count: ids.length, userId },
+        facade,
+        method: 'batchDeleteAsync',
+        operation: OPERATIONS.BOBBLEHEADS.BATCH_DELETE,
+      },
+      async () => {
+        const context = createUserQueryContext(userId, { dbInstance });
+
+        // Delete bobbleheads and get photo URLs for cleanup
+        const { deletedBobbleheads, photoUrls } = await BobbleheadsQuery.batchDeleteAsync(ids, context);
+
+        if (deletedBobbleheads.length === 0) {
+          return { count: 0, deletedBobbleheads: [] };
+        }
+
+        // Attempt to clean up photos from Cloudinary (non-blocking)
+        if (photoUrls.length > 0) {
+          try {
+            const deletionResults = await CloudinaryService.deletePhotosByUrls(photoUrls);
+
+            const successfulDeletions = deletionResults.filter((result) => result.success).length;
+            const failedDeletions = deletionResults.filter((result) => !result.success);
+
+            if (successfulDeletions > 0) {
+              facadeBreadcrumb(`Successfully deleted ${successfulDeletions} photos from Cloudinary`, {
+                count: successfulDeletions,
+                totalBobbleheads: deletedBobbleheads.length,
+              });
+            }
+
+            if (failedDeletions.length > 0) {
+              trackFacadeWarning(
+                facade,
+                'batchDeleteAsync',
+                `Failed to delete ${failedDeletions.length} photos from Cloudinary`,
+                { count: failedDeletions.length, failures: failedDeletions },
+              );
+            }
+          } catch (error) {
+            // Don't fail the entire operation if Cloudinary cleanup fails
+            captureFacadeWarning(error, facade, OPERATIONS.BOBBLEHEADS.BATCH_DELETE, {
+              operation: 'cloudinary-cleanup',
+              photoCount: photoUrls.length,
+            });
+          }
+        }
+
+        // Remove tag associations for each deleted bobblehead
+        for (const bobblehead of deletedBobbleheads) {
+          try {
+            const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
+
+            if (!wasTagRemovalSuccessful) {
+              trackFacadeWarning(
+                facade,
+                'batchDeleteAsync',
+                'Failed to remove tags during bobblehead deletion',
+                {
+                  bobbleheadId: bobblehead.id,
+                },
+              );
+            }
+          } catch (error) {
+            // Don't fail the entire operation if tag removal fails
+            captureFacadeWarning(error, facade, OPERATIONS.BOBBLEHEADS.BATCH_DELETE, {
+              bobbleheadId: bobblehead.id,
+              operation: 'tag-removal',
+            });
+          }
+        }
+
+        // Invalidate cache for each deleted bobblehead
+        deletedBobbleheads.forEach((bobblehead) => {
+          this.invalidateOnDelete(bobblehead.id, userId, bobblehead.collectionId, bobblehead.slug);
+        });
+
+        return {
+          count: deletedBobbleheads.length,
+          deletedBobbleheads,
+        };
+      },
+    );
+  }
+
+  /**
    * Batch update the featured status of multiple bobbleheads.
    * Requires ownership verification for all bobbleheads.
    *

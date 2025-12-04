@@ -32,6 +32,7 @@ export const OPERATIONS = {
     RECORD_VIEW: 'record_view',
   },
   BOBBLEHEADS: {
+    BATCH_DELETE: 'batch_delete_bobbleheads',
     BATCH_UPDATE_FEATURED: 'batch_update_bobblehead_featured',
     CREATE: 'create_bobblehead',
     CREATE_WITH_PHOTOS: 'create_bobblehead_with_photos',

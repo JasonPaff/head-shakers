@@ -15,6 +15,7 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 import {
+  batchDeleteBobbleheadsAction,
   batchUpdateBobbleheadFeatureAction,
   deleteBobbleheadAction,
   updateBobbleheadFeatureAction,
@@ -52,6 +53,7 @@ export const BobbleheadGridDisplay = ({
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
   const [deleteTarget, setDeleteTarget] = useState<null | string>(null);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
     userPreferences.collectionGridDensity ?? 'compact',
@@ -101,6 +103,15 @@ export const BobbleheadGridDisplay = ({
     },
   });
 
+  const { executeAsync: executeBulkDeleteAsync } = useServerAction(batchDeleteBobbleheadsAction, {
+    loadingMessage: 'Deleting bobbleheads...',
+    onAfterSuccess: () => {
+      setSelectedIds(new Set());
+      setIsBulkDeleteDialogOpen(false);
+      router.refresh();
+    },
+  });
+
   // Sync debounced search to URL
   useEffect(() => {
     if (debouncedSearch !== search) {
@@ -141,8 +152,11 @@ export const BobbleheadGridDisplay = ({
   };
 
   const handleBulkDelete = () => {
-    console.log('Bulk delete:', Array.from(selectedIds));
-    setSelectedIds(new Set());
+    setIsBulkDeleteDialogOpen(true);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    await executeBulkDeleteAsync({ ids: Array.from(selectedIds) });
   };
 
   const handleBulkFeature = async () => {
@@ -312,6 +326,19 @@ export const BobbleheadGridDisplay = ({
         onDeleteAsync={handleDeleteConfirm}
       >
         This will permanently delete all information and photos attached to this bobblehead.
+      </ConfirmDeleteAlertDialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmDeleteAlertDialog
+        confirmationText={selectedIds.size.toString()}
+        isOpen={isBulkDeleteDialogOpen}
+        onClose={() => {
+          setIsBulkDeleteDialogOpen(false);
+        }}
+        onDeleteAsync={handleBulkDeleteConfirm}
+      >
+        This will permanently delete {selectedIds.size} bobblehead{selectedIds.size === 1 ? '' : 's'} and all
+        associated photos. Type the number below to confirm.
       </ConfirmDeleteAlertDialog>
     </Fragment>
   );

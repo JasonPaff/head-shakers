@@ -10,6 +10,7 @@ import { cloudinaryPhotosValidationSchema } from '@/lib/validations/photo-upload
 export const customFieldsSchema = z.record(z.string(), z.string());
 
 export type AddBobbleheadFormSchema = z.input<typeof createBobbleheadWithPhotosSchema>;
+export type BatchDeleteBobbleheads = z.infer<typeof batchDeleteBobbleheadsSchema>;
 export type BatchUpdateBobbleheadFeature = z.infer<typeof batchUpdateBobbleheadFeatureSchema>;
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
@@ -46,6 +47,14 @@ export const insertBobbleheadPhotoSchema = createInsertSchema(bobbleheadPhotos, 
 export const deleteBobbleheadSchema = z.object({
   bobbleheadId: z.uuid(),
 });
+
+export const batchDeleteBobbleheadsSchema = z.object({
+  ids: z
+    .array(z.uuid({ message: 'Bobblehead ID is required' }))
+    .min(1, { message: 'At least one bobblehead ID is required' })
+    .max(100, { message: 'Cannot delete more than 100 bobbleheads at once' }),
+});
+
 export const updateBobbleheadPhotoSchema = insertBobbleheadPhotoSchema.partial();
 export const selectBobbleheadTagSchema = createSelectSchema(bobbleheadTags);
 export const insertBobbleheadTagSchema = createInsertSchema(bobbleheadTags).omit({
