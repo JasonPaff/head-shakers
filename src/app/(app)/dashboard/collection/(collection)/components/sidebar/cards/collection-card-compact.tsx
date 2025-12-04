@@ -1,12 +1,18 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, GlobeIcon, LockIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, LockIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card';
 import { formatCurrency } from '@/lib/utils/currency.utils';
 import { cn } from '@/utils/tailwind-utils';
@@ -18,6 +24,7 @@ export type CollectionCardCompactProps = {
   isActive: boolean;
   isHoverCardEnabled?: boolean;
   onClick: (slug: string) => void;
+  onDelete: (id: string) => void;
   onEdit: (id: string) => void;
 };
 
@@ -26,6 +33,7 @@ export const CollectionCardCompact = ({
   isActive,
   isHoverCardEnabled = false,
   onClick,
+  onDelete,
   onEdit,
 }: CollectionCardCompactProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
@@ -35,6 +43,11 @@ export const CollectionCardCompact = ({
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
     onEdit(collection.id);
+  };
+
+  const handleDelete = (e: MouseEvent) => {
+    e.stopPropagation();
+    onDelete(collection.id);
   };
 
   return (
@@ -82,15 +95,26 @@ export const CollectionCardCompact = ({
               </div>
             </div>
 
-            {/* Edit Button (visible on hover) */}
-            <Button
-              className={'opacity-0 transition-opacity group-hover:opacity-100 md:block'}
-              onClick={handleEdit}
-              size={'icon'}
-              variant={'ghost'}
-            >
-              <EditIcon aria-hidden className={'size-3.5'} />
-            </Button>
+            {/* Actions Menu (visible on hover) */}
+            <div className={'opacity-0 transition-opacity group-hover:opacity-100'}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size={'icon'} variant={'ghost'}>
+                    <MoreVerticalIcon aria-hidden className={'size-4'} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={'end'}>
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <EditIcon aria-hidden className={'size-4'} />
+                    Edit Collection
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} variant={'destructive'}>
+                    <TrashIcon aria-hidden className={'size-4'} />
+                    Delete Collection
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Active Indicator with Animated Pulse */}

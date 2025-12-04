@@ -1,11 +1,17 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, GlobeIcon, HeartIcon, LockIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, HeartIcon, LockIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card';
 import { formatCurrency } from '@/lib/utils/currency.utils';
 import { cn } from '@/utils/tailwind-utils';
@@ -17,6 +23,7 @@ export type CollectionCardCoverProps = {
   isActive: boolean;
   isHoverCardEnabled?: boolean;
   onClick: (slug: string) => void;
+  onDelete: (id: string) => void;
   onEdit: (id: string) => void;
 };
 
@@ -25,6 +32,7 @@ export const CollectionCardCover = ({
   isActive,
   isHoverCardEnabled = false,
   onClick,
+  onDelete,
   onEdit,
 }: CollectionCardCoverProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
@@ -34,6 +42,11 @@ export const CollectionCardCover = ({
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
     onEdit(collection.id);
+  };
+
+  const handleDelete = (e: MouseEvent) => {
+    e.stopPropagation();
+    onDelete(collection.id);
   };
 
   return (
@@ -93,18 +106,28 @@ export const CollectionCardCover = ({
               : <LockIcon aria-label={'Private'} className={'size-3.5'} />}
             </div>
 
-            {/* Edit Button */}
-            <Button
-              className={cn(
-                'absolute top-2 right-2 size-8 opacity-0 transition-opacity',
-                'group-hover:opacity-100',
-              )}
-              onClick={handleEdit}
-              size={'icon'}
-              variant={'secondary'}
+            {/* Actions Menu */}
+            <div
+              className={cn('absolute top-2 right-2 opacity-0 transition-opacity', 'group-hover:opacity-100')}
             >
-              <EditIcon aria-hidden className={'size-3.5'} />
-            </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size={'icon'} variant={'secondary'}>
+                    <MoreVerticalIcon aria-hidden className={'size-4'} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={'end'}>
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <EditIcon aria-hidden className={'size-4'} />
+                    Edit Collection
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} variant={'destructive'}>
+                    <TrashIcon aria-hidden className={'size-4'} />
+                    Delete Collection
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             {/* Active Indicator */}
             <Conditional isCondition={isActive}>

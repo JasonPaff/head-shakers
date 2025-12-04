@@ -9,9 +9,12 @@ import type { CollectionDashboardListRecord } from '@/lib/queries/collections/co
 
 import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
+import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { sortCollections } from '@/lib/utils/collection.utils';
 
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
@@ -49,7 +52,10 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
     userPreferences.collectionSidebarSort ?? 'name-asc',
   );
 
+  const [deletingCollectionId, setDeletingCollectionId] = useState<null | string>(null);
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isCollectionHoverCardEnabled);
 
@@ -59,6 +65,15 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
   );
 
   const { setPreference } = useUserPreferences();
+
+  const { executeAsync: executeDeleteAsync } = useServerAction(deleteCollectionAction, {
+    loadingMessage: 'Deleting collection...',
+    onAfterSuccess: () => {
+      void setParams({ collectionSlug: null });
+      setIsDeleteDialogOpen.off();
+      setDeletingCollectionId(null);
+    },
+  });
 
   // Filter and sort collections using the shared utility
   const filteredCollections = useMemo(() => {
@@ -133,6 +148,25 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
     setEditingCollection(null);
   };
 
+  const handleDeleteCollection = (id: string) => {
+    setDeletingCollectionId(id);
+    setIsDeleteDialogOpen.on();
+  };
+
+  const handleDeleteDialogClose = () => {
+    setIsDeleteDialogOpen.off();
+    setDeletingCollectionId(null);
+  };
+
+  const handleDeleteAsync = async () => {
+    if (deletingCollectionId) {
+      await executeDeleteAsync({ collectionId: deletingCollectionId });
+    }
+  };
+
+  const deletingCollection =
+    deletingCollectionId ? collections.find((c) => c.id === deletingCollectionId) : null;
+
   const hasAnyCollections = collections.length > 0;
   const hasFilteredResults = filteredCollections.length > 0;
 
@@ -167,6 +201,7 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
               isHoverCardEnabled={isHoverCardEnabled}
               key={collection.id}
               onCollectionSelect={handleCollectionSelect}
+              onDeleteCollection={handleDeleteCollection}
               onEditCollection={handleEditCollection}
               selectedCollectionSlug={selectedCollectionSlug}
             />
@@ -194,6 +229,18 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
           onClose={handleEditDialogClose}
         />
       </Conditional>
+
+      {/* Delete Collection Confirmation Dialog */}
+      <Conditional isCondition={!!deletingCollection}>
+        <ConfirmDeleteAlertDialog
+          confirmationText={deletingCollection?.name ?? ''}
+          isOpen={isDeleteDialogOpen}
+          onClose={handleDeleteDialogClose}
+          onDeleteAsync={handleDeleteAsync}
+        >
+          This will permanently delete this collection and all bobbleheads within.
+        </ConfirmDeleteAlertDialog>
+      </Conditional>
     </Fragment>
   );
 };
@@ -203,6 +250,7 @@ interface CollectionCardMapperProps {
   collection: CollectionDashboardListRecord;
   isHoverCardEnabled: boolean;
   onCollectionSelect: (slug: string) => void;
+  onDeleteCollection: (id: string) => void;
   onEditCollection: (id: string) => void;
   selectedCollectionSlug?: string;
 }
@@ -212,6 +260,7 @@ const CollectionCardMapper = ({
   collection,
   isHoverCardEnabled,
   onCollectionSelect,
+  onDeleteCollection,
   onEditCollection,
   selectedCollectionSlug,
 }: CollectionCardMapperProps) => {
@@ -224,6 +273,7 @@ const CollectionCardMapper = ({
         isActive={isActive}
         isHoverCardEnabled={isHoverCardEnabled}
         onClick={onCollectionSelect}
+        onDelete={onDeleteCollection}
         onEdit={onEditCollection}
       />
     );
@@ -236,6 +286,7 @@ const CollectionCardMapper = ({
         isActive={isActive}
         isHoverCardEnabled={isHoverCardEnabled}
         onClick={onCollectionSelect}
+        onDelete={onDeleteCollection}
         onEdit={onEditCollection}
       />
     );
@@ -246,6 +297,7 @@ const CollectionCardMapper = ({
       isActive={isActive}
       isHoverCardEnabled={isHoverCardEnabled}
       onClick={onCollectionSelect}
+      onDelete={onDeleteCollection}
       onEdit={onEditCollection}
     />
   );
