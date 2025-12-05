@@ -52,6 +52,7 @@ vi.mock('@clerk/nextjs', () => ({
   SignedOut: () => null,
   SignInButton: () => null,
   SignOutButton: () => null,
+  SignUpButton: ({ children }: { children: unknown }) => children,
   useAuth: () => ({
     getToken: vi.fn().mockResolvedValue('mock-token'),
     isLoaded: true,
