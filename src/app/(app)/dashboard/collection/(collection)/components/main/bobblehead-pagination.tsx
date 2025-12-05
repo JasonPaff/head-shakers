@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getPageNumbers } from '@/lib/utils/pagination.utils';
 
 interface BobbleheadPaginationProps {
   currentPage: number;
@@ -55,7 +56,12 @@ export const BobbleheadPagination = ({
         {/* Page size selector */}
         <div className={'flex items-center gap-2'}>
           <span className={'text-sm text-muted-foreground'}>Per page:</span>
-          <Select onValueChange={(value) => onPageSizeChange(Number(value))} value={String(pageSize)}>
+          <Select
+            onValueChange={(value) => {
+              onPageSizeChange(Number(value));
+            }}
+            value={String(pageSize)}
+          >
             <SelectTrigger className={'w-20'}>
               <SelectValue />
             </SelectTrigger>
@@ -71,11 +77,13 @@ export const BobbleheadPagination = ({
         <div className={'flex items-center gap-1'}>
           <Button
             disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
+            onClick={() => {
+              onPageChange(currentPage - 1);
+            }}
             size={'icon'}
             variant={'outline'}
           >
-            <ChevronLeft className={'size-4'} />
+            <ChevronLeft aria-hidden className={'size-4'} />
           </Button>
 
           {pagesNumbers.map((page, index) => {
@@ -90,7 +98,9 @@ export const BobbleheadPagination = ({
             return (
               <Button
                 key={page}
-                onClick={() => onPageChange(page)}
+                onClick={() => {
+                  onPageChange(page);
+                }}
                 size={'icon'}
                 variant={page === currentPage ? 'default' : 'outline'}
               >
@@ -101,49 +111,16 @@ export const BobbleheadPagination = ({
 
           <Button
             disabled={currentPage === totalPages}
-            onClick={() => onPageChange(currentPage + 1)}
+            onClick={() => {
+              onPageChange(currentPage + 1);
+            }}
             size={'icon'}
             variant={'outline'}
           >
-            <ChevronRight className={'size-4'} />
+            <ChevronRight aria-hidden className={'size-4'} />
           </Button>
         </div>
       </div>
     </div>
   );
-};
-
-const getPageNumbers = (currentPage: number, totalPages: number) => {
-  const pages: Array<number> = [];
-  const maxPagesToShow = 5;
-
-  if (totalPages <= maxPagesToShow) {
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
-    }
-  } else {
-    // Always show first page
-    pages.push(1);
-
-    if (currentPage > 3) {
-      pages.push(-1); // Ellipsis marker
-    }
-
-    // Show pages around current page
-    const start = Math.max(2, currentPage - 1);
-    const end = Math.min(totalPages - 1, currentPage + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (currentPage < totalPages - 2) {
-      pages.push(-1); // Ellipsis marker
-    }
-
-    // Always show last page
-    pages.push(totalPages);
-  }
-
-  return pages;
 };
