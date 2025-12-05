@@ -1,20 +1,20 @@
 # Bobblehead Grid Test Implementation
 
-**Execution Date**: 2025-12-04
+**Execution Date**: 2025-12-04 (Updated: 2025-12-05)
 **Test Plan**: [bobblehead-grid-test-plan.md](../../plans/bobblehead-grid-test-plan.md)
 **Execution Mode**: full-auto
-**Scope**: unit, component (integration tests pending)
-**Status**: Partially Completed
+**Scope**: unit, component, integration
+**Status**: Completed
 
 ## Overview
 
 - Total Steps: 14
-- Steps Completed: 11/14 (Infrastructure + Unit + Component tests complete)
-- Test Files Created: 8
-- Test Cases Implemented: 179
-- Tests Passed: 179 / Failed: 0
+- Steps Completed: 14/14 (All phases complete)
+- Test Files Created: 11
+- Test Cases Implemented: 234
+- Tests Passed: 234 / Failed: 0
 - Total Fix Attempts: 0 (across all steps)
-- Total Duration: ~45 minutes
+- Total Duration: ~90 minutes (across two sessions)
 
 ## Test Type Routing
 
@@ -31,9 +31,9 @@
 | 3.4 Toolbar component tests | component | component-test-specialist | DONE | 23 |
 | 3.5 BobbleheadCard component tests | component | component-test-specialist | DONE | 35 |
 | 3.6 BobbleheadGridDisplay component tests | component | component-test-specialist | DONE | 14 |
-| 4.1 BobbleheadsDashboardQuery integration tests | integration | integration-test-specialist | PENDING | - |
-| 4.2 BobbleheadsDashboardFacade integration tests | integration | integration-test-specialist | PENDING | - |
-| 4.3 Bobblehead server actions integration tests | integration | integration-test-specialist | PENDING | - |
+| 4.1 BobbleheadsDashboardQuery integration tests | integration | integration-test-specialist | DONE | 22 |
+| 4.2 BobbleheadsDashboardFacade integration tests | integration | integration-test-specialist | DONE | 13 |
+| 4.3 Bobblehead server actions integration tests | integration | integration-test-specialist | DONE | 20 |
 
 ## Files Created
 
@@ -48,15 +48,22 @@
 ### Source Files Modified
 - `src/lib/utils/pagination.utils.ts` - Extracted getPageNumbers utility
 
-### Test Files
+### Unit Test Files
 - `tests/unit/app/dashboard/collection/route-type.test.ts` - 47 tests
 - `tests/unit/lib/utils/pagination.utils.test.ts` - 22 tests
+
+### Component Test Files
 - `tests/components/dashboard/collection/bobblehead-grid.test.tsx` - 11 tests
 - `tests/components/dashboard/collection/bulk-actions-bar.test.tsx` - 12 tests
 - `tests/components/dashboard/collection/bobblehead-pagination.test.tsx` - 15 tests
 - `tests/components/dashboard/collection/toolbar.test.tsx` - 23 tests
 - `tests/components/dashboard/collection/bobblehead-card.test.tsx` - 35 tests
 - `tests/components/dashboard/collection/bobblehead-grid-display.test.tsx` - 14 tests
+
+### Integration Test Files
+- `tests/integration/queries/bobbleheads/bobbleheads-dashboard.query.test.ts` - 22 tests
+- `tests/integration/facades/bobbleheads-dashboard/bobbleheads-dashboard.facade.test.ts` - 13 tests
+- `tests/integration/actions/bobbleheads/bobbleheads.actions.test.ts` - 20 tests
 
 ## Test Breakdown
 
@@ -70,35 +77,106 @@
 | Component Tests (Toolbar) | 23 |
 | Component Tests (Card) | 35 |
 | Component Tests (GridDisplay) | 14 |
-| **Total** | **179** |
+| Integration Tests (Query) | 22 |
+| Integration Tests (Facade) | 13 |
+| Integration Tests (Actions) | 20 |
+| **Total** | **234** |
 
-## Remaining Work (Integration Tests)
+## Integration Tests Summary
 
-The following integration tests are pending:
+### BobbleheadsDashboardQuery (22 tests)
+Tests for the query layer with real PostgreSQL via Testcontainers:
 
-1. **BobbleheadsDashboardQuery** (12-16 tests)
-   - Test query methods with real database
-   - Test complex SQL queries with subqueries
-   - Test filters, sorting, pagination
+**getListAsync** (16 tests):
+- Stats aggregation (likes, views, comments) via subqueries
+- Category, condition, and featured filtering
+- Case-insensitive search on name, characterName
+- Sort by newest, oldest, name-asc, value-high
+- Pagination with offset/limit
+- Permission filtering (userId context)
+- Soft delete exclusion (deletedAt IS NULL)
 
-2. **BobbleheadsDashboardFacade** (8-12 tests)
-   - Test facade methods with caching
-   - Test business logic orchestration
-   - Test cache key generation
+**getCategoriesByCollectionSlugAsync** (3 tests):
+- Distinct category retrieval
+- Null category exclusion
+- Alphabetical ordering
 
-3. **Bobblehead Server Actions** (16-22 tests)
-   - Test delete and feature actions
-   - Test batch operations
-   - Test permission checks
+**getCountAsync** (3 tests):
+- Count with no filters
+- Count with category filter
+- Count with search term
+
+### BobbleheadsDashboardFacade (13 tests)
+Tests for the facade layer with caching and business orchestration:
+
+**getListByCollectionSlugAsync** (4 tests):
+- Pagination metadata (currentPage, pageSize, totalCount, totalPages)
+- Empty results handling
+
+**getCategoriesByCollectionSlugAsync** (2 tests):
+- Cache pass-through execution
+- Distinct categories
+
+**getBobbleheadForEditAsync** (3 tests):
+- Bobblehead with tags for owner
+- Null for non-owner (permission check)
+- Null for non-existent bobblehead
+
+**getUserCollectionSelectorsAsync** (3 tests):
+- Collection selectors ordered by name
+- Empty array for user with no collections
+- Ownership filtering
+
+**Sentry integration** (1 test):
+- Breadcrumb tracking for operations
+
+### Bobblehead Server Actions (20 tests)
+Tests for mutation actions with authentication and permission checks:
+
+**deleteBobbleheadAction** (5 tests):
+- Successful deletion
+- Soft delete (sets deletedAt)
+- Success response verification
+- Error for not found
+- Error for non-owner
+
+**updateBobbleheadFeatureAction** (5 tests):
+- Update isFeatured to true
+- Update isFeatured to false
+- Success response
+- Error for not found
+- Error for non-owner
+
+**batchDeleteBobbleheadsAction** (4 tests):
+- Multiple bobblehead deletion
+- UUID validation
+- Owner-only deletion (partial success)
+- Empty array handling
+
+**batchUpdateBobbleheadFeatureAction** (6 tests):
+- Feature multiple bobbleheads
+- Un-feature multiple bobbleheads
+- UUID validation
+- Owner-only updates (partial success)
+- Status update verification
+- Empty array handling
 
 ## Run Tests
 
 ```bash
-# Run all implemented tests
+# Run all bobblehead grid tests (unit + component)
 npm run test -- --run tests/unit/app/dashboard/collection tests/unit/lib/utils/pagination tests/components/dashboard/collection
 
-# Run specific test file
-npm run test -- --run tests/components/dashboard/collection/bobblehead-grid-display.test.tsx
+# Run all integration tests for bobblehead grid
+npm run test -- --run tests/integration/queries/bobbleheads tests/integration/facades/bobbleheads-dashboard tests/integration/actions/bobbleheads
+
+# Run all tests together
+npm run test -- --run tests/unit/app/dashboard/collection tests/unit/lib/utils/pagination tests/components/dashboard/collection tests/integration/queries/bobbleheads tests/integration/facades/bobbleheads-dashboard tests/integration/actions/bobbleheads
+
+# Run specific test files
+npm run test -- --run tests/integration/queries/bobbleheads/bobbleheads-dashboard.query.test.ts
+npm run test -- --run tests/integration/facades/bobbleheads-dashboard/bobbleheads-dashboard.facade.test.ts
+npm run test -- --run tests/integration/actions/bobbleheads/bobbleheads.actions.test.ts
 ```
 
 ## Summary
@@ -108,5 +186,14 @@ Successfully implemented comprehensive test coverage for the bobblehead grid fea
 - **Infrastructure**: Created factories, mocks, and setup utilities
 - **Unit Tests**: 69 tests covering URL parsers and pagination logic
 - **Component Tests**: 110 tests covering all UI components
+- **Integration Tests**: 55 tests covering query, facade, and action layers
 
-All 179 tests pass. Integration tests remain pending and can be added in a follow-up session.
+All 234 tests pass. The test implementation is complete.
+
+### Key Achievements
+1. **Query Layer**: Full coverage of complex SQL queries with subqueries for stats aggregation
+2. **Facade Layer**: Business logic orchestration with caching verification
+3. **Action Layer**: Server action mutations with permission enforcement
+4. **Real Database**: Integration tests use actual PostgreSQL via Testcontainers
+5. **Permission Checks**: Owner validation tested across all layers
+6. **Batch Operations**: Multi-record operations tested including partial success scenarios
