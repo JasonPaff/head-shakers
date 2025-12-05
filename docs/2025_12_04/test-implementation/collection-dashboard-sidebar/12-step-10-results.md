@@ -17,15 +17,18 @@ Test Radix UI HoverCard with collection preview details
 ## Test Cases Implemented (6 tests)
 
 ### Trigger and Content Display
+
 1. should render trigger element (card preview)
 2. should show hovercard content on hover/focus
 
 ### Collection Stats Display
+
 3. should display collection stats in hovercard
 4. should display collection description if present
 5. should handle null description gracefully
 
 ### Hovercard Interactions
+
 6. should close hovercard when trigger loses focus
 
 ## Conventions Applied
@@ -40,9 +43,9 @@ Test Radix UI HoverCard with collection preview details
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/collection-card-hovercard.test.tsx | PASS | 6 tests passed in 1.53s |
+| Command                                                                                       | Result | Notes                   |
+| --------------------------------------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/components/collections/dashboard/collection-card-hovercard.test.tsx | PASS   | 6 tests passed in 1.53s |
 
 ## Success Criteria
 

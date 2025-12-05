@@ -17,6 +17,7 @@ Test missing schema variations and edge cases in collections validation schemas
 ## Test Cases Implemented (18 tests total, 8 new)
 
 ### insertCollectionSchema (5 tests)
+
 1. should validate correct input with all fields
 2. should validate correct input with minimal fields (name only)
 3. should reject name below min length
@@ -24,13 +25,16 @@ Test missing schema variations and edge cases in collections validation schemas
 5. should reject invalid coverImageUrl format
 
 ### updateCollectionSchema (2 tests)
+
 6. should require collectionId UUID
 7. should reject invalid collectionId UUID format
 
 ### deleteCollectionSchema (1 test)
+
 8. should validate collectionId is present
 
 ### getCollectionBySlugSchema (1 test)
+
 - should validate slug format (lowercase, hyphens only)
 
 ## Conventions Applied
@@ -44,9 +48,9 @@ Test missing schema variations and edge cases in collections validation schemas
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/unit/lib/validations/collections.validation.test.ts | PASS | 18 tests passed in 17ms |
+| Command                                                                       | Result | Notes                   |
+| ----------------------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/unit/lib/validations/collections.validation.test.ts | PASS   | 18 tests passed in 17ms |
 
 ## Success Criteria
 

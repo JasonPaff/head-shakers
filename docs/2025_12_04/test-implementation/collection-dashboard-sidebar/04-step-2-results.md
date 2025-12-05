@@ -42,9 +42,9 @@ Test pure sorting function for 9 different sort options
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/unit/lib/utils/sort-collections.test.ts | PASS | 13 tests passed in 20ms |
+| Command                                                           | Result | Notes                   |
+| ----------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/unit/lib/utils/sort-collections.test.ts | PASS   | 13 tests passed in 20ms |
 
 ## Success Criteria
 

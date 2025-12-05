@@ -29,9 +29,9 @@ Test empty state component when user has no collections
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/no-collections.test.tsx | PASS | 2 tests passed in 216ms |
+| Command                                                                            | Result | Notes                   |
+| ---------------------------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/components/collections/dashboard/no-collections.test.tsx | PASS   | 2 tests passed in 216ms |
 
 ## Success Criteria
 

@@ -37,9 +37,11 @@ Scope: unit | component | integration (NO E2E)
 **Why**: Dashboard components need collections with aggregated stats (bobbleheadCount, likeCount, etc.) that don't exist in base mock data
 
 **Files to Create**:
+
 - `tests/mocks/data/collections-dashboard.mock.ts`
 
 **Utilities to Add**:
+
 ```typescript
 // Mock dashboard list records with stats
 export const mockCollectionDashboardRecord
@@ -51,17 +53,20 @@ export const mockCollectionDashboardHeaderRecord
 ```
 
 **Patterns to Follow**:
+
 - Reference `tests/mocks/data/collections.mock.ts` for structure
 - Include all properties from `CollectionDashboardListRecord` type
 - Provide realistic stat values (bobbleheadCount, likeCount, viewCount, commentCount, totalValue)
 
 **Validation Commands**:
+
 ```bash
 npm run typecheck
 npm run lint
 ```
 
 **Success Criteria**:
+
 - Mock data compiles without TypeScript errors
 - Mock factories create valid dashboard record types
 - Can be imported by test files
@@ -75,9 +80,11 @@ npm run lint
 **Why**: CRITICAL - This utility powers all sidebar sorting and must handle all sort modes correctly
 
 **Files to Create**:
+
 - `tests/unit/lib/utils/sort-collections.test.ts`
 
 **Test Cases**:
+
 1. Sort by name (A-Z) - alphabetical ascending
 2. Sort by name (Z-A) - alphabetical descending
 3. Sort by newest - most recent createdAt first
@@ -91,12 +98,14 @@ npm run lint
 11. Handle single item array
 
 **Patterns to Follow**:
+
 - Arrange/Act/Assert pattern (see `tests/unit/lib/utils/action-response.test.ts`)
 - Use descriptive test names with "should" prefix
 - Test edge cases (empty, single item, equal values)
 - Verify sort stability for equal values
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/unit/lib/utils/sort-collections.test.ts
 npm run lint
@@ -104,6 +113,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 11 tests pass
 - 100% code coverage of sortCollections function
 - No lint or type errors
@@ -117,9 +127,11 @@ npm run typecheck
 **Why**: HIGH PRIORITY - Validation schemas protect data integrity and need comprehensive coverage
 
 **Files to Create**:
+
 - `tests/unit/lib/validations/collections.validation.test.ts`
 
 **Test Cases**:
+
 1. `insertCollectionSchema` - valid data with all fields
 2. `insertCollectionSchema` - valid data with minimal fields (name only)
 3. `insertCollectionSchema` - rejects name below min length
@@ -130,12 +142,14 @@ npm run typecheck
 8. `deleteCollectionSchema` - validates collectionId is present
 
 **Patterns to Follow**:
+
 - Use `schema.safeParse()` for validation checks
 - Test both valid and invalid inputs
 - Check error messages match expected field names
 - Reference existing validation test patterns in codebase
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/unit/lib/validations/collections.validation.test.ts
 npm run lint
@@ -143,6 +157,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 8 tests pass
 - Schema validation errors are properly tested
 - Type inference works correctly
@@ -156,9 +171,11 @@ npm run typecheck
 **Why**: HIGH PRIORITY - Facade orchestrates caching and query coordination
 
 **Files to Create**:
+
 - `tests/unit/lib/facades/collections/collections-dashboard.facade.test.ts`
 
 **Test Cases**:
+
 1. `getHeaderByCollectionSlugAsync` - calls query with correct context
 2. `getHeaderByCollectionSlugAsync` - wraps result in cache service
 3. `getHeaderByCollectionSlugAsync` - passes userId and slug correctly
@@ -167,12 +184,14 @@ npm run typecheck
 6. `getListByUserIdAsync` - returns empty array when no collections exist
 
 **Patterns to Follow**:
+
 - Mock `CollectionsDashboardQuery` methods
 - Mock `CacheService.collections.dashboard` and `dashboardHeader`
 - Verify method calls with correct arguments using `vi.fn()`
 - Don't test actual database operations (that's integration tests)
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/unit/lib/facades/collections/collections-dashboard.facade.test.ts
 npm run lint
@@ -180,6 +199,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 6 tests pass
 - Mocks verify correct method calls
 - No actual database calls made
@@ -193,18 +213,22 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - Simple presentational component, good starting point for component tests
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/no-collections.test.tsx`
 
 **Test Cases**:
+
 1. Renders empty state message and icon
 2. Renders "Create Collection" call-to-action button
 
 **Patterns to Follow**:
+
 - Use `render` from `tests/setup/test-utils`
 - Query by role, text, or test IDs
 - Reference `tests/components/ui/empty-state.test.tsx` patterns
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/no-collections.test.tsx
 npm run lint
@@ -212,6 +236,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 2 tests pass
 - Component renders correct empty state UI
 - Accessibility checks pass (proper roles)
@@ -225,17 +250,21 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - Similar to no-collections but different messaging
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/no-filtered-collections.test.tsx`
 
 **Test Cases**:
+
 1. Renders "no results found" message with search context
 2. Renders "clear filters" suggestion or button
 
 **Patterns to Follow**:
+
 - Same as Step 5
 - Test that messaging differs from no-collections component
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/no-filtered-collections.test.tsx
 npm run lint
@@ -243,6 +272,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 2 tests pass
 - Distinct messaging from no-collections component
 
@@ -255,17 +285,21 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - Simple presentational component
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/sidebar-header.test.tsx`
 
 **Test Cases**:
+
 1. Renders "Collections" title or header text
 2. Renders "New Collection" or create action button
 
 **Patterns to Follow**:
+
 - Test for heading roles (h1, h2, etc.)
 - Test button presence and accessibility
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/sidebar-header.test.tsx
 npm run lint
@@ -273,6 +307,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 2 tests pass
 - Proper heading hierarchy
 - Interactive elements are accessible
@@ -286,20 +321,24 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - May display totals or navigation
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/sidebar-footer.test.tsx`
 
 **Test Cases**:
+
 1. Renders total collection count when provided
 2. Renders additional summary stats (total items, total value)
 3. Handles zero collections gracefully
 4. Renders footer actions or links if present
 
 **Patterns to Follow**:
+
 - Pass mock data as props
 - Test conditional rendering based on data presence
 - Verify number formatting for stats
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/sidebar-footer.test.tsx
 npm run lint
@@ -307,6 +346,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 4 tests pass
 - Stats display correctly formatted
 - Conditional elements render appropriately
@@ -320,19 +360,23 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - Orchestrator component that delegates to card variants
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/sidebar-collection-list.test.tsx`
 
 **Test Cases**:
+
 1. Renders list of collections using provided variant prop
 2. Passes correct data to each collection card
 3. Handles empty list by rendering empty state
 
 **Patterns to Follow**:
+
 - Mock child card components (collection-card-compact, etc.)
 - Verify correct props passed to children
 - Test list iteration logic
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/sidebar-collection-list.test.tsx
 npm run lint
@@ -340,6 +384,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 3 tests pass
 - List renders correct number of items
 - Empty state delegation works
@@ -353,9 +398,11 @@ npm run typecheck
 **Why**: MEDIUM PRIORITY - Enhances UX with quick previews
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/collection-card-hovercard.test.tsx`
 
 **Test Cases**:
+
 1. Renders trigger element (card preview)
 2. Shows hovercard content on hover/focus
 3. Displays collection stats in hovercard
@@ -364,11 +411,13 @@ npm run typecheck
 6. Closes hovercard when trigger loses focus
 
 **Patterns to Follow**:
+
 - Use `user.hover()` for hover interactions
 - Test Radix UI HoverCard trigger and content
 - Reference Radix UI component test patterns
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/collection-card-hovercard.test.tsx
 npm run lint
@@ -376,6 +425,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 6 tests pass
 - Hover interactions work correctly
 - Content displays expected data
@@ -389,9 +439,11 @@ npm run typecheck
 **Why**: CRITICAL - Primary card variant used in dashboard sidebar
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/collection-card-compact.test.tsx`
 
 **Test Cases**:
+
 1. Renders collection name
 2. Renders collection item count
 3. Renders collection visibility badge (public/private)
@@ -405,6 +457,7 @@ npm run typecheck
 11. Shows hover effects via CSS classes
 
 **Patterns to Follow**:
+
 - Reference `tests/components/home/display/featured-collections-display.test.tsx`
 - Mock next/image and next-cloudinary
 - Mock $path from next-typesafe-url
@@ -412,6 +465,7 @@ npm run typecheck
 - Test image rendering (CldImage vs placeholder)
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/collection-card-compact.test.tsx
 npm run lint
@@ -419,6 +473,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 11 tests pass
 - Image handling works for all cases
 - Link generation uses $path correctly
@@ -433,9 +488,11 @@ npm run typecheck
 **Why**: CRITICAL - Alternative card variant with full statistics
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/collection-card-detailed.test.tsx`
 
 **Test Cases**:
+
 1. Renders all compact card features (inherit from compact)
 2. Displays like count with icon
 3. Displays view count with icon
@@ -449,12 +506,14 @@ npm run typecheck
 11. Handles missing optional stats gracefully
 
 **Patterns to Follow**:
+
 - Similar setup to collection-card-compact
 - Test number formatting utilities
 - Verify icon rendering (lucide-react icons)
 - Test layout and stat positioning
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/collection-card-detailed.test.tsx
 npm run lint
@@ -462,6 +521,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 11 tests pass
 - Stats display with correct formatting
 - Icons render for each stat type
@@ -476,9 +536,11 @@ npm run typecheck
 **Why**: CRITICAL - Visual-first card variant for image-focused displays
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/collection-card-cover.test.tsx`
 
 **Test Cases**:
+
 1. Renders full-bleed cover image as background
 2. Renders collection name as overlay text
 3. Displays gradient overlay for text readability
@@ -494,12 +556,14 @@ npm run typecheck
 13. Handles image loading errors gracefully
 
 **Patterns to Follow**:
+
 - Mock CldImage component
 - Test CSS class application for overlays
 - Test image aspect ratios
 - Verify gradient overlays render
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/collection-card-cover.test.tsx
 npm run lint
@@ -507,6 +571,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 13 tests pass
 - Image overlay rendering works
 - Fallback for missing images
@@ -521,9 +586,11 @@ npm run typecheck
 **Why**: HIGH PRIORITY - Core interaction point for sidebar filtering/sorting
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/sidebar-search.test.tsx`
 
 **Test Cases**:
+
 1. Renders search input field with placeholder
 2. Updates search value on user input
 3. Debounces search input (if applicable)
@@ -538,6 +605,7 @@ npm run typecheck
 12. Keyboard navigation works for sort dropdown
 
 **Patterns to Follow**:
+
 - Use `user.type()` for input interactions
 - Use `user.click()` and `user.selectOptions()` for dropdown
 - Test callback functions with `vi.fn()`
@@ -545,6 +613,7 @@ npm run typecheck
 - Reference form component test patterns
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/sidebar-search.test.tsx
 npm run lint
@@ -552,6 +621,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 12 tests pass
 - User interactions trigger correct callbacks
 - Debouncing works correctly
@@ -566,9 +636,11 @@ npm run typecheck
 **Why**: CRITICAL - Highest priority component test, integrates all sidebar features
 
 **Files to Create**:
+
 - `tests/components/collections/dashboard/sidebar-display.test.tsx`
 
 **Test Cases**:
+
 1. Renders sidebar header with title
 2. Renders search and sort controls
 3. Renders collection list with provided collections
@@ -589,6 +661,7 @@ npm run typecheck
 18. Integrates all child components correctly
 
 **Patterns to Follow**:
+
 - Mock child components (sidebar-header, sidebar-search, etc.)
 - Test state management for search/sort
 - Test derived state (filtered/sorted collections)
@@ -596,6 +669,7 @@ npm run typecheck
 - Reference `tests/components/home/display/featured-collections-display.test.tsx`
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/components/collections/dashboard/sidebar-display.test.tsx
 npm run lint
@@ -603,6 +677,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 18 tests pass
 - Integration of all child components works
 - State management functions correctly
@@ -617,9 +692,11 @@ npm run typecheck
 **Why**: CRITICAL - Complex SQL queries with joins and aggregations must be tested against real DB
 
 **Files to Create**:
+
 - `tests/integration/queries/collections/collections-dashboard.query.test.ts`
 
 **Test Cases**:
+
 1. `getHeaderByCollectionSlugAsync` - returns correct aggregated stats for collection
 2. `getHeaderByCollectionSlugAsync` - returns zero counts for collection with no activity
 3. `getHeaderByCollectionSlugAsync` - returns null for non-existent collection
@@ -630,6 +707,7 @@ npm run typecheck
 8. `getSelectorsByUserIdAsync` - returns minimal collection data for selectors
 
 **Patterns to Follow**:
+
 - Use `beforeEach(resetTestDatabase)`
 - Use `createTestUser()` and `createTestCollection()` factories
 - Create related entities (bobbleheads, likes, views, comments) for aggregation tests
@@ -638,6 +716,7 @@ npm run typecheck
 - Verify SQL aggregation results
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/integration/queries/collections/collections-dashboard.query.test.ts
 npm run lint
@@ -645,6 +724,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 8 tests pass
 - Aggregation queries return correct counts/sums
 - Permission filtering works correctly
@@ -659,9 +739,11 @@ npm run typecheck
 **Why**: HIGH PRIORITY - Server actions orchestrate facades and need integration testing
 
 **Files to Create**:
+
 - `tests/integration/actions/collections.actions.test.ts`
 
 **Test Cases**:
+
 1. `createCollectionAction` - successfully creates collection with valid data
 2. `createCollectionAction` - rejects duplicate collection name for user
 3. `updateCollectionAction` - successfully updates collection
@@ -670,6 +752,7 @@ npm run typecheck
 6. `deleteCollectionAction` - rejects unauthorized delete (wrong user)
 
 **Patterns to Follow**:
+
 - Reference `tests/integration/actions/collections.facade.test.ts`
 - Mock Sentry, cache service, cache revalidation, Redis
 - Mock Next.js cache functions (revalidatePath, revalidateTag)
@@ -678,6 +761,7 @@ npm run typecheck
 - Verify ActionResponse types (actionSuccess/actionFailure)
 
 **Validation Commands**:
+
 ```bash
 npm run test:run tests/integration/actions/collections.actions.test.ts
 npm run lint
@@ -685,6 +769,7 @@ npm run typecheck
 ```
 
 **Success Criteria**:
+
 - All 6 tests pass
 - Actions return correct ActionResponse types
 - Permission checks work correctly
@@ -695,6 +780,7 @@ npm run typecheck
 ## Quality Gates
 
 ### All Tests Must Pass
+
 ```bash
 npm run test:run tests/unit/lib/utils/sort-collections.test.ts
 npm run test:run tests/unit/lib/validations/collections.validation.test.ts
@@ -705,17 +791,20 @@ npm run test:run tests/integration/actions/collections.actions.test.ts
 ```
 
 ### Type Safety
+
 ```bash
 npm run typecheck
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint
 npm run format
 ```
 
 ### Coverage Requirements
+
 - Unit tests: 100% coverage of pure functions
 - Component tests: All user-facing scenarios covered
 - Integration tests: All database queries and actions tested
@@ -727,6 +816,7 @@ npm run format
 ### Mocking Patterns
 
 #### For Component Tests
+
 ```typescript
 // Mock next/image
 vi.mock('next/image', () => ({
@@ -754,15 +844,18 @@ vi.mock('next-typesafe-url', () => ({
 ```
 
 #### For Integration Tests
+
 ```typescript
 // Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
   addBreadcrumb: vi.fn(),
   captureException: vi.fn(),
-  startSpan: vi.fn((_, callback) => callback({
-    recordException: vi.fn(),
-    setStatus: vi.fn()
-  })),
+  startSpan: vi.fn((_, callback) =>
+    callback({
+      recordException: vi.fn(),
+      setStatus: vi.fn(),
+    }),
+  ),
 }));
 
 // Mock cache service
@@ -802,17 +895,20 @@ vi.mock('@/lib/db', () => ({
 ### Test Data Factories
 
 Use existing factories for integration tests:
+
 - `createTestUser()` - Create test users
 - `createTestCollection()` - Create test collections
 - `createTestCollections(userId, count)` - Create multiple collections
 
 Create new mock data for unit/component tests:
+
 - `createMockCollectionDashboardRecord()` - Mock collections with stats
 - `createMockCollectionDashboardRecords(count)` - Multiple mock collections
 
 ### Testcontainers Setup
 
 All integration tests automatically use:
+
 - PostgreSQL via Testcontainers
 - `resetTestDatabase()` before each test
 - Real database operations (no mocks)
@@ -828,15 +924,19 @@ All integration tests automatically use:
 ## Execution Strategy
 
 ### Phase 1: Foundation (Steps 1-4) - 4-5 hours
+
 Build test infrastructure and unit tests for utilities and validation.
 
 ### Phase 2: Simple Components (Steps 5-10) - 3-4 hours
+
 Test empty states, headers, footers, and simple container components.
 
 ### Phase 3: Complex Components (Steps 11-15) - 5-6 hours
+
 Test card variants and main sidebar display orchestrator.
 
 ### Phase 4: Integration (Steps 16-17) - 4-5 hours
+
 Test database queries and server actions with real database.
 
 ---
@@ -844,14 +944,17 @@ Test database queries and server actions with real database.
 ## Risk Mitigation
 
 ### High-Risk Areas
+
 1. **Complex aggregation queries** - Step 16 requires careful verification of SQL joins
 2. **Sort function edge cases** - Step 2 must handle all 9 sort modes correctly
 3. **Sidebar integration** - Step 15 orchestrates many moving parts
 
 ### Recommended Order
+
 Execute in step order (1-17) to build incrementally from simple to complex.
 
 ### Parallel Execution Opportunities
+
 - Steps 5-10 (simple components) can be done in parallel by different developers
 - Steps 2-4 (unit tests) can be done in parallel
 - Component tests (Steps 11-13) are independent and can be parallelized

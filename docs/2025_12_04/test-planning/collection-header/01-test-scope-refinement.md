@@ -35,6 +35,7 @@ The collection dashboard header consists of two primary presentation layers: Col
 ## Refined Test Scope
 
 ### Components to Test
+
 - **CollectionStickyHeader** - Mobile/tablet compact header
 - **CollectionHeaderCard** - Desktop comprehensive header card
 - **CollectionUpsertDialog** - Edit collection modal
@@ -44,6 +45,7 @@ The collection dashboard header consists of two primary presentation layers: Col
 - **ReportButton** - Report content
 
 ### Functionality to Test
+
 1. **Metadata Display**: Collection name, description, cover image, slug
 2. **Statistics Display**: Bobblehead count, featured count, total value, likes, views, comments
 3. **Owner Actions**: Edit, delete, share
@@ -51,6 +53,7 @@ The collection dashboard header consists of two primary presentation layers: Col
 5. **Data Layer**: CollectionsDashboardFacade.getHeaderByCollectionSlugAsync, caching
 
 ### Error Scenarios
+
 - Missing collection data
 - Permission validation
 - Loading states

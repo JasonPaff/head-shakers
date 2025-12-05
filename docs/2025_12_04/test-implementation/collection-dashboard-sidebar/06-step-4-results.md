@@ -34,9 +34,9 @@ Test business logic facade methods with mocked dependencies
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/unit/lib/facades/collections/collections-dashboard.facade.test.ts | PASS | 6 tests passed in 11ms |
+| Command                                                                                     | Result | Notes                  |
+| ------------------------------------------------------------------------------------------- | ------ | ---------------------- |
+| npm run test:run -- tests/unit/lib/facades/collections/collections-dashboard.facade.test.ts | PASS   | 6 tests passed in 11ms |
 
 ## Success Criteria
 

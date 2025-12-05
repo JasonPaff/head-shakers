@@ -32,11 +32,13 @@ The collection sidebar encompasses a comprehensive set of testable functionality
 ## Refined Test Scope Extracted
 
 ### Unit Tests Target
+
 - `sortCollections` utility function with 9 sort options
 - Filtering logic for collection names and descriptions
 - Currency formatting for collection values
 
 ### Component Tests Target
+
 - SidebarDisplay orchestration
 - SidebarHeader with create collection button
 - SidebarSearch with clearing capability
@@ -49,6 +51,7 @@ The collection sidebar encompasses a comprehensive set of testable functionality
 - Empty state components
 
 ### Integration Tests Target
+
 - SidebarAsync server component data flow
 - CollectionsDashboardFacade operations
 - CollectionsDashboardQuery data fetching

@@ -11,27 +11,27 @@
 
 ## Coverage Matrix
 
-| Source File | Unit | Component | Integration | Gap Status |
-|---|---|---|---|---|
-| `sidebar-display.tsx` | N/A | ❌ | N/A | Missing |
-| `sidebar-async.tsx` | N/A | ❌ | N/A | Missing |
-| `sidebar-header.tsx` | N/A | ❌ | N/A | Missing |
-| `sidebar-search.tsx` | N/A | ❌ | N/A | Missing |
-| `sidebar-collection-list.tsx` | N/A | ❌ | N/A | Missing |
-| `sidebar-footer.tsx` | N/A | ❌ | N/A | Missing |
-| `collection-card-compact.tsx` | N/A | ❌ | N/A | Missing |
-| `collection-card-detailed.tsx` | N/A | ❌ | N/A | Missing |
-| `collection-card-cover.tsx` | N/A | ❌ | N/A | Missing |
-| `collection-card-hovercard.tsx` | N/A | ❌ | N/A | Missing |
-| `no-collections.tsx` | N/A | ❌ | N/A | Missing |
-| `no-filtered-collections.tsx` | N/A | ❌ | N/A | Missing |
-| `collections-dashboard.facade.ts` | ❌ | N/A | ✅* | Partial |
-| `collections-dashboard.query.ts` | ❌ | N/A | ✅* | Partial |
-| `collections.actions.ts` | ❌ | N/A | ✅* | Partial |
-| `collections.validation.ts` | ✅ | N/A | N/A | Complete |
-| `collection.utils.ts` (sortCollections) | ❌ | N/A | N/A | Missing |
+| Source File                             | Unit | Component | Integration | Gap Status |
+| --------------------------------------- | ---- | --------- | ----------- | ---------- |
+| `sidebar-display.tsx`                   | N/A  | ❌        | N/A         | Missing    |
+| `sidebar-async.tsx`                     | N/A  | ❌        | N/A         | Missing    |
+| `sidebar-header.tsx`                    | N/A  | ❌        | N/A         | Missing    |
+| `sidebar-search.tsx`                    | N/A  | ❌        | N/A         | Missing    |
+| `sidebar-collection-list.tsx`           | N/A  | ❌        | N/A         | Missing    |
+| `sidebar-footer.tsx`                    | N/A  | ❌        | N/A         | Missing    |
+| `collection-card-compact.tsx`           | N/A  | ❌        | N/A         | Missing    |
+| `collection-card-detailed.tsx`          | N/A  | ❌        | N/A         | Missing    |
+| `collection-card-cover.tsx`             | N/A  | ❌        | N/A         | Missing    |
+| `collection-card-hovercard.tsx`         | N/A  | ❌        | N/A         | Missing    |
+| `no-collections.tsx`                    | N/A  | ❌        | N/A         | Missing    |
+| `no-filtered-collections.tsx`           | N/A  | ❌        | N/A         | Missing    |
+| `collections-dashboard.facade.ts`       | ❌   | N/A       | ✅\*        | Partial    |
+| `collections-dashboard.query.ts`        | ❌   | N/A       | ✅\*        | Partial    |
+| `collections.actions.ts`                | ❌   | N/A       | ✅\*        | Partial    |
+| `collections.validation.ts`             | ✅   | N/A       | N/A         | Complete   |
+| `collection.utils.ts` (sortCollections) | ❌   | N/A       | N/A         | Missing    |
 
-**Legend**: ✅ = Complete, ✅* = Covered but by parent facade tests, ❌ = Missing, N/A = Not Applicable
+**Legend**: ✅ = Complete, ✅\* = Covered but by parent facade tests, ❌ = Missing, N/A = Not Applicable
 
 ---
 
@@ -48,10 +48,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarDisplay` component (main component)
 - `CollectionCardMapper` sub-component (internal)
 
 **Key Functionality**:
+
 - State management: cardStyle, editingCollection, searchValue, sortOption, deletingCollectionId
 - Dialog orchestration: Create, Edit, Delete dialogs
 - Collection filtering by search query (name + description)
@@ -62,6 +64,7 @@
 - Fallback collection selection when none specified
 
 **Edge Cases to Test**:
+
 - Empty collections (shows NoCollections component)
 - Search with no results (shows NoFilteredCollections)
 - Create dialog open/close
@@ -81,6 +84,7 @@
 **Risk Assessment**: CRITICAL - This is the main orchestration component for the entire sidebar feature. Complex state management, multiple dialogs, and user preference handling create high risk for bugs.
 
 **Test Infrastructure Needed**:
+
 - Mock `nuqs` for query state management
 - Mock `useServerAction` hook
 - Mock `useUserPreferences` hook
@@ -98,10 +102,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarSearch` component
 - `CollectionCardStyle` type export
 
 **Key Functionality**:
+
 - Search input with clearable state
 - Disabled state support
 - Card style selector (3 options: compact, detailed, cover)
@@ -110,6 +116,7 @@
 - Dynamic icon selection based on sort option
 
 **Edge Cases to Test**:
+
 - Disabled search input when no collections
 - Search input value changes
 - Search clear button
@@ -124,6 +131,7 @@
 **Risk Assessment**: HIGH - Multiple dropdowns with 9 sort options, incorrect label mapping or sort values could confuse users.
 
 **Test Infrastructure Needed**:
+
 - Mock Radix UI dropdown components
 - Mock lucide-react icons
 - Mock Input component
@@ -140,14 +148,17 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarCollectionList` component
 
 **Key Functionality**:
+
 - Conditional spacing based on cardStyle ('compact' vs 'detailed'/'cover')
 - Scrollable container
 - Children rendering
 
 **Edge Cases to Test**:
+
 - Compact view spacing (space-y-2)
 - Cover/detailed view spacing (space-y-3)
 - Overflow handling
@@ -168,14 +179,17 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarAsync` function
 
 **Key Functionality**:
+
 - Async data fetching from `CollectionsDashboardFacade`
 - User preferences retrieval
 - Passes data to `SidebarDisplay`
 
 **Edge Cases to Test**:
+
 - Data loading and passing to display component
 - User authentication verification
 - Exception handling for facade calls
@@ -185,6 +199,7 @@
 **Risk Assessment**: MEDIUM - Server component orchestration; data flow critical.
 
 **Test Infrastructure Needed**:
+
 - Mock `CollectionsDashboardFacade.getListByUserIdAsync`
 - Mock `getUserPreferences`
 - Mock `getRequiredUserIdAsync`
@@ -202,10 +217,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `CollectionCardCompact` component
 - `CollectionCardCompactProps` type
 
 **Key Functionality**:
+
 - Card selection (onClick, keyboard Enter/Space)
 - Active state styling (border-primary, gradient background, pulse animation)
 - Hover card support (optional)
@@ -217,6 +234,7 @@
 - Keyboard accessibility
 
 **Edge Cases to Test**:
+
 - Active state styling applied
 - Inactive state styling
 - Hover effects
@@ -232,6 +250,7 @@
 **Risk Assessment**: CRITICAL - User interaction point; keyboard navigation and selection state critical for UX.
 
 **Test Infrastructure Needed**:
+
 - Mock HoverCard components
 - Mock DropdownMenu components
 - Mock Avatar components
@@ -249,10 +268,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `CollectionCardDetailed` component
 - `CollectionCardDetailedProps` type
 
 **Key Functionality**:
+
 - Card selection with keyboard support
 - Active state styling
 - Extended stats: likes, featured count
@@ -262,6 +283,7 @@
 - Engagement stats rendering
 
 **Edge Cases to Test**:
+
 - All card-compact tests (same selection/navigation patterns)
 - Stats display: likes, featured count
 - Description rendering with line-clamp
@@ -283,10 +305,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `CollectionCardCover` component
 - `CollectionCardCoverProps` type
 
 **Key Functionality**:
+
 - Cover image display with aspect ratio
 - Gradient overlay (dark to transparent)
 - Image scale on hover
@@ -298,6 +322,7 @@
 - Keyboard navigation support
 
 **Edge Cases to Test**:
+
 - Image loading with fallback
 - Hover scale animation
 - Active state ring styling
@@ -322,10 +347,12 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `CollectionHoverCardContent` component
 - `CollectionHoverCardContentProps` type
 
 **Key Functionality**:
+
 - Hover card content with avatar, name, item count
 - Separator dividers
 - Stats grid: Total Value, Featured, Views, Likes, Visibility, Comments
@@ -333,6 +360,7 @@
 - Public/Private visibility text
 
 **Edge Cases to Test**:
+
 - All stats displayed correctly
 - Currency formatting
 - Visibility text (Public/Private)
@@ -358,13 +386,16 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `NoCollections` component
 
 **Key Functionality**:
+
 - Create button with icon
 - Static messaging
 
 **Edge Cases to Test**:
+
 - Create button click
 - onCreateClick callback
 
@@ -383,13 +414,16 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `NoFilteredCollections` component
 
 **Key Functionality**:
+
 - Clear search button with icon
 - Static messaging
 
 **Edge Cases to Test**:
+
 - Clear button click
 - onClearSearch callback
 
@@ -410,14 +444,17 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarHeader` component
 
 **Key Functionality**:
+
 - Collections title with gradient text
 - Create button with icon
 - Optional onCreateClick callback
 
 **Edge Cases to Test**:
+
 - Create button click
 - onCreateClick callback
 - Gradient styling applied
@@ -437,13 +474,16 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `SidebarFooter` component
 
 **Key Functionality**:
+
 - Total collection count display
 - Plural/singular text handling
 
 **Edge Cases to Test**:
+
 - Single collection (no plural 's')
 - Multiple collections (plural 's')
 - Zero collections
@@ -466,16 +506,19 @@
 **Current Coverage**: Partial - covered by parent `CollectionsFacade` tests
 
 **Exports Requiring Tests**:
+
 - `CollectionsDashboardFacade.getHeaderByCollectionSlugAsync` (static method)
 - `CollectionsDashboardFacade.getListByUserIdAsync` (static method)
 
 **Key Functionality**:
+
 - Fetch collection header by slug with stats aggregation
 - Fetch all collections for user with stats
 - Cache integration
 - Permission context handling
 
 **Missing Test Coverage**:
+
 - Unit tests for facade methods with mocked dependencies
 - Error handling scenarios
 - Cache key consistency
@@ -495,6 +538,7 @@
 **Current Coverage**: Partial - covered by facade integration tests
 
 **Exports Requiring Tests**:
+
 - `CollectionsDashboardQuery.getHeaderByCollectionSlugAsync` (static method)
 - `CollectionsDashboardQuery.getListByUserIdAsync` (static method)
 - `CollectionsDashboardQuery.getSelectorsByUserIdAsync` (static method)
@@ -505,12 +549,14 @@
   - `_buildViewStatsSubquery` (view count)
 
 **Key Functionality**:
+
 - Complex SQL joins with 4 aggregate subqueries
 - Permission filtering (user context, isPublic, deletedAt)
 - Null coalescing for optional counts
 - Case-insensitive name ordering
 
 **Missing Test Coverage**:
+
 - Unit tests for individual query methods
 - Aggregate calculation correctness
 - Permission filtering edge cases
@@ -531,11 +577,13 @@
 **Current Coverage**: Partial - covered by facade integration tests
 
 **Exports Requiring Tests**:
+
 - `createCollectionAction` (server action)
 - `updateCollectionAction` (server action)
 - `deleteCollectionAction` (server action)
 
 **Key Functionality**:
+
 - Input schema validation
 - Duplicate name checking
 - Error handling with Sentry context
@@ -543,6 +591,7 @@
 - Transaction requirement metadata
 
 **Missing Test Coverage**:
+
 - Duplicate name check validation
 - Permission errors
 - Action response formatting
@@ -565,9 +614,11 @@
 **Current Coverage**: None
 
 **Exports Requiring Tests**:
+
 - `sortCollections` function
 
 **Key Functionality**:
+
 - 9 sort options with correct implementation:
   - `name-asc`: Locale string comparison ascending
   - `name-desc`: Locale string comparison descending
@@ -581,6 +632,7 @@
 - Returns new sorted array (non-mutating)
 
 **Edge Cases to Test**:
+
 - Each of 9 sort options
 - Collections with same sort key (stable sort)
 - Collections with null/zero values
@@ -605,6 +657,7 @@
 **Current Coverage**: Partial (2 schemas covered; missing schema variations)
 
 **Exports Requiring Tests**:
+
 - `insertCollectionSchema` ✅ (not directly tested, but covered by actions)
 - `updateCollectionSchema` ✅ (not directly tested)
 - `deleteCollectionSchema` ✅ (currently tested)
@@ -613,6 +666,7 @@
 - `getCollectionBySlugSchema` ✅ (currently tested)
 
 **Missing Test Coverage**:
+
 - `insertCollectionSchema` variations (edge cases)
 - `updateCollectionSchema` variations
 - `selectCollectionSchema`
@@ -656,12 +710,14 @@
 ### Existing Fixtures
 
 Available in `tests/fixtures/`:
+
 - `user.factory.ts` - createTestUser()
 - `collection.factory.ts` - createTestCollection()
 
 ### Existing Mocks
 
 Available in `tests/integration/actions/`:
+
 - Sentry mocks (addBreadcrumb, captureException, etc.)
 - CacheService mocks (collections cache methods)
 - Next.js cache mocks (revalidatePath, revalidateTag)
@@ -676,6 +732,7 @@ Available in `tests/integration/actions/`:
 ### Component Testing Infrastructure
 
 No existing sidebar component tests - will need to establish:
+
 - Rendering patterns
 - Mock structure for Radix UI components
 - Mock patterns for server actions
@@ -796,34 +853,37 @@ Priority Order:
 
 ## Summary Statistics
 
-| Category | Count |
-|---|---|
-| Source files with NO tests | 15 |
-| Source files with PARTIAL tests | 2 |
-| Source files with COMPLETE tests | 1 |
-| Component tests needed | 35 |
-| Unit tests needed | 19 |
-| Integration tests needed | 14 |
-| Total new tests required | 68 |
-| Estimated implementation hours | 20-28 hours |
-| Estimated review hours | 5-7 hours |
+| Category                         | Count       |
+| -------------------------------- | ----------- |
+| Source files with NO tests       | 15          |
+| Source files with PARTIAL tests  | 2           |
+| Source files with COMPLETE tests | 1           |
+| Component tests needed           | 35          |
+| Unit tests needed                | 19          |
+| Integration tests needed         | 14          |
+| Total new tests required         | 68          |
+| Estimated implementation hours   | 20-28 hours |
+| Estimated review hours           | 5-7 hours   |
 
 ---
 
 ## Risk Assessment Summary
 
 **Critical Risk Areas** (will implement first):
+
 - SidebarDisplay orchestration (complex state, multiple dialogs)
 - Collection card components (user interaction, selection state)
 - sortCollections utility (all 9 sort options)
 - Collections dashboard query (stat calculation accuracy)
 
 **High Risk Areas** (secondary priority):
+
 - Sidebar search controls (9 sort options, UI consistency)
 - Server actions (permission checks, error handling)
 - User preferences persistence (selection state, view preferences)
 
 **Medium Risk Areas** (tertiary priority):
+
 - Empty states (user onboarding experience)
 - Footer/header (simple components, formatting edge cases)
 - Hover card preview (stat display accuracy)
@@ -844,4 +904,3 @@ Priority Order:
 - [ ] Create remaining simple component tests (12 tests)
 - [ ] Update coverage reports
 - [ ] Document test patterns for team reference
-

@@ -14,6 +14,7 @@
 This plan covers comprehensive test implementation for the collection header feature, addressing critical coverage gaps across utilities, hooks, UI components, and server actions.
 
 **Test Distribution:**
+
 - **Unit Tests**: 17 tests (utilities & hooks)
 - **Component Tests**: 35 tests (UI components)
 - **Integration Tests**: 12 tests (actions, async components, queries)
@@ -23,6 +24,7 @@ This plan covers comprehensive test implementation for the collection header fea
 **Overall Risk Level**: MEDIUM-HIGH
 
 **Risk Factors:**
+
 1. **Currency formatting** - Edge cases with null/undefined/string values
 2. **Share utilities** - Browser API mocking (clipboard, window.open)
 3. **useLike hook** - Complex optimistic updates with auth gating
@@ -31,6 +33,7 @@ This plan covers comprehensive test implementation for the collection header fea
 6. **Dialog orchestration** - Multiple dialogs with state synchronization
 
 **Technical Challenges:**
+
 - Mocking browser APIs (clipboard, navigator)
 - Testing optimistic UI updates with server action integration
 - Testing authenticated vs unauthenticated flows
@@ -40,12 +43,14 @@ This plan covers comprehensive test implementation for the collection header fea
 ### 1.3 Dependencies
 
 **Existing Test Infrastructure:**
+
 - `tests/setup/test-utils.tsx` - Component rendering with Clerk mock
 - `tests/setup/test-db.ts` - Testcontainers database setup
 - `tests/fixtures/collection.factory.ts` - Collection test data
 - `tests/fixtures/user.factory.ts` - User test data
 
 **Required New Infrastructure:**
+
 - Browser API mocks (clipboard, window.open)
 - Social share URL mocks
 - MSW handlers for server actions
@@ -82,6 +87,7 @@ This plan covers comprehensive test implementation for the collection header fea
 ### 2.2 Validation Commands
 
 After creating infrastructure:
+
 ```bash
 # Verify infrastructure files compile
 npm run typecheck
@@ -103,6 +109,7 @@ npm test tests/mocks/browser-api.mocks.test.ts
 **Test Type**: Infrastructure (no tests yet)
 
 **Files to Create:**
+
 1. `C:\Users\jasonpaff\dev\head-shakers\tests\mocks\browser-api.mocks.ts`
 2. `C:\Users\jasonpaff\dev\head-shakers\tests\fixtures\collection-header.factory.ts`
 3. `C:\Users\jasonpaff\dev\head-shakers\tests\mocks\handlers\collections.handlers.ts`
@@ -111,37 +118,44 @@ npm test tests/mocks/browser-api.mocks.test.ts
 **Implementation Details:**
 
 **browser-api.mocks.ts** should include:
+
 - `mockClipboard()` - Returns mock clipboard API with writeText
 - `mockWindowOpen()` - Returns spy for window.open calls
 - `mockWindowScreen()` - Mocks screen dimensions
 - `restoreBrowserAPIs()` - Cleanup function
 
 **collection-header.factory.ts** should include:
+
 - `createMockCollectionHeader()` - Full header data with defaults
 - `createMockPublicCollection()` - Public collection variant
 - Preset options: `withLikes`, `withComments`, `withValue`
 
 **collections.handlers.ts** should include:
+
 - Handler for `createCollectionAction`
 - Handler for `updateCollectionAction`
 - Handler for `deleteCollectionAction`
 - Error response variants (permission denied, validation error)
 
 **mock-environment.ts** should include:
+
 - `setupMockEnvironment()` - Sets NEXT_PUBLIC_APP_URL
 - `teardownMockEnvironment()` - Restores original values
 
 **Patterns to Follow:**
+
 - Reference `tests/setup/test-utils.tsx` for setup patterns
 - Reference `tests/fixtures/user.factory.ts` for factory structure
 
 **Validation Commands:**
+
 ```bash
 npm run typecheck
 npm test tests/mocks/ -- --run
 ```
 
 **Success Criteria:**
+
 - All infrastructure files compile without errors
 - Mock factories can be imported in test files
 - Environment variables can be set/restored
@@ -157,9 +171,11 @@ npm test tests/mocks/ -- --run
 **Test Type**: Unit
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\unit\lib\utils\currency.utils.test.ts`
 
 **Test Cases:**
+
 1. Should format valid number as USD currency with thousand separators
 2. Should format string numeric value as currency
 3. Should return '$0.00' for null value
@@ -175,17 +191,20 @@ Test 4: `formatCurrency(undefined) => "$0.00"`
 Test 5: `formatCurrency("invalid") => "$0.00"`
 
 **Patterns to Follow:**
+
 - Reference `tests/unit/lib/utils/email-utils.test.ts` for unit test structure
 - Use simple describe/it blocks
 - Test edge cases explicitly
 - Verify exact string output
 
 **Validation Commands:**
+
 ```bash
 npm test tests/unit/lib/utils/currency.utils.test.ts -- --run
 ```
 
 **Success Criteria:**
+
 - All 5 tests pass
 - 100% code coverage of `currency.utils.ts`
 - No console warnings or errors
@@ -201,25 +220,21 @@ npm test tests/unit/lib/utils/currency.utils.test.ts -- --run
 **Test Type**: Unit
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\unit\lib\utils\share-utils.test.ts`
 
 **Test Cases:**
 
 **copyToClipboard (2 tests):**
+
 1. Should copy text to clipboard and return true on success
 2. Should return false when clipboard API is unavailable
 
-**generateAbsoluteUrl (2 tests):**
-3. Should generate absolute URL from relative path with leading slash
-4. Should add leading slash if missing and generate absolute URL
+**generateAbsoluteUrl (2 tests):** 3. Should generate absolute URL from relative path with leading slash 4. Should add leading slash if missing and generate absolute URL
 
-**generateSocialShareUrl (3 tests):**
-5. Should generate Twitter/X share URL with title and description
-6. Should generate Facebook share URL with just URL
-7. Should generate LinkedIn share URL with URL parameter
+**generateSocialShareUrl (3 tests):** 5. Should generate Twitter/X share URL with title and description 6. Should generate Facebook share URL with just URL 7. Should generate LinkedIn share URL with URL parameter
 
-**getBaseUrl (1 test):**
-8. Should throw error when NEXT_PUBLIC_APP_URL is not configured
+**getBaseUrl (1 test):** 8. Should throw error when NEXT_PUBLIC_APP_URL is not configured
 
 **Test Details:**
 
@@ -229,17 +244,20 @@ Tests 5-7: Verify URL construction and URLSearchParams encoding
 Test 8: Verify error is thrown and captured by Sentry mock
 
 **Patterns to Follow:**
+
 - Reference `tests/unit/lib/utils/email-utils.test.ts` for unit test structure
 - Use `beforeEach` to set up mocks
 - Use `afterEach` to restore mocks
 - Verify Sentry calls for error cases
 
 **Validation Commands:**
+
 ```bash
 npm test tests/unit/lib/utils/share-utils.test.ts -- --run
 ```
 
 **Success Criteria:**
+
 - All 8 tests pass
 - Browser API mocks work correctly
 - Sentry mock captures exceptions
@@ -256,9 +274,11 @@ npm test tests/unit/lib/utils/share-utils.test.ts -- --run
 **Test Type**: Unit (Hook)
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\unit\hooks\use-like.test.tsx`
 
 **Test Cases:**
+
 1. Should initialize with provided like count and isLiked state
 2. Should toggle like state optimistically when toggleLike is called
 3. Should not toggle like when user is not signed in
@@ -272,23 +292,27 @@ Test 3: Mock unauthenticated Clerk state, call `toggleLike()`, verify no state c
 Test 4: Provide `onLikeChange` callback, verify it's called with correct args
 
 **Implementation Notes:**
+
 - Use `renderHook` from `@testing-library/react`
 - Mock `@clerk/nextjs` useAuth hook
 - Mock `toggleLikeAction` server action
 - Mock `useOptimisticServerAction` hook behavior
 
 **Patterns to Follow:**
+
 - Create wrapper with necessary providers (Clerk)
 - Use `act()` for state updates
 - Test authenticated and unauthenticated scenarios
 - Verify callbacks are called with correct arguments
 
 **Validation Commands:**
+
 ```bash
 npm test tests/unit/hooks/use-like.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Hook state updates correctly
 - Auth gating works
@@ -305,9 +329,11 @@ npm test tests/unit/hooks/use-like.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\dashboard\collection-header-card.test.tsx`
 
 **Test Cases:**
+
 1. Should render collection name, description, and avatar
 2. Should display formatted stats (items, likes, views, comments)
 3. Should format total value as currency using formatCurrency utility
@@ -321,6 +347,7 @@ Test 3: Pass collection with totalValue=1234.56, verify "$1,234.56" displayed
 Test 4: Click dropdown trigger, verify Edit and Delete menu items
 
 **Required Props:**
+
 ```typescript
 {
   collection: createMockCollectionHeader({ totalValue: 1234.56 }),
@@ -330,17 +357,20 @@ Test 4: Click dropdown trigger, verify Edit and Delete menu items
 ```
 
 **Patterns to Follow:**
+
 - Reference `tests/components/collections/dashboard/sidebar-header.test.tsx`
 - Use `render()` from test-utils
 - Query by role for accessibility
 - Test user interactions with `user.click()`
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/dashboard/collection-header-card.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Component renders without errors
 - Stats display correctly
@@ -357,9 +387,11 @@ npm test tests/components/collections/dashboard/collection-header-card.test.tsx 
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\dashboard\collection-header-display.test.tsx`
 
 **Test Cases:**
+
 1. Should render CollectionHeaderCard with collection data
 2. Should open edit dialog when onEdit is triggered
 3. Should open delete confirmation dialog when onDelete is triggered
@@ -375,20 +407,24 @@ Test 4: Open edit dialog, click Cancel, verify dialog closes and state clears
 Test 5: Mock `deleteCollectionAction`, confirm delete, verify action called and navigation occurs
 
 **MSW Handlers Required:**
+
 - Mock `deleteCollectionAction` success response
 
 **Patterns to Follow:**
+
 - Use `render()` with mock collection data
 - Query dialogs by role and test IDs
 - Mock `useServerAction` hook
 - Verify `setParams` called with null to clear route
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/dashboard/collection-header-display.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 5 tests pass
 - Dialogs open/close correctly
 - Server action executes on delete
@@ -405,9 +441,11 @@ npm test tests/components/collections/dashboard/collection-header-display.test.t
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\collection-sticky-header.test.tsx`
 
 **Test Cases:**
+
 1. Should render collection title and like button for all users
 2. Should show Edit and Delete buttons for owner when canEdit and canDelete are true
 3. Should show Report button for non-owner users
@@ -423,22 +461,26 @@ Test 4: Click Edit button, verify CollectionUpsertDialog opens
 Test 5: Pass `canEdit=false, canDelete=false`, verify buttons hidden
 
 **Required Props Variants:**
+
 - Owner with permissions
 - Owner without permissions
 - Non-owner
 
 **Patterns to Follow:**
+
 - Test conditional rendering with different prop combinations
 - Query buttons by aria-label
 - Verify nested dialog components render
 - Test responsive behavior (desktop vs mobile if needed)
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/collection-sticky-header.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 5 tests pass
 - Conditional rendering works correctly
 - Owner/non-owner flows verified
@@ -455,9 +497,11 @@ npm test tests/components/collections/collection-sticky-header.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\collection-upsert-dialog.test.tsx`
 
 **Test Cases:**
+
 1. Should render in create mode with "Create Collection" title and no delete button
 2. Should render in edit mode with "Edit Collection" title and delete button
 3. Should validate required fields and show errors on submit
@@ -473,23 +517,27 @@ Test 4: Mock successful action, submit valid form, verify onSuccess called
 Test 5: Click Cancel button, verify dialog closes and form resets
 
 **Form Fields to Test:**
+
 - Collection name (required)
 - Description (optional)
 - isPublic toggle
 - Cover image upload
 
 **Patterns to Follow:**
+
 - Mock `useCollectionUpsertForm` hook
 - Mock server actions (create/update)
 - Test form validation with TanStack Form
 - Verify focus management on errors
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/collection-upsert-dialog.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 5 tests pass
 - Create and edit modes work differently
 - Form validation fires correctly
@@ -506,9 +554,11 @@ npm test tests/components/collections/collection-upsert-dialog.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\collection-share-menu.test.tsx`
 
 **Test Cases:**
+
 1. Should render dropdown menu with Copy Link, Twitter, and Facebook options
 2. Should copy absolute URL to clipboard and show success toast
 3. Should open Twitter share window with correct URL
@@ -522,22 +572,26 @@ Test 3: Mock window.open, click "Share on X", verify called with Twitter URL
 Test 4: Mock window.open, click "Share on Facebook", verify called with Facebook URL
 
 **Browser API Mocks Required:**
+
 - `navigator.clipboard.writeText`
 - `window.open`
 - `window.screen` dimensions
 
 **Patterns to Follow:**
+
 - Use browser-api.mocks from Step 1
 - Mock toast notifications
 - Verify URL construction with correct collectionSlug
 - Test error handling (clipboard fails)
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/collection-share-menu.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Clipboard operations work
 - Social share URLs correct
@@ -554,9 +608,11 @@ npm test tests/components/collections/collection-share-menu.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\collections\collection-delete.test.tsx`
 
 **Test Cases:**
+
 1. Should render delete button with trash icon
 2. Should open confirmation dialog when button is clicked
 3. Should execute delete action and call onSuccess callback
@@ -570,6 +626,7 @@ Test 3: Mock action success, confirm delete, verify action called and onSuccess 
 Test 4: Set `isExecuting=true` state, verify button disabled
 
 **Confirmation Flow:**
+
 - Click delete button
 - Dialog opens with confirmation text
 - User types collection name
@@ -577,17 +634,20 @@ Test 4: Set `isExecuting=true` state, verify button disabled
 - Action executes
 
 **Patterns to Follow:**
+
 - Mock `useServerAction` hook
 - Mock `deleteCollectionAction`
 - Verify `router.refresh()` called
 - Test loading state
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/collections/collection-delete.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Confirmation dialog works
 - Delete action executes
@@ -604,21 +664,19 @@ npm test tests/components/collections/collection-delete.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\ui\like-button.test.tsx`
 
 **Test Cases:**
 
 **LikeIconButton (2 tests):**
+
 1. Should render with heart icon and like count
 2. Should toggle like state when clicked (authenticated)
 
-**LikeCompactButton (2 tests):**
-3. Should render compact variant with smaller size
-4. Should show sign-in prompt when clicked while unauthenticated
+**LikeCompactButton (2 tests):** 3. Should render compact variant with smaller size 4. Should show sign-in prompt when clicked while unauthenticated
 
-**LikeFullButton (2 tests):**
-5. Should render full variant with label text
-6. Should call onLikeChange callback with new values on toggle
+**LikeFullButton (2 tests):** 5. Should render full variant with label text 6. Should call onLikeChange callback with new values on toggle
 
 **Test Details:**
 
@@ -627,22 +685,26 @@ Tests 3-4: Mock unauthenticated Clerk state, verify sign-up button shows
 Tests 5-6: Test full variant with "Like" text and callback
 
 **Mock Requirements:**
+
 - Mock `useLike` hook (already tested in Step 4)
 - Mock Clerk `useAuth` for auth state
 - Mock `toggleLikeAction` server action
 
 **Patterns to Follow:**
+
 - Test each variant separately
 - Mock hook return values
 - Verify aria-labels for accessibility
 - Test NumberFlow animation component integration
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/ui/like-button.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 6 tests pass
 - Three variants render correctly
 - Auth gating works
@@ -659,9 +721,11 @@ npm test tests/components/ui/like-button.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\content-reports\report-button.test.tsx`
 
 **Test Cases:**
+
 1. Should render button with flag icon
 2. Should open ReportReasonDialog when clicked
 3. Should use correct aria-label based on target type
@@ -673,17 +737,20 @@ Test 2: Click button, verify dialog opens (check dialog visibility)
 Test 3: Test with targetType='collection', 'bobblehead', 'comment', verify aria-labels
 
 **Patterns to Follow:**
+
 - Query by role='button'
 - Test dialog state (open/closed)
 - Verify accessibility labels
 - Test different target types
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/content-reports/report-button.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 3 tests pass
 - Button renders correctly
 - Dialog opens on click
@@ -700,9 +767,11 @@ npm test tests/components/content-reports/report-button.test.tsx -- --run
 **Test Type**: Component
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\components\ui\alert-dialogs\confirm-delete-alert-dialog.test.tsx`
 
 **Test Cases:**
+
 1. Should render dialog with warning message and confirmation input
 2. Should disable Delete button until confirmation text matches
 3. Should execute onDeleteAsync when form is valid and submitted
@@ -716,22 +785,26 @@ Test 3: Submit valid form, verify `onDeleteAsync` called
 Test 4: Click Cancel, verify dialog closes and form resets
 
 **Form Validation:**
+
 - User must type exact confirmation text
 - Delete button disabled until validation passes
 - Form uses TanStack Form with `createConfirmationSchema`
 
 **Patterns to Follow:**
+
 - Test TanStack Form validation
 - Use `user.type()` for input interactions
 - Verify button disabled states
 - Test async delete execution
 
 **Validation Commands:**
+
 ```bash
 npm test tests/components/ui/alert-dialogs/confirm-delete-alert-dialog.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Validation works correctly
 - Delete executes on valid submit
@@ -748,21 +821,19 @@ npm test tests/components/ui/alert-dialogs/confirm-delete-alert-dialog.test.tsx 
 **Test Type**: Integration
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\integration\actions\collections.actions.test.ts`
 
 **Test Cases:**
 
 **createCollectionAction (2 tests):**
+
 1. Should create collection with valid data and return success response
 2. Should return failure when collection name is already taken
 
-**updateCollectionAction (2 tests):**
-3. Should update collection and return success response
-4. Should return failure when user doesn't own the collection
+**updateCollectionAction (2 tests):** 3. Should update collection and return success response 4. Should return failure when user doesn't own the collection
 
-**deleteCollectionAction (2 tests):**
-5. Should delete collection and return success response
-6. Should return failure when collection doesn't exist
+**deleteCollectionAction (2 tests):** 5. Should delete collection and return success response 6. Should return failure when collection doesn't exist
 
 **Test Details:**
 
@@ -773,23 +844,27 @@ Test permission checks
 Verify database state after operations
 
 **Infrastructure Required:**
+
 - Import `getTestDb()` and `resetTestDatabase()`
 - Mock Sentry (already done in existing tests)
 - Mock cache service
 - Create test users and collections using factories
 
 **Patterns to Follow:**
+
 - Reference `tests/integration/actions/collections.facade.test.ts`
 - Use `beforeEach` to reset database
 - Create test data with factories
 - Verify response structure matches `ActionResponse<T>`
 
 **Validation Commands:**
+
 ```bash
 npm test tests/integration/actions/collections.actions.test.ts -- --run
 ```
 
 **Success Criteria:**
+
 - All 6 tests pass
 - Database operations work correctly
 - Permission checks enforce ownership
@@ -806,9 +881,11 @@ npm test tests/integration/actions/collections.actions.test.ts -- --run
 **Test Type**: Integration
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\integration\components\collection-header-async.test.tsx`
 
 **Test Cases:**
+
 1. Should fetch collection header data and render CollectionHeaderDisplay
 2. Should return null when collectionSlug is not provided
 
@@ -818,23 +895,27 @@ Test 1: Mock search params cache with valid slug, create collection in DB, verif
 Test 2: Mock search params cache with null slug, verify component returns null
 
 **Mock Requirements:**
+
 - Mock `collectionDashboardSearchParamsCache.get()`
 - Mock `getRequiredUserIdAsync()` to return test user ID
 - Use real database with Testcontainers
 - Create test collection data
 
 **Patterns to Follow:**
+
 - Similar to component tests but with database integration
 - Mock Next.js search params utilities
 - Verify facade calls and data fetching
 - Test null handling edge cases
 
 **Validation Commands:**
+
 ```bash
 npm test tests/integration/components/collection-header-async.test.tsx -- --run
 ```
 
 **Success Criteria:**
+
 - Both tests pass
 - Data fetching works with real DB
 - Null slug handled gracefully
@@ -851,18 +932,18 @@ npm test tests/integration/components/collection-header-async.test.tsx -- --run
 **Test Type**: Integration
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\head-shakers\tests\integration\queries\collections-dashboard.query.test.ts` (2 tests)
 - `C:\Users\jasonpaff\dev\head-shakers\tests\integration\facades\collections-dashboard.facade.test.ts` (2 tests)
 
 **Test Cases:**
 
 **Query Tests (2 tests):**
+
 1. Should fetch collection header record with all stats (likes, views, comments)
 2. Should return null when collection doesn't exist
 
-**Facade Tests (2 tests):**
-3. Should call query and return formatted header data
-4. Should apply permission filtering for private collections
+**Facade Tests (2 tests):** 3. Should call query and return formatted header data 4. Should apply permission filtering for private collections
 
 **Test Details:**
 
@@ -872,23 +953,27 @@ Use real database with Testcontainers
 Create test data with likes, views, and comments
 
 **Required Test Data:**
+
 - Collection with associated stats
 - Public and private collections
 - Owner and non-owner users
 
 **Patterns to Follow:**
+
 - Reference existing facade tests
 - Test both success and edge cases
 - Verify permission filtering
 - Check data structure matches TypeScript types
 
 **Validation Commands:**
+
 ```bash
 npm test tests/integration/queries/collections-dashboard.query.test.ts -- --run
 npm test tests/integration/facades/collections-dashboard.facade.test.ts -- --run
 ```
 
 **Success Criteria:**
+
 - All 4 tests pass
 - Queries return correct data structure
 - Facades apply business logic correctly
@@ -901,18 +986,21 @@ npm test tests/integration/facades/collections-dashboard.facade.test.ts -- --run
 ### 4.1 Checkpoint 1: After Steps 1-4 (Infrastructure + Unit Tests)
 
 **Criteria:**
+
 - All infrastructure files compile without TypeScript errors
 - Unit tests for currency and share utilities pass (13 tests)
 - useLike hook tests pass (4 tests)
 - No test flakiness or intermittent failures
 
 **Validation:**
+
 ```bash
 npm run typecheck
 npm test tests/unit/lib/utils/ tests/unit/hooks/ -- --run
 ```
 
 **Gate Decision:**
+
 - ✅ PASS: Proceed to component tests
 - ❌ FAIL: Fix infrastructure issues before continuing
 
@@ -921,17 +1009,20 @@ npm test tests/unit/lib/utils/ tests/unit/hooks/ -- --run
 ### 4.2 Checkpoint 2: After Steps 5-13 (Component Tests)
 
 **Criteria:**
+
 - All component tests pass (35 tests)
 - No console errors or warnings during test runs
 - Test coverage for components >80%
 - MSW handlers work correctly
 
 **Validation:**
+
 ```bash
 npm test tests/components/ -- --run --coverage
 ```
 
 **Gate Decision:**
+
 - ✅ PASS: Proceed to integration tests
 - ❌ FAIL: Review component test failures
 
@@ -940,17 +1031,20 @@ npm test tests/components/ -- --run --coverage
 ### 4.3 Checkpoint 3: After Steps 14-16 (Integration Tests)
 
 **Criteria:**
+
 - All integration tests pass (12 tests)
 - Testcontainers database setup works
 - Server actions execute correctly
 - No database connection errors
 
 **Validation:**
+
 ```bash
 npm test tests/integration/ -- --run
 ```
 
 **Gate Decision:**
+
 - ✅ PASS: Implementation complete
 - ❌ FAIL: Debug integration issues
 
@@ -959,18 +1053,21 @@ npm test tests/integration/ -- --run
 ### 4.4 Final Validation: All Tests
 
 **Criteria:**
+
 - All 65 tests pass
 - No skipped or pending tests
 - Test suite runs in <2 minutes
 - No memory leaks or hanging processes
 
 **Validation:**
+
 ```bash
 npm test -- --run
 npm test -- --run --coverage
 ```
 
 **Success Metrics:**
+
 - Test pass rate: 100%
 - Code coverage: >85% for collection header feature
 - No flaky tests (run 3 times, all pass)
@@ -982,6 +1079,7 @@ npm test -- --run --coverage
 ### 5.1 Mock Patterns
 
 **Browser API Mocks:**
+
 ```typescript
 // Usage in tests
 import { mockClipboard, restoreBrowserAPIs } from '@/tests/mocks/browser-api.mocks';
@@ -996,6 +1094,7 @@ afterEach(() => {
 ```
 
 **Environment Mocks:**
+
 ```typescript
 // Usage in tests
 import { setupMockEnvironment } from '@/tests/setup/mock-environment';
@@ -1008,6 +1107,7 @@ beforeEach(() => {
 ### 5.2 Factory Patterns
 
 **Collection Header Factory:**
+
 ```typescript
 // Usage in tests
 import { createMockCollectionHeader } from '@/tests/fixtures/collection-header.factory';
@@ -1016,13 +1116,14 @@ const collection = createMockCollectionHeader({
   totalValue: 1234.56,
   likeCount: 10,
   viewCount: 100,
-  commentCount: 5
+  commentCount: 5,
 });
 ```
 
 ### 5.3 MSW Handler Patterns
 
 **Server Action Handlers:**
+
 ```typescript
 // Usage in tests
 import { server } from '@/tests/setup/msw.setup';
@@ -1036,6 +1137,7 @@ beforeEach(() => {
 ### 5.4 Common Test Utilities
 
 **Component Rendering:**
+
 ```typescript
 import { render, screen } from '@/tests/setup/test-utils';
 
@@ -1044,6 +1146,7 @@ await user.click(screen.getByRole('button'));
 ```
 
 **Database Setup:**
+
 ```typescript
 import { getTestDb, resetTestDatabase } from '@/tests/setup/test-db';
 
@@ -1055,6 +1158,7 @@ beforeEach(async () => {
 ### 5.6 Debugging Tips
 
 **Common Issues:**
+
 1. **Clerk mock not working**: Ensure `ClerkProvider` is in test-utils wrapper
 2. **Clipboard tests failing**: Check that `navigator` is properly mocked
 3. **Dialog not opening**: Verify dialog state management and triggers
@@ -1062,6 +1166,7 @@ beforeEach(async () => {
 5. **Database tests hanging**: Ensure Testcontainers is properly initialized
 
 **Debug Commands:**
+
 ```bash
 # Run single test file with verbose output
 npm test tests/unit/lib/utils/currency.utils.test.ts -- --run --reporter=verbose
@@ -1080,24 +1185,29 @@ npm test tests/components/collections/ -- --watch
 ### 6.1 High-Risk Areas
 
 **1. Browser API Mocking**
+
 - **Risk**: Tests may fail in CI if browser APIs aren't properly mocked
 - **Mitigation**: Create reusable mock utilities in Step 1; test mocks independently
 
 **2. Optimistic Updates**
+
 - **Risk**: Race conditions between optimistic UI and server response
 - **Mitigation**: Test both optimistic and resolved states; use `waitFor()` for async assertions
 
 **3. Form Validation**
+
 - **Risk**: Complex TanStack Form validation may not trigger correctly in tests
 - **Mitigation**: Test validation explicitly; verify error messages appear
 
 **4. Database Transactions**
+
 - **Risk**: Testcontainers may be slow or flaky in some environments
 - **Mitigation**: Use `beforeEach` to reset DB; increase timeout for integration tests
 
 ### 6.2 Flaky Test Prevention
 
 **Strategies:**
+
 1. Always use `waitFor()` for async assertions
 2. Mock all external dependencies (APIs, timers)
 3. Reset all mocks in `afterEach`
@@ -1155,34 +1265,34 @@ tests/
 
 ### 7.2 Dependency Matrix
 
-| Step | Depends On | Blocks |
-|------|------------|--------|
-| 1 (Infrastructure) | - | 2, 3, 4, 5-13 |
-| 2 (Currency Utils) | 1 | 5 |
-| 3 (Share Utils) | 1 | 9 |
-| 4 (useLike Hook) | 1 | 11 |
-| 5 (Header Card) | 1, 2 | 6 |
-| 6 (Header Display) | 1, 5 | - |
-| 7 (Sticky Header) | 1 | - |
-| 8 (Upsert Dialog) | 1 | 6, 7 |
-| 9 (Share Menu) | 1, 3 | 7 |
-| 10 (Delete Component) | 1 | 6, 7, 8 |
-| 11 (Like Button) | 1, 4 | 7 |
-| 12 (Report Button) | 1 | 7 |
-| 13 (Confirm Delete) | 1 | 10 |
-| 14 (Actions Integration) | 1 | 15, 16 |
-| 15 (Header Async) | 1, 14 | - |
-| 16 (Query/Facade) | 1, 14 | 15 |
+| Step                     | Depends On | Blocks        |
+| ------------------------ | ---------- | ------------- |
+| 1 (Infrastructure)       | -          | 2, 3, 4, 5-13 |
+| 2 (Currency Utils)       | 1          | 5             |
+| 3 (Share Utils)          | 1          | 9             |
+| 4 (useLike Hook)         | 1          | 11            |
+| 5 (Header Card)          | 1, 2       | 6             |
+| 6 (Header Display)       | 1, 5       | -             |
+| 7 (Sticky Header)        | 1          | -             |
+| 8 (Upsert Dialog)        | 1          | 6, 7          |
+| 9 (Share Menu)           | 1, 3       | 7             |
+| 10 (Delete Component)    | 1          | 6, 7, 8       |
+| 11 (Like Button)         | 1, 4       | 7             |
+| 12 (Report Button)       | 1          | 7             |
+| 13 (Confirm Delete)      | 1          | 10            |
+| 14 (Actions Integration) | 1          | 15, 16        |
+| 15 (Header Async)        | 1, 14      | -             |
+| 16 (Query/Facade)        | 1, 14      | 15            |
 
 ### 7.3 Estimated Effort
 
-| Step Range | Effort | Time Estimate |
-|------------|--------|---------------|
-| Step 1 (Infrastructure) | High | 3-4 hours |
-| Steps 2-4 (Unit Tests) | Medium | 3-4 hours |
-| Steps 5-13 (Component Tests) | High | 8-10 hours |
-| Steps 14-16 (Integration Tests) | Medium | 4-5 hours |
-| **Total** | - | **18-23 hours** |
+| Step Range                      | Effort | Time Estimate   |
+| ------------------------------- | ------ | --------------- |
+| Step 1 (Infrastructure)         | High   | 3-4 hours       |
+| Steps 2-4 (Unit Tests)          | Medium | 3-4 hours       |
+| Steps 5-13 (Component Tests)    | High   | 8-10 hours      |
+| Steps 14-16 (Integration Tests) | Medium | 4-5 hours       |
+| **Total**                       | -      | **18-23 hours** |
 
 ---
 

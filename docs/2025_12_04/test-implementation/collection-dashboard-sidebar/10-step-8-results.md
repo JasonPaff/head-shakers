@@ -17,15 +17,18 @@ Test sidebar footer with summary stats or actions
 ## Test Cases Implemented (7 tests)
 
 ### Rendering total count
+
 1. should render total collection count when provided
 2. should render singular "collection" text for count of 1
 3. should render plural "collections" text for count greater than 1
 
 ### Edge cases
+
 4. should handle zero collections gracefully
 5. should render large collection counts correctly
 
 ### Component structure
+
 6. should render footer with accessible text content
 7. should display count information in footer region
 
@@ -39,9 +42,9 @@ Test sidebar footer with summary stats or actions
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/sidebar-footer.test.tsx | PASS | 7 tests passed in 55ms |
+| Command                                                                            | Result | Notes                  |
+| ---------------------------------------------------------------------------------- | ------ | ---------------------- |
+| npm run test:run -- tests/components/collections/dashboard/sidebar-footer.test.tsx | PASS   | 7 tests passed in 55ms |
 
 ## Success Criteria
 

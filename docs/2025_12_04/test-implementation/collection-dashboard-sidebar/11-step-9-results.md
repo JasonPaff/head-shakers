@@ -17,15 +17,18 @@ Test collection list container that maps collection data to cards
 ## Test Cases Implemented (6 tests)
 
 ### Rendering
+
 1. should render children correctly
 2. should apply space-y-3 class for cover card style
 3. should apply space-y-2 class for non-cover card styles
 
 ### Layout
+
 4. should render container with sidebar-content data-slot
 5. should apply scrollable overflow styles
 
 ### Empty state
+
 6. should render empty state component when provided as children
 
 ## Conventions Applied
@@ -38,9 +41,9 @@ Test collection list container that maps collection data to cards
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/sidebar-collection-list.test.tsx | PASS | 6 tests passed in 58ms |
+| Command                                                                                     | Result | Notes                  |
+| ------------------------------------------------------------------------------------------- | ------ | ---------------------- |
+| npm run test:run -- tests/components/collections/dashboard/sidebar-collection-list.test.tsx | PASS   | 6 tests passed in 58ms |
 
 ## Success Criteria
 

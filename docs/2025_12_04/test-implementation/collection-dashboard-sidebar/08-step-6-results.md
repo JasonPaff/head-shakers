@@ -21,10 +21,10 @@ Test empty state when search/filter returns no results
 
 ## Messaging Distinction Verified
 
-| Component | Heading | Message | Button |
-|-----------|---------|---------|--------|
-| NoCollections | "No collections yet" | "Create your first collection..." | "Create Collection" |
-| NoFilteredCollections | "No collections found" | "No collections match your search..." | "Clear Search" |
+| Component             | Heading                | Message                               | Button              |
+| --------------------- | ---------------------- | ------------------------------------- | ------------------- |
+| NoCollections         | "No collections yet"   | "Create your first collection..."     | "Create Collection" |
+| NoFilteredCollections | "No collections found" | "No collections match your search..." | "Clear Search"      |
 
 ## Conventions Applied
 
@@ -37,9 +37,9 @@ Test empty state when search/filter returns no results
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/no-filtered-collections.test.tsx | PASS | 2 tests passed in 230ms |
+| Command                                                                                     | Result | Notes                   |
+| ------------------------------------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/components/collections/dashboard/no-filtered-collections.test.tsx | PASS   | 2 tests passed in 230ms |
 
 ## Success Criteria
 

@@ -30,9 +30,9 @@ Test sidebar header with title and action buttons
 
 ## Orchestrator Verification Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| npm run test:run -- tests/components/collections/dashboard/sidebar-header.test.tsx | PASS | 3 tests passed in 264ms |
+| Command                                                                            | Result | Notes                   |
+| ---------------------------------------------------------------------------------- | ------ | ----------------------- |
+| npm run test:run -- tests/components/collections/dashboard/sidebar-header.test.tsx | PASS   | 3 tests passed in 264ms |
 
 ## Success Criteria
 

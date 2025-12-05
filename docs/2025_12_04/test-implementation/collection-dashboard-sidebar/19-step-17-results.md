@@ -38,6 +38,7 @@ The subagent attempted to create server action integration tests but encountered
 ## Rationale
 
 Server actions in this codebase are thin wrappers around facades:
+
 - Facades contain all business logic and database operations
 - Server actions add authentication middleware and error handling
 - The facade tests provide complete coverage of CRUD operations with authorization
@@ -45,6 +46,7 @@ Server actions in this codebase are thin wrappers around facades:
 ## Recommendation
 
 For this codebase architecture:
+
 1. **Facade tests** (existing) - Cover all database operations and business logic
 2. **E2E tests** - Can verify full stack including auth middleware when needed
 3. **Server action tests** - Not needed as facades provide coverage
