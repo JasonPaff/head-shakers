@@ -15,10 +15,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 
-import { createTestBobblehead, createTestBobbleheads } from '../../fixtures/bobblehead.factory';
-import { createTestCollection } from '../../fixtures/collection.factory';
-import { createTestUser } from '../../fixtures/user.factory';
-import { getTestDb, resetTestDatabase } from '../../setup/test-db';
+import { createTestBobblehead, createTestBobbleheads } from '../../../fixtures/bobblehead.factory';
+import { createTestCollection } from '../../../fixtures/collection.factory';
+import { createTestUser } from '../../../fixtures/user.factory';
+import { getTestDb, resetTestDatabase } from '../../../setup/test-db';
 
 // Mock the database to use the test container database
 vi.mock('@/lib/db', () => ({

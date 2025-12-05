@@ -15,9 +15,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 
-import { createTestCollection } from '../../fixtures/collection.factory';
-import { createTestUser } from '../../fixtures/user.factory';
-import { getTestDb, resetTestDatabase } from '../../setup/test-db';
+import { createTestCollection } from '../../../fixtures/collection.factory';
+import { createTestUser } from '../../../fixtures/user.factory';
+import { getTestDb, resetTestDatabase } from '../../../setup/test-db';
 
 // Mock the database to use the test container database
 vi.mock('@/lib/db', () => ({

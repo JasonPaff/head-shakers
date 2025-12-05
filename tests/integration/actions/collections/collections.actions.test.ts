@@ -18,9 +18,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ERROR_MESSAGES } from '@/lib/constants';
 
-import { createTestCollection } from '../../fixtures/collection.factory';
-import { createTestUser } from '../../fixtures/user.factory';
-import { getTestDb, resetTestDatabase } from '../../setup/test-db';
+import { createTestCollection } from '../../../fixtures/collection.factory';
+import { createTestUser } from '../../../fixtures/user.factory';
+import { getTestDb, resetTestDatabase } from '../../../setup/test-db';
 
 // Mock server-only to allow importing server actions in tests
 vi.mock('server-only', () => ({}));
