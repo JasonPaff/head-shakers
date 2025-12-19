@@ -82,13 +82,13 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
       data-slot={'featured-collection-card'}
       data-testid={testId ?? generateTestId('feature', 'collection-card', collection.id)}
       href={$path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug: collection.contentSlug },
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: { collectionSlug: collection.contentSlug, username: '' },
       })}
     >
       {/* Image Section */}
       <div
-        className={'relative aspect-[4/3] overflow-hidden'}
+        className={'relative aspect-4/3 overflow-hidden'}
         data-slot={'featured-collection-image-container'}
       >
         <Conditional isCondition={_hasImage}>
@@ -126,7 +126,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
         {/* Gradient Overlay */}
         <div
           aria-hidden
-          className={'absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent'}
+          className={'absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent'}
           data-slot={'featured-collection-overlay'}
         />
 
@@ -135,7 +135,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
           <div className={'absolute top-4 right-4'} data-slot={'featured-collection-trending-badge'}>
             <Badge
               className={
-                'border-transparent bg-gradient-to-r from-gradient-from to-trending text-trending-foreground shadow-lg'
+                'border-transparent bg-linear-to-r from-gradient-from to-trending text-trending-foreground shadow-lg'
               }
             >
               <FlameIcon aria-hidden className={'size-3'} />

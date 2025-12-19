@@ -15,6 +15,7 @@ declare module "@@@next-typesafe-url" {
     "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
     "/collections/[collectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/(collection)/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
+    "/user/[username]/collection/[collectionSlug]": InferRoute<import("./src/app/(app)/user/[username]/collection/[collectionSlug]/route-type").RouteType>;
     "/users/profile/[userId]": InferRoute<import("./src/app/(app)/users/profile/[userId]/route-type").RouteType>;
   }
 
