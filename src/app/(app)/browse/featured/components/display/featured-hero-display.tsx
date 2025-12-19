@@ -118,7 +118,7 @@ export const FeaturedHeroDisplay = ({ heroData, onViewContent }: FeaturedHeroDis
           routeParams: { bobbleheadSlug: content.contentSlug },
         })
       : $path({
-          route: '/users/[userId]',
+          route: '/users/profile/[userId]',
           routeParams: { userId: content.contentSlug },
         });
 

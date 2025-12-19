@@ -140,7 +140,7 @@ export const FeaturedContentDisplay = ({
           routeParams: { bobbleheadSlug: content.contentSlug },
         })
       : $path({
-          route: '/users/[userId]',
+          route: '/users/profile/[userId]',
           routeParams: { userId: content.contentSlug },
         });
 

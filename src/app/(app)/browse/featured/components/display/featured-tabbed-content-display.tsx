@@ -128,7 +128,7 @@ export const FeaturedTabbedContentDisplay = ({
           routeParams: { bobbleheadSlug: content.contentSlug },
         })
       : $path({
-          route: '/users/[userId]',
+          route: '/users/profile/[userId]',
           routeParams: { userId: content.contentSlug },
         });
 
@@ -136,7 +136,7 @@ export const FeaturedTabbedContentDisplay = ({
       <Card className={cardClasses} key={content.id}>
         <div className={'relative'}>
           {hasImage ?
-            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>
+            <div className={'relative aspect-4/3 w-full overflow-hidden rounded-t-lg bg-muted'}>
               <CldImage
                 alt={content.title}
                 className={'size-full object-contain'}
@@ -148,7 +148,7 @@ export const FeaturedTabbedContentDisplay = ({
                 width={isHero ? 800 : 533}
               />
             </div>
-          : <div className={'aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>
+          : <div className={'aspect-4/3 w-full overflow-hidden rounded-t-lg bg-muted'}>
               <img alt={content.title} className={'size-full object-contain'} src={'/placeholder.jpg'} />
             </div>
           }

@@ -84,7 +84,7 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
           routeParams: { collectionSlug: item.targetSlug },
         });
       case 'user':
-        return $path({ route: '/users/[userId]', routeParams: { userId: item.targetId } });
+        return $path({ route: '/users/profile/[userId]', routeParams: { userId: item.targetId } });
       default:
         return '#';
     }

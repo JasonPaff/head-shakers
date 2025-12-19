@@ -96,7 +96,7 @@ const getContentLink = (report: SelectContentReportWithSlugs): null | string => 
       });
     case 'user':
       return $path({
-        route: '/users/[userId]',
+        route: '/users/profile/[userId]',
         routeParams: { userId: report.targetId },
       });
     default:

@@ -15,7 +15,7 @@ declare module "@@@next-typesafe-url" {
     "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
     "/collections/[collectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/(collection)/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
-    "/users/[userId]": InferRoute<import("./src/app/(app)/users/[userId]/route-type").RouteType>;
+    "/users/profile/[userId]": InferRoute<import("./src/app/(app)/users/profile/[userId]/route-type").RouteType>;
   }
 
   interface StaticRouter {
@@ -30,9 +30,6 @@ declare module "@@@next-typesafe-url" {
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
     "/browse/trending": StaticRoute;
-    "/collections/[collectionSlug]/edit": StaticRoute;
-    "/collections/[collectionSlug]/settings": StaticRoute;
-    "/collections/[collectionSlug]/share": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;
@@ -40,9 +37,6 @@ declare module "@@@next-typesafe-url" {
     "/settings": StaticRoute;
     "/settings/privacy": StaticRoute;
     "/settings/profile": StaticRoute;
-    "/users/[userId]/collections": StaticRoute;
-    "/users/[userId]/followers": StaticRoute;
-    "/users/[userId]/following": StaticRoute;
     "/about": StaticRoute;
     "/coming-soon": StaticRoute;
     "/privacy": StaticRoute;

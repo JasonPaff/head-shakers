@@ -6,9 +6,9 @@ import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import type { PageProps } from '@/app/(app)/users/[userId]/route-type';
+import type { PageProps } from '@/app/(app)/users/profile/[userId]/route-type';
 
-import { Route } from '@/app/(app)/users/[userId]/route-type';
+import { Route } from '@/app/(app)/users/profile/[userId]/route-type';
 import { ViewTracker } from '@/components/analytics/view-tracker';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,7 @@ export async function generateMetadata({
   }
 
   // Generate canonical URL for this user profile
-  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/profile/[userId]', routeParams: { userId } })}`;
 
   // Prepare profile image URL for social sharing
   let profileImage: string = FALLBACK_METADATA.imageUrl;
@@ -93,7 +93,7 @@ async function UserPage({ routeParams }: UserPageProps) {
   const isOwner = await getIsOwnerAsync(user.id);
 
   // Generate canonical URL for JSON-LD schemas
-  const profileUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;
+  const profileUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/profile/[userId]', routeParams: { userId } })}`;
 
   // Generate Person schema for user profile
   const personSchema = generatePersonSchema({
