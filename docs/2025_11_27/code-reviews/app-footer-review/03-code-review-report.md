@@ -13,9 +13,9 @@
 | Layer          | Score  | Grade | Status |
 | -------------- | ------ | ----- | ------ |
 | UI/Components  | 85     | B     | ✓      |
-| Business Logic | 70     | C     | ⚠     |
-| Data Layer     | 75     | C     | ⚠     |
-| Validation     | 65     | D     | ⚠     |
+| Business Logic | 70     | C     | ⚠      |
+| Data Layer     | 75     | C     | ⚠      |
+| Validation     | 65     | D     | ⚠      |
 | **Overall**    | **83** | **B** | **✓**  |
 
 ### Issue Summary

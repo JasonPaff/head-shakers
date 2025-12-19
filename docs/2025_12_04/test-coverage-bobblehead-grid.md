@@ -17,20 +17,20 @@
 
 ## Coverage Matrix
 
-| Source File | Unit | Component | Integration | Gap Status |
-|---|---|---|---|---|
-| `bobblehead-grid-display.tsx` | N/A | ❌ Missing | ❌ Missing | Critical |
-| `toolbar.tsx` | N/A | ❌ Missing | N/A | High |
-| `bulk-actions-bar.tsx` | N/A | ❌ Missing | N/A | High |
-| `bobblehead-card.tsx` | N/A | ❌ Missing | N/A | High |
-| `bobblehead-pagination.tsx` | N/A | ❌ Missing | N/A | High |
-| `bobblehead-grid.tsx` | N/A | ❌ Missing | N/A | Medium |
-| `bobbleheads.actions.ts` | ✅ Partial | N/A | ❌ Missing | High |
-| `bobbleheads-dashboard.facade.ts` | ❌ Missing | N/A | ✅ Exists | Partial |
-| `bobbleheads.facade.ts` | ❌ Missing | N/A | ✅ Exists | Partial |
-| `bobbleheads-dashboard.query.ts` | ❌ Missing | N/A | ❌ Missing | Critical |
-| `bobbleheads.validation.ts` | ✅ Exists | N/A | N/A | Complete |
-| `route-type.ts` | ❌ Missing | N/A | N/A | Low |
+| Source File                       | Unit       | Component  | Integration | Gap Status |
+| --------------------------------- | ---------- | ---------- | ----------- | ---------- |
+| `bobblehead-grid-display.tsx`     | N/A        | ❌ Missing | ❌ Missing  | Critical   |
+| `toolbar.tsx`                     | N/A        | ❌ Missing | N/A         | High       |
+| `bulk-actions-bar.tsx`            | N/A        | ❌ Missing | N/A         | High       |
+| `bobblehead-card.tsx`             | N/A        | ❌ Missing | N/A         | High       |
+| `bobblehead-pagination.tsx`       | N/A        | ❌ Missing | N/A         | High       |
+| `bobblehead-grid.tsx`             | N/A        | ❌ Missing | N/A         | Medium     |
+| `bobbleheads.actions.ts`          | ✅ Partial | N/A        | ❌ Missing  | High       |
+| `bobbleheads-dashboard.facade.ts` | ❌ Missing | N/A        | ✅ Exists   | Partial    |
+| `bobbleheads.facade.ts`           | ❌ Missing | N/A        | ✅ Exists   | Partial    |
+| `bobbleheads-dashboard.query.ts`  | ❌ Missing | N/A        | ❌ Missing  | Critical   |
+| `bobbleheads.validation.ts`       | ✅ Exists  | N/A        | N/A         | Complete   |
+| `route-type.ts`                   | ❌ Missing | N/A        | N/A         | Low        |
 
 ---
 
@@ -45,9 +45,11 @@
 **Missing Test Types**: Component, Integration
 
 **Exports Requiring Tests**:
+
 - `BobbleheadGridDisplay` - Main orchestration component
 
 **Functionality Lacking Coverage**:
+
 1. **Search & Filtering**:
    - Search input debouncing (300ms delay)
    - Filter state management (category, condition, featured)
@@ -106,6 +108,7 @@
    - `_isAllSelected` calculation
 
 **Risk Assessment**: Critical - This is the core orchestration component that:
+
 - Manages complex state (selection, filters, pagination, preferences)
 - Handles all user interactions with the grid
 - Integrates multiple child components
@@ -113,6 +116,7 @@
 - Manages cache invalidation through router refresh
 
 **Estimated Tests**: 18-22 tests
+
 - Happy path flow: 3 tests
 - Error cases: 4 tests
 - State management: 6 tests
@@ -129,10 +133,12 @@
 **Missing Test Types**: Component
 
 **Exports Requiring Tests**:
+
 - `BobbleheadCard` - Individual card display with actions
 - `conditionVariants` - CVA for condition styling
 
 **Functionality Lacking Coverage**:
+
 1. **Card Rendering**:
    - Image display with feature photo
    - Name and condition display
@@ -170,6 +176,7 @@
    - Keyboard event handlers
 
 **Risk Assessment**: High - This component:
+
 - Is rendered hundreds of times (per-item rendering)
 - Handles complex conditional rendering (selection vs hover modes)
 - Has keyboard accessibility requirements
@@ -177,6 +184,7 @@
 - Has CVA styling variants that must be tested
 
 **Estimated Tests**: 14-18 tests
+
 - Rendering states: 4 tests
 - Selection mode interactions: 4 tests
 - Hover card behavior: 3 tests
@@ -193,12 +201,14 @@
 **Missing Test Types**: Integration
 
 **Exports Requiring Tests**:
+
 - `BobbleheadsDashboardQuery.getCategoriesByCollectionSlugAsync()`
 - `BobbleheadsDashboardQuery.getCountAsync()`
 - `BobbleheadsDashboardQuery.getListAsync()`
 - Private filter methods
 
 **Functionality Lacking Coverage**:
+
 1. **Category Fetching**:
    - Distinct categories by collection slug
    - Filtering null categories
@@ -239,6 +249,7 @@
    - Null values in optional fields
 
 **Risk Assessment**: Critical - Query layer:
+
 - Directly affects API response correctness
 - Handles complex filtering logic
 - Pagination correctness impacts UX
@@ -246,6 +257,7 @@
 - Permission checks must be enforced
 
 **Estimated Tests**: 12-16 tests
+
 - Category queries: 2 tests
 - Count queries with filters: 4 tests
 - List queries with pagination: 4 tests
@@ -264,10 +276,12 @@
 **Missing Test Types**: Component
 
 **Exports Requiring Tests**:
+
 - `Toolbar` - Search, filter, sort controls
 - `ToolbarProps` - Type definitions
 
 **Functionality Lacking Coverage**:
+
 1. **Search Input**:
    - Input value binding
    - Input change handler
@@ -323,6 +337,7 @@
    - Responsive layout (flex-col on mobile, flex-row on sm)
 
 **Risk Assessment**: High - UI component:
+
 - User interacts with frequently
 - Controls all filtering and search behavior
 - Multiple conditional renders for responsive design
@@ -330,6 +345,7 @@
 - State synchronization with display
 
 **Estimated Tests**: 12-16 tests
+
 - Search functionality: 3 tests
 - Filter dropdowns: 4 tests
 - Sort dropdown: 2 tests
@@ -346,10 +362,12 @@
 **Missing Test Types**: Component
 
 **Exports Requiring Tests**:
+
 - `BulkActionsBar` - Bulk selection actions
 - `BulkActionsBarProps` - Type definitions
 
 **Functionality Lacking Coverage**:
+
 1. **Selection Count Display**:
    - Correct singular/plural text ("1 item" vs "N items")
    - Count accuracy
@@ -378,12 +396,14 @@
    - Responsive spacing
 
 **Risk Assessment**: High - UI component:
+
 - Critical for bulk operations UX
 - Simple but frequently used
 - Event handler accuracy important
 - Text formatting must be exact
 
 **Estimated Tests**: 8-10 tests
+
 - Selection count: 2 tests
 - Select all button: 2 tests
 - Feature action: 2 tests
@@ -399,13 +419,15 @@
 **Missing Test Types**: Component
 
 **Exports Requiring Tests**:
+
 - `BobbleheadPagination` - Pagination controls
 - `getPageNumbers()` - Helper function
 
 **Functionality Lacking Coverage**:
+
 1. **Results Info Display**:
-   - Start item calculation: (page - 1) * pageSize + 1
-   - End item calculation: min(page * pageSize, totalCount)
+   - Start item calculation: (page - 1) \* pageSize + 1
+   - End item calculation: min(page \* pageSize, totalCount)
    - Zero totalCount handling
    - Text formatting
 
@@ -439,12 +461,14 @@
    - Large page counts: ellipsis logic
 
 **Risk Assessment**: High - Component:
+
 - Complex pagination math must be correct
 - UX depends on accurate page display
 - Helper function has multiple branches
 - Styling affects usability
 
 **Estimated Tests**: 10-13 tests
+
 - Results info: 3 tests
 - Page size selector: 2 tests
 - Pagination controls: 3 tests
@@ -460,12 +484,14 @@
 **Missing Test Types**: Integration
 
 **Exports Requiring Tests**:
+
 - `deleteBobbleheadAction()` - Single delete with transaction
 - `updateBobbleheadFeatureAction()` - Single feature toggle
 - `batchUpdateBobbleheadFeatureAction()` - Bulk feature toggle
 - `batchDeleteBobbleheadsAction()` - Bulk delete with transaction
 
 **Functionality Lacking Coverage** (for dashboard grid):
+
 1. **deleteBobbleheadAction**:
    - Input validation
    - Authorization check (owns bobblehead)
@@ -508,6 +534,7 @@
    - Rate limiting
 
 **Risk Assessment**: High - Server actions:
+
 - Direct data mutation operations
 - Critical for grid functionality (delete, feature)
 - Complex transaction handling
@@ -515,6 +542,7 @@
 - Permission checks essential
 
 **Estimated Tests**: 10-14 tests per action
+
 - Happy path: 2 tests per action = 8 tests
 - Error cases: 2 tests per action = 8 tests
 - Permission/authorization: 1 test per action = 4 tests
@@ -530,12 +558,14 @@
 **Missing Test Types**: Integration
 
 **Exports Requiring Tests**:
+
 - `BobbleheadsDashboardFacade.getListByCollectionSlugAsync()` - Main grid data fetch
 - `BobbleheadsDashboardFacade.getCategoriesByCollectionSlugAsync()` - Category fetch
 - `BobbleheadsDashboardFacade.getBobbleheadForEditAsync()` - Edit fetch
 - `BobbleheadsDashboardFacade.getUserCollectionSelectorsAsync()` - Collection selectors
 
 **Functionality Lacking Coverage**:
+
 1. **getListByCollectionSlugAsync**:
    - Pagination metadata calculation
    - Separate data and count caching with different keys
@@ -561,12 +591,14 @@
    - Minimal data return (id, name, slug)
 
 **Risk Assessment**: High - Facade layer:
+
 - Orchestrates queries with caching
 - Critical for performance (pagination, separate caches)
 - Permission checks at business logic layer
 - Complex cache key generation
 
 **Estimated Tests**: 8-12 tests
+
 - List queries with pagination: 3 tests
 - Category queries: 2 tests
 - Cache behavior: 2 tests
@@ -584,9 +616,11 @@
 **Missing Test Types**: Component
 
 **Exports Requiring Tests**:
+
 - `BobbleheadGrid` - Grid wrapper component
 
 **Functionality Lacking Coverage**:
+
 1. **Grid Density Styling**:
    - Compact: grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7
    - Comfortable: grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
@@ -602,11 +636,13 @@
    - Data slot for testing
 
 **Risk Assessment**: Medium - Styling component:
+
 - Simple layout wrapper
 - No complex logic
 - Styling correctness important for UX
 
 **Estimated Tests**: 4-6 tests
+
 - Compact grid rendering: 1 test
 - Comfortable grid rendering: 1 test
 - Empty state layout: 1 test
@@ -621,10 +657,12 @@
 **Missing Test Types**: Unit
 
 **Exports Requiring Tests**:
+
 - Route definition and parser validation
 - All search params types and defaults
 
 **Functionality Lacking Coverage**:
+
 1. **Search Params Validation**:
    - Type coercion (boolean, integer, string enum)
    - Default values application
@@ -642,10 +680,12 @@
    - `sortBy`: enum with 'newest' default
 
 **Risk Assessment**: Low - Type/config layer:
+
 - Critical for URL state integrity
 - But straightforward validation
 
 **Estimated Tests**: 4-6 tests
+
 - Each param type validation: 9 tests
 - Default values: 1 test
 - Parser cache: 1 test
@@ -661,6 +701,7 @@
 **Missing Test Types**: Integration (dashboard-specific tests)
 
 **Dashboard-Specific Methods Lacking Coverage**:
+
 - `updateFeaturedAsync()` - Single feature toggle
 - `batchUpdateFeaturedAsync()` - Bulk feature toggle
 - `batchDeleteAsync()` - Bulk delete
@@ -678,6 +719,7 @@
 **Missing Test Types**: Integration
 
 **Current Status**:
+
 - Async boundary component for Suspense
 - Simple server component wrapper
 - Uses async data fetching
@@ -714,10 +756,12 @@
 ## Recommended Testing Order
 
 ### Phase 1: Foundation (Unit Tests)
+
 1. Route type params validation (4-6 tests)
 2. Pagination helper (`getPageNumbers()`) (3-5 tests)
 
 ### Phase 2: Component Layer (Component Tests)
+
 3. Bobblehead Card (14-18 tests)
 4. Toolbar (12-16 tests)
 5. Bulk Actions Bar (8-10 tests)
@@ -725,23 +769,25 @@
 7. Bobblehead Grid (4-6 tests)
 
 ### Phase 3: Business Logic (Integration Tests)
+
 8. Dashboard Query Layer (12-16 tests)
 9. Dashboard Facade (8-12 tests)
 10. Server Actions (16-22 tests)
 
 ### Phase 4: Orchestration (Component Tests)
+
 11. Bobblehead Grid Display (18-22 tests)
 
 ---
 
 ## Test Count Estimates by Type
 
-| Test Type | Count | Key Files |
-|---|---|---|
-| **Unit** | 7-11 | route-type.ts, pagination helper |
-| **Component** | 50-61 | Toolbar, Card, Pagination, Grid, Bulk Actions |
-| **Integration** | 36-50 | Queries, Facades, Actions |
-| **Total** | **93-122** | All combined |
+| Test Type       | Count      | Key Files                                     |
+| --------------- | ---------- | --------------------------------------------- |
+| **Unit**        | 7-11       | route-type.ts, pagination helper              |
+| **Component**   | 50-61      | Toolbar, Card, Pagination, Grid, Bulk Actions |
+| **Integration** | 36-50      | Queries, Facades, Actions                     |
+| **Total**       | **93-122** | All combined                                  |
 
 **Focused Scope (High Priority Only)**: 68-82 tests
 
@@ -750,6 +796,7 @@
 ## Key Testing Patterns to Implement
 
 ### Component Testing Patterns
+
 ```typescript
 // Search/filter state management
 // Selection mode interactions
@@ -761,6 +808,7 @@
 ```
 
 ### Integration Testing Patterns
+
 ```typescript
 // Query filters with complex conditions
 // Pagination calculations
@@ -771,6 +819,7 @@
 ```
 
 ### Mock Setup Requirements
+
 ```typescript
 // nuqs for URL state management
 // Next router for navigation
@@ -794,6 +843,7 @@
 ## Dependencies & Blockers
 
 ### None Identified
+
 - Test infrastructure fully available
 - Factories and mocks ready
 - All source files accessible
@@ -804,10 +854,10 @@
 ## Conclusion
 
 The bobblehead grid dashboard feature has **minimal existing test coverage** with a clear need for:
+
 1. **Critical**: Orchestration component and query layer tests
 2. **High**: All interactive component tests and server action tests
 3. **Medium**: Grid wrapper and utility component tests
 4. **Low**: Route type and async boundary tests
 
 Implementing the estimated **68-82 high-priority tests** will achieve **85%+ coverage** for this feature and significantly improve code reliability and maintainability.
-

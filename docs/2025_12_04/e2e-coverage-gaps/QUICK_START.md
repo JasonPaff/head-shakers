@@ -16,6 +16,7 @@
 ## What You Need to Know (90 Seconds)
 
 Featured bobblehead is the highlighted card in the home page hero section showing a cool bobblehead. It:
+
 - Fetches data server-side via async component
 - Displays image, title, stats, and floating cards
 - Links to the bobblehead detail page
@@ -24,6 +25,7 @@ Featured bobblehead is the highlighted card in the home page hero section showin
 **Currently Tested**: None (section visibility only, no interaction)
 
 **Critical Gaps**:
+
 1. Card doesn't appear in test
 2. Click doesn't navigate
 3. Mobile layout untested
@@ -33,14 +35,18 @@ Featured bobblehead is the highlighted card in the home page hero section showin
 ## The 4 Documents (Read in This Order)
 
 ### 1. SUMMARY.md (5 min read)
+
 **Start here.** Quick overview of findings and recommendations.
+
 - What's tested: section visibility
 - What's missing: 12 gaps identified
 - Timeline: 3 weeks, 17 tests
 - Risk: High - critical user path untested
 
 ### 2. gap-reference.md (10 min read)
+
 **Then this.** Quick lookup for each gap.
+
 - All 12 gaps explained
 - What needs testing for each
 - Priority level
@@ -48,7 +54,9 @@ Featured bobblehead is the highlighted card in the home page hero section showin
 - Number of tests needed
 
 ### 3. home-featured-bobblehead-e2e-analysis.md (30 min read)
+
 **Detailed analysis.** Full technical breakdown.
+
 - 6 source files analyzed
 - 14 existing tests reviewed
 - 12 coverage gaps detailed
@@ -57,7 +65,9 @@ Featured bobblehead is the highlighted card in the home page hero section showin
 - Implementation roadmap
 
 ### 4. test-implementation-guide.md (Reference)
+
 **Copy-paste tests.** Complete code for all 17 tests.
+
 - Page Object setup
 - Phase 1: 6 critical tests with full code
 - Phase 2: 6 visual tests with full code
@@ -70,6 +80,7 @@ Featured bobblehead is the highlighted card in the home page hero section showin
 ## Implementation Timeline
 
 ### Week 1: Critical Path (6 tests, 2-3 hours)
+
 ```
 Monday-Tuesday:
   - Add Page Object locators (30 min)
@@ -88,6 +99,7 @@ Friday:
 ```
 
 ### Week 2: Visual & Responsive (6 tests, 2-3 hours)
+
 ```
 Tests 7-12: Badge, Floating Cards, Image, Description, Layout
   Similar flow as Week 1
@@ -95,6 +107,7 @@ Tests 7-12: Badge, Floating Cards, Image, Description, Layout
 ```
 
 ### Week 3: Edge Cases (5 tests, 2-3 hours)
+
 ```
 Tests 13-17: Null state, Errors, Auth, Performance, Scroll
   Similar flow as Week 1
@@ -112,6 +125,7 @@ Tests 13-17: Null state, Errors, Auth, Performance, Scroll
 - [ ] Skim test-implementation-guide.md
 
 **Commands**:
+
 ```bash
 # Navigate to project
 cd C:\Users\jasonpaff\dev\head-shakers
@@ -128,6 +142,7 @@ mkdir -p tests/e2e/specs/feature
 - [ ] Save file
 
 **Check**:
+
 ```bash
 npm run test:e2e -- home-sections.spec.ts  # Verify existing tests still pass
 ```
@@ -139,6 +154,7 @@ npm run test:e2e -- home-sections.spec.ts  # Verify existing tests still pass
 - [ ] Run tests
 
 **Commands**:
+
 ```bash
 # Run Phase 1 tests
 npm run test:e2e -- home-featured-bobblehead.spec.ts
@@ -161,16 +177,19 @@ npm run test:e2e -- -g "should render featured bobblehead card"
 ## File Paths (Copy-Paste Ready)
 
 ### Files to Create
+
 ```
 C:\Users\jasonpaff\dev\head-shakers\tests\e2e\specs\feature\home-featured-bobblehead.spec.ts
 ```
 
 ### Files to Modify
+
 ```
 C:\Users\jasonpaff\dev\head-shakers\tests\e2e\pages\home.page.ts
 ```
 
 ### Analysis Documents (Already Created)
+
 ```
 C:\Users\jasonpaff\dev\head-shakers\docs\2025_12_04\e2e-coverage-gaps\
 ├── SUMMARY.md
@@ -289,20 +308,26 @@ async isFeaturedBobbleheadVisible(): Promise<boolean> {
 ## Common Issues & Solutions
 
 ### Issue: Tests timeout waiting for featured bobblehead
+
 **Solution**: Increase timeout
+
 ```typescript
 await expect(featuredCard).toBeVisible({ timeout: 15000 }); // 15 seconds
 ```
 
 ### Issue: Page Object locators not found
+
 **Solution**: Verify test IDs exist in source code
+
 ```bash
 # Search for test IDs in source
 grep -r "feature-bobblehead-card" src/
 ```
 
 ### Issue: Featured bobblehead doesn't exist in test database
+
 **Solution**: Seed data or use factory
+
 ```typescript
 import { createTestFeaturedBobbleheadContent } from '../../fixtures/featured-content.factory';
 
@@ -311,7 +336,9 @@ await createTestFeaturedBobbleheadContent(bobblehead.id, { isActive: true });
 ```
 
 ### Issue: Tests fail on mobile viewport
+
 **Solution**: Set viewport before test
+
 ```typescript
 await page.setViewportSize({ width: 375, height: 667 });
 ```
@@ -323,15 +350,18 @@ await page.setViewportSize({ width: 375, height: 667 });
 ### After Adding Tests
 
 **Step 1: Run tests locally**
+
 ```bash
 npm run test:e2e -- home-featured-bobblehead.spec.ts
 ```
 
 **Step 2: Verify they pass**
+
 - All 6 Phase 1 tests should pass
 - No flaky tests (run 2x to verify)
 
 **Step 3: Check coverage**
+
 ```bash
 # Run existing tests to ensure no regression
 npm run test:e2e -- home-sections.spec.ts
@@ -339,6 +369,7 @@ npm run test:e2e -- home-authenticated.spec.ts
 ```
 
 **Step 4: Review**
+
 - Ask team member to review test code
 - Verify test IDs match source code
 - Check assertions are meaningful
@@ -348,6 +379,7 @@ npm run test:e2e -- home-authenticated.spec.ts
 ## Success Metrics
 
 After Phase 1 (6 tests):
+
 - [x] Featured bobblehead card renders
 - [x] Featured bobblehead navigation works
 - [x] Keyboard navigation works
@@ -356,11 +388,13 @@ After Phase 1 (6 tests):
 - [x] Tests pass consistently
 
 After Phase 2 (12 tests):
+
 - [x] All visual elements tested
 - [x] Responsive layout tested
 - [x] Mobile and desktop verified
 
 After Phase 3 (17 tests):
+
 - [x] Error handling tested
 - [x] Edge cases covered
 - [x] Full E2E coverage achieved
@@ -370,18 +404,21 @@ After Phase 3 (17 tests):
 ## Resources
 
 ### In This Repository
+
 - `tests/e2e/specs/public/home-sections.spec.ts` - Reference tests
 - `tests/e2e/pages/home.page.ts` - Page Object pattern
 - `tests/e2e/fixtures/base.fixture.ts` - Test setup
 - `tests/fixtures/featured-content.factory.ts` - Data factory
 
 ### Documentation
+
 - `docs/2025_12_04/e2e-coverage-gaps/SUMMARY.md` - Overview
 - `docs/2025_12_04/e2e-coverage-gaps/gap-reference.md` - Gap details
 - `docs/2025_12_04/e2e-coverage-gaps/home-featured-bobblehead-e2e-analysis.md` - Full analysis
 - `docs/2025_12_04/e2e-coverage-gaps/test-implementation-guide.md` - Implementation code
 
 ### External
+
 - Playwright Docs: https://playwright.dev/docs/intro
 - Testing Library: https://testing-library.com/docs/playwright-testing-library/intro
 
@@ -431,4 +468,3 @@ After Phase 3 (17 tests):
 ---
 
 **Ready to get started? → Read SUMMARY.md next**
-

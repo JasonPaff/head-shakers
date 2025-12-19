@@ -956,6 +956,7 @@ npm run test:e2e -- tests/e2e/specs/visual/home-featured-bobblehead-visual.spec.
 Use this checklist to track progress:
 
 ### Infrastructure (Steps 1-2)
+
 - [ ] Page Object locators added to `home.page.ts`
 - [ ] Helper methods added to `home.page.ts`
 - [ ] Database seeding script created
@@ -963,6 +964,7 @@ Use this checklist to track progress:
 - [ ] ESLint passes
 
 ### Critical Priority (Steps 3-6)
+
 - [ ] Card visibility tests (2 tests)
 - [ ] Navigation tests (3 tests)
 - [ ] Loading state tests (4 tests)
@@ -970,6 +972,7 @@ Use this checklist to track progress:
 - [ ] All critical tests pass consistently
 
 ### High Priority (Steps 7-10)
+
 - [ ] Floating cards tests (2 tests)
 - [ ] Editor's Pick badge test (1 test)
 - [ ] Responsive layout tests (2 tests)
@@ -977,6 +980,7 @@ Use this checklist to track progress:
 - [ ] All high priority tests pass
 
 ### Medium Priority (Steps 11-15)
+
 - [ ] Auth state consistency tests (2 tests)
 - [ ] Error handling tests (2 tests)
 - [ ] Image performance test (1 test)
@@ -985,6 +989,7 @@ Use this checklist to track progress:
 - [ ] All medium priority tests pass
 
 ### Final Validation
+
 - [ ] All 23 tests pass (5 consecutive runs)
 - [ ] No flaky tests
 - [ ] CI/CD integration complete

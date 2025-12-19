@@ -32,7 +32,7 @@ export interface MockQueryState {
 /**
  * Mock return type for useQueryStates hook
  */
-export type MockUseQueryStatesReturn = readonly [
+export type MockUseQueryStatesReturn = [
   MockQueryState,
   (updates: Partial<MockQueryState>) => Promise<URLSearchParams>,
 ];
@@ -77,7 +77,7 @@ export const mockUseQueryStates = (initialState: Partial<MockQueryState> = {}): 
   const state = { ...defaultState, ...initialState };
   const setState = vi.fn().mockResolvedValue(new URLSearchParams());
 
-  return [state, setState] as const;
+  return [state, setState];
 };
 
 /**

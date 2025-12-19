@@ -18,26 +18,27 @@
 
 ## Test Type Routing
 
-| Step | Test Type | Specialist | Status | Tests |
-|------|-----------|------------|--------|-------|
-| 1.1 Create bobblehead grid factory | infrastructure | test-infrastructure-specialist | DONE | N/A |
-| 1.2 Create hook mocks | infrastructure | test-infrastructure-specialist | DONE | N/A |
-| 1.3 Extend mock environment setup | infrastructure | test-infrastructure-specialist | DONE | N/A |
-| 2.1 URL parser tests | unit | unit-test-specialist | DONE | 47 |
-| 2.2 Pagination helper tests | unit | unit-test-specialist | DONE | 22 |
-| 3.1 BobbleheadGrid component tests | component | component-test-specialist | DONE | 11 |
-| 3.2 BulkActionsBar component tests | component | component-test-specialist | DONE | 12 |
-| 3.3 BobbleheadPagination component tests | component | component-test-specialist | DONE | 15 |
-| 3.4 Toolbar component tests | component | component-test-specialist | DONE | 23 |
-| 3.5 BobbleheadCard component tests | component | component-test-specialist | DONE | 35 |
-| 3.6 BobbleheadGridDisplay component tests | component | component-test-specialist | DONE | 14 |
-| 4.1 BobbleheadsDashboardQuery integration tests | integration | integration-test-specialist | DONE | 22 |
-| 4.2 BobbleheadsDashboardFacade integration tests | integration | integration-test-specialist | DONE | 13 |
-| 4.3 Bobblehead server actions integration tests | integration | integration-test-specialist | DONE | 20 |
+| Step                                             | Test Type      | Specialist                     | Status | Tests |
+| ------------------------------------------------ | -------------- | ------------------------------ | ------ | ----- |
+| 1.1 Create bobblehead grid factory               | infrastructure | test-infrastructure-specialist | DONE   | N/A   |
+| 1.2 Create hook mocks                            | infrastructure | test-infrastructure-specialist | DONE   | N/A   |
+| 1.3 Extend mock environment setup                | infrastructure | test-infrastructure-specialist | DONE   | N/A   |
+| 2.1 URL parser tests                             | unit           | unit-test-specialist           | DONE   | 47    |
+| 2.2 Pagination helper tests                      | unit           | unit-test-specialist           | DONE   | 22    |
+| 3.1 BobbleheadGrid component tests               | component      | component-test-specialist      | DONE   | 11    |
+| 3.2 BulkActionsBar component tests               | component      | component-test-specialist      | DONE   | 12    |
+| 3.3 BobbleheadPagination component tests         | component      | component-test-specialist      | DONE   | 15    |
+| 3.4 Toolbar component tests                      | component      | component-test-specialist      | DONE   | 23    |
+| 3.5 BobbleheadCard component tests               | component      | component-test-specialist      | DONE   | 35    |
+| 3.6 BobbleheadGridDisplay component tests        | component      | component-test-specialist      | DONE   | 14    |
+| 4.1 BobbleheadsDashboardQuery integration tests  | integration    | integration-test-specialist    | DONE   | 22    |
+| 4.2 BobbleheadsDashboardFacade integration tests | integration    | integration-test-specialist    | DONE   | 13    |
+| 4.3 Bobblehead server actions integration tests  | integration    | integration-test-specialist    | DONE   | 20    |
 
 ## Files Created
 
 ### Infrastructure Files
+
 - `tests/fixtures/bobblehead-grid.factory.ts` - Mock factory for dashboard records with stats
 - `tests/mocks/hooks/use-user-preferences.mock.ts` - User preferences hook mock
 - `tests/mocks/hooks/use-server-action.mock.ts` - Server action hook mock
@@ -46,13 +47,16 @@
 - `tests/setup/component-test-environment.ts` - Centralized component test setup
 
 ### Source Files Modified
+
 - `src/lib/utils/pagination.utils.ts` - Extracted getPageNumbers utility
 
 ### Unit Test Files
+
 - `tests/unit/app/dashboard/collection/route-type.test.ts` - 47 tests
 - `tests/unit/lib/utils/pagination.utils.test.ts` - 22 tests
 
 ### Component Test Files
+
 - `tests/components/dashboard/collection/bobblehead-grid.test.tsx` - 11 tests
 - `tests/components/dashboard/collection/bulk-actions-bar.test.tsx` - 12 tests
 - `tests/components/dashboard/collection/bobblehead-pagination.test.tsx` - 15 tests
@@ -61,33 +65,36 @@
 - `tests/components/dashboard/collection/bobblehead-grid-display.test.tsx` - 14 tests
 
 ### Integration Test Files
+
 - `tests/integration/queries/bobbleheads/bobbleheads-dashboard.query.test.ts` - 22 tests
 - `tests/integration/facades/bobbleheads-dashboard/bobbleheads-dashboard.facade.test.ts` - 13 tests
 - `tests/integration/actions/bobbleheads/bobbleheads.actions.test.ts` - 20 tests
 
 ## Test Breakdown
 
-| Category | Test Count |
-|----------|-----------|
-| Unit Tests (URL parsers) | 47 |
-| Unit Tests (Pagination) | 22 |
-| Component Tests (Grid) | 11 |
-| Component Tests (BulkActions) | 12 |
-| Component Tests (Pagination) | 15 |
-| Component Tests (Toolbar) | 23 |
-| Component Tests (Card) | 35 |
-| Component Tests (GridDisplay) | 14 |
-| Integration Tests (Query) | 22 |
-| Integration Tests (Facade) | 13 |
-| Integration Tests (Actions) | 20 |
-| **Total** | **234** |
+| Category                      | Test Count |
+| ----------------------------- | ---------- |
+| Unit Tests (URL parsers)      | 47         |
+| Unit Tests (Pagination)       | 22         |
+| Component Tests (Grid)        | 11         |
+| Component Tests (BulkActions) | 12         |
+| Component Tests (Pagination)  | 15         |
+| Component Tests (Toolbar)     | 23         |
+| Component Tests (Card)        | 35         |
+| Component Tests (GridDisplay) | 14         |
+| Integration Tests (Query)     | 22         |
+| Integration Tests (Facade)    | 13         |
+| Integration Tests (Actions)   | 20         |
+| **Total**                     | **234**    |
 
 ## Integration Tests Summary
 
 ### BobbleheadsDashboardQuery (22 tests)
+
 Tests for the query layer with real PostgreSQL via Testcontainers:
 
 **getListAsync** (16 tests):
+
 - Stats aggregation (likes, views, comments) via subqueries
 - Category, condition, and featured filtering
 - Case-insensitive search on name, characterName
@@ -97,43 +104,53 @@ Tests for the query layer with real PostgreSQL via Testcontainers:
 - Soft delete exclusion (deletedAt IS NULL)
 
 **getCategoriesByCollectionSlugAsync** (3 tests):
+
 - Distinct category retrieval
 - Null category exclusion
 - Alphabetical ordering
 
 **getCountAsync** (3 tests):
+
 - Count with no filters
 - Count with category filter
 - Count with search term
 
 ### BobbleheadsDashboardFacade (13 tests)
+
 Tests for the facade layer with caching and business orchestration:
 
 **getListByCollectionSlugAsync** (4 tests):
+
 - Pagination metadata (currentPage, pageSize, totalCount, totalPages)
 - Empty results handling
 
 **getCategoriesByCollectionSlugAsync** (2 tests):
+
 - Cache pass-through execution
 - Distinct categories
 
 **getBobbleheadForEditAsync** (3 tests):
+
 - Bobblehead with tags for owner
 - Null for non-owner (permission check)
 - Null for non-existent bobblehead
 
 **getUserCollectionSelectorsAsync** (3 tests):
+
 - Collection selectors ordered by name
 - Empty array for user with no collections
 - Ownership filtering
 
 **Sentry integration** (1 test):
+
 - Breadcrumb tracking for operations
 
 ### Bobblehead Server Actions (20 tests)
+
 Tests for mutation actions with authentication and permission checks:
 
 **deleteBobbleheadAction** (5 tests):
+
 - Successful deletion
 - Soft delete (sets deletedAt)
 - Success response verification
@@ -141,6 +158,7 @@ Tests for mutation actions with authentication and permission checks:
 - Error for non-owner
 
 **updateBobbleheadFeatureAction** (5 tests):
+
 - Update isFeatured to true
 - Update isFeatured to false
 - Success response
@@ -148,12 +166,14 @@ Tests for mutation actions with authentication and permission checks:
 - Error for non-owner
 
 **batchDeleteBobbleheadsAction** (4 tests):
+
 - Multiple bobblehead deletion
 - UUID validation
 - Owner-only deletion (partial success)
 - Empty array handling
 
 **batchUpdateBobbleheadFeatureAction** (6 tests):
+
 - Feature multiple bobbleheads
 - Un-feature multiple bobbleheads
 - UUID validation
@@ -191,6 +211,7 @@ Successfully implemented comprehensive test coverage for the bobblehead grid fea
 All 234 tests pass. The test implementation is complete.
 
 ### Key Achievements
+
 1. **Query Layer**: Full coverage of complex SQL queries with subqueries for stats aggregation
 2. **Facade Layer**: Business logic orchestration with caching verification
 3. **Action Layer**: Server action mutations with permission enforcement

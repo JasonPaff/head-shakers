@@ -177,9 +177,8 @@ describe('FooterSocialLinks with empty config', () => {
     }));
 
     // Re-import the component to get fresh mock
-    const { FooterSocialLinks: EmptySocialLinks } = await import(
-      '@/components/layout/app-footer/components/footer-social-links'
-    );
+    const { FooterSocialLinks: EmptySocialLinks } =
+      await import('@/components/layout/app-footer/components/footer-social-links');
 
     const { container } = render(<EmptySocialLinks />);
 
@@ -205,9 +204,8 @@ describe('FooterSocialLinks with partial config', () => {
       },
     }));
 
-    const { FooterSocialLinks: PartialSocialLinks } = await import(
-      '@/components/layout/app-footer/components/footer-social-links'
-    );
+    const { FooterSocialLinks: PartialSocialLinks } =
+      await import('@/components/layout/app-footer/components/footer-social-links');
 
     render(<PartialSocialLinks />);
 

@@ -9,11 +9,13 @@
 The featured collections section on the Head Shakers home page has **only 2 basic E2E tests** covering section visibility. A comprehensive analysis reveals **40+ missing test scenarios** across 6 critical user flows.
 
 ### Current State
+
 - **E2E Tests Written**: 2 (visibility checks only)
 - **Coverage Gap**: 95% untested
 - **Risk Level**: HIGH - Core user experience feature with minimal validation
 
 ### Required Implementation
+
 - **New Tests Needed**: 18-22 test cases
 - **Estimated Effort**: 8-10 hours
 - **Priority**: CRITICAL (blocks proper feature validation)
@@ -24,11 +26,13 @@ The featured collections section on the Head Shakers home page has **only 2 basi
 ## Key Findings
 
 ### What's Tested (2 tests)
+
 1. Featured collections section is visible on home page
 2. Section header displays "Featured Collections" text
 3. View All button exists
 
 ### What's NOT Tested (40+ gaps)
+
 1. **Display**: Cards render with metadata, trending badges, owner info, stats
 2. **Navigation**: Clicking cards navigates to detail pages, View All navigates correctly
 3. **Authentication**: Personal like status vs. aggregate likes visibility differs by user
@@ -41,22 +45,25 @@ The featured collections section on the Head Shakers home page has **only 2 basi
 ## Risk Assessment
 
 ### High-Risk Gaps (Could affect users)
-| Risk | Gap | Impact |
-|------|-----|--------|
-| **Navigation Broken** | Cards don't navigate to collection detail | Users can't access collections from featured section |
-| **Auth Data Leak** | Personal like status visible to wrong users | Privacy violation, security issue |
-| **Mobile Layout Broken** | Cards don't adapt to mobile viewport | Mobile users see 6 stacked cards instead of 1 column |
-| **Empty State Crash** | No featured collections → error | Home page breaks if curators remove all featured content |
-| **Accessibility Fail** | No keyboard navigation | Keyboard-only users blocked from featured collections |
+
+| Risk                     | Gap                                         | Impact                                                   |
+| ------------------------ | ------------------------------------------- | -------------------------------------------------------- |
+| **Navigation Broken**    | Cards don't navigate to collection detail   | Users can't access collections from featured section     |
+| **Auth Data Leak**       | Personal like status visible to wrong users | Privacy violation, security issue                        |
+| **Mobile Layout Broken** | Cards don't adapt to mobile viewport        | Mobile users see 6 stacked cards instead of 1 column     |
+| **Empty State Crash**    | No featured collections → error             | Home page breaks if curators remove all featured content |
+| **Accessibility Fail**   | No keyboard navigation                      | Keyboard-only users blocked from featured collections    |
 
 ---
 
 ## Coverage by User Flow
 
 ### 1. Display & Metadata (9 gaps) - CRITICAL
+
 **Status**: 20% covered | **Risk**: HIGH
 
 Tests needed for collection cards displaying:
+
 - Title, owner, avatar, item count, estimated value
 - Engagement stats (likes, views, comments)
 - Trending badges
@@ -64,6 +71,7 @@ Tests needed for collection cards displaying:
 - Placeholder fallbacks
 
 **Example gaps**:
+
 - No test verifies card count (should be 6)
 - No test verifies owner information displays
 - No test verifies trending badge only shows when `isTrending: true`
@@ -71,14 +79,17 @@ Tests needed for collection cards displaying:
 ---
 
 ### 2. Navigation (8 gaps) - CRITICAL
+
 **Status**: 15% covered | **Risk**: CRITICAL
 
 Tests needed for:
+
 - Clicking collection cards navigates to `/collections/[slug]`
 - Different cards navigate to different slugs
 - "View All Collections" button navigates to `/browse`
 
 **Example gaps**:
+
 - `home-sections.spec.ts` tests Browse button but NOT card navigation
 - No tests verify correct slug in URL
 - No multi-card navigation tests
@@ -86,15 +97,18 @@ Tests needed for:
 ---
 
 ### 3. Authentication (10 gaps) - CRITICAL
+
 **Status**: 0% covered | **Risk**: CRITICAL
 
 Tests needed for:
+
 - Unauthenticated users see aggregate likes only
 - Authenticated users see personal like status
 - Like status differs between authenticated and unauthenticated users
 - Cache doesn't leak personal data across users
 
 **Example gaps**:
+
 - No tests compare like display between auth states
 - No tests verify userId is passed to query correctly
 - No tests verify cache keys include userId
@@ -102,15 +116,18 @@ Tests needed for:
 ---
 
 ### 4. State Handling (8 gaps) - HIGH
+
 **Status**: 0% covered | **Risk**: HIGH
 
 Tests needed for:
+
 - Loading skeleton displays during async fetch
 - Empty state when no featured collections
 - Error boundary catches rendering errors
 - Smooth transitions without layout shifts
 
 **Example gaps**:
+
 - No test verifies Suspense boundary works
 - No test verifies empty state renders correctly
 - No test verifies ErrorBoundary catches errors
@@ -118,14 +135,17 @@ Tests needed for:
 ---
 
 ### 5. Responsive Layout (8 gaps) - HIGH
+
 **Status**: 0% covered | **Risk**: HIGH
 
 Tests needed for:
+
 - Desktop: 3 column grid (lg breakpoint)
 - Tablet: 2 column grid (md breakpoint)
 - Mobile: 1 column, first 3 cards only (hidden md:block rule)
 
 **Example gaps**:
+
 - No viewport size tests
 - No tests verify cards 4-6 are hidden on mobile
 - No responsive grid layout tests
@@ -133,15 +153,18 @@ Tests needed for:
 ---
 
 ### 6. Accessibility (7 gaps) - MEDIUM
+
 **Status**: 0% covered | **Risk**: MEDIUM
 
 Tests needed for:
+
 - Keyboard navigation (Tab through cards)
 - Screen reader support (titles, owner, stats announced)
 - ARIA labels on interactive elements
 - Focus states visible
 
 **Example gaps**:
+
 - No keyboard navigation tests
 - No screen reader announcement tests
 - No accessible name verification
@@ -151,9 +174,11 @@ Tests needed for:
 ## Detailed Analysis Documents
 
 ### Document 1: Main Gap Analysis
+
 **File**: `featured-collections-e2e-gap-analysis.md`
 
 **Contents**:
+
 - Complete coverage matrix by user flow
 - Detailed analysis of each gap with context
 - Test infrastructure and recommendations
@@ -165,9 +190,11 @@ Tests needed for:
 ---
 
 ### Document 2: Detailed Test Scenarios
+
 **File**: `featured-collections-e2e-scenarios.md`
 
 **Contents**:
+
 - 20+ complete test scenario descriptions
 - Working code examples for each test
 - Acceptance criteria for each scenario
@@ -181,6 +208,7 @@ Tests needed for:
 ## Implementation Roadmap
 
 ### Phase 1: Critical Tests (Foundation) - 2-3 hours
+
 - [x] Planned: Display collection cards with metadata
 - [x] Planned: Card navigation to detail pages
 - [x] Planned: View All button navigation
@@ -191,6 +219,7 @@ Tests needed for:
 **Deliverable**: `featured-collections.spec.ts` with 10 core tests
 
 ### Phase 2: Authentication Tests - 1-2 hours
+
 - [x] Planned: Unauthenticated like display
 - [x] Planned: Authenticated personal like status
 - [x] Planned: Like status differs by auth state
@@ -199,6 +228,7 @@ Tests needed for:
 **Deliverable**: Auth test describe block with 10 tests
 
 ### Phase 3: Responsive & Accessibility - 2-3 hours
+
 - [x] Planned: Desktop/tablet/mobile layouts
 - [x] Planned: Mobile card visibility rules
 - [x] Planned: Keyboard navigation
@@ -207,6 +237,7 @@ Tests needed for:
 **Deliverable**: Responsive + accessibility test blocks with 8 tests
 
 ### Phase 4: Polish & Edge Cases - 1-2 hours
+
 - [x] Planned: Trending badge display
 - [x] Planned: Image loading/placeholders
 - [x] Planned: Error boundary behavior
@@ -274,6 +305,7 @@ Tests needed for:
 ## Test Infrastructure Summary
 
 ### What Already Exists (No New Setup Needed)
+
 ✅ Playwright E2E testing framework
 ✅ Page Object Model pattern
 ✅ Component finder helpers
@@ -283,6 +315,7 @@ Tests needed for:
 ✅ HomePage page object with featured collections locator
 
 ### What's Ready to Use
+
 - `finder.feature('collection-card')` - Get collection card elements
 - `finder.layout('featured-collections-section')` - Get section
 - `page.getByRole()` - Semantic element selection
@@ -290,6 +323,7 @@ Tests needed for:
 - `page` fixture - Unauthenticated context
 
 ### What Needs Implementation
+
 - `tests/e2e/specs/feature/featured-collections.spec.ts` - New test file
 - 18-22 individual test cases
 - Following existing patterns from:
@@ -301,6 +335,7 @@ Tests needed for:
 ## Success Criteria
 
 ### When Analysis is Complete
+
 ✅ 2 detailed analysis documents created
 ✅ 40+ test gaps identified and prioritized
 ✅ 18-22 test scenarios defined with examples
@@ -309,6 +344,7 @@ Tests needed for:
 ✅ Data requirements documented
 
 ### When Implementation is Complete
+
 - [ ] All 18-22 tests implemented
 - [ ] All tests passing in local environment
 - [ ] All tests passing in CI/CD pipeline
@@ -321,28 +357,30 @@ Tests needed for:
 
 ## Key Metrics
 
-| Metric | Value |
-|--------|-------|
-| Current E2E Test Count | 2 |
-| Required E2E Tests | 18-22 |
-| Coverage Gap | 95% |
-| Test Categories | 6 (Display, Navigation, Auth, State, Responsive, Accessibility) |
-| Priority Level | CRITICAL |
-| Estimated Implementation | 8-10 hours |
-| Risk if Not Implemented | HIGH (95% of feature untested) |
-| Code Complexity | Medium (existing patterns) |
-| Infrastructure Changes | None (ready to use) |
+| Metric                   | Value                                                           |
+| ------------------------ | --------------------------------------------------------------- |
+| Current E2E Test Count   | 2                                                               |
+| Required E2E Tests       | 18-22                                                           |
+| Coverage Gap             | 95%                                                             |
+| Test Categories          | 6 (Display, Navigation, Auth, State, Responsive, Accessibility) |
+| Priority Level           | CRITICAL                                                        |
+| Estimated Implementation | 8-10 hours                                                      |
+| Risk if Not Implemented  | HIGH (95% of feature untested)                                  |
+| Code Complexity          | Medium (existing patterns)                                      |
+| Infrastructure Changes   | None (ready to use)                                             |
 
 ---
 
 ## Questions & Contact
 
 ### For Questions About This Analysis
+
 - **Coverage gaps**: See `featured-collections-e2e-gap-analysis.md` (Detailed Coverage Analysis by User Flow)
 - **Test examples**: See `featured-collections-e2e-scenarios.md` (Test Scenario Catalog)
 - **Implementation**: See `featured-collections-e2e-scenarios.md` (Test Infrastructure & Recommendations)
 
 ### Key Resources
+
 - [Playwright Documentation](https://playwright.dev)
 - [Testing Library Queries](https://testing-library.com)
 - Newsletter E2E Tests: `tests/e2e/specs/feature/newsletter-footer.spec.ts` (reference for auth patterns)

@@ -90,7 +90,7 @@ describe('BobbleheadGridDisplay', () => {
 
     // Setup default mock implementations
     const { useQueryStates } = await import('nuqs');
-    vi.mocked(useQueryStates).mockReturnValue(mockUseQueryStates());
+    vi.mocked(useQueryStates).mockReturnValue(mockUseQueryStates() as ReturnType<typeof useQueryStates>);
 
     const { useRouter } = await import('next/navigation');
     vi.mocked(useRouter).mockReturnValue({
@@ -112,15 +112,13 @@ describe('BobbleheadGridDisplay', () => {
 
     const { useServerAction } = await import('@/hooks/use-server-action');
     vi.mocked(useServerAction).mockReturnValue({
+      execute: vi.fn(),
       executeAsync: vi.fn().mockResolvedValue({ success: true }),
-      hasErrored: false,
-      hasExecuted: false,
-      hasSucceeded: false,
       isExecuting: false,
       reset: vi.fn(),
       result: {},
       status: 'idle',
-    });
+    } as unknown as ReturnType<typeof useServerAction>);
   });
 
   describe('Rendering Tests', () => {
@@ -170,7 +168,7 @@ describe('BobbleheadGridDisplay', () => {
           condition: 'all',
           featured: 'all',
           search: '',
-        }),
+        }) as ReturnType<typeof useQueryStates>,
       );
 
       render(
@@ -192,12 +190,12 @@ describe('BobbleheadGridDisplay', () => {
       vi.mocked(useQueryStates).mockReturnValue(
         mockUseQueryStates({
           search: 'baseball',
-        }),
+        }) as ReturnType<typeof useQueryStates>,
       );
 
       render(<BobbleheadGridDisplay {...defaultProps} />);
 
-      const searchInput = screen.getByPlaceholderText('Search bobbleheads...');
+      const searchInput = screen.getByPlaceholderText('Search bobbleheads...') as HTMLInputElement;
       expect(searchInput.value).toBe('baseball');
     });
 
@@ -213,7 +211,7 @@ describe('BobbleheadGridDisplay', () => {
           sortBy: 'newest',
         },
         setParams,
-      ]);
+      ] as unknown as ReturnType<typeof useQueryStates>);
 
       const { user } = render(<BobbleheadGridDisplay {...defaultProps} />);
 
@@ -240,7 +238,7 @@ describe('BobbleheadGridDisplay', () => {
           sortBy: 'newest',
         },
         setParams,
-      ]);
+      ] as unknown as ReturnType<typeof useQueryStates>);
 
       const { user } = render(<BobbleheadGridDisplay {...defaultProps} />);
 
@@ -269,7 +267,7 @@ describe('BobbleheadGridDisplay', () => {
           sortBy: 'newest',
         },
         setParams,
-      ]);
+      ] as unknown as ReturnType<typeof useQueryStates>);
 
       const { user } = render(<BobbleheadGridDisplay {...defaultProps} />);
 
@@ -299,7 +297,7 @@ describe('BobbleheadGridDisplay', () => {
           sortBy: 'newest',
         },
         setParams,
-      ]);
+      ] as unknown as ReturnType<typeof useQueryStates>);
 
       const { user } = render(<BobbleheadGridDisplay {...defaultProps} />);
 

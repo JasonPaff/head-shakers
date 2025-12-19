@@ -113,7 +113,10 @@ Create helper function to wait for featured bobblehead:
 async function waitForFeaturedBobblehead(page: Page): Promise<void> {
   // Wait for either skeleton to appear or real content
   await Promise.race([
-    page.getByTestId('ui-skeleton-hero-featured-bobblehead').waitFor({ state: 'visible', timeout: 2000 }).catch(() => {}),
+    page
+      .getByTestId('ui-skeleton-hero-featured-bobblehead')
+      .waitFor({ state: 'visible', timeout: 2000 })
+      .catch(() => {}),
     page.getByTestId('feature-bobblehead-card-card').waitFor({ state: 'visible', timeout: 5000 }),
   ]);
 
@@ -158,6 +161,7 @@ test('should render featured bobblehead card in hero section - public', async ({
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead card visible within 10 seconds
 - [x] Image renders without broken image icon
 - [x] Title text is displayed and not empty
@@ -170,7 +174,10 @@ test('should render featured bobblehead card in hero section - public', async ({
 **Objective**: Verify featured bobblehead displays identically for authenticated users
 
 ```typescript
-test('should render featured bobblehead card in hero section - authenticated', async ({ userPage, userFinder }) => {
+test('should render featured bobblehead card in hero section - authenticated', async ({
+  userPage,
+  userFinder,
+}) => {
   const homePage = new HomePage(userPage);
   await homePage.goto();
 
@@ -190,6 +197,7 @@ test('should render featured bobblehead card in hero section - authenticated', a
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead renders when user is authenticated
 - [x] Featured bobblehead content matches public version
 - [x] No permission errors appear
@@ -214,10 +222,7 @@ test('should navigate to bobblehead detail page when clicking featured card', as
   expect(href).toMatch(/^\/bobbleheads\/[^/]+$/);
 
   // Click and verify navigation
-  await Promise.all([
-    page.waitForURL(/\/bobbleheads\/[^/]+/),
-    homePage.clickFeaturedBobblehead(),
-  ]);
+  await Promise.all([page.waitForURL(/\/bobbleheads\/[^/]+/), homePage.clickFeaturedBobblehead()]);
 
   // Verify URL is correct
   expect(page.url()).toMatch(/\/bobbleheads\//);
@@ -225,6 +230,7 @@ test('should navigate to bobblehead detail page when clicking featured card', as
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured card link href is valid URL
 - [x] Clicking card navigates to bobblehead detail page
 - [x] Navigation URL includes bobblehead slug
@@ -276,16 +282,14 @@ test('should be keyboard accessible - featured bobblehead card', async ({ page }
   expect(focusedElement.isVisible).toBe(true);
 
   // Press Enter to activate
-  await Promise.all([
-    page.waitForURL(/\/bobbleheads\/[^/]+/),
-    page.keyboard.press('Enter'),
-  ]);
+  await Promise.all([page.waitForURL(/\/bobbleheads\/[^/]+/), page.keyboard.press('Enter')]);
 
   expect(page.url()).toMatch(/\/bobbleheads\//);
 });
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured card is reachable via keyboard navigation
 - [x] Focus indicator is visible when tabbed to
 - [x] Pressing Enter activates the link
@@ -303,7 +307,7 @@ test('should display loading skeleton while featured bobblehead loads', async ({
 
   // Go to page but slow down network to see skeleton
   await page.route('**/api/**', async (route) => {
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Artificial delay
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Artificial delay
     await route.continue();
   });
 
@@ -322,6 +326,7 @@ test('should display loading skeleton while featured bobblehead loads', async ({
 ```
 
 **Acceptance Criteria**:
+
 - [x] Skeleton or loading state displays
 - [x] Real content eventually replaces skeleton
 - [x] No duplicate content (skeleton + real) on screen
@@ -372,6 +377,7 @@ test('should display featured bobblehead stats with correct formatting', async (
 ```
 
 **Acceptance Criteria**:
+
 - [x] Like count is visible and formatted with commas for thousands
 - [x] View count is visible and formatted with commas for thousands
 - [x] Stats don't overflow or break layout
@@ -417,6 +423,7 @@ test('should display editor's pick badge with styling', async ({ page }) => {
 ```
 
 **Acceptance Criteria**:
+
 - [x] Badge text "Editor's Pick" is visible
 - [x] Crown icon displays next to text
 - [x] Badge has distinctive styling
@@ -466,6 +473,7 @@ test('should render floating cards - top rated and value growth', async ({ page 
 ```
 
 **Acceptance Criteria**:
+
 - [x] Top Rated card is visible with correct text
 - [x] Value Growth card is visible with correct data (+23%)
 - [x] Both cards have icons (trophy, trending up)
@@ -513,6 +521,7 @@ test('should load featured bobblehead image with proper attributes', async ({ pa
 ```
 
 **Acceptance Criteria**:
+
 - [x] Image renders without broken state
 - [x] Image has descriptive alt text
 - [x] Image source is from Cloudinary (or valid image service)
@@ -558,6 +567,7 @@ test('should display featured bobblehead description when available', async ({ p
 ```
 
 **Acceptance Criteria**:
+
 - [x] Description renders when available
 - [x] Description text is readable and not truncated
 - [x] If no description, page doesn't show "null" or error
@@ -607,6 +617,7 @@ test('should display featured bobblehead in correct grid position on desktop', a
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead is on right side of hero on desktop
 - [x] Featured bobblehead takes roughly 50% of space (or less with gap)
 - [x] No horizontal scrolling occurs
@@ -653,6 +664,7 @@ test('should stack featured bobblehead below content on mobile', async ({ page }
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead stacks below text on mobile
 - [x] Featured bobblehead takes up ~90% of viewport width
 - [x] No horizontal scrolling occurs
@@ -697,6 +709,7 @@ test('should handle missing featured bobblehead gracefully', async ({ page }) =>
 ```
 
 **Acceptance Criteria**:
+
 - [x] Page loads without errors when featured bobblehead is null
 - [x] Hero buttons are still accessible
 - [x] No error messages appear to user
@@ -742,6 +755,7 @@ test('should handle featured bobblehead component errors gracefully', async ({ p
 ```
 
 **Acceptance Criteria**:
+
 - [x] Error boundary catches component errors
 - [x] Page doesn't show white screen of death
 - [x] Rest of page remains functional
@@ -794,6 +808,7 @@ test('should render featured bobblehead identically for both authentication stat
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead displays for authenticated and unauthenticated users
 - [x] Content is identical in both states
 - [x] No permission issues
@@ -834,6 +849,7 @@ test('should load featured bobblehead image with good performance', async ({ pag
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead loads within 5 seconds
 - [x] Image is loaded (not placeholder)
 - [x] Image comes from Cloudinary CDN
@@ -880,6 +896,7 @@ test('should display featured bobblehead without scrolling required', async ({ p
 ```
 
 **Acceptance Criteria**:
+
 - [x] Featured bobblehead is visible in initial viewport (or top portion is)
 - [x] No scroll required to see the card on desktop
 - [x] Works on various viewport sizes
@@ -914,12 +931,12 @@ npm run test:e2e
 
 ### Test Coverage Summary
 
-| Phase | Tests | Hours | Status |
-| --- | --- | --- | --- |
-| Phase 1 (Critical Path) | 6 | 2-3 | Ready |
-| Phase 2 (Visual/Interaction) | 6 | 2-3 | Ready |
-| Phase 3 (Edge Cases) | 5 | 2-3 | Ready |
-| **Total** | **17** | **6-9** | **Ready** |
+| Phase                        | Tests  | Hours   | Status    |
+| ---------------------------- | ------ | ------- | --------- |
+| Phase 1 (Critical Path)      | 6      | 2-3     | Ready     |
+| Phase 2 (Visual/Interaction) | 6      | 2-3     | Ready     |
+| Phase 3 (Edge Cases)         | 5      | 2-3     | Ready     |
+| **Total**                    | **17** | **6-9** | **Ready** |
 
 ---
 
@@ -928,12 +945,14 @@ npm run test:e2e
 ### Common Issues
 
 **Issue**: Test times out waiting for featured bobblehead
+
 ```typescript
 // Solution: Increase timeout for async component
 await expect(featuredCard).toBeVisible({ timeout: 15000 });
 ```
 
 **Issue**: Featured bobblehead image not loading
+
 ```typescript
 // Solution: Check network tab for image URL
 console.log(await image.getAttribute('src'));
@@ -944,6 +963,7 @@ await page.route('**/*.jpg', (route) => {
 ```
 
 **Issue**: Responsive test fails on different screen
+
 ```typescript
 // Solution: Use exact viewport size
 await page.setViewportSize({ width: 375, height: 667 });
@@ -952,6 +972,7 @@ console.log(page.viewportSize());
 ```
 
 **Issue**: Featured bobblehead card click not working
+
 ```typescript
 // Solution: Verify card is clickable and visible
 const card = homePage.featuredBobbleheadCard;
@@ -977,4 +998,3 @@ await card.click();
 5. **Dark Mode**: Featured bobblehead should work in both light and dark modes - consider adding dark mode tests if needed
 
 6. **Accessibility**: Tests should verify ARIA attributes, keyboard navigation, and focus indicators
-

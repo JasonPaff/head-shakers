@@ -88,7 +88,7 @@ describe('BulkActionsBar', () => {
       render(<BulkActionsBar {...defaultProps} />);
 
       const featureButton = screen.getByRole('button', { name: /feature selected/i });
-       
+
       const featureButtonText = featureButton.querySelector('.hidden.sm\\:inline');
 
       expect(featureButtonText).toBeInTheDocument();
@@ -101,7 +101,7 @@ describe('BulkActionsBar', () => {
       render(<BulkActionsBar {...defaultProps} />);
 
       const deleteButton = screen.getByRole('button', { name: /delete selected/i });
-       
+
       const deleteButtonText = deleteButton.querySelector('.hidden.sm\\:inline');
 
       expect(deleteButtonText).toBeInTheDocument();

@@ -32,93 +32,94 @@ For the collection dashboard's bobblehead grid feature, discover ALL relevant so
 
 #### High Priority - Core Implementation (Critical)
 
-| File | Priority | Description |
-|------|----------|-------------|
+| File                                                                                             | Priority | Description                                                           |
+| ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
 | `src/app/(app)/dashboard/collection/(collection)/components/display/bobblehead-grid-display.tsx` | Critical | Core orchestration component - state, URL params, selection, bulk ops |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/toolbar.tsx` | Critical | Search, filters, sort, toggles, selection mode |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/bulk-actions-bar.tsx` | Critical | Bulk selection controls, batch delete/feature |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-card.tsx` | Critical | Individual card with hover, selection, actions |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-pagination.tsx` | Critical | Pagination controls, page size selector |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-grid.tsx` | High | Responsive grid wrapper with density variants |
-| `src/lib/actions/bobbleheads/bobbleheads.actions.ts` | Critical | Server actions (delete, batch delete, feature, batch feature) |
-| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts` | Critical | Data fetching facade with caching |
-| `src/lib/facades/bobbleheads/bobbleheads.facade.ts` | Critical | Business logic facade for mutations |
-| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts` | Critical | Database queries with filtering/sorting/pagination |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/toolbar.tsx`                    | Critical | Search, filters, sort, toggles, selection mode                        |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/bulk-actions-bar.tsx`           | Critical | Bulk selection controls, batch delete/feature                         |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-card.tsx`            | Critical | Individual card with hover, selection, actions                        |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-pagination.tsx`      | Critical | Pagination controls, page size selector                               |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-grid.tsx`            | High     | Responsive grid wrapper with density variants                         |
+| `src/lib/actions/bobbleheads/bobbleheads.actions.ts`                                             | Critical | Server actions (delete, batch delete, feature, batch feature)         |
+| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts`                                    | Critical | Data fetching facade with caching                                     |
+| `src/lib/facades/bobbleheads/bobbleheads.facade.ts`                                              | Critical | Business logic facade for mutations                                   |
+| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts`                                     | Critical | Database queries with filtering/sorting/pagination                    |
 
 #### Medium Priority - Supporting (High)
 
-| File | Priority | Description |
-|------|----------|-------------|
-| `src/app/(app)/dashboard/collection/(collection)/components/async/bobblehead-grid-async.tsx` | High | Server component data fetching wrapper |
-| `src/app/(app)/dashboard/collection/(collection)/components/empty-states/no-bobbleheads.tsx` | High | Empty state (no bobbleheads) |
-| `src/app/(app)/dashboard/collection/(collection)/components/empty-states/no-results.tsx` | High | Empty state (no filtered results) |
-| `src/app/(app)/dashboard/collection/(collection)/components/skeleton/bobblehead-grid-skeleton.tsx` | Medium | Loading skeleton for grid |
-| `src/app/(app)/dashboard/collection/(collection)/components/skeleton/toolbar-skeleton.tsx` | Medium | Loading skeleton for toolbar |
-| `src/app/(app)/dashboard/collection/(collection)/route-type.ts` | High | URL state parsers (nuqs), type definitions |
-| `src/lib/validations/bobbleheads.validation.ts` | High | Validation schemas for actions |
+| File                                                                                               | Priority | Description                                |
+| -------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------ |
+| `src/app/(app)/dashboard/collection/(collection)/components/async/bobblehead-grid-async.tsx`       | High     | Server component data fetching wrapper     |
+| `src/app/(app)/dashboard/collection/(collection)/components/empty-states/no-bobbleheads.tsx`       | High     | Empty state (no bobbleheads)               |
+| `src/app/(app)/dashboard/collection/(collection)/components/empty-states/no-results.tsx`           | High     | Empty state (no filtered results)          |
+| `src/app/(app)/dashboard/collection/(collection)/components/skeleton/bobblehead-grid-skeleton.tsx` | Medium   | Loading skeleton for grid                  |
+| `src/app/(app)/dashboard/collection/(collection)/components/skeleton/toolbar-skeleton.tsx`         | Medium   | Loading skeleton for toolbar               |
+| `src/app/(app)/dashboard/collection/(collection)/route-type.ts`                                    | High     | URL state parsers (nuqs), type definitions |
+| `src/lib/validations/bobbleheads.validation.ts`                                                    | High     | Validation schemas for actions             |
 
 #### Low Priority - Utilities (Medium/Low)
 
-| File | Priority | Description |
-|------|----------|-------------|
-| `src/app/(app)/dashboard/collection/(collection)/page.tsx` | Low | Page entry point |
-| `src/app/(app)/dashboard/collection/(collection)/loading.tsx` | Low | Page loading state |
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Medium | General bobblehead queries |
-| `src/lib/db/schema/bobbleheads.schema.ts` | Low | Database schema |
-| `src/hooks/use-user-preferences.ts` | Medium | User preferences hook |
-| `src/hooks/use-server-action.ts` | Medium | Server action wrapper |
-| `src/hooks/use-toggle.ts` | Low | Toggle state hook |
+| File                                                          | Priority | Description                |
+| ------------------------------------------------------------- | -------- | -------------------------- |
+| `src/app/(app)/dashboard/collection/(collection)/page.tsx`    | Low      | Page entry point           |
+| `src/app/(app)/dashboard/collection/(collection)/loading.tsx` | Low      | Page loading state         |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts`            | Medium   | General bobblehead queries |
+| `src/lib/db/schema/bobbleheads.schema.ts`                     | Low      | Database schema            |
+| `src/hooks/use-user-preferences.ts`                           | Medium   | User preferences hook      |
+| `src/hooks/use-server-action.ts`                              | Medium   | Server action wrapper      |
+| `src/hooks/use-toggle.ts`                                     | Low      | Toggle state hook          |
 
 #### UI Components (Reusable)
 
-| File | Priority | Description |
-|------|----------|-------------|
-| `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx` | Medium | Delete confirmation dialog |
-| `src/components/ui/button.tsx` | Low | Button component |
-| `src/components/ui/input.tsx` | Low | Input component |
-| `src/components/ui/dropdown-menu.tsx` | Low | Dropdown menu |
-| `src/components/ui/checkbox.tsx` | Low | Checkbox component |
-| `src/components/ui/select.tsx` | Low | Select component |
-| `src/components/ui/hover-card.tsx` | Low | Hover card component |
+| File                                                              | Priority | Description                |
+| ----------------------------------------------------------------- | -------- | -------------------------- |
+| `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx` | Medium   | Delete confirmation dialog |
+| `src/components/ui/button.tsx`                                    | Low      | Button component           |
+| `src/components/ui/input.tsx`                                     | Low      | Input component            |
+| `src/components/ui/dropdown-menu.tsx`                             | Low      | Dropdown menu              |
+| `src/components/ui/checkbox.tsx`                                  | Low      | Checkbox component         |
+| `src/components/ui/select.tsx`                                    | Low      | Select component           |
+| `src/components/ui/hover-card.tsx`                                | Low      | Hover card component       |
 
 ### Existing Test Files (10 files)
 
 #### Component Tests
 
-| File | What It Tests |
-|------|---------------|
-| `tests/components/home/display/featured-bobblehead-display.test.tsx` | Featured bobblehead rendering |
-| `tests/components/home/display/trending-bobbleheads-display.test.tsx` | Trending bobbleheads rendering |
-| `tests/components/home/sections/trending-bobbleheads-section.test.tsx` | Trending section component |
-| `tests/components/home/skeleton/featured-bobblehead-skeleton.test.tsx` | Skeleton loading states |
-| `tests/components/home/skeleton/trending-bobbleheads-skeleton.test.tsx` | Skeleton loading states |
+| File                                                                    | What It Tests                  |
+| ----------------------------------------------------------------------- | ------------------------------ |
+| `tests/components/home/display/featured-bobblehead-display.test.tsx`    | Featured bobblehead rendering  |
+| `tests/components/home/display/trending-bobbleheads-display.test.tsx`   | Trending bobbleheads rendering |
+| `tests/components/home/sections/trending-bobbleheads-section.test.tsx`  | Trending section component     |
+| `tests/components/home/skeleton/featured-bobblehead-skeleton.test.tsx`  | Skeleton loading states        |
+| `tests/components/home/skeleton/trending-bobbleheads-skeleton.test.tsx` | Skeleton loading states        |
 
 #### Unit Tests
 
-| File | What It Tests |
-|------|---------------|
+| File                                                        | What It Tests           |
+| ----------------------------------------------------------- | ----------------------- |
 | `tests/unit/lib/validations/bobbleheads.validation.test.ts` | Validation schema tests |
 
 #### Integration Tests
 
-| File | What It Tests |
-|------|---------------|
+| File                                                               | What It Tests                          |
+| ------------------------------------------------------------------ | -------------------------------------- |
 | `tests/integration/facades/bobbleheads/bobbleheads.facade.test.ts` | Facade integration with Testcontainers |
 
 ### Test Infrastructure Files
 
-| File | Purpose |
-|------|---------|
-| `tests/fixtures/bobblehead.factory.ts` | createTestBobblehead, createTestBobbleheads, etc. |
-| `tests/mocks/data/bobbleheads.mock.ts` | mockBobblehead, createMockBobblehead, etc. |
-| `tests/mocks/data/collections.mock.ts` | Collection mock data |
-| `tests/mocks/data/collections-dashboard.mock.ts` | Dashboard mock data |
-| `tests/mocks/handlers/bobbleheads.handlers.ts` | MSW handlers for bobbleheads |
-| `tests/mocks/handlers/collections.handlers.ts` | MSW handlers for collections |
+| File                                             | Purpose                                           |
+| ------------------------------------------------ | ------------------------------------------------- |
+| `tests/fixtures/bobblehead.factory.ts`           | createTestBobblehead, createTestBobbleheads, etc. |
+| `tests/mocks/data/bobbleheads.mock.ts`           | mockBobblehead, createMockBobblehead, etc.        |
+| `tests/mocks/data/collections.mock.ts`           | Collection mock data                              |
+| `tests/mocks/data/collections-dashboard.mock.ts` | Dashboard mock data                               |
+| `tests/mocks/handlers/bobbleheads.handlers.ts`   | MSW handlers for bobbleheads                      |
+| `tests/mocks/handlers/collections.handlers.ts`   | MSW handlers for collections                      |
 
 ## Architecture Insights
 
 ### Data Fetching Flow
+
 ```
 Server Component (BobbleheadGridAsync)
     ↓
@@ -130,16 +131,19 @@ Database (Drizzle ORM)
 ```
 
 ### URL State Management
+
 - Uses `nuqs` for type-safe URL state
 - Parsers in `route-type.ts`
 - Search, filters, sort, page, pageSize params
 
 ### Selection & Bulk Operations
+
 - Client-side Set-based selection tracking
 - Bulk actions via server actions
 - Confirmation dialogs for destructive operations
 
 ### Existing Test Patterns Found
+
 - Skeleton component tests
 - Display component tests with mock data
 - Section component tests

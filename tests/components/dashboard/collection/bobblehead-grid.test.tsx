@@ -174,7 +174,6 @@ describe('BobbleheadGrid', () => {
       const containerElement = container.querySelector('[data-slot="bobblehead-grid-container"]');
       expect(containerElement).toBeInTheDocument();
 
-       
       const emptyWrapper = containerElement!.firstElementChild;
 
       expect(emptyWrapper).toHaveClass('flex');

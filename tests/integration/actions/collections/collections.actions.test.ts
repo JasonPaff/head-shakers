@@ -127,9 +127,8 @@ vi.mock('@clerk/nextjs/server', () => ({
 }));
 
 // Import actions AFTER all mocks are set up
-const { createCollectionAction, deleteCollectionAction, updateCollectionAction } = await import(
-  '@/lib/actions/collections/collections.actions'
-);
+const { createCollectionAction, deleteCollectionAction, updateCollectionAction } =
+  await import('@/lib/actions/collections/collections.actions');
 
 describe('Collections Actions Integration Tests', () => {
   let testUser: Awaited<ReturnType<typeof createTestUser>>;

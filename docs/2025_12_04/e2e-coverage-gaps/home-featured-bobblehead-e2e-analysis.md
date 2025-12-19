@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-| Metric | Value |
-| --- | --- |
-| **Source Files Analyzed** | 6 |
-| **Existing E2E Tests** | 2 test files (14 tests total) |
-| **Test Coverage Type** | Mixed (section visibility, navigation, auth state) |
-| **E2E Gaps Identified** | 12 critical gaps |
-| **Estimated New E2E Tests** | 15-18 tests |
+| Metric                      | Value                                              |
+| --------------------------- | -------------------------------------------------- |
+| **Source Files Analyzed**   | 6                                                  |
+| **Existing E2E Tests**      | 2 test files (14 tests total)                      |
+| **Test Coverage Type**      | Mixed (section visibility, navigation, auth state) |
+| **E2E Gaps Identified**     | 12 critical gaps                                   |
+| **Estimated New E2E Tests** | 15-18 tests                                        |
 
 ---
 
@@ -65,18 +65,19 @@
 **Purpose**: Public (unauthenticated) home page E2E tests
 **Tests**: 8 tests total
 
-| Test Name | What It Tests | Coverage Type |
-| --- | --- | --- |
-| Hero section visibility | Hero section renders | Visibility |
-| Platform statistics | Stats load within hero | Visibility + Async |
-| Featured collections section | Collections section visible | Visibility |
-| Trending bobbleheads section | Trending section visible | Visibility |
-| Join community section | Community section renders | Visibility |
-| Browse collections navigation | Clicks browse button | Navigation |
-| Explore bobbleheads navigation | Clicks explore bobbleheads button | Navigation |
-| All sections in correct order | All sections present | Layout/Order |
+| Test Name                      | What It Tests                     | Coverage Type      |
+| ------------------------------ | --------------------------------- | ------------------ |
+| Hero section visibility        | Hero section renders              | Visibility         |
+| Platform statistics            | Stats load within hero            | Visibility + Async |
+| Featured collections section   | Collections section visible       | Visibility         |
+| Trending bobbleheads section   | Trending section visible          | Visibility         |
+| Join community section         | Community section renders         | Visibility         |
+| Browse collections navigation  | Clicks browse button              | Navigation         |
+| Explore bobbleheads navigation | Clicks explore bobbleheads button | Navigation         |
+| All sections in correct order  | All sections present              | Layout/Order       |
 
 **Featured Bobblehead Specific**: Very limited coverage
+
 - Verifies hero section is visible
 - Does NOT interact with featured bobblehead card
 - Does NOT verify featured bobblehead image loads
@@ -88,18 +89,19 @@
 **Purpose**: Authenticated home page E2E tests
 **Tests**: 6 tests total
 
-| Test Name | What It Tests | Coverage Type |
-| --- | --- | --- |
-| Hero section with My Collection button | Auth state shows My Collection | Auth + Visibility |
-| Navigate to dashboard | Clicks My Collection in hero | Navigation |
-| Join community auth state | Auth state in community section | Auth |
-| Join community navigation | Clicks My Collection in community | Navigation |
-| Featured collections section | Collections section visible | Visibility |
-| Trending section | Trending section visible | Visibility |
-| Auth state throughout page | User avatar visible after scroll | Auth State |
-| All sections in order | Sections present for authenticated | Layout/Order |
+| Test Name                              | What It Tests                      | Coverage Type     |
+| -------------------------------------- | ---------------------------------- | ----------------- |
+| Hero section with My Collection button | Auth state shows My Collection     | Auth + Visibility |
+| Navigate to dashboard                  | Clicks My Collection in hero       | Navigation        |
+| Join community auth state              | Auth state in community section    | Auth              |
+| Join community navigation              | Clicks My Collection in community  | Navigation        |
+| Featured collections section           | Collections section visible        | Visibility        |
+| Trending section                       | Trending section visible           | Visibility        |
+| Auth state throughout page             | User avatar visible after scroll   | Auth State        |
+| All sections in order                  | Sections present for authenticated | Layout/Order      |
 
 **Featured Bobblehead Specific**: Minimal coverage
+
 - Only verifies hero section is visible
 - Does NOT interact with featured bobblehead card
 - Does NOT verify featured bobblehead renders when authenticated
@@ -111,14 +113,15 @@
 
 ```typescript
 // General
-heroSection          // Hero section container
-platformStats        // Platform stats display
+heroSection; // Hero section container
+platformStats; // Platform stats display
 
 // Newsletter (footer-related)
-newsletterSection    // Newsletter subscription area
+newsletterSection; // Newsletter subscription area
 ```
 
 **Missing Locators** that would help test featured bobblehead:
+
 - No featured bobblehead card locator
 - No featured bobblehead image locator
 - No featured bobblehead stats locators (likes, views)
@@ -137,6 +140,7 @@ newsletterSection    // Newsletter subscription area
 **Risk**: High - Featured bobblehead is a key hero element visible to all users
 
 **What's NOT tested**:
+
 - Featured bobblehead card renders on page load
 - Featured bobblehead card is visible without scrolling (or within viewport)
 - Featured bobblehead card renders with proper layout (left/right grid positioning)
@@ -184,6 +188,7 @@ Feature: Featured Bobblehead Display on Home Hero
 **Risk**: Critical - Featured bobblehead card is a primary CTA linking to detail page
 
 **What's NOT tested**:
+
 - Clicking featured bobblehead card navigates to bobblehead detail page
 - Navigation URL contains correct bobblehead slug
 - Featured bobblehead card link is properly accessible (keyboard navigation)
@@ -226,6 +231,7 @@ Feature: Featured Bobblehead Navigation
 **Risk**: Medium-High - Visual elements with data that should render consistently
 
 **What's NOT tested**:
+
 - "Top Rated This Week" floating card renders and animates
 - "Value Growth" floating card renders with correct data/percentage
 - Floating cards animate with correct timing (different durations)
@@ -271,6 +277,7 @@ Feature: Featured Bobblehead Floating Cards
 **Risk**: High - User experience during data fetch is critical
 
 **What's NOT tested**:
+
 - Skeleton/loading state shows while featured bobblehead data is fetching
 - Skeleton has proper accessibility (aria-busy, aria-label)
 - Skeleton renders all expected placeholder elements
@@ -324,6 +331,7 @@ Feature: Featured Bobblehead Loading States
 **Risk**: Medium - User engagement metrics should display correctly
 
 **What's NOT tested**:
+
 - Large numbers (1000+) are formatted with commas in E2E context
 - Like count displays with heart icon
 - View count displays with eye icon
@@ -370,6 +378,7 @@ Feature: Featured Bobblehead Stats Display
 **Risk**: Medium - Badge identifies featured content type
 
 **What's NOT tested**:
+
 - Editor's Pick badge renders on featured bobblehead card
 - Badge displays "Editor's Pick" text
 - Crown icon renders next to badge text
@@ -407,6 +416,7 @@ Feature: Editor's Pick Badge
 **Risk**: Medium - Description provides context for featured bobblehead
 
 **What's NOT tested**:
+
 - Description text renders when available
 - Description text is hidden when null/empty
 - Description positioning and styling
@@ -423,6 +433,7 @@ Feature: Editor's Pick Badge
 **Risk**: Medium - Grid layout breaks on responsive sizes
 
 **What's NOT tested**:
+
 - Featured bobblehead renders on right side of grid on desktop
 - Featured bobblehead stacks below text on tablet/mobile
 - Featured bobblehead image aspect ratio maintains on resize
@@ -466,6 +477,7 @@ Feature: Hero Section Responsive Layout
 **Risk**: Medium - Visual issues in specific browsers
 
 **What's NOT tested**:
+
 - Featured bobblehead renders consistently across browsers
 - Image loading works in all browsers
 - Gradient overlays display correctly
@@ -485,6 +497,7 @@ Feature: Hero Section Responsive Layout
 **Risk**: Medium - Featured bobblehead should render identically for auth/unauth users
 
 **What's NOT tested**:
+
 - Featured bobblehead renders identically for authenticated and unauthenticated users
 - Featured bobblehead click-through works for both states
 - Featured bobblehead doesn't show private/user-specific data
@@ -499,6 +512,7 @@ Feature: Hero Section Responsive Layout
 **Risk**: Low-Medium - Performance perception affects UX
 
 **What's NOT tested**:
+
 - Featured bobblehead image loads within reasonable time
 - Blur placeholder displays before image fully loads
 - Image dimensions and alt text are correct
@@ -515,6 +529,7 @@ Feature: Hero Section Responsive Layout
 **Risk**: Low - User should see featured bobblehead on initial page load
 
 **What's NOT tested**:
+
 - Featured bobblehead is visible in initial viewport (no scroll needed)
 - Featured bobblehead visibility on different screen heights
 - Scroll position doesn't cause featured bobblehead to be cut off
@@ -525,14 +540,14 @@ Feature: Hero Section Responsive Layout
 
 ## Coverage Matrix
 
-| Source File | Current E2E Coverage | Gap Status | Priority |
-| --- | --- | --- | --- |
-| `src/app/(app)/(home)/page.tsx` | Partial (section visibility) | Partial | N/A |
-| `src/app/(app)/(home)/components/sections/hero-section.tsx` | Partial (section visibility) | Partial | High |
-| `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx` | None | Critical | Critical |
-| `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx` | Partial (loading state) | Partial | High |
-| `src/lib/facades/featured-content/featured-content.facade.ts` | Integration tests exist (not E2E) | N/A | N/A |
-| `src/lib/queries/featured-content/featured-content-query.ts` | Integration tests exist (not E2E) | N/A | N/A |
+| Source File                                                               | Current E2E Coverage              | Gap Status | Priority |
+| ------------------------------------------------------------------------- | --------------------------------- | ---------- | -------- |
+| `src/app/(app)/(home)/page.tsx`                                           | Partial (section visibility)      | Partial    | N/A      |
+| `src/app/(app)/(home)/components/sections/hero-section.tsx`               | Partial (section visibility)      | Partial    | High     |
+| `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx` | None                              | Critical   | Critical |
+| `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx`     | Partial (loading state)           | Partial    | High     |
+| `src/lib/facades/featured-content/featured-content.facade.ts`             | Integration tests exist (not E2E) | N/A        | N/A      |
+| `src/lib/queries/featured-content/featured-content-query.ts`              | Integration tests exist (not E2E) | N/A        | N/A      |
 
 ---
 
@@ -543,8 +558,8 @@ Feature: Hero Section Responsive Layout
 **Current locators** in `tests/e2e/pages/home.page.ts`:
 
 ```typescript
-heroSection              // Container
-platformStats           // Stats display
+heroSection; // Container
+platformStats; // Stats display
 ```
 
 **Recommended new locators** for featured bobblehead testing:
@@ -591,6 +606,7 @@ get featuredBobbleheadValueGrowthCard(): Locator {
 ### Test Fixtures and Data
 
 **Available factories** in `tests/fixtures/`:
+
 - `featured-content.factory.ts` - createTestFeaturedBobbleheadContent()
 - `bobblehead.factory.ts` - createTestBobblehead()
 - `collection.factory.ts` - createTestCollection()
@@ -601,6 +617,7 @@ These can be used to set up test data before E2E tests run.
 ### MSW Mocks
 
 **Current mocks** available:
+
 - API mocks in `tests/mocks/` can intercept featured content API calls if needed
 
 ---
@@ -679,9 +696,7 @@ test('should render featured bobblehead card in hero section', async ({ page, fi
 ### Test 2: Featured Bobblehead Navigation
 
 ```typescript
-test('should navigate to bobblehead detail page when clicking featured card', async ({
-  page,
-}) => {
+test('should navigate to bobblehead detail page when clicking featured card', async ({ page }) => {
   const homePage = new HomePage(page);
   await homePage.goto();
 
@@ -691,10 +706,7 @@ test('should navigate to bobblehead detail page when clicking featured card', as
   const featuredCard = homePage.featuredBobbleheadCard;
 
   // Listen for navigation
-  await Promise.all([
-    page.waitForURL(/\/bobbleheads\/[^/]+/),
-    featuredCard.click(),
-  ]);
+  await Promise.all([page.waitForURL(/\/bobbleheads\/[^/]+/), featuredCard.click()]);
 
   // Verify URL changed
   expect(page.url()).toMatch(/\/bobbleheads\//);
@@ -767,9 +779,7 @@ test('should display formatted stats with icons', async ({ page }) => {
 ### Test 6: Responsive Layout
 
 ```typescript
-test('should display featured bobblehead in correct grid position on desktop', async ({
-  page,
-}) => {
+test('should display featured bobblehead in correct grid position on desktop', async ({ page }) => {
   // Set desktop viewport
   await page.setViewportSize({ width: 1280, height: 800 });
 
@@ -866,22 +876,22 @@ test('should handle missing featured bobblehead gracefully', async ({ page }) =>
 
 ## Gap Summary Table
 
-| Gap # | Category | Description | Priority | Estimated Tests | Status |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Visibility | Featured bobblehead card rendering | Critical | 3 | NOT TESTED |
-| 2 | Navigation | Featured bobblehead click-through | Critical | 3 | NOT TESTED |
-| 3 | Visual | Floating cards animation/display | High | 2 | NOT TESTED |
-| 4 | UX | Loading states and skeletons | Critical | 3-4 | PARTIAL |
-| 5 | Display | Stats formatting and icons | High | 2 | NOT TESTED |
-| 6 | Visual | Editor's Pick badge | High | 2 | NOT TESTED |
-| 7 | Display | Description text render/hide | Medium | 1 | NOT TESTED |
-| 8 | Responsive | Layout breakpoints (desktop/mobile) | High | 3 | NOT TESTED |
-| 9 | Browser | Cross-browser compatibility | Medium | 0* | NOT TESTED |
-| 10 | Auth | Authentication state consistency | Medium | 1 | NOT TESTED |
-| 11 | Performance | Image loading and CLS | Medium | 1 | NOT TESTED |
-| 12 | UX | Scroll and viewport positioning | Low | 1 | NOT TESTED |
+| Gap # | Category    | Description                         | Priority | Estimated Tests | Status     |
+| ----- | ----------- | ----------------------------------- | -------- | --------------- | ---------- |
+| 1     | Visibility  | Featured bobblehead card rendering  | Critical | 3               | NOT TESTED |
+| 2     | Navigation  | Featured bobblehead click-through   | Critical | 3               | NOT TESTED |
+| 3     | Visual      | Floating cards animation/display    | High     | 2               | NOT TESTED |
+| 4     | UX          | Loading states and skeletons        | Critical | 3-4             | PARTIAL    |
+| 5     | Display     | Stats formatting and icons          | High     | 2               | NOT TESTED |
+| 6     | Visual      | Editor's Pick badge                 | High     | 2               | NOT TESTED |
+| 7     | Display     | Description text render/hide        | Medium   | 1               | NOT TESTED |
+| 8     | Responsive  | Layout breakpoints (desktop/mobile) | High     | 3               | NOT TESTED |
+| 9     | Browser     | Cross-browser compatibility         | Medium   | 0\*             | NOT TESTED |
+| 10    | Auth        | Authentication state consistency    | Medium   | 1               | NOT TESTED |
+| 11    | Performance | Image loading and CLS               | Medium   | 1               | NOT TESTED |
+| 12    | UX          | Scroll and viewport positioning     | Low      | 1               | NOT TESTED |
 
-*Browser testing deferred - requires setup.
+\*Browser testing deferred - requires setup.
 
 ---
 
@@ -931,6 +941,7 @@ Featured bobblehead is fetched server-side via `FeaturedBobbleheadAsync`:
 ```
 
 Tests must:
+
 - Wait for async data to load (use `page.waitForTimeout(2000)` or wait for specific element)
 - Handle skeleton display during initial load
 - Verify final content renders after async completes
@@ -961,6 +972,7 @@ E2E tests don't need to worry about cache - they test actual rendered output.
 ### Database Filtering
 
 Query filters featured bobbleheads by:
+
 - `isActive = true`
 - `contentType = 'bobblehead'`
 - Date range validation (startDate, endDate)
@@ -972,6 +984,7 @@ Test fixtures should use `createTestFeaturedBobbleheadContent()` with appropriat
 ### Responsive Design
 
 Hero section uses:
+
 - Desktop (lg breakpoint, 1024px+): 2-column grid layout
 - Mobile/Tablet (< 1024px): Stack vertically
 

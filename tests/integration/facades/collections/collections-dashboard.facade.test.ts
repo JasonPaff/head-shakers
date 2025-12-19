@@ -441,9 +441,8 @@ describe('CollectionsDashboardFacade Integration Tests', () => {
   describe('Error handling and Sentry integration', () => {
     it('should propagate error context when query fails', async () => {
       // Arrange - Mock query to throw an error
-      const { CollectionsDashboardQuery } = await import(
-        '@/lib/queries/collections/collections-dashboard.query'
-      );
+      const { CollectionsDashboardQuery } =
+        await import('@/lib/queries/collections/collections-dashboard.query');
       const originalMethod =
         CollectionsDashboardQuery.getHeaderByCollectionSlugAsync.bind(CollectionsDashboardQuery);
 

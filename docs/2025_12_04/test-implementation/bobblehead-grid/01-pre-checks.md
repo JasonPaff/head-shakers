@@ -20,11 +20,13 @@
 - **Risk Assessment**: Critical - Core collection dashboard feature
 
 ### Test Breakdown
+
 - **Unit Tests**: 20-25 tests (URL parsers, pure utilities)
 - **Component Tests**: 81-95 tests (UI components, interactions, accessibility)
 - **Integration Tests**: 32-43 tests (Query layer, facade, server actions)
 
 ### Critical Risk Areas
+
 1. BobbleheadGridDisplay - Complex state orchestration with 11+ state variables
 2. BobbleheadCard - Selection mode, hover cards, accessibility, condition variants
 3. BobbleheadsDashboardQuery - Complex subqueries for stats aggregation
@@ -34,21 +36,25 @@
 ## Prerequisites Validation
 
 ### Existing Fixtures (Available)
+
 - `tests/fixtures/bobblehead.factory.ts` - createTestBobblehead(), createTestBobbleheads(), createTestFeaturedBobblehead()
 - `tests/fixtures/collection.factory.ts` - createTestCollection()
 - `tests/fixtures/user.factory.ts` - createTestUser()
 
 ### Existing Mocks (Available)
+
 - `tests/mocks/data/bobbleheads.mock.ts` - mockBobblehead, createMockBobblehead(), createMockBobbleheads()
 - MSW handlers available
 
 ### Test Infrastructure (Available)
+
 - `tests/setup/test-db.ts` - Testcontainers database setup
 - `tests/setup/mock-environment.ts` - Environment variable mocking
 - `tests/setup/vitest.setup.ts` - Vitest configuration
 - `tests/setup/msw.setup.ts` - MSW configuration
 
 ### New Infrastructure Needed (To Be Created)
+
 1. `tests/fixtures/bobblehead-grid.factory.ts` - Mock dashboard record factory
 2. `tests/mocks/hooks/use-user-preferences.mock.ts` - User preferences hook mock
 3. `tests/mocks/hooks/use-server-action.mock.ts` - Server action hook mock
@@ -59,15 +65,18 @@
 ## Implementation Plan
 
 ### Phase 1: Test Infrastructure Setup (3 steps)
+
 - Step 1.1: Create bobblehead grid factory
 - Step 1.2: Create hook mocks
 - Step 1.3: Extend mock environment setup
 
 ### Phase 2: Unit Tests (2 steps)
+
 - Step 2.1: URL parser tests (route-type.ts)
 - Step 2.2: Pagination helper tests (getPageNumbers)
 
 ### Phase 3: Component Tests (6 steps)
+
 - Step 3.1: BobbleheadGrid component tests
 - Step 3.2: BulkActionsBar component tests
 - Step 3.3: BobbleheadPagination component tests
@@ -76,6 +85,7 @@
 - Step 3.6: BobbleheadGridDisplay component tests
 
 ### Phase 4: Integration Tests (3 steps)
+
 - Step 4.1: BobbleheadsDashboardQuery integration tests
 - Step 4.2: BobbleheadsDashboardFacade integration tests
 - Step 4.3: Bobblehead server actions integration tests

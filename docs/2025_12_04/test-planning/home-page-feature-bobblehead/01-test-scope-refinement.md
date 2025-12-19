@@ -42,6 +42,7 @@ The home page featured bobblehead section requires E2E testing covering the comp
 ## Refined Test Scope Summary
 
 ### Source Files Identified
+
 - `src/app/(app)/(home)/page.tsx` - Home page route
 - `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx` - Server component
 - `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx` - Client component
@@ -50,6 +51,7 @@ The home page featured bobblehead section requires E2E testing covering the comp
 - `src/lib/services/cache.service.ts` - Redis caching service
 
 ### E2E Test Areas
+
 1. **UI Rendering**: Featured bobblehead card, hero section, Cloudinary images, metadata display
 2. **User Interactions**: Card click navigation, hover effects, badge display
 3. **Data Operations**: PostgreSQL fetch, Drizzle ORM joins, Redis caching, Cloudinary URLs

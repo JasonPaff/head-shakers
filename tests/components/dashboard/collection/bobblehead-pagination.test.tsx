@@ -162,7 +162,6 @@ describe('BobbleheadPagination', () => {
     it('should return null when totalCount is 0', () => {
       const { container } = render(<BobbleheadPagination {...defaultProps} totalCount={0} />);
 
-       
       expect(container.firstChild).toBeNull();
     });
   });

@@ -11,6 +11,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Featured bobblehead card renders in hero section
 
 **What Needs Testing**:
+
 - [ ] Card is visible on page load
 - [ ] Card appears after async component loads
 - [ ] Card image renders without broken state
@@ -19,6 +20,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Card is not hidden or cropped
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 33-158)
 - `featured-bobblehead-async.tsx` (lines 6-11)
 
@@ -39,6 +41,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Clicking featured bobblehead navigates to detail page
 
 **What Needs Testing**:
+
 - [ ] Click on card triggers navigation
 - [ ] URL contains correct bobblehead slug
 - [ ] Navigation URL matches expected pattern `/bobbleheads/[slug]`
@@ -47,6 +50,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Keyboard activation (Enter key) works
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 37-46)
 - `hero-section.tsx` (lines 154-158)
 
@@ -67,6 +71,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Top Rated and Value Growth floating cards render
 
 **What Needs Testing**:
+
 - [ ] Top Rated card is visible
 - [ ] "Top Rated" and "This Week" text displays
 - [ ] Trophy icon renders in Top Rated card
@@ -78,6 +83,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Cards respect motion-reduce preference
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 114-155)
 
 **Test File**: `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
@@ -97,6 +103,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Skeleton and loading states during data fetch
 
 **What Needs Testing**:
+
 - [ ] Skeleton displays while loading
 - [ ] Skeleton has aria-busy="true"
 - [ ] Skeleton has descriptive aria-label
@@ -107,6 +114,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Page doesn't break if featured bobblehead returns null
 
 **Components Affected**:
+
 - `featured-bobblehead-skeleton.tsx`
 - `hero-section.tsx` (lines 154-158)
 - `featured-bobblehead-async.tsx` (lines 6-11)
@@ -128,6 +136,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Like and view count stats display and format correctly
 
 **What Needs Testing**:
+
 - [ ] Like count displays
 - [ ] View count displays
 - [ ] Large numbers (1000+) have comma formatting
@@ -140,6 +149,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Stats update if featured bobblehead changes
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 99-109)
 
 **Test File**: `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
@@ -159,6 +169,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Editor's Pick badge displays with correct styling
 
 **What Needs Testing**:
+
 - [ ] Badge text "Editor's Pick" is visible
 - [ ] Crown icon displays
 - [ ] Badge has distinctive styling
@@ -167,6 +178,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Badge visible on all screen sizes
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 80-88)
 
 **Test File**: `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
@@ -186,6 +198,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Description text displays when available
 
 **What Needs Testing**:
+
 - [ ] Description renders when available
 - [ ] Description hidden when null/empty
 - [ ] Description text is readable
@@ -194,6 +207,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Long description text wraps correctly
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 94-97)
 
 **Test File**: `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
@@ -215,6 +229,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **What Needs Testing**:
 
 **Desktop (1280px+)**:
+
 - [ ] 2-column grid layout
 - [ ] Featured card on right side
 - [ ] Text content on left side
@@ -222,6 +237,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] No horizontal scroll
 
 **Mobile (375px)**:
+
 - [ ] Single column (stacked) layout
 - [ ] Featured card full width
 - [ ] Featured card below text content
@@ -229,10 +245,12 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Content readable without zoom
 
 **Tablet (768px)**:
+
 - [ ] Proper intermediate layout
 - [ ] Featured card visible
 
 **Components Affected**:
+
 - `hero-section.tsx` (lines 50-52)
 - `featured-bobblehead-display.tsx` (lines 33-34)
 
@@ -253,6 +271,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Featured bobblehead renders consistently across browsers
 
 **What Needs Testing**:
+
 - [ ] Chrome/Chromium
 - [ ] Firefox
 - [ ] Safari
@@ -279,6 +298,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Featured bobblehead renders identically for auth/unauth users
 
 **What Needs Testing**:
+
 - [ ] Card renders for authenticated users
 - [ ] Card renders for unauthenticated users
 - [ ] Content is identical in both states
@@ -287,6 +307,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Navigation works in both states
 
 **Components Affected**:
+
 - `hero-section.tsx` (lines 154-158)
 - `featured-bobblehead-async.tsx` (all)
 
@@ -307,6 +328,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Errors handled gracefully when featured bobblehead fails
 
 **What Needs Testing**:
+
 - [ ] Error boundary catches errors
 - [ ] Page doesn't show white screen
 - [ ] Rest of page works if featured bobblehead fails
@@ -315,6 +337,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] API errors handled
 
 **Components Affected**:
+
 - `hero-section.tsx` (lines 154-158)
 - `featured-bobblehead-async.tsx` (lines 8)
 
@@ -335,6 +358,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 **Description**: Featured bobblehead image loads within acceptable time
 
 **What Needs Testing**:
+
 - [ ] Image loads within 5 seconds
 - [ ] Blur placeholder displays during load
 - [ ] Image dimensions are correct
@@ -343,6 +367,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - [ ] Image doesn't cause layout shift (CLS)
 
 **Components Affected**:
+
 - `featured-bobblehead-display.tsx` (lines 48-74)
 
 **Test File**: `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
@@ -357,21 +382,21 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 
 ## Coverage Summary Table
 
-| Gap # | Title | Priority | Tests | Current | Status |
-|-------|-------|----------|-------|---------|--------|
-| 1 | Card Visibility | Critical | 1-2 | None | Not Tested |
-| 2 | Navigation | Critical | 2-3 | None | Not Tested |
-| 3 | Floating Cards | High | 2 | None | Not Tested |
-| 4 | Loading States | Critical | 3-4 | Partial | Partial |
-| 5 | Stats Display | High | 2 | Partial | Not Tested (E2E) |
-| 6 | Badge | High | 1-2 | None | Not Tested |
-| 7 | Description | Medium | 1 | None | Not Tested |
-| 8 | Responsive | High | 3 | None | Not Tested |
-| 9 | Browser Compat | Medium | 0 | None | Deferred |
-| 10 | Auth State | Medium | 1 | None | Not Tested |
-| 11 | Error Handling | Medium | 2 | None | Not Tested |
-| 12 | Performance | Medium | 1 | None | Not Tested |
-| **TOTAL** | | | **17-20** | 0 | |
+| Gap #     | Title           | Priority | Tests     | Current | Status           |
+| --------- | --------------- | -------- | --------- | ------- | ---------------- |
+| 1         | Card Visibility | Critical | 1-2       | None    | Not Tested       |
+| 2         | Navigation      | Critical | 2-3       | None    | Not Tested       |
+| 3         | Floating Cards  | High     | 2         | None    | Not Tested       |
+| 4         | Loading States  | Critical | 3-4       | Partial | Partial          |
+| 5         | Stats Display   | High     | 2         | Partial | Not Tested (E2E) |
+| 6         | Badge           | High     | 1-2       | None    | Not Tested       |
+| 7         | Description     | Medium   | 1         | None    | Not Tested       |
+| 8         | Responsive      | High     | 3         | None    | Not Tested       |
+| 9         | Browser Compat  | Medium   | 0         | None    | Deferred         |
+| 10        | Auth State      | Medium   | 1         | None    | Not Tested       |
+| 11        | Error Handling  | Medium   | 2         | None    | Not Tested       |
+| 12        | Performance     | Medium   | 1         | None    | Not Tested       |
+| **TOTAL** |                 |          | **17-20** | 0       |                  |
 
 ---
 
@@ -380,6 +405,7 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 ### By React Component
 
 **featured-bobblehead-display.tsx** (Client Component)
+
 - Gap 1: Card rendering (lines 33-158)
 - Gap 2: Navigation/link (lines 37-46)
 - Gap 3: Floating cards (lines 114-155)
@@ -389,17 +415,20 @@ Quick lookup reference for all 12 identified gaps in featured bobblehead E2E tes
 - Gap 12: Image loading (lines 48-74)
 
 **featured-bobblehead-async.tsx** (Server Component)
+
 - Gap 4: Loading skeleton fallback (lines 155-157)
 - Gap 10: Auth state (all)
 - Gap 11: Error handling (line 8)
 
 **hero-section.tsx** (Server Component)
+
 - Gap 1: Card visibility (lines 154-158)
 - Gap 4: Suspense boundary (lines 154-158)
 - Gap 8: Responsive layout (lines 50-52)
 - Gap 11: Error boundary (lines 154-158)
 
 **featured-bobblehead-skeleton.tsx** (Component)
+
 - Gap 4: Skeleton rendering
 
 ---
@@ -473,27 +502,28 @@ E2E tests should test the entire stack from `hero-section.tsx` rendering perspec
 ## Common Test Patterns
 
 ### Pattern 1: Wait for Async Component
+
 ```typescript
 const featuredCard = homePage.featuredBobbleheadCard;
 await expect(featuredCard).toBeVisible({ timeout: 10000 });
 ```
 
 ### Pattern 2: Verify Navigation
+
 ```typescript
-await Promise.all([
-  page.waitForURL(/\/bobbleheads\/[^/]+/),
-  featuredCard.click(),
-]);
+await Promise.all([page.waitForURL(/\/bobbleheads\/[^/]+/), featuredCard.click()]);
 expect(page.url()).toMatch(/\/bobbleheads\//);
 ```
 
 ### Pattern 3: Test Responsive
+
 ```typescript
 await page.setViewportSize({ width: 375, height: 667 }); // Mobile
 await page.setViewportSize({ width: 1280, height: 800 }); // Desktop
 ```
 
 ### Pattern 4: Verify Accessibility
+
 ```typescript
 const href = await card.getAttribute('href');
 expect(href).toBeTruthy();
@@ -503,6 +533,7 @@ await page.keyboard.press('Enter');
 ```
 
 ### Pattern 5: Verify Data Display
+
 ```typescript
 const text = await element.textContent();
 expect(text).toMatch(/^\d{1,}(?:,\d{3})*$/); // Comma-formatted numbers
@@ -530,24 +561,28 @@ After implementing all 17 tests, verify:
 ## Quick Reference: What to Test
 
 ### Must Test (Critical)
+
 - Featured card renders
 - Navigation works
 - Loading state displays
 - Stats format correctly
 
 ### Should Test (High)
+
 - Floating cards display
 - Badge displays
 - Responsive layout
 - Description displays
 
 ### Nice to Have (Medium)
+
 - Error handling
 - Auth consistency
 - Performance
 - Description text
 
 ### Can Skip (Low/Deferred)
+
 - Cross-browser testing (requires matrix setup)
 - Dark mode specifics (if covered by component tests)
 
@@ -556,14 +591,17 @@ After implementing all 17 tests, verify:
 ## File Locations
 
 **Analysis Documents**:
+
 - Main analysis: `docs/2025_12_04/e2e-coverage-gaps/home-featured-bobblehead-e2e-analysis.md`
 - Implementation guide: `docs/2025_12_04/e2e-coverage-gaps/test-implementation-guide.md`
 - This reference: `docs/2025_12_04/e2e-coverage-gaps/gap-reference.md`
 
 **Test File to Create**:
+
 - `tests/e2e/specs/feature/home-featured-bobblehead.spec.ts`
 
 **File to Modify**:
+
 - `tests/e2e/pages/home.page.ts` (add featured bobblehead locators)
 
 ---

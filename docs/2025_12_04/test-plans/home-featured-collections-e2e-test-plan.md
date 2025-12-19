@@ -779,12 +779,14 @@ npm run test:e2e -- tests/e2e/specs/public/home-featured-collections.spec.ts --g
 Use this checklist to track progress:
 
 ### Infrastructure (Step 1)
+
 - [ ] Page Object locators added to `home.page.ts`
 - [ ] Helper methods added to `home.page.ts`
 - [ ] TypeScript compilation passes
 - [ ] ESLint passes
 
 ### Critical Priority (Steps 2-5)
+
 - [ ] Display metadata tests (5 tests)
 - [ ] Collection images tests (3 tests)
 - [ ] Navigation tests (4 tests)
@@ -792,15 +794,18 @@ Use this checklist to track progress:
 - [ ] All critical tests pass consistently
 
 ### High Priority (Steps 6-7)
+
 - [ ] State handling tests (3 tests)
 - [ ] Responsive layout tests (5 tests)
 - [ ] All high priority tests pass
 
 ### Medium Priority (Step 8)
+
 - [ ] Accessibility tests (3 tests)
 - [ ] All medium priority tests pass
 
 ### Final Validation
+
 - [ ] All 28 tests pass (5 consecutive runs)
 - [ ] No flaky tests
 - [ ] CI/CD integration complete

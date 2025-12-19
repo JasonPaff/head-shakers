@@ -9,9 +9,11 @@
 ### Display & Metadata Tests
 
 #### Scenario 1.1: Display Collection Cards with Metadata
+
 **Priority**: CRITICAL | **Complexity**: Medium | **File**: `featured-collections.spec.ts`
 
 **Acceptance Criteria**:
+
 - Exactly 6 collection cards render in grid
 - Each card displays title, owner name, avatar, item count, estimated value
 - Likes, views, and comments stats visible with icons
@@ -19,6 +21,7 @@
 - Cards are ordered by featured content priority
 
 **Test Implementation**:
+
 ```typescript
 test('should display 6 collection cards with complete metadata', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -63,21 +66,25 @@ test('should display 6 collection cards with complete metadata', async ({ page, 
 ```
 
 **Related Test Data**:
+
 - Featured collections must have: title, owner, items, value, stats populated
 - Each card uses data from `FeaturedCollectionData` type
 
 ---
 
 #### Scenario 1.2: Verify Trending Badge Display
+
 **Priority**: HIGH | **Complexity**: Low
 
 **Acceptance Criteria**:
+
 - Trending badge visible only for collections where `isTrending: true`
 - Badge displays flame icon and "Trending" text
 - Badge positioned top-right of collection image
 - Non-trending collections don't show badge
 
 **Test Implementation**:
+
 ```typescript
 test('should display trending badge only for trending collections', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -105,15 +112,18 @@ test('should display trending badge only for trending collections', async ({ pag
 ---
 
 #### Scenario 1.3: Verify Image Loading with Blur Placeholder
+
 **Priority**: HIGH | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - Cloudinary image loads progressively with blur placeholder
 - Image aspect ratio maintained (4:3)
 - Placeholder removes when image loads
 - Fallback placeholder shows if image URL invalid
 
 **Test Implementation**:
+
 ```typescript
 test('should load collection image with blur placeholder', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -147,15 +157,18 @@ test('should load collection image with blur placeholder', async ({ page, finder
 ---
 
 #### Scenario 1.4: Verify Placeholder Image Fallback
+
 **Priority**: MEDIUM | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - When no image URL provided, placeholder image displays
 - Placeholder has same layout as normal image
 - Placeholder is from correct CLOUDINARY_PATHS constant
 - No broken image states
 
 **Test Implementation**:
+
 ```typescript
 test('should display placeholder image when no image available', async ({ page, finder }) => {
   // This test requires a featured collection with imageUrl: null
@@ -184,15 +197,18 @@ test('should display placeholder image when no image available', async ({ page, 
 ### Navigation Tests
 
 #### Scenario 2.1: Click Collection Card Navigates to Detail
+
 **Priority**: CRITICAL | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - Clicking collection card navigates to `/collections/[collectionSlug]`
 - URL includes correct slug from `contentSlug` field
 - Detail page loads with content
 - Navigation uses `$path` type-safe routing
 
 **Test Implementation**:
+
 ```typescript
 test('should navigate to collection detail page when clicking card', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -206,10 +222,7 @@ test('should navigate to collection detail page when clicking card', async ({ pa
   expect(href).toMatch(/\/collections\/[a-z0-9\-]+/);
 
   // Wait for navigation and click
-  await Promise.all([
-    page.waitForURL(/\/collections\/[a-z0-9\-]+/, { timeout: 10000 }),
-    firstCard.click()
-  ]);
+  await Promise.all([page.waitForURL(/\/collections\/[a-z0-9\-]+/, { timeout: 10000 }), firstCard.click()]);
 
   // Verify we're on collection detail page
   await expect(page).toHaveURL(/\/collections\/[a-z0-9\-]+/);
@@ -217,21 +230,25 @@ test('should navigate to collection detail page when clicking card', async ({ pa
 ```
 
 **Related Source Code**:
+
 - Line 84-86 of `featured-collections-display.tsx`: Link href definition
 - Uses `$path({ route: '/collections/[collectionSlug]', ... })`
 
 ---
 
 #### Scenario 2.2: Multiple Card Navigation
+
 **Priority**: HIGH | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - Each of 6 cards navigates to correct detail page
 - Different cards navigate to different slugs
 - URL changes match expected collection slugs
 - No cards navigate to wrong page
 
 **Test Implementation**:
+
 ```typescript
 test('should navigate to correct detail page for each collection card', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -251,10 +268,7 @@ test('should navigate to correct detail page for each collection card', async ({
     const expectedHref = await card.getAttribute('href');
 
     // Navigate to collection
-    await Promise.all([
-      page.waitForURL(/\/collections\//),
-      card.click()
-    ]);
+    await Promise.all([page.waitForURL(/\/collections\//), card.click()]);
 
     // Verify correct URL
     const currentUrl = page.url();
@@ -266,15 +280,18 @@ test('should navigate to correct detail page for each collection card', async ({
 ---
 
 #### Scenario 2.3: View All Button Navigation
+
 **Priority**: CRITICAL | **Complexity**: Low
 
 **Acceptance Criteria**:
+
 - "View All Collections" button navigates to `/browse`
 - Button is visible in featured collections section
 - Navigation completes without errors
 - Browse page content loads
 
 **Test Implementation**:
+
 ```typescript
 test('should navigate to browse page from View All button', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -289,10 +306,7 @@ test('should navigate to browse page from View All button', async ({ page }) => 
   expect(href).toContain('/browse');
 
   // Navigate
-  await Promise.all([
-    page.waitForURL(/\/browse/, { timeout: 10000 }),
-    viewAllButton.click()
-  ]);
+  await Promise.all([page.waitForURL(/\/browse/, { timeout: 10000 }), viewAllButton.click()]);
 
   // Verify navigation successful
   await expect(page).toHaveURL(/\/browse/);
@@ -300,6 +314,7 @@ test('should navigate to browse page from View All button', async ({ page }) => 
 ```
 
 **Related Source Code**:
+
 - Line 49 of `featured-collections-section.tsx`: Link component
 - Navigation to `$path({ route: '/browse' })`
 
@@ -308,15 +323,18 @@ test('should navigate to browse page from View All button', async ({ page }) => 
 ### Authentication Tests
 
 #### Scenario 3.1: Unauthenticated Like Display
+
 **Priority**: CRITICAL | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - Unauthenticated users see aggregate likes count
 - No personal like status indicator shown
 - Likes count is consistent with database
 - Same view for all unauthenticated users
 
 **Test Implementation**:
+
 ```typescript
 test('should display aggregate likes for unauthenticated users', async ({ page, finder }) => {
   // This test uses default page fixture (unauthenticated)
@@ -345,6 +363,7 @@ test('should display aggregate likes for unauthenticated users', async ({ page, 
 ```
 
 **Related Source Code**:
+
 - Line 417-425 in `featured-content-query.ts`: Like count aggregate query
 - Query returns `likes: sql<number>` (aggregate count)
 - Query returns `isLiked: sql<boolean>` (user-specific, false when no userId)
@@ -352,15 +371,18 @@ test('should display aggregate likes for unauthenticated users', async ({ page, 
 ---
 
 #### Scenario 3.2: Authenticated Personal Like Status
+
 **Priority**: CRITICAL | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - Authenticated users see personal like status
 - Like status is accurate (liked vs. unliked)
 - Different users see different states for same collection
 - Like status persists across page reloads
 
 **Test Implementation**:
+
 ```typescript
 test('should show personal like status for authenticated user', async ({ userPage, userFinder }) => {
   const homePage = new HomePage(userPage);
@@ -390,6 +412,7 @@ test('should show personal like status for authenticated user', async ({ userPag
 ```
 
 **Related Source Code**:
+
 - Line 444-450 in `featured-content-query.ts`: User-specific like join
 - `isLiked` boolean field is true only if current user liked collection
 - When userId provided: left join to likes with user filter
@@ -398,17 +421,25 @@ test('should show personal like status for authenticated user', async ({ userPag
 ---
 
 #### Scenario 3.3: Like Status Differs by Auth State
+
 **Priority**: HIGH | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - Same collection shows different like status for anon vs. auth users
 - Auth user sees personal status, anon sees only aggregate
 - Cache uses separate keys per user (no data leakage)
 - Facade passes userId correctly to query
 
 **Test Implementation**:
+
 ```typescript
-test('should show different like statuses for authenticated vs unauthenticated', async ({ page, userPage, finder, userFinder }) => {
+test('should show different like statuses for authenticated vs unauthenticated', async ({
+  page,
+  userPage,
+  finder,
+  userFinder,
+}) => {
   // Get likes count as unauthenticated
   const homePage = new HomePage(page);
   await homePage.goto();
@@ -443,15 +474,18 @@ test('should show different like statuses for authenticated vs unauthenticated',
 ### State Handling Tests
 
 #### Scenario 4.1: Loading Skeleton Displays During Fetch
+
 **Priority**: CRITICAL | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - Loading skeleton renders while async component fetches data
 - Skeleton has same layout/spacing as real cards
 - Skeleton disappears when data loads
 - Transition is smooth (no layout shift)
 
 **Test Implementation**:
+
 ```typescript
 test('should display loading skeleton while fetching data', async ({ page, finder }) => {
   // Disable network speed to ensure we see skeleton
@@ -475,21 +509,25 @@ test('should display loading skeleton while fetching data', async ({ page, finde
 ```
 
 **Related Source Code**:
+
 - Line 35-37 of `featured-collections-section.tsx`: Suspense with skeleton fallback
 - `FeaturedCollectionsSkeleton` component in `skeleton/featured-collections-skeleton.tsx`
 
 ---
 
 #### Scenario 4.2: Empty State Displays When No Collections
+
 **Priority**: HIGH | **Complexity**: Low
 
 **Acceptance Criteria**:
+
 - Empty state renders when `collections.length === 0`
 - Shows icon, message, and Browse button
 - Message is clear: "No featured collections available at this time"
 - Browse button navigates to `/browse`
 
 **Test Implementation**:
+
 ```typescript
 test('should display empty state when no collections available', async ({ page, finder }) => {
   // This test requires featured collections to be empty
@@ -501,7 +539,10 @@ test('should display empty state when no collections available', async ({ page, 
   const emptyState = finder.feature('collections-empty-state');
   const collectionCards = finder.feature('collection-card');
 
-  const cardsVisible = await collectionCards.first().isVisible().catch(() => false);
+  const cardsVisible = await collectionCards
+    .first()
+    .isVisible()
+    .catch(() => false);
   const emptyVisible = await emptyState.isVisible().catch(() => false);
 
   if (emptyVisible) {
@@ -519,21 +560,25 @@ test('should display empty state when no collections available', async ({ page, 
 ```
 
 **Related Source Code**:
+
 - Line 25-39 of `featured-collections-display.tsx`: Empty state check and rendering
 - Uses `FeaturedCollectionData` type array length check
 
 ---
 
 #### Scenario 4.3: Error Boundary Catches Rendering Errors
+
 **Priority**: HIGH | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - If async component throws, error boundary catches
 - Error message displays gracefully
 - Page doesn't crash completely
 - Section remains in layout without breaking
 
 **Test Implementation**:
+
 ```typescript
 test('should handle component errors gracefully with error boundary', async ({ page, finder }) => {
   // This test is challenging - requires injection of error
@@ -556,6 +601,7 @@ test('should handle component errors gracefully with error boundary', async ({ p
 ```
 
 **Related Source Code**:
+
 - Line 34-38 of `featured-collections-section.tsx`: ErrorBoundary wrapper
 - `<ErrorBoundary name={'featured-collections'}>`
 
@@ -564,15 +610,18 @@ test('should handle component errors gracefully with error boundary', async ({ p
 ### Responsive Behavior Tests
 
 #### Scenario 5.1: Desktop View Shows 3 Columns
+
 **Priority**: CRITICAL | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - At 1024px+ width, grid displays 3 columns
 - All 6 cards visible
 - Cards align in 3x2 grid layout
 - Spacing maintained
 
 **Test Implementation**:
+
 ```typescript
 test('should display 3 columns on desktop viewport', async ({ page, finder }) => {
   // Set desktop viewport (1280x720)
@@ -605,6 +654,7 @@ test('should display 3 columns on desktop viewport', async ({ page, finder }) =>
 ```
 
 **Related Source Code**:
+
 - Line 43 of `featured-collections-display.tsx`: Grid classes
 - `grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3`
 - Tailwind breakpoints: lg = 1024px
@@ -612,14 +662,17 @@ test('should display 3 columns on desktop viewport', async ({ page, finder }) =>
 ---
 
 #### Scenario 5.2: Tablet View Shows 2 Columns
+
 **Priority**: HIGH | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - At 640-1023px width, grid displays 2 columns
 - All 6 cards visible in 3x2 layout
 - Spacing and gaps maintained
 
 **Test Implementation**:
+
 ```typescript
 test('should display 2 columns on tablet viewport', async ({ page, finder }) => {
   // Set tablet viewport (768x1024)
@@ -650,15 +703,18 @@ test('should display 2 columns on tablet viewport', async ({ page, finder }) => 
 ---
 
 #### Scenario 5.3: Mobile View Shows 1 Column with First 3 Cards
+
 **Priority**: CRITICAL | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - At <640px width, grid displays 1 column
 - Only first 3 cards visible (cards 0, 1, 2)
 - Cards 4, 5, 6 hidden with `hidden md:block`
 - Mobile layout is readable and full-width
 
 **Test Implementation**:
+
 ```typescript
 test('should display 1 column on mobile viewport with only first 3 cards', async ({ page, finder }) => {
   // Set mobile viewport (375x667)
@@ -692,6 +748,7 @@ test('should display 1 column on mobile viewport with only first 3 cards', async
 ```
 
 **Related Source Code**:
+
 - Line 49 of `featured-collections-display.tsx`: Visibility logic
 - `className={index >= 3 ? 'hidden md:block' : undefined}`
 - Cards 0-2: always visible
@@ -702,15 +759,18 @@ test('should display 1 column on mobile viewport with only first 3 cards', async
 ### Accessibility Tests
 
 #### Scenario 6.1: Collection Card Links Keyboard Navigable
+
 **Priority**: CRITICAL | **Complexity**: Medium
 
 **Acceptance Criteria**:
+
 - Tab through cards in order
 - Focus state visible on each card
 - Enter key navigates to collection
 - Outline visible for keyboard users
 
 **Test Implementation**:
+
 ```typescript
 test('should navigate collection cards with keyboard', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -737,31 +797,32 @@ test('should navigate collection cards with keyboard', async ({ page, finder }) 
   // Press Enter on focused card
   const currentHref = await page.evaluate(() => document.activeElement?.getAttribute('href'));
 
-  await Promise.all([
-    page.waitForURL(/\/collections\//),
-    page.keyboard.press('Enter')
-  ]);
+  await Promise.all([page.waitForURL(/\/collections\//), page.keyboard.press('Enter')]);
 
   expect(page.url()).toContain(currentHref);
 });
 ```
 
 **Related Source Code**:
+
 - Line 75-87 of `featured-collections-display.tsx`: Link component
 - Native `Link` component provides keyboard navigation
 
 ---
 
 #### Scenario 6.2: Screen Reader Announces Collection Titles
+
 **Priority**: HIGH | **Complexity**: High
 
 **Acceptance Criteria**:
+
 - Screen readers announce collection title
 - Context provided (e.g., "Featured collection: Title by @Owner")
 - Owner name announced
 - Stats announced with context
 
 **Test Implementation**:
+
 ```typescript
 test('should announce collection titles to screen readers', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -792,14 +853,17 @@ test('should announce collection titles to screen readers', async ({ page, finde
 ---
 
 #### Scenario 6.3: Empty State Screen Reader Friendly
+
 **Priority**: MEDIUM | **Complexity**: Low
 
 **Acceptance Criteria**:
+
 - Empty state message announced clearly
 - Browse button accessible
 - Clear language explaining situation
 
 **Test Implementation**:
+
 ```typescript
 test('should announce empty state to screen readers', async ({ page, finder }) => {
   const homePage = new HomePage(page);
@@ -895,9 +959,11 @@ WHERE fc.content_type = 'collection';
 ## Common Test Issues & Solutions
 
 ### Issue 1: Tests Flake Due to Async Data Loading
+
 **Symptom**: Tests pass sometimes, fail other times
 
 **Solution**: Use proper waits
+
 ```typescript
 // BAD: Hard wait
 await page.waitForTimeout(2000);
@@ -907,18 +973,22 @@ await expect(finder.feature('collection-card').first()).toBeVisible({ timeout: 1
 ```
 
 ### Issue 2: Mobile Viewport Tests Fail
+
 **Symptom**: `setViewportSize` doesn't apply responsive classes
 
 **Solution**: Reload page after viewport change
+
 ```typescript
 await page.setViewportSize({ width: 375, height: 667 });
 await homePage.goto(); // Reload to apply responsive styles
 ```
 
 ### Issue 3: Grid Layout Verification Flakes
+
 **Symptom**: Computing card positions is unreliable
 
 **Solution**: Check computed styles instead
+
 ```typescript
 const grid = page.locator('[data-slot="featured-collections-grid"]');
 const computedStyle = await grid.evaluate((el) => {
@@ -927,9 +997,11 @@ const computedStyle = await grid.evaluate((el) => {
 ```
 
 ### Issue 4: Auth State Not Properly Isolated
+
 **Symptom**: User context leaks between tests
 
 **Solution**: Use separate page fixtures
+
 ```typescript
 // Use userPage fixture (separate context)
 await userPage.goto(...);

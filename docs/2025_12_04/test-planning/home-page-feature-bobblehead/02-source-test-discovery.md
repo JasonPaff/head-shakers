@@ -8,6 +8,7 @@
 ## Input (Refined Scope from Step 1)
 
 Feature area involves:
+
 - Home page route and components
 - Featured bobblehead display (server and client components)
 - Featured content facade and queries
@@ -52,70 +53,79 @@ Use glob patterns and grep to thoroughly search. Return a comprehensive list of 
 ### Discovered Source Files (27 relevant files)
 
 #### Critical Priority (Core Implementation)
-| File Path | Description |
-|-----------|-------------|
-| `src/app/(app)/(home)/page.tsx` | Main home page route, renders HeroSection |
-| `src/app/(app)/(home)/components/sections/hero-section.tsx` | Hero section container with featured bobblehead |
-| `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx` | Client component for featured card display |
-| `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx` | Server component fetching data |
-| `src/lib/facades/featured-content/featured-content.facade.ts` | Business logic with caching |
-| `src/lib/queries/featured-content/featured-content-query.ts` | Database queries with Drizzle ORM |
+
+| File Path                                                                 | Description                                     |
+| ------------------------------------------------------------------------- | ----------------------------------------------- |
+| `src/app/(app)/(home)/page.tsx`                                           | Main home page route, renders HeroSection       |
+| `src/app/(app)/(home)/components/sections/hero-section.tsx`               | Hero section container with featured bobblehead |
+| `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx` | Client component for featured card display      |
+| `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx`     | Server component fetching data                  |
+| `src/lib/facades/featured-content/featured-content.facade.ts`             | Business logic with caching                     |
+| `src/lib/queries/featured-content/featured-content-query.ts`              | Database queries with Drizzle ORM               |
 
 #### High Priority (Supporting)
-| File Path | Description |
-|-----------|-------------|
-| `src/lib/queries/featured-content/featured-content-transformer.ts` | Data transformation |
-| `src/lib/services/cache.service.ts` | Redis + unstable_cache service |
-| `src/lib/services/cache-revalidation.service.ts` | Cache invalidation |
-| `src/app/(app)/(home)/components/skeleton/featured-bobblehead-skeleton.tsx` | Loading skeleton |
+
+| File Path                                                                   | Description                    |
+| --------------------------------------------------------------------------- | ------------------------------ |
+| `src/lib/queries/featured-content/featured-content-transformer.ts`          | Data transformation            |
+| `src/lib/services/cache.service.ts`                                         | Redis + unstable_cache service |
+| `src/lib/services/cache-revalidation.service.ts`                            | Cache invalidation             |
+| `src/app/(app)/(home)/components/skeleton/featured-bobblehead-skeleton.tsx` | Loading skeleton               |
 
 #### Medium Priority (Context/Related)
-| File Path | Description |
-|-----------|-------------|
-| `src/lib/utils/cloudinary.utils.ts` | Cloudinary URL utilities |
-| `src/lib/utils/redis-client.ts` | Redis client operations |
-| `src/lib/constants/cache.ts` | Cache configuration |
-| `src/lib/constants/operations.ts` | Operation name constants |
-| Other home sections (trending, collections, platform stats) | Related components |
+
+| File Path                                                   | Description              |
+| ----------------------------------------------------------- | ------------------------ |
+| `src/lib/utils/cloudinary.utils.ts`                         | Cloudinary URL utilities |
+| `src/lib/utils/redis-client.ts`                             | Redis client operations  |
+| `src/lib/constants/cache.ts`                                | Cache configuration      |
+| `src/lib/constants/operations.ts`                           | Operation name constants |
+| Other home sections (trending, collections, platform stats) | Related components       |
 
 ### Discovered Test Files (14 files)
 
 #### E2E Tests
-| File Path | Description |
-|-----------|-------------|
-| `tests/e2e/specs/public/home-sections.spec.ts` | Public home page E2E tests |
+
+| File Path                                         | Description                       |
+| ------------------------------------------------- | --------------------------------- |
+| `tests/e2e/specs/public/home-sections.spec.ts`    | Public home page E2E tests        |
 | `tests/e2e/specs/user/home-authenticated.spec.ts` | Authenticated home page E2E tests |
-| `tests/e2e/specs/smoke/auth-flow.spec.ts` | Authentication flow smoke tests |
-| `tests/e2e/specs/smoke/health.spec.ts` | Basic health checks |
-| `tests/e2e/pages/home.page.ts` | Home page Page Object |
+| `tests/e2e/specs/smoke/auth-flow.spec.ts`         | Authentication flow smoke tests   |
+| `tests/e2e/specs/smoke/health.spec.ts`            | Basic health checks               |
+| `tests/e2e/pages/home.page.ts`                    | Home page Page Object             |
 
 #### Component Tests
-| File Path | Description |
-|-----------|-------------|
-| `tests/components/home/display/featured-bobblehead-display.test.tsx` | FeaturedBobbleheadDisplay tests |
-| `tests/components/home/sections/hero-section.test.tsx` | HeroSection tests |
-| `tests/components/home/skeleton/featured-bobblehead-skeleton.test.tsx` | Skeleton tests |
+
+| File Path                                                              | Description                     |
+| ---------------------------------------------------------------------- | ------------------------------- |
+| `tests/components/home/display/featured-bobblehead-display.test.tsx`   | FeaturedBobbleheadDisplay tests |
+| `tests/components/home/sections/hero-section.test.tsx`                 | HeroSection tests               |
+| `tests/components/home/skeleton/featured-bobblehead-skeleton.test.tsx` | Skeleton tests                  |
 
 #### Integration Tests
-| File Path | Description |
-|-----------|-------------|
+
+| File Path                                                                    | Description              |
+| ---------------------------------------------------------------------------- | ------------------------ |
 | `tests/integration/facades/featured-content/featured-content.facade.test.ts` | Facade integration tests |
-| `tests/integration/queries/featured-content/featured-content-query.test.ts` | Query integration tests |
+| `tests/integration/queries/featured-content/featured-content-query.test.ts`  | Query integration tests  |
 
 #### Unit Tests
-| File Path | Description |
-|-----------|-------------|
+
+| File Path                                                                      | Description            |
+| ------------------------------------------------------------------------------ | ---------------------- |
 | `tests/unit/lib/queries/featured-content/featured-content-transformer.test.ts` | Transformer unit tests |
 
 #### Fixtures
-| File Path | Description |
-|-----------|-------------|
+
+| File Path                                    | Description              |
+| -------------------------------------------- | ------------------------ |
 | `tests/fixtures/featured-content.factory.ts` | Featured content factory |
-| `tests/fixtures/bobblehead.factory.ts` | Bobblehead factory |
+| `tests/fixtures/bobblehead.factory.ts`       | Bobblehead factory       |
 
 ## Architecture Insights
 
 **Layered Architecture Pattern:**
+
 1. **Route Layer** (`page.tsx`) → Renders sections with Suspense boundaries
 2. **Section Layer** (HeroSection) → Orchestrates async/display components
 3. **Async Layer** (FeaturedBobbleheadAsync) → Server components calling facades
@@ -124,6 +134,7 @@ Use glob patterns and grep to thoroughly search. Return a comprehensive list of 
 6. **Display Layer** (FeaturedBobbleheadDisplay) → Client component for interactivity
 
 **Caching Strategy:**
+
 - Two-tier: Redis (distributed) + Next.js unstable_cache (in-memory)
 - TTL: EXTENDED (4 hours production, 48 minutes development)
 - Cache key: `featured:featured-bobblehead`
@@ -131,12 +142,14 @@ Use glob patterns and grep to thoroughly search. Return a comprehensive list of 
 ## Existing E2E Test Coverage
 
 ### What's Covered:
+
 - Home page visibility checks (public and authenticated)
 - Hero section rendering
 - Platform stats display
 - Basic navigation
 
 ### E2E Test Gaps Identified:
+
 - No specific tests for featured bobblehead card interactions (click, navigation)
 - No tests for Cloudinary image loading
 - No tests for featured bobblehead stats display accuracy

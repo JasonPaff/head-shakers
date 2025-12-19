@@ -89,9 +89,8 @@ describe('CollectionUpsertDialog', () => {
     onSuccessCallback?: (result: { id: string; name: string; slug: string }) => void;
     resetForm?: () => void;
   }) => {
-    const { useCollectionUpsertForm } = await import(
-      '@/components/feature/collections/hooks/use-collection-upsert-form'
-    );
+    const { useCollectionUpsertForm } =
+      await import('@/components/feature/collections/hooks/use-collection-upsert-form');
 
     const resetFormFn = options.resetForm || vi.fn();
 
@@ -205,9 +204,8 @@ describe('CollectionUpsertDialog', () => {
     it('should validate required fields and show errors on submit', async () => {
       const mockForm = createMockForm();
 
-      const { useCollectionUpsertForm } = await import(
-        '@/components/feature/collections/hooks/use-collection-upsert-form'
-      );
+      const { useCollectionUpsertForm } =
+        await import('@/components/feature/collections/hooks/use-collection-upsert-form');
       vi.mocked(useCollectionUpsertForm).mockReturnValue({
         coverImageUrl: undefined,
         form: mockForm as never,

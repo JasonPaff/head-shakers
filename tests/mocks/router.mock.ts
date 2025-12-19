@@ -57,9 +57,9 @@ export const mockRouterWithImplementation = (
  * Creates a router mock that tracks navigation calls
  */
 export const mockRouterWithTracking = (): MockRouterReturn & {
-  calls: Array<{ args: Array<unknown>; method: string; }>;
+  calls: Array<{ args: Array<unknown>; method: string }>;
 } => {
-  const calls: Array<{ args: Array<unknown>; method: string; }> = [];
+  const calls: Array<{ args: Array<unknown>; method: string }> = [];
 
   const trackCall = (method: string) => {
     return vi.fn((...args: Array<unknown>) => {
@@ -75,5 +75,5 @@ export const mockRouterWithTracking = (): MockRouterReturn & {
     push: trackCall('push'),
     refresh: trackCall('refresh'),
     replace: trackCall('replace'),
-  } as MockRouterReturn & { calls: Array<{ args: Array<unknown>; method: string; }> };
+  } as MockRouterReturn & { calls: Array<{ args: Array<unknown>; method: string }> };
 };

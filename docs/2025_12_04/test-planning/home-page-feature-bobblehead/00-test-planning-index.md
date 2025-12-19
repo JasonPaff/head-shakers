@@ -11,22 +11,22 @@ This directory contains the orchestration logs for test planning the home page f
 
 ## Summary
 
-| Metric | Value |
-|--------|-------|
-| Source Files Analyzed | 27 |
-| Existing Tests Found | 14 |
-| Coverage Gaps Identified | 12 |
-| New Tests Planned | 23 |
-| Estimated Effort | 8-10 hours |
+| Metric                   | Value      |
+| ------------------------ | ---------- |
+| Source Files Analyzed    | 27         |
+| Existing Tests Found     | 14         |
+| Coverage Gaps Identified | 12         |
+| New Tests Planned        | 23         |
+| Estimated Effort         | 8-10 hours |
 
 ## Steps
 
-| Step | Name | Status | Duration |
-|------|------|--------|----------|
-| 1 | Test Scope Refinement | Complete | ~30s |
-| 2 | Source & Test Discovery | Complete | ~60s |
-| 3 | Coverage Gap Analysis | Complete | ~60s |
-| 4 | Test Plan Generation | Complete | ~60s |
+| Step | Name                    | Status   | Duration |
+| ---- | ----------------------- | -------- | -------- |
+| 1    | Test Scope Refinement   | Complete | ~30s     |
+| 2    | Source & Test Discovery | Complete | ~60s     |
+| 3    | Coverage Gap Analysis   | Complete | ~60s     |
+| 4    | Test Plan Generation    | Complete | ~60s     |
 
 ## Step Logs
 
@@ -42,6 +42,7 @@ This directory contains the orchestration logs for test planning the home page f
 ## Next Steps
 
 Execute the test plan using:
+
 ```
 /implement-tests docs/2025_12_04/plans/home-featured-bobblehead-e2e-test-plan.md
 ```
