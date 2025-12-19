@@ -13,9 +13,7 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.email).toBe('user@example.com');
-      }
+      expect(result.data?.email).toBe('user@example.com');
     });
 
     it('should reject invalid email format (missing @)', () => {
@@ -23,9 +21,7 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
 
     it('should reject email exceeding maximum length', () => {
@@ -35,11 +31,9 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain(
-          `Email must be at most ${SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MAX} characters`,
-        );
-      }
+      expect(result.error?.issues[0]?.message).toContain(
+        `Email must be at most ${SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MAX} characters`,
+      );
     });
 
     it('should reject email with leading/trailing whitespace', () => {
@@ -48,9 +42,7 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
 
     it('should reject empty email', () => {
@@ -58,9 +50,7 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
 
     it('should reject email with only whitespace', () => {
@@ -68,9 +58,7 @@ describe('newsletter validation schemas', () => {
       const result = insertNewsletterSignupSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
   });
 
@@ -80,9 +68,7 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.email).toBe('user@example.com');
-      }
+      expect(result.data?.email).toBe('user@example.com');
     });
 
     it('should reject invalid email format', () => {
@@ -90,9 +76,7 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
 
     it('should reject email exceeding maximum length (255 chars)', () => {
@@ -102,11 +86,9 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain(
-          `Email must be at most ${SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MAX} characters`,
-        );
-      }
+      expect(result.error?.issues[0]?.message).toContain(
+        `Email must be at most ${SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MAX} characters`,
+      );
     });
 
     it('should reject email with leading/trailing whitespace', () => {
@@ -115,9 +97,7 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Please enter a valid email address');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Please enter a valid email address');
     });
 
     it('should reject missing email field', () => {
@@ -125,9 +105,7 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('email');
-      }
+      expect(result.error?.issues[0]?.path).toContain('email');
     });
 
     it('should accept email at maximum allowed length', () => {
@@ -137,9 +115,7 @@ describe('newsletter validation schemas', () => {
       const result = unsubscribeFromNewsletterSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.email).toHaveLength(255);
-      }
+      expect(result.data?.email).toHaveLength(255);
     });
   });
 });

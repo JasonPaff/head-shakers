@@ -170,15 +170,13 @@ describe('Collections Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-        expect(result.data.data.name).toBe('My Collection');
-        expect(result.data.data.description).toBe('My awesome bobbleheads');
-        expect(result.data.data.isPublic).toBe(true);
-        expect(result.data.data.userId).toBe(testUser!.id);
-        expect(result.data.data.slug).toBeDefined();
-        expect(result.data.message).toBe('Collection created successfully!');
-      }
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.name).toBe('My Collection');
+      expect(result.data?.data?.description).toBe('My awesome bobbleheads');
+      expect(result.data?.data?.isPublic).toBe(true);
+      expect(result.data?.data?.userId).toBe(testUser!.id);
+      expect(result.data?.data?.slug).toBeDefined();
+      expect(result.data?.message).toBe('Collection created successfully!');
     });
 
     it('should return failure when collection name is already taken', async () => {
@@ -202,10 +200,8 @@ describe('Collections Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(false);
 
       // Verify failure response structure
-      if (result?.data && !result.data.wasSuccess) {
-        expect(result.data.data).toBeNull();
-        expect(result.data.message).toBe(ERROR_MESSAGES.COLLECTION.NAME_TAKEN);
-      }
+      expect(result.data?.data).toBeNull();
+      expect(result.data?.message).toBe(ERROR_MESSAGES.COLLECTION.NAME_TAKEN);
     });
   });
 
@@ -230,13 +226,11 @@ describe('Collections Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-        expect(result.data.data.name).toBe('Updated Name');
-        expect(result.data.data.description).toBe('Updated description');
-        expect(result.data.data.isPublic).toBe(false);
-        expect(result.data.message).toBe('Collection updated successfully!');
-      }
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.name).toBe('Updated Name');
+      expect(result.data?.data?.description).toBe('Updated description');
+      expect(result.data?.data?.isPublic).toBe(false);
+      expect(result.data?.message).toBe('Collection updated successfully!');
     });
 
     it('should return failure when user does not own the collection', async () => {
@@ -284,11 +278,9 @@ describe('Collections Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-        expect(result.data.data.id).toBe(collection!.id);
-        expect(result.data.message).toBe('Collection deleted successfully!');
-      }
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.id).toBe(collection!.id);
+      expect(result.data?.message).toBe('Collection deleted successfully!');
     });
 
     it('should return failure when collection does not exist', async () => {

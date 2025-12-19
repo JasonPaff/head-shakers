@@ -16,9 +16,7 @@ describe('bobbleheads validation schemas', () => {
       const result = deleteBobbleheadSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.bobbleheadId).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.bobbleheadId).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should reject missing bobbleheadId', () => {
@@ -42,9 +40,7 @@ describe('bobbleheads validation schemas', () => {
       const result = getBobbleheadByIdSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.id).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.id).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should reject invalid UUID', () => {
@@ -61,9 +57,7 @@ describe('bobbleheads validation schemas', () => {
       const result = getBobbleheadBySlugSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.slug).toBe('my-bobblehead-123');
-      }
+      expect(result.data?.slug).toBe('my-bobblehead-123');
     });
 
     it('should reject slug with uppercase letters', () => {
@@ -104,10 +98,8 @@ describe('bobbleheads validation schemas', () => {
       const result = deleteBobbleheadPhotoSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.bobbleheadId).toBe('123e4567-e89b-12d3-a456-426614174000');
-        expect(result.data.photoId).toBe('223e4567-e89b-12d3-a456-426614174001');
-      }
+      expect(result.data?.bobbleheadId).toBe('123e4567-e89b-12d3-a456-426614174000');
+      expect(result.data?.photoId).toBe('223e4567-e89b-12d3-a456-426614174001');
     });
 
     it('should reject missing photoId', () => {
@@ -142,10 +134,8 @@ describe('bobbleheads validation schemas', () => {
       const result = reorderBobbleheadPhotosSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.photoOrder).toHaveLength(2);
-        expect(result.data.photoOrder[1]?.isPrimary).toBe(true);
-      }
+      expect(result.data?.photoOrder).toHaveLength(2);
+      expect(result.data?.photoOrder[1]?.isPrimary).toBe(true);
     });
 
     it('should reject empty photoOrder array', () => {
@@ -180,10 +170,8 @@ describe('bobbleheads validation schemas', () => {
       const result = updateBobbleheadPhotoMetadataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.altText).toBe('A rare bobblehead from 1995');
-        expect(result.data.caption).toBe('Found at a vintage shop');
-      }
+      expect(result.data?.altText).toBe('A rare bobblehead from 1995');
+      expect(result.data?.caption).toBe('Found at a vintage shop');
     });
 
     it('should allow optional altText and caption', () => {
@@ -205,9 +193,7 @@ describe('bobbleheads validation schemas', () => {
       const result = updateBobbleheadPhotoMetadataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.altText).toBe('trimmed text');
-      }
+      expect(result.data?.altText).toBe('trimmed text');
     });
   });
 });

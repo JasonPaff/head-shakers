@@ -121,14 +121,10 @@ describe('action response helpers', () => {
       const response: ActionResponse<{ id: string }> = actionSuccess({ id: '123' });
 
       // Act & Assert
-      if (isActionSuccess(response)) {
-        // TypeScript should know response.data exists here
-        expect(response.data).toEqual({ id: '123' });
-        expect(response.wasSuccess).toBe(true);
-      } else {
-        // This should not execute
-        expect.fail('Expected success response');
-      }
+      expect(isActionSuccess(response)).toBe(true);
+      // TypeScript should know response.data exists here after the guard
+      expect(response.data).toEqual({ id: '123' });
+      expect(response.wasSuccess).toBe(true);
     });
   });
 
@@ -160,15 +156,11 @@ describe('action response helpers', () => {
       const response: ActionResponse<{ id: string }> = actionFailure('Something went wrong');
 
       // Act & Assert
-      if (isActionFailure(response)) {
-        // TypeScript should know response is ActionFailureResponse here
-        expect(response.message).toBe('Something went wrong');
-        expect(response.data).toBeNull();
-        expect(response.wasSuccess).toBe(false);
-      } else {
-        // This should not execute
-        expect.fail('Expected failure response');
-      }
+      expect(isActionFailure(response)).toBe(true);
+      // TypeScript should know response is ActionFailureResponse here after the guard
+      expect(response.message).toBe('Something went wrong');
+      expect(response.data).toBeNull();
+      expect(response.wasSuccess).toBe(false);
     });
   });
 
@@ -198,13 +190,7 @@ describe('action response helpers', () => {
       const failureResponse = actionFailure(errorMessage);
 
       // Act & Assert
-      try {
-        unwrapActionResponse(failureResponse);
-        expect.fail('Expected error to be thrown');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe(errorMessage);
-      }
+      expect(() => unwrapActionResponse(failureResponse)).toThrow(errorMessage);
     });
 
     it('should handle null data in successful response', () => {
@@ -237,19 +223,18 @@ describe('action response helpers', () => {
       expect(successResults).toHaveLength(2);
       expect(failureResults).toHaveLength(2);
 
-      // Type narrowing verification
+      // Type narrowing verification - success results
       successResults.forEach((r) => {
-        if (r.wasSuccess) {
-          expect(r.data).toBeDefined();
-          expect(r.data).toHaveProperty('id');
-        }
+        expect(r.wasSuccess).toBe(true);
+        expect(r.data).toBeDefined();
+        expect(r.data).toHaveProperty('id');
       });
 
+      // Type narrowing verification - failure results
       failureResults.forEach((r) => {
-        if (!r.wasSuccess) {
-          expect(r.data).toBeNull();
-          expect(r.message).toBeDefined();
-        }
+        expect(r.wasSuccess).toBe(false);
+        expect(r.data).toBeNull();
+        expect(r.message).toBeDefined();
       });
     });
 
@@ -258,12 +243,9 @@ describe('action response helpers', () => {
       const response: ActionResponse<string> = actionSuccess('test-data');
 
       // Act & Assert
-      if (isActionSuccess(response)) {
-        expect(response.data).toBe('test-data');
-        expect(response.wasSuccess).toBe(true);
-      } else if (isActionFailure(response)) {
-        expect.fail('Should not reach failure branch');
-      }
+      expect(isActionSuccess(response)).toBe(true);
+      expect(response.data).toBe('test-data');
+      expect(response.wasSuccess).toBe(true);
     });
   });
 });

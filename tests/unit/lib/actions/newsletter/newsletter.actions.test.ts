@@ -139,13 +139,11 @@ describe('newsletter server actions', () => {
 
       // Assert
       expect(result.wasSuccess).toBe(true);
-      if (result.wasSuccess) {
-        expect(result.data).toEqual({
-          isAlreadySubscribed: false,
-          signupId,
-        });
-        expect(result.message).toBe("Thanks for subscribing! You'll receive our latest updates.");
-      }
+      expect(result.data).toEqual({
+        isAlreadySubscribed: false,
+        signupId,
+      });
+      expect(result.message).toBe("Thanks for subscribing! You'll receive our latest updates.");
     });
 
     it('should return success response for existing subscriber (same message for privacy)', async () => {
@@ -180,13 +178,11 @@ describe('newsletter server actions', () => {
 
       // Assert - verify same success message as new subscription (privacy-preserving)
       expect(result.wasSuccess).toBe(true);
-      if (result.wasSuccess) {
-        expect(result.data).toEqual({
-          isAlreadySubscribed: true,
-          signupId,
-        });
-        expect(result.message).toBe("Thanks for subscribing! You'll receive our latest updates.");
-      }
+      expect(result.data).toEqual({
+        isAlreadySubscribed: true,
+        signupId,
+      });
+      expect(result.message).toBe("Thanks for subscribing! You'll receive our latest updates.");
     });
 
     it('should return failure response when facade fails', async () => {
@@ -220,9 +216,7 @@ describe('newsletter server actions', () => {
 
       // Assert
       expect(result.wasSuccess).toBe(false);
-      if (!result.wasSuccess) {
-        expect(result.message).toBe('Unable to process your subscription. Please try again.');
-      }
+      expect(result.message).toBe('Unable to process your subscription. Please try again.');
 
       expect(vi.mocked(actionBreadcrumb)).toHaveBeenCalledWith(
         'Newsletter signup failed',
@@ -270,9 +264,7 @@ describe('newsletter server actions', () => {
 
       // Assert
       expect(result.wasSuccess).toBe(true);
-      if (result.wasSuccess) {
-        expect(result.message).toBe('You have been unsubscribed from the newsletter.');
-      }
+      expect(result.message).toBe('You have been unsubscribed from the newsletter.');
     });
 
     it('should return same success message even if email does not exist (privacy)', async () => {
@@ -296,9 +288,7 @@ describe('newsletter server actions', () => {
 
       // Assert - verify same success message (privacy-preserving)
       expect(result.wasSuccess).toBe(true);
-      if (result.wasSuccess) {
-        expect(result.message).toBe('You have been unsubscribed from the newsletter.');
-      }
+      expect(result.message).toBe('You have been unsubscribed from the newsletter.');
     });
 
     it('should return failure response when facade fails', async () => {
@@ -333,9 +323,7 @@ describe('newsletter server actions', () => {
 
       // Assert
       expect(result.wasSuccess).toBe(false);
-      if (!result.wasSuccess) {
-        expect(result.message).toBe('Unable to process your unsubscribe request. Please try again.');
-      }
+      expect(result.message).toBe('Unable to process your unsubscribe request. Please try again.');
 
       expect(vi.mocked(actionBreadcrumb)).toHaveBeenCalledWith(
         'Newsletter unsubscribe failed',

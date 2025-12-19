@@ -17,10 +17,8 @@ describe('like validation schemas', () => {
       const result = toggleLikeSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.targetId).toBe('123e4567-e89b-12d3-a456-426614174000');
-        expect(result.data.targetType).toBe('bobblehead');
-      }
+      expect(result.data?.targetId).toBe('123e4567-e89b-12d3-a456-426614174000');
+      expect(result.data?.targetType).toBe('bobblehead');
     });
 
     it('should validate a valid like toggle for collection', () => {
@@ -41,9 +39,7 @@ describe('like validation schemas', () => {
       const result = toggleLikeSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('bobblehead or collection');
-      }
+      expect(result.error?.issues[0]?.message).toContain('bobblehead or collection');
     });
 
     it('should reject invalid UUID format', () => {
@@ -54,9 +50,7 @@ describe('like validation schemas', () => {
       const result = toggleLikeSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('valid UUID');
-      }
+      expect(result.error?.issues[0]?.message).toContain('valid UUID');
     });
 
     it('should reject missing targetId', () => {
@@ -127,9 +121,7 @@ describe('like validation schemas', () => {
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.targets).toHaveLength(1);
-      }
+      expect(result.data?.targets).toHaveLength(1);
     });
 
     it('should validate a valid batch with multiple targets', () => {
@@ -148,9 +140,7 @@ describe('like validation schemas', () => {
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.targets).toHaveLength(2);
-      }
+      expect(result.data?.targets).toHaveLength(2);
     });
 
     it('should reject empty targets array', () => {
@@ -160,9 +150,7 @@ describe('like validation schemas', () => {
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('At least one target is required');
-      }
+      expect(result.error?.issues[0]?.message).toContain('At least one target is required');
     });
 
     it('should reject targets exceeding maximum (50)', () => {
@@ -176,9 +164,7 @@ describe('like validation schemas', () => {
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Maximum 50 targets');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Maximum 50 targets');
     });
 
     it('should validate exactly 50 targets (maximum allowed)', () => {
@@ -191,9 +177,7 @@ describe('like validation schemas', () => {
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.targets).toHaveLength(50);
-      }
+      expect(result.data?.targets).toHaveLength(50);
     });
 
     it('should reject batch with invalid target ID', () => {

@@ -22,10 +22,8 @@ describe('comment validation schemas', () => {
       const result = createCommentSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.content).toBe('This is a great bobblehead!');
-        expect(result.data.targetType).toBe('bobblehead');
-      }
+      expect(result.data?.content).toBe('This is a great bobblehead!');
+      expect(result.data?.targetType).toBe('bobblehead');
     });
 
     it('should allow optional parentCommentId for replies', () => {
@@ -38,9 +36,7 @@ describe('comment validation schemas', () => {
       const result = createCommentSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.parentCommentId).toBe('223e4567-e89b-12d3-a456-426614174001');
-      }
+      expect(result.data?.parentCommentId).toBe('223e4567-e89b-12d3-a456-426614174001');
     });
 
     it('should reject invalid parentCommentId format', () => {
@@ -102,9 +98,7 @@ describe('comment validation schemas', () => {
       const result = updateCommentSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.content).toBe('Updated comment content');
-      }
+      expect(result.data?.content).toBe('Updated comment content');
     });
 
     it('should trim whitespace from content', () => {
@@ -115,9 +109,7 @@ describe('comment validation schemas', () => {
       const result = updateCommentSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.content).toBe('trimmed content');
-      }
+      expect(result.data?.content).toBe('trimmed content');
     });
 
     it('should reject content exceeding maximum length', () => {
@@ -147,9 +139,7 @@ describe('comment validation schemas', () => {
       const result = deleteCommentSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.commentId).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.commentId).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should reject invalid UUID', () => {
@@ -182,10 +172,8 @@ describe('comment validation schemas', () => {
       const result = commentPaginationSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.limit).toBe(DEFAULTS.PAGINATION.LIMIT);
-        expect(result.data.offset).toBe(DEFAULTS.PAGINATION.OFFSET);
-      }
+      expect(result.data?.limit).toBe(DEFAULTS.PAGINATION.LIMIT);
+      expect(result.data?.offset).toBe(DEFAULTS.PAGINATION.OFFSET);
     });
 
     it('should accept valid pagination values', () => {
@@ -193,10 +181,8 @@ describe('comment validation schemas', () => {
       const result = commentPaginationSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.limit).toBe(50);
-        expect(result.data.offset).toBe(10);
-      }
+      expect(result.data?.limit).toBe(50);
+      expect(result.data?.offset).toBe(10);
     });
 
     it('should reject limit exceeding maximum', () => {
@@ -218,10 +204,8 @@ describe('comment validation schemas', () => {
       const result = commentPaginationSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.limit).toBe(25);
-        expect(result.data.offset).toBe(5);
-      }
+      expect(result.data?.limit).toBe(25);
+      expect(result.data?.offset).toBe(5);
     });
   });
 
@@ -234,10 +218,8 @@ describe('comment validation schemas', () => {
       const result = getCommentsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.targetType).toBe('collection');
-        expect(result.data.pagination.limit).toBe(DEFAULTS.PAGINATION.LIMIT);
-      }
+      expect(result.data?.targetType).toBe('collection');
+      expect(result.data?.pagination.limit).toBe(DEFAULTS.PAGINATION.LIMIT);
     });
 
     it('should accept custom pagination', () => {
@@ -249,10 +231,8 @@ describe('comment validation schemas', () => {
       const result = getCommentsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.pagination.limit).toBe(30);
-        expect(result.data.pagination.offset).toBe(20);
-      }
+      expect(result.data?.pagination.limit).toBe(30);
+      expect(result.data?.pagination.offset).toBe(20);
     });
   });
 

@@ -195,7 +195,7 @@ describe('BobbleheadGridDisplay', () => {
 
       render(<BobbleheadGridDisplay {...defaultProps} />);
 
-      const searchInput = screen.getByPlaceholderText('Search bobbleheads...');
+      const searchInput: HTMLInputElement = screen.getByPlaceholderText('Search bobbleheads...');
       expect(searchInput.value).toBe('baseball');
     });
 

@@ -21,10 +21,8 @@ describe('tags validation schemas', () => {
       const result = insertTagSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('Vintage');
-        expect(result.data.color).toBe('#3B82F6');
-      }
+      expect(result.data?.name).toBe('Vintage');
+      expect(result.data?.color).toBe('#3B82F6');
     });
 
     it('should validate tag with default usage count', () => {
@@ -35,9 +33,7 @@ describe('tags validation schemas', () => {
       const result = insertTagSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.usageCount).toBe(0);
-      }
+      expect(result.data?.usageCount).toBe(0);
     });
 
     it('should reject invalid hex color format', () => {
@@ -98,9 +94,7 @@ describe('tags validation schemas', () => {
       const result = insertTagSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('Trimmed Tag');
-      }
+      expect(result.data?.name).toBe('Trimmed Tag');
     });
 
     it('should accept lowercase hex color', () => {
@@ -123,9 +117,7 @@ describe('tags validation schemas', () => {
       const result = attachTagsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.tagIds).toHaveLength(1);
-      }
+      expect(result.data?.tagIds).toHaveLength(1);
     });
 
     it('should validate multiple tags', () => {
@@ -140,9 +132,7 @@ describe('tags validation schemas', () => {
       const result = attachTagsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.tagIds).toHaveLength(3);
-      }
+      expect(result.data?.tagIds).toHaveLength(3);
     });
 
     it('should reject empty tagIds array', () => {
@@ -153,9 +143,7 @@ describe('tags validation schemas', () => {
       const result = attachTagsSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('At least one tag is required');
-      }
+      expect(result.error?.issues[0]?.message).toContain('At least one tag is required');
     });
 
     it('should reject tags exceeding maximum per bobblehead', () => {
@@ -222,9 +210,7 @@ describe('tags validation schemas', () => {
       const result = bulkDeleteTagsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.tagIds).toHaveLength(2);
-      }
+      expect(result.data?.tagIds).toHaveLength(2);
     });
 
     it('should reject empty tagIds array', () => {
@@ -248,9 +234,7 @@ describe('tags validation schemas', () => {
       const result = getTagSuggestionsSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.query).toBe('vin');
-      }
+      expect(result.data?.query).toBe('vin');
     });
 
     it('should reject query shorter than 2 characters', () => {
@@ -258,9 +242,7 @@ describe('tags validation schemas', () => {
       const result = getTagSuggestionsSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('at least 2 characters');
-      }
+      expect(result.error?.issues[0]?.message).toContain('at least 2 characters');
     });
 
     it('should reject query longer than 50 characters', () => {
@@ -268,9 +250,7 @@ describe('tags validation schemas', () => {
       const result = getTagSuggestionsSchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('Query too long');
-      }
+      expect(result.error?.issues[0]?.message).toContain('Query too long');
     });
 
     it('should accept exactly 2 character query', () => {
@@ -294,9 +274,7 @@ describe('tags validation schemas', () => {
       const result = deleteTagSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.tagId).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.tagId).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should reject invalid tag ID', () => {
@@ -317,10 +295,8 @@ describe('tags validation schemas', () => {
       const result = updateTagActionSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('Updated Name');
-        expect(result.data.color).toBe('#FF5733');
-      }
+      expect(result.data?.name).toBe('Updated Name');
+      expect(result.data?.color).toBe('#FF5733');
     });
 
     it('should allow partial updates', () => {
@@ -331,10 +307,8 @@ describe('tags validation schemas', () => {
       const result = updateTagActionSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('Only Name Updated');
-        expect(result.data.color).toBeUndefined();
-      }
+      expect(result.data?.name).toBe('Only Name Updated');
+      expect(result.data?.color).toBeUndefined();
     });
 
     it('should reject missing tagId', () => {

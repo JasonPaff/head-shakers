@@ -77,39 +77,30 @@ describe('cloudinary utilities', () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
     it('should generate valid blur data URL for simple public ID', () => {
-      if (!cloudName) {
-        expect(generateBlurDataUrl('sample')).toBe('');
-        return;
-      }
-
       const result = generateBlurDataUrl('sample');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/sample`
+        : '';
+      expect(result).toBe(expected);
     });
 
     it('should generate valid blur data URL for public ID with folder path', () => {
-      if (!cloudName) {
-        expect(generateBlurDataUrl('bobbleheads/item-123')).toBe('');
-        return;
-      }
-
       const result = generateBlurDataUrl('bobbleheads/item-123');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/bobbleheads/item-123`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/bobbleheads/item-123`
+        : '';
+      expect(result).toBe(expected);
     });
 
     it('should generate valid blur data URL for nested folder paths', () => {
-      if (!cloudName) {
-        expect(generateBlurDataUrl('users/abc/photo')).toBe('');
-        return;
-      }
-
       const result = generateBlurDataUrl('users/abc/photo');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/users/abc/photo`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/users/abc/photo`
+        : '';
+      expect(result).toBe(expected);
     });
 
     it('should return empty string for empty public ID', () => {
@@ -167,27 +158,21 @@ describe('cloudinary utilities', () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
     it('should generate valid Open Graph image URL', () => {
-      if (!cloudName) {
-        expect(generateOpenGraphImageUrl('sample')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateOpenGraphImageUrl('sample');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should generate valid Open Graph image URL for public ID with folder path', () => {
-      if (!cloudName) {
-        expect(generateOpenGraphImageUrl('bobbleheads/item-123')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateOpenGraphImageUrl('bobbleheads/item-123');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/bobbleheads/item-123`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/bobbleheads/item-123`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should return default social image for empty public ID', () => {
@@ -213,27 +198,21 @@ describe('cloudinary utilities', () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
     it('should generate valid Twitter card image URL', () => {
-      if (!cloudName) {
-        expect(generateTwitterCardImageUrl('sample')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateTwitterCardImageUrl('sample');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should generate valid Twitter card image URL for public ID with folder path', () => {
-      if (!cloudName) {
-        expect(generateTwitterCardImageUrl('bobbleheads/item-123')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateTwitterCardImageUrl('bobbleheads/item-123');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/bobbleheads/item-123`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/bobbleheads/item-123`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should return default social image for empty public ID', () => {
@@ -259,51 +238,39 @@ describe('cloudinary utilities', () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
     it('should generate default platform image URL', () => {
-      if (!cloudName) {
-        expect(generateSocialImageUrl('sample', 'default')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateSocialImageUrl('sample', 'default');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should generate Open Graph platform image URL', () => {
-      if (!cloudName) {
-        expect(generateSocialImageUrl('sample', 'og')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateSocialImageUrl('sample', 'og');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should generate Twitter platform image URL', () => {
-      if (!cloudName) {
-        expect(generateSocialImageUrl('sample', 'twitter')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateSocialImageUrl('sample', 'twitter');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should use default platform when no platform is specified', () => {
-      if (!cloudName) {
-        expect(generateSocialImageUrl('sample')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateSocialImageUrl('sample');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/sample`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
 
     it('should return default social image for empty public ID', () => {
@@ -325,15 +292,12 @@ describe('cloudinary utilities', () => {
     });
 
     it('should handle public ID with nested folder paths', () => {
-      if (!cloudName) {
-        expect(generateSocialImageUrl('users/abc/photo', 'twitter')).toBe('/images/og-default.jpg');
-        return;
-      }
-
       const result = generateSocialImageUrl('users/abc/photo', 'twitter');
-      expect(result).toBe(
-        `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/users/abc/photo`,
-      );
+      const expected =
+        cloudName ?
+          `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_418,f_auto,q_auto/users/abc/photo`
+        : '/images/og-default.jpg';
+      expect(result).toBe(expected);
     });
   });
 });

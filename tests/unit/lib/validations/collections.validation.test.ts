@@ -20,12 +20,10 @@ describe('collections validation schemas', () => {
       const result = insertCollectionSchema.safeParse(validInput);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('Vintage Collection');
-        expect(result.data.description).toBe('A comprehensive collection of vintage bobbleheads');
-        expect(result.data.coverImageUrl).toBe('https://example.com/image.jpg');
-        expect(result.data.isPublic).toBe(true);
-      }
+      expect(result.data?.name).toBe('Vintage Collection');
+      expect(result.data?.description).toBe('A comprehensive collection of vintage bobbleheads');
+      expect(result.data?.coverImageUrl).toBe('https://example.com/image.jpg');
+      expect(result.data?.isPublic).toBe(true);
     });
 
     it('should validate correct input with minimal fields (name only)', () => {
@@ -37,11 +35,9 @@ describe('collections validation schemas', () => {
       const result = insertCollectionSchema.safeParse(validInput);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.name).toBe('My Collection');
-        expect(result.data.description).toBeNull(); // empty string transforms to null
-        expect(result.data.isPublic).toBe(true); // default value
-      }
+      expect(result.data?.name).toBe('My Collection');
+      expect(result.data?.description).toBeNull(); // empty string transforms to null
+      expect(result.data?.isPublic).toBe(true); // default value
     });
 
     it('should reject name below min length', () => {
@@ -53,10 +49,8 @@ describe('collections validation schemas', () => {
       const result = insertCollectionSchema.safeParse(invalidInput);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues.length).toBeGreaterThan(0);
-        expect(result.error.issues.some((issue) => issue.path.includes('name'))).toBe(true);
-      }
+      expect(result.error?.issues.length).toBeGreaterThan(0);
+      expect(result.error?.issues.some((issue) => issue.path.includes('name'))).toBe(true);
     });
 
     it('should reject name above max length', () => {
@@ -68,10 +62,8 @@ describe('collections validation schemas', () => {
       const result = insertCollectionSchema.safeParse(invalidInput);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues.length).toBeGreaterThan(0);
-        expect(result.error.issues.some((issue) => issue.path.includes('name'))).toBe(true);
-      }
+      expect(result.error?.issues.length).toBeGreaterThan(0);
+      expect(result.error?.issues.some((issue) => issue.path.includes('name'))).toBe(true);
     });
 
     it('should reject invalid coverImageUrl format', () => {
@@ -83,10 +75,8 @@ describe('collections validation schemas', () => {
       const result = insertCollectionSchema.safeParse(invalidInput);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues.length).toBeGreaterThan(0);
-        expect(result.error.issues[0]?.path).toContain('coverImageUrl');
-      }
+      expect(result.error?.issues.length).toBeGreaterThan(0);
+      expect(result.error?.issues[0]?.path).toContain('coverImageUrl');
     });
   });
 
@@ -101,10 +91,8 @@ describe('collections validation schemas', () => {
       const result = updateCollectionSchema.safeParse(validInput);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.collectionId).toBe('123e4567-e89b-12d3-a456-426614174000');
-        expect(result.data.name).toBe('Updated Collection');
-      }
+      expect(result.data?.collectionId).toBe('123e4567-e89b-12d3-a456-426614174000');
+      expect(result.data?.name).toBe('Updated Collection');
     });
 
     it('should reject invalid collectionId UUID format', () => {
@@ -117,10 +105,8 @@ describe('collections validation schemas', () => {
       const result = updateCollectionSchema.safeParse(invalidInput);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues.length).toBeGreaterThan(0);
-        expect(result.error.issues.some((issue) => issue.path.includes('collectionId'))).toBe(true);
-      }
+      expect(result.error?.issues.length).toBeGreaterThan(0);
+      expect(result.error?.issues.some((issue) => issue.path.includes('collectionId'))).toBe(true);
     });
   });
 
@@ -130,9 +116,7 @@ describe('collections validation schemas', () => {
       const result = deleteCollectionSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.collectionId).toBe('collection-123');
-      }
+      expect(result.data?.collectionId).toBe('collection-123');
     });
 
     it('should validate collectionId is present', () => {
@@ -140,10 +124,8 @@ describe('collections validation schemas', () => {
       const result = deleteCollectionSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.collectionId).toBeDefined();
-        expect(result.data.collectionId).toBe('valid-id');
-      }
+      expect(result.data?.collectionId).toBeDefined();
+      expect(result.data?.collectionId).toBe('valid-id');
     });
 
     it('should reject missing collectionId', () => {
@@ -170,10 +152,8 @@ describe('collections validation schemas', () => {
       const result = getCollectionBySlugSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.slug).toBe('my-collection');
-        expect(result.data.userId).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.slug).toBe('my-collection');
+      expect(result.data?.userId).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should reject empty slug', () => {
@@ -234,9 +214,7 @@ describe('collections validation schemas', () => {
       const result = getCollectionBySlugSchema.safeParse(validInput);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.slug).toBe('valid-slug-123');
-      }
+      expect(result.data?.slug).toBe('valid-slug-123');
     });
   });
 });

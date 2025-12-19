@@ -9,9 +9,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('newest');
-      }
+      expect(result.data?.sortBy).toBe('newest');
     });
 
     it('should validate "oldest" sort option', () => {
@@ -19,9 +17,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('oldest');
-      }
+      expect(result.data?.sortBy).toBe('oldest');
     });
 
     it('should validate "name-asc" sort option', () => {
@@ -29,9 +25,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('name-asc');
-      }
+      expect(result.data?.sortBy).toBe('name-asc');
     });
 
     it('should validate "name-desc" sort option', () => {
@@ -39,9 +33,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('name-desc');
-      }
+      expect(result.data?.sortBy).toBe('name-desc');
     });
 
     it('should validate "value-high" sort option', () => {
@@ -49,9 +41,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('value-high');
-      }
+      expect(result.data?.sortBy).toBe('value-high');
     });
 
     it('should validate "value-low" sort option', () => {
@@ -59,9 +49,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('value-low');
-      }
+      expect(result.data?.sortBy).toBe('value-low');
     });
 
     it('should reject invalid sort option', () => {
@@ -76,9 +64,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.sortBy).toBe('newest');
-      }
+      expect(result.data?.sortBy).toBe('newest');
     });
   });
 
@@ -88,9 +74,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('all');
-      }
+      expect(result.data?.condition).toBe('all');
     });
 
     it('should validate "mint" condition', () => {
@@ -98,9 +82,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('mint');
-      }
+      expect(result.data?.condition).toBe('mint');
     });
 
     it('should validate "excellent" condition', () => {
@@ -108,9 +90,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('excellent');
-      }
+      expect(result.data?.condition).toBe('excellent');
     });
 
     it('should validate "good" condition', () => {
@@ -118,9 +98,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('good');
-      }
+      expect(result.data?.condition).toBe('good');
     });
 
     it('should validate "fair" condition', () => {
@@ -128,9 +106,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('fair');
-      }
+      expect(result.data?.condition).toBe('fair');
     });
 
     it('should validate "poor" condition', () => {
@@ -138,9 +114,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('poor');
-      }
+      expect(result.data?.condition).toBe('poor');
     });
 
     it('should reject invalid condition', () => {
@@ -155,9 +129,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.condition).toBe('all');
-      }
+      expect(result.data?.condition).toBe('all');
     });
   });
 
@@ -167,9 +139,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.featured).toBe('all');
-      }
+      expect(result.data?.featured).toBe('all');
     });
 
     it('should validate "featured" filter', () => {
@@ -177,9 +147,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.featured).toBe('featured');
-      }
+      expect(result.data?.featured).toBe('featured');
     });
 
     it('should validate "not-featured" filter', () => {
@@ -187,9 +155,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.featured).toBe('not-featured');
-      }
+      expect(result.data?.featured).toBe('not-featured');
     });
 
     it('should reject invalid featured value', () => {
@@ -204,9 +170,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.featured).toBe('all');
-      }
+      expect(result.data?.featured).toBe('all');
     });
   });
 
@@ -216,9 +180,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.page).toBe(5);
-      }
+      expect(result.data?.page).toBe(5);
     });
 
     it('should validate page number 1', () => {
@@ -226,9 +188,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.page).toBe(1);
-      }
+      expect(result.data?.page).toBe(1);
     });
 
     it('should reject zero as page number', () => {
@@ -250,9 +210,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.page).toBe(1);
-      }
+      expect(result.data?.page).toBe(1);
     });
   });
 
@@ -262,9 +220,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.pageSize).toBe(48);
-      }
+      expect(result.data?.pageSize).toBe(48);
     });
 
     it('should default to 24 when pageSize is not provided', () => {
@@ -272,9 +228,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.pageSize).toBe(24);
-      }
+      expect(result.data?.pageSize).toBe(24);
     });
 
     it('should reject zero as pageSize', () => {
@@ -298,9 +252,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.search).toBe('');
-      }
+      expect(result.data?.search).toBe('');
     });
 
     it('should validate search query string', () => {
@@ -308,9 +260,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.search).toBe('baseball bobblehead');
-      }
+      expect(result.data?.search).toBe('baseball bobblehead');
     });
 
     it('should default to empty string when search is not provided', () => {
@@ -318,9 +268,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.search).toBe('');
-      }
+      expect(result.data?.search).toBe('');
     });
   });
 
@@ -330,9 +278,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.category).toBe('sports');
-      }
+      expect(result.data?.category).toBe('sports');
     });
 
     it('should default to "all" when category is not provided', () => {
@@ -340,9 +286,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.category).toBe('all');
-      }
+      expect(result.data?.category).toBe('all');
     });
   });
 
@@ -352,9 +296,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.add).toBe(true);
-      }
+      expect(result.data?.add).toBe(true);
     });
 
     it('should coerce non-truthy string to true', () => {
@@ -362,10 +304,8 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        // Zod's coerce.boolean treats any non-empty string as true
-        expect(result.data.add).toBe(true);
-      }
+      // Zod's coerce.boolean treats any non-empty string as true
+      expect(result.data?.add).toBe(true);
     });
 
     it('should default to false when add is not provided', () => {
@@ -373,9 +313,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.add).toBe(false);
-      }
+      expect(result.data?.add).toBe(false);
     });
   });
 
@@ -385,9 +323,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.edit).toBe('123e4567-e89b-12d3-a456-426614174000');
-      }
+      expect(result.data?.edit).toBe('123e4567-e89b-12d3-a456-426614174000');
     });
 
     it('should be undefined when edit is not provided', () => {
@@ -395,9 +331,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.edit).toBeUndefined();
-      }
+      expect(result.data?.edit).toBeUndefined();
     });
   });
 
@@ -407,9 +341,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.collectionSlug).toBe('my-collection');
-      }
+      expect(result.data?.collectionSlug).toBe('my-collection');
     });
 
     it('should be undefined when collectionSlug is not provided', () => {
@@ -417,9 +349,7 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.collectionSlug).toBeUndefined();
-      }
+      expect(result.data?.collectionSlug).toBeUndefined();
     });
   });
 
@@ -441,18 +371,16 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.add).toBe(true);
-        expect(result.data.category).toBe('sports');
-        expect(result.data.collectionSlug).toBe('my-collection');
-        expect(result.data.condition).toBe('mint');
-        expect(result.data.edit).toBe('123e4567-e89b-12d3-a456-426614174000');
-        expect(result.data.featured).toBe('featured');
-        expect(result.data.page).toBe(2);
-        expect(result.data.pageSize).toBe(48);
-        expect(result.data.search).toBe('baseball');
-        expect(result.data.sortBy).toBe('name-asc');
-      }
+      expect(result.data?.add).toBe(true);
+      expect(result.data?.category).toBe('sports');
+      expect(result.data?.collectionSlug).toBe('my-collection');
+      expect(result.data?.condition).toBe('mint');
+      expect(result.data?.edit).toBe('123e4567-e89b-12d3-a456-426614174000');
+      expect(result.data?.featured).toBe('featured');
+      expect(result.data?.page).toBe(2);
+      expect(result.data?.pageSize).toBe(48);
+      expect(result.data?.search).toBe('baseball');
+      expect(result.data?.sortBy).toBe('name-asc');
     });
 
     it('should apply defaults for all optional fields when empty', () => {
@@ -461,18 +389,16 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.add).toBe(false);
-        expect(result.data.category).toBe('all');
-        expect(result.data.condition).toBe('all');
-        expect(result.data.featured).toBe('all');
-        expect(result.data.page).toBe(1);
-        expect(result.data.pageSize).toBe(24);
-        expect(result.data.search).toBe('');
-        expect(result.data.sortBy).toBe('newest');
-        expect(result.data.collectionSlug).toBeUndefined();
-        expect(result.data.edit).toBeUndefined();
-      }
+      expect(result.data?.add).toBe(false);
+      expect(result.data?.category).toBe('all');
+      expect(result.data?.condition).toBe('all');
+      expect(result.data?.featured).toBe('all');
+      expect(result.data?.page).toBe(1);
+      expect(result.data?.pageSize).toBe(24);
+      expect(result.data?.search).toBe('');
+      expect(result.data?.sortBy).toBe('newest');
+      expect(result.data?.collectionSlug).toBeUndefined();
+      expect(result.data?.edit).toBeUndefined();
     });
 
     it('should validate partial search params with pagination', () => {
@@ -485,14 +411,12 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.page).toBe(3);
-        expect(result.data.search).toBe('vintage');
-        expect(result.data.sortBy).toBe('oldest');
-        expect(result.data.add).toBe(false);
-        expect(result.data.category).toBe('all');
-        expect(result.data.condition).toBe('all');
-      }
+      expect(result.data?.page).toBe(3);
+      expect(result.data?.search).toBe('vintage');
+      expect(result.data?.sortBy).toBe('oldest');
+      expect(result.data?.add).toBe(false);
+      expect(result.data?.category).toBe('all');
+      expect(result.data?.condition).toBe('all');
     });
 
     it('should coerce string numbers to integers', () => {
@@ -504,12 +428,10 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.page).toBe(10);
-        expect(result.data.pageSize).toBe(100);
-        expect(typeof result.data.page).toBe('number');
-        expect(typeof result.data.pageSize).toBe('number');
-      }
+      expect(result.data?.page).toBe(10);
+      expect(result.data?.pageSize).toBe(100);
+      expect(typeof result.data?.page).toBe('number');
+      expect(typeof result.data?.pageSize).toBe('number');
     });
 
     it('should coerce string boolean to boolean', () => {
@@ -520,10 +442,8 @@ describe('Route.searchParams Zod schema', () => {
       const result = Route.searchParams.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.add).toBe(true);
-        expect(typeof result.data.add).toBe('boolean');
-      }
+      expect(result.data?.add).toBe(true);
+      expect(typeof result.data?.add).toBe('boolean');
     });
   });
 });

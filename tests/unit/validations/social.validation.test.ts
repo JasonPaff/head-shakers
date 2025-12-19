@@ -217,9 +217,7 @@ describe('Social Validation Schemas', () => {
       const result = updateCommentSchema.safeParse(validData);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.content).toBe('Trimmed content');
-      }
+      expect(result.data?.content).toBe('Trimmed content');
     });
   });
 
@@ -270,11 +268,9 @@ describe('Social Validation Schemas', () => {
       const result = getCommentsSchema.safeParse(validData);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.pagination).toBeDefined();
-        expect(result.data.pagination.limit).toBeGreaterThan(0);
-        expect(result.data.pagination.offset).toBe(0);
-      }
+      expect(result.data?.pagination).toBeDefined();
+      expect(result.data?.pagination.limit).toBeGreaterThan(0);
+      expect(result.data?.pagination.offset).toBe(0);
     });
 
     it('should accept custom pagination', () => {
@@ -287,10 +283,8 @@ describe('Social Validation Schemas', () => {
       const result = getCommentsSchema.safeParse(validData);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.pagination.limit).toBe(25);
-        expect(result.data.pagination.offset).toBe(10);
-      }
+      expect(result.data?.pagination.limit).toBe(25);
+      expect(result.data?.pagination.offset).toBe(10);
     });
 
     it('should reject negative offset', () => {

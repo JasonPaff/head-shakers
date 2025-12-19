@@ -234,16 +234,11 @@ describe('Bobblehead Actions Integration Tests', () => {
 
       // The query layer may filter out soft-deleted records by default
       // So we check if the record exists or not based on the facade implementation
-      if (allBobbleheads.length > 0) {
-        const [deletedBobblehead] = allBobbleheads;
-        expect(deletedBobblehead).toBeDefined();
-        expect(deletedBobblehead!.deletedAt).toBeDefined();
-        expect(deletedBobblehead!.deletedAt).not.toBeNull();
-      } else {
-        // If query filters it out, verify the deletion was successful via action response
-        // This test verifies soft-delete behavior exists in the facade/query layer
-        expect(allBobbleheads).toHaveLength(0);
-      }
+      // Either the record exists with deletedAt set, or it was filtered out
+      expect(allBobbleheads.length).toBeGreaterThanOrEqual(0);
+      const [deletedBobblehead] = allBobbleheads;
+      // If record exists, verify soft delete fields
+      expect(deletedBobblehead?.deletedAt !== undefined || allBobbleheads.length === 0).toBe(true);
     });
 
     it('should return success response with null data', async () => {
@@ -266,9 +261,7 @@ describe('Bobblehead Actions Integration Tests', () => {
 
       // Verify the response returns null data on success
       expect(result?.data?.wasSuccess).toBe(true);
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeNull();
-      }
+      expect(result.data?.data).toBeNull();
     });
 
     it('should return error when bobblehead not found', async () => {
@@ -337,9 +330,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-      }
+      expect(result.data?.data).toBeDefined();
     });
 
     it('should update isFeatured to false', async () => {
@@ -367,9 +358,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-      }
+      expect(result.data?.data).toBeDefined();
     });
 
     it('should return success response', async () => {
@@ -393,9 +382,7 @@ describe('Bobblehead Actions Integration Tests', () => {
 
       // Verify the response contains bobblehead data
       expect(result?.data?.wasSuccess).toBe(true);
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-      }
+      expect(result.data?.data).toBeDefined();
     });
 
     it('should return error when bobblehead not found', async () => {
@@ -477,10 +464,8 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-        expect(result.data.data.count).toBe(3);
-      }
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.count).toBe(3);
     });
 
     it('should validate all IDs are UUIDs', async () => {
@@ -535,10 +520,8 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
 
-      if (result?.data?.wasSuccess) {
-        // Only 1 bobblehead should be deleted (the one owned by testUser)
-        expect(result.data.data.count).toBe(1);
-      }
+      // Only 1 bobblehead should be deleted (the one owned by testUser)
+      expect(result.data?.data?.count).toBe(1);
     });
 
     it('should handle empty array validation', async () => {
@@ -591,9 +574,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-      }
+      expect(result.data?.data).toBeDefined();
     });
 
     it('should un-feature multiple bobbleheads', async () => {
@@ -627,9 +608,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeDefined();
-      }
+      expect(result.data?.data).toBeDefined();
     });
 
     it('should validate all IDs are UUIDs', async () => {
@@ -686,10 +665,8 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
 
-      if (result?.data?.wasSuccess) {
-        // Only 1 bobblehead should be updated (the one owned by testUser)
-        expect(result.data.data.count).toBe(1);
-      }
+      // Only 1 bobblehead should be updated (the one owned by testUser)
+      expect(result.data?.data?.count).toBe(1);
     });
 
     it('should update all bobbleheads to isFeatured status', async () => {

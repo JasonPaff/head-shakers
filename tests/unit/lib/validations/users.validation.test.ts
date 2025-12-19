@@ -14,9 +14,7 @@ describe('users validation schemas', () => {
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.username).toBe('valid_user123');
-      }
+      expect(result.data?.username).toBe('valid_user123');
     });
 
     it('should reject username shorter than minimum length', () => {
@@ -24,11 +22,9 @@ describe('users validation schemas', () => {
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain(
-          `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,
-        );
-      }
+      expect(result.error?.issues[0]?.message).toContain(
+        `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,
+      );
     });
 
     it('should reject username longer than maximum length', () => {
@@ -36,11 +32,9 @@ describe('users validation schemas', () => {
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain(
-          `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,
-        );
-      }
+      expect(result.error?.issues[0]?.message).toContain(
+        `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,
+      );
     });
 
     it('should reject username with special characters', () => {
@@ -48,9 +42,7 @@ describe('users validation schemas', () => {
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('letters, numbers, and underscores');
-      }
+      expect(result.error?.issues[0]?.message).toContain('letters, numbers, and underscores');
     });
 
     it('should reject username with spaces', () => {
@@ -72,9 +64,7 @@ describe('users validation schemas', () => {
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('reserved');
-      }
+      expect(result.error?.issues[0]?.message).toContain('reserved');
     });
   });
 
@@ -84,9 +74,7 @@ describe('users validation schemas', () => {
       const result = updateUsernameSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.username).toBe('new_username');
-      }
+      expect(result.data?.username).toBe('new_username');
     });
 
     it('should reject invalid username format', () => {
@@ -113,10 +101,8 @@ describe('users validation schemas', () => {
       const result = insertUserSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.email).toBe('john@example.com');
-        expect(result.data.username).toBe('johndoe');
-      }
+      expect(result.data?.email).toBe('john@example.com');
+      expect(result.data?.username).toBe('johndoe');
     });
 
     it('should reject invalid email format', () => {
@@ -138,9 +124,7 @@ describe('users validation schemas', () => {
       const result = insertUserSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.bio).toBe('Bobblehead collector since 2010');
-      }
+      expect(result.data?.bio).toBe('Bobblehead collector since 2010');
     });
 
     it('should reject bio exceeding maximum length', () => {
@@ -163,9 +147,7 @@ describe('users validation schemas', () => {
       const result = insertUserSchema.safeParse(input);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.location).toBe('New York, NY');
-      }
+      expect(result.data?.location).toBe('New York, NY');
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable react-snob/require-boolean-prefix-is */
 /**
  * Mock utilities for useServerAction hook used in component tests.
  * Provides helpers to mock different action execution states.
@@ -113,7 +114,7 @@ export const mockLoadingServerAction = (): MockUseServerActionReturn => {
 };
 
 /**
- * Creates a mock with error state
+ * Creates a mock with the error state
  */
 export const mockErrorServerAction = (error = 'Something went wrong'): MockUseServerActionReturn => {
   return mockUseServerAction({ error });
