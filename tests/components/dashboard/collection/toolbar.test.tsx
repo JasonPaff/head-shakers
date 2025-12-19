@@ -59,10 +59,8 @@ describe('Toolbar', () => {
 
       expect(clearButton).toBeInTheDocument();
 
-      if (clearButton) {
-        await user.click(clearButton);
-        expect(onSearchClear).toHaveBeenCalledTimes(1);
-      }
+      await user.click(clearButton!);
+      expect(onSearchClear).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -76,12 +76,10 @@ describe('HomePage', () => {
       render(<HomePage />);
 
       expect(WEBSITE_SCHEMA).toHaveProperty('potentialAction');
-      if (WEBSITE_SCHEMA.potentialAction) {
-        expect(WEBSITE_SCHEMA.potentialAction).toHaveProperty('@type', 'SearchAction');
-        expect(WEBSITE_SCHEMA.potentialAction).toHaveProperty('target');
-        expect(WEBSITE_SCHEMA.potentialAction).toHaveProperty('query-input');
-        expect(WEBSITE_SCHEMA.potentialAction.target).toContain('/search');
-      }
+      expect(WEBSITE_SCHEMA.potentialAction!).toHaveProperty('@type', 'SearchAction');
+      expect(WEBSITE_SCHEMA.potentialAction!).toHaveProperty('target');
+      expect(WEBSITE_SCHEMA.potentialAction!).toHaveProperty('query-input');
+      expect(WEBSITE_SCHEMA.potentialAction!.target).toContain('/search');
     });
 
     it('should have valid Organization schema properties', () => {

@@ -206,9 +206,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data?.wasSuccess).toBe(true);
 
       // Verify success response structure
-      if (result?.data?.wasSuccess) {
-        expect(result.data.data).toBeNull();
-      }
+      expect(result.data?.data).toBeNull();
     });
 
     it('should soft-delete (set deletedAt) rather than hard delete', async () => {
