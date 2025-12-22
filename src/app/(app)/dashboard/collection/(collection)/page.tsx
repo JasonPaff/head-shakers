@@ -27,6 +27,10 @@ import { Route } from './route-type';
 
 type CollectionPageProps = PageProps;
 
+interface MainContentProps {
+  mode: 'add' | 'edit';
+}
+
 export function generateMetadata(): Metadata {
   return {
     description: 'Manage your bobblehead collections',
@@ -64,41 +68,6 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
     }
   }
 
-  const isAddMode = params.add === true;
-  const isEditMode = !!params.edit;
-
-  // Render the appropriate main content based on mode
-  // Add mode takes precedence over edit mode if both are set
-  const renderMainContent = () => {
-    if (isAddMode) {
-      return (
-        <ErrorBoundary name={'add-bobblehead-form'}>
-          <Suspense fallback={<AddItemFormSkeleton />}>
-            <AddBobbleheadFormAsync />
-          </Suspense>
-        </ErrorBoundary>
-      );
-    }
-
-    if (isEditMode) {
-      return (
-        <ErrorBoundary name={'edit-bobblehead-form'}>
-          <Suspense fallback={<AddItemFormSkeleton />}>
-            <EditBobbleheadFormAsync />
-          </Suspense>
-        </ErrorBoundary>
-      );
-    }
-
-    return (
-      <ErrorBoundary name={'collection-bobbleheads'}>
-        <Suspense fallback={<BobbleheadContentSkeleton />}>
-          <BobbleheadGridAsync />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  };
-
   return (
     <CollectionLayout
       main={
@@ -111,7 +80,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
           </ErrorBoundary>
 
           {/* Conditional: Add Form, Edit Form, or Bobblehead Grid */}
-          {renderMainContent()}
+          <MainContent mode={params.add === true ? 'add' : 'edit'} />
         </Fragment>
       }
       sidebar={
@@ -124,5 +93,37 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
     />
   );
 }
+
+// Render the appropriate main content based on mode
+// Add mode takes precedence over edit mode if both are set
+const MainContent = ({ mode }: MainContentProps) => {
+  if (mode === 'add') {
+    return (
+      <ErrorBoundary name={'add-bobblehead-form'}>
+        <Suspense fallback={<AddItemFormSkeleton />}>
+          <AddBobbleheadFormAsync />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (mode === 'edit') {
+    return (
+      <ErrorBoundary name={'edit-bobblehead-form'}>
+        <Suspense fallback={<AddItemFormSkeleton />}>
+          <EditBobbleheadFormAsync />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  return (
+    <ErrorBoundary name={'collection-bobbleheads'}>
+      <Suspense fallback={<BobbleheadContentSkeleton />}>
+        <BobbleheadGridAsync />
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
 
 export default withParamValidation(CollectionPage, Route);

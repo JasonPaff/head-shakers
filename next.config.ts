@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default withSentryConfig(nextConfig, {

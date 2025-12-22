@@ -8,7 +8,7 @@ import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo/seo.constants';
 
 import { HeroSection } from './components/sections/hero-section';
 
-export const revalidate = 600;
+export const dynamic = 'force-dynamic';
 
 export function generateMetadata(): Metadata {
   return generatePageMetadata('home', {

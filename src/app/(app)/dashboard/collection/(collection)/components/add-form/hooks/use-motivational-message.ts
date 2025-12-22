@@ -29,17 +29,15 @@ export function useMotivationalMessage(
 
     // if there are required fields, all must be filled
     if (requiredFields.length > 0) {
-      const allRequiredFilled = requiredFields.every((fieldName) => {
+      return requiredFields.every((fieldName) => {
         const value = formValues[fieldName];
         return value !== null && value !== undefined && value !== '';
       });
-
-      return allRequiredFilled;
     }
 
     // if there are only optional fields, show if at least one is filled and blurred
     if (optionalFields.length > 0) {
-      const hasFilledAndBlurredField = optionalFields.some((fieldName) => {
+      return optionalFields.some((fieldName) => {
         const value = formValues[fieldName];
         const meta = fieldMeta[fieldName];
 
@@ -67,8 +65,6 @@ export function useMotivationalMessage(
 
         return hasValue && hasBeenTouched;
       });
-
-      return hasFilledAndBlurredField;
     }
 
     // default to not showing if no configuration is provided

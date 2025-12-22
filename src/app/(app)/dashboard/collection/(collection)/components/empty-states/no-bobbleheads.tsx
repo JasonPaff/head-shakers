@@ -16,7 +16,7 @@ export const NoBobbleheads = () => {
 
   return (
     <div
-      className={`flex h-full min-h-[400px] w-full flex-col items-center justify-center
+      className={`flex h-full min-h-100 w-full flex-col items-center justify-center
         rounded-lg border border-dashed bg-card p-8 text-center`}
       data-slot={'no-bobbleheads'}
     >

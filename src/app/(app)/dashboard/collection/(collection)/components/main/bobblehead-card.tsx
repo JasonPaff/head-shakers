@@ -63,9 +63,17 @@ export const BobbleheadCard = ({
     onSelectionChange(bobblehead.id, checked);
   };
 
-  const handleEdit = () => onEdit(bobblehead.id);
-  const handleDelete = () => onDelete(bobblehead.id);
-  const handleFeatureToggle = () => onFeatureToggle(bobblehead.id);
+  const handleEdit = () => {
+    onEdit(bobblehead.id);
+  };
+
+  const handleDelete = () => {
+    onDelete(bobblehead.id);
+  };
+
+  const handleFeatureToggle = () => {
+    onFeatureToggle(bobblehead.id);
+  };
 
   const handleCardClick = () => {
     if (isSelectionMode) {

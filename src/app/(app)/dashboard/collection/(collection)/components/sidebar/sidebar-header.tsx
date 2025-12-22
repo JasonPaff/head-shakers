@@ -14,7 +14,7 @@ export const SidebarHeader = ({ onCreateClick }: SidebarHeaderProps) => {
     >
       <h2
         className={
-          'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-lg font-bold text-transparent'
+          'bg-linear-to-r from-primary to-primary/70 bg-clip-text text-lg font-bold text-transparent'
         }
       >
         Collections

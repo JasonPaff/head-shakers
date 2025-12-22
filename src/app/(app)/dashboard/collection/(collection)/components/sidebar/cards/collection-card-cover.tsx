@@ -37,7 +37,9 @@ export const CollectionCardCover = ({
 }: CollectionCardCoverProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
-  const handleClick = () => onClick(collection.slug);
+  const handleClick = () => {
+    onClick(collection.slug);
+  };
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
@@ -71,7 +73,7 @@ export const CollectionCardCover = ({
           tabIndex={0}
         >
           {/* Cover Image with Gradient Overlay */}
-          <div className={'relative aspect-[4/3] overflow-hidden bg-muted'}>
+          <div className={'relative aspect-4/3 overflow-hidden bg-muted'}>
             <img
               alt={collection.name}
               className={'size-full object-cover transition-transform group-hover:scale-105'}
@@ -80,7 +82,7 @@ export const CollectionCardCover = ({
             />
 
             {/* Gradient Overlay */}
-            <div className={'absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent'} />
+            <div className={'absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent'} />
 
             {/* Collection Info Overlay */}
             <div className={'absolute right-0 bottom-0 left-0 p-4 text-white'}>

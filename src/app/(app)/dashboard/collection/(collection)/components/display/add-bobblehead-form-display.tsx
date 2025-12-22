@@ -101,12 +101,7 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
               <div className={'flex items-center justify-end'}>
                 {/* Form actions */}
                 <div className={'flex items-center gap-4'}>
-                  <Button
-                    className={'min-w-[100px]'}
-                    onClick={handleClose}
-                    type={'button'}
-                    variant={'outline'}
-                  >
+                  <Button className={'min-w-25'} onClick={handleClose} type={'button'} variant={'outline'}>
                     Cancel
                   </Button>
                   <form.SubmitButton isDisabled={isExecuting}>

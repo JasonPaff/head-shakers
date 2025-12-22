@@ -14,7 +14,7 @@ export const NoCollections = ({ onCreateClick }: NoCollectionsProps) => {
     >
       <LayersIcon aria-hidden className={'mb-4 size-12 text-muted-foreground/50'} />
       <h3 className={'mb-2 text-lg font-semibold'}>No collections yet</h3>
-      <p className={'mb-4 max-w-[200px] text-sm text-muted-foreground'}>
+      <p className={'mb-4 max-w-50 text-sm text-muted-foreground'}>
         Create your first collection to start organizing your bobbleheads
       </p>
       <Button onClick={onCreateClick} size={'sm'}>

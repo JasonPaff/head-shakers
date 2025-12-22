@@ -46,7 +46,9 @@ export const CollectionCardDetailed = ({
 }: CollectionCardDetailedProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
-  const handleClick = () => onClick(collection.slug);
+  const handleClick = () => {
+    onClick(collection.slug);
+  };
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
@@ -66,7 +68,7 @@ export const CollectionCardDetailed = ({
             'group relative cursor-pointer rounded-lg border p-3 transition-all',
             'hover:border-primary hover:bg-accent',
             isActive ?
-              'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-md'
+              'border-primary bg-linear-to-r from-primary/10 to-primary/5 shadow-md'
             : 'border-border bg-card',
           )}
           data-slot={'collection-card-detailed'}

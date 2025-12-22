@@ -50,10 +50,10 @@ export const BobbleheadGridDisplay = ({
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
   const router = useRouter();
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useToggle();
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
   const [deleteTarget, setDeleteTarget] = useState<null | string>(null);
-  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
     userPreferences.collectionGridDensity ?? 'compact',
@@ -106,7 +106,7 @@ export const BobbleheadGridDisplay = ({
     loadingMessage: 'Deleting bobbleheads...',
     onAfterSuccess: () => {
       setSelectedIds(new Set());
-      setIsBulkDeleteDialogOpen(false);
+      setIsBulkDeleteDialogOpen.off();
       router.refresh();
     },
   });
@@ -151,7 +151,7 @@ export const BobbleheadGridDisplay = ({
   };
 
   const handleBulkDelete = () => {
-    setIsBulkDeleteDialogOpen(true);
+    setIsBulkDeleteDialogOpen.on();
   };
 
   const handleBulkDeleteConfirm = async () => {
@@ -331,9 +331,7 @@ export const BobbleheadGridDisplay = ({
       <ConfirmDeleteAlertDialog
         confirmationText={selectedIds.size.toString()}
         isOpen={isBulkDeleteDialogOpen}
-        onClose={() => {
-          setIsBulkDeleteDialogOpen(false);
-        }}
+        onClose={setIsBulkDeleteDialogOpen.off}
         onDeleteAsync={handleBulkDeleteConfirm}
       >
         This will permanently delete {selectedIds.size} bobblehead{selectedIds.size === 1 ? '' : 's'} and all

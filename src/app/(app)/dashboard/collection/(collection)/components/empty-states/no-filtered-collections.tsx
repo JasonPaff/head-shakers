@@ -14,7 +14,7 @@ export const NoFilteredCollections = ({ onClearSearch }: NoFilteredCollectionsPr
     >
       <SearchIcon aria-hidden className={'mb-4 size-12 text-muted-foreground/50'} />
       <h3 className={'mb-2 text-lg font-semibold'}>No collections found</h3>
-      <p className={'mb-4 max-w-[200px] text-sm text-muted-foreground'}>
+      <p className={'mb-4 max-w-50 text-sm text-muted-foreground'}>
         No collections match your search. Try a different term.
       </p>
       <Button onClick={onClearSearch} size={'sm'} variant={'outline'}>
