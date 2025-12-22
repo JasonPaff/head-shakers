@@ -1,12 +1,15 @@
 import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
+import assert from 'node:assert';
 
 import { CONFIG } from '@/lib/constants';
 
 import * as schema from './schema/index';
 
+assert(process.env.DATABASE_URL, 'DATABASE_URL must be set');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
+  connectionString: process.env.DATABASE_URL,
   connectionTimeoutMillis: CONFIG.DATABASE.QUERY_TIMEOUT,
   idleTimeoutMillis: CONFIG.DATABASE.TRANSACTION_TIMEOUT,
   max: CONFIG.DATABASE.CONNECTION_POOL_SIZE,
