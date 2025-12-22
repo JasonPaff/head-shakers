@@ -8,7 +8,7 @@
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.20rem;
 
   /* Core - Home page inspired warm orange/slate palette */
   --background: oklch(0.98 0.016 73.684); /* orange-50 warm background */
