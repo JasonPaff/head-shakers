@@ -94,7 +94,7 @@ describe('CollectionCardCompact', () => {
 
       const card = screen.getByRole('button', { name: /sports collection/i });
       expect(card).toHaveClass('border-primary');
-      expect(card).toHaveClass('bg-gradient-to-r');
+      expect(card).toHaveClass('bg-linear-to-r');
       expect(card).toHaveClass('from-primary/10');
     });
 
@@ -104,7 +104,7 @@ describe('CollectionCardCompact', () => {
       const card = screen.getByRole('button', { name: /sports collection/i });
       expect(card).toHaveClass('border-border');
       expect(card).toHaveClass('bg-card');
-      expect(card).not.toHaveClass('bg-gradient-to-r');
+      expect(card).not.toHaveClass('bg-linear-to-r');
     });
 
     it('should render active indicator when isActive is true', () => {
