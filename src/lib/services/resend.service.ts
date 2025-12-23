@@ -127,7 +127,7 @@ export class ResendService {
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { text-align: center; margin-bottom: 30px; }
             .header h1 { color: #000; font-size: 24px; margin: 0; }
-            .content { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            .content { background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
             .footer { text-align: center; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; }
             .button { display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 4px; margin: 20px 0; }
           </style>
@@ -165,9 +165,9 @@ export class ResendService {
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #333; line-height: 1.6; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px 20px; border-radius: 8px; }
+            .header { text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px 20px; border-radius: 4px; }
             .header h1 { font-size: 32px; margin: 0; }
-            .content { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            .content { background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
             .footer { text-align: center; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; }
             .button { display: inline-block; padding: 12px 24px; background: #667eea; color: #fff; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: bold; }
             .button:hover { background: #764ba2; }
@@ -209,9 +209,9 @@ export class ResendService {
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #333; line-height: 1.6; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px 20px; border-radius: 8px; }
+            .header { text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px 20px; border-radius: 4px; }
             .header h1 { font-size: 28px; margin: 0; }
-            .content { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            .content { background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
             .highlight { background: #fff; padding: 15px; border-left: 4px solid #667eea; margin: 15px 0; border-radius: 0 4px 4px 0; }
             .footer { text-align: center; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; }
             .button { display: inline-block; padding: 12px 24px; background: #667eea; color: #fff; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: bold; }
