@@ -13,14 +13,14 @@ export const BobbleheadGridSkeleton = () => {
 
       <div className={'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'}>
         {Array.from({ length: 12 }).map((_, index) => (
-          <div className={'overflow-hidden rounded-lg border bg-card'} key={index}>
+          <div className={'overflow-hidden rounded-md border bg-card'} key={index}>
             {/* Image Skeleton */}
             <Skeleton className={'aspect-square w-full rounded-none'} />
 
             {/* Card Info Skeleton */}
             <div className={'space-y-2 p-2'}>
               <Skeleton className={'h-4 w-full'} />
-              <Skeleton className={'h-5 w-16 rounded-md'} />
+              <Skeleton className={'h-5 w-16 rounded-sm'} />
             </div>
           </div>
         ))}

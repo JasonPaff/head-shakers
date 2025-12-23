@@ -20,7 +20,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/utils/tailwind-utils';
 
-const conditionVariants = cva('inline-block rounded-md px-2 py-0.5 text-xs font-medium', {
+const conditionVariants = cva('inline-block rounded-sm px-2 py-0.5 text-xs font-medium', {
   defaultVariants: {
     condition: 'good',
   },
@@ -86,7 +86,7 @@ export const BobbleheadCard = ({
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-lg border bg-card transition-all hover:shadow-lg',
+        'group relative overflow-hidden rounded-md border bg-card transition-all hover:shadow-lg',
         isSelected && 'ring-2 ring-primary',
       )}
       data-slot={'bobblehead-card'}

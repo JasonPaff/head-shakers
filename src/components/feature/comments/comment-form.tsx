@@ -104,7 +104,7 @@ export const CommentForm = ({
     <form className={cn('space-y-3', className)} onSubmit={handleSubmit} {...props}>
       {/* Reply Context Indicator */}
       <Conditional isCondition={_shouldShowReplyContext}>
-        <div className={cn('flex flex-col gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2')}>
+        <div className={cn('flex flex-col gap-2 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2')}>
           <div className={'flex items-center justify-between gap-2'}>
             <div className={'flex items-center gap-2 text-sm text-muted-foreground'}>
               <ReplyIcon aria-hidden className={'size-4 shrink-0'} />
@@ -136,7 +136,7 @@ export const CommentForm = ({
       <Conditional isCondition={isAtMaxDepth}>
         <div
           className={cn(
-            'rounded-md border border-orange-500/20 bg-orange-500/10 px-3 py-2 text-sm text-orange-600',
+            'rounded-sm border border-orange-500/20 bg-orange-500/10 px-3 py-2 text-sm text-orange-600',
           )}
           role={'alert'}
         >

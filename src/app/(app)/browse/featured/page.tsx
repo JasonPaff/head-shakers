@@ -60,7 +60,7 @@ export default async function FeaturedPage() {
           </ErrorBoundary>
 
           {/* Static Call to Action - renders immediately */}
-          <section className={'rounded-lg bg-muted/30 p-8 text-center'}>
+          <section className={'rounded-md bg-muted/30 p-8 text-center'}>
             <h3 className={'mb-2 text-xl font-semibold'}>Want to be featured?</h3>
             <p className={'mb-4 text-muted-foreground'}>
               Share your amazing collections and connect with other collectors to get noticed by our community

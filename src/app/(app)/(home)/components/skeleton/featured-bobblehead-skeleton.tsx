@@ -25,15 +25,15 @@ export const FeaturedBobbleheadSkeleton = () => {
       {/* Main Featured Card Container */}
       <div className={'relative'}>
         <div
-          className={`relative overflow-hidden rounded-3xl border border-orange-200/50 bg-gradient-to-br
+          className={`relative overflow-hidden rounded-2xl border border-orange-200/50 bg-gradient-to-br
             from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm dark:border-slate-700/50
             dark:from-slate-800/80 dark:to-slate-900/80`}
           data-slot={'hero-featured-bobblehead-skeleton-card'}
         >
           {/* Main Image Area Skeleton */}
-          <div className={'relative aspect-square overflow-hidden rounded-2xl'}>
+          <div className={'relative aspect-square overflow-hidden rounded-xl'}>
             <Skeleton
-              className={'absolute inset-0 size-full rounded-2xl'}
+              className={'absolute inset-0 size-full rounded-xl'}
               testId={generateTestId('ui', 'skeleton', 'hero-featured-bobblehead-image')}
             />
 
@@ -75,7 +75,7 @@ export const FeaturedBobbleheadSkeleton = () => {
         {/* Floating Card Skeleton - Top Left */}
         <div
           aria-hidden={'true'}
-          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
+          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-xl border
             border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
             dark:bg-slate-800/90`}
           data-slot={'hero-featured-bobblehead-skeleton-float-card'}
@@ -83,7 +83,7 @@ export const FeaturedBobbleheadSkeleton = () => {
         >
           <div className={'flex items-center gap-3'}>
             <Skeleton
-              className={'size-9 rounded-xl'}
+              className={'size-9 rounded-lg'}
               testId={generateTestId('ui', 'skeleton', 'hero-featured-bobblehead-float-icon-1')}
             />
             <div>
@@ -102,7 +102,7 @@ export const FeaturedBobbleheadSkeleton = () => {
         {/* Floating Card Skeleton - Bottom Right */}
         <div
           aria-hidden={'true'}
-          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
+          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-xl border
             border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
             dark:bg-slate-800/90`}
           data-slot={'hero-featured-bobblehead-skeleton-float-card'}
@@ -110,7 +110,7 @@ export const FeaturedBobbleheadSkeleton = () => {
         >
           <div className={'flex items-center gap-3'}>
             <Skeleton
-              className={'size-9 rounded-xl'}
+              className={'size-9 rounded-lg'}
               testId={generateTestId('ui', 'skeleton', 'hero-featured-bobblehead-float-icon-2')}
             />
             <div>

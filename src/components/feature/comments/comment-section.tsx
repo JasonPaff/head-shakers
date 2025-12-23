@@ -189,7 +189,7 @@ export const CommentSection = ({
 
       {/* Comment Form */}
       <Conditional isCondition={_shouldShowForm}>
-        <div className={'rounded-lg border bg-card p-4'}>
+        <div className={'rounded-md border bg-card p-4'}>
           <CommentForm
             isAtMaxDepth={_isAtMaxDepth}
             isDisabled={_isProcessing}
@@ -207,7 +207,7 @@ export const CommentSection = ({
 
       {/* Unauthenticated Message */}
       <Conditional isCondition={!isAuthenticated}>
-        <div className={'rounded-lg border bg-muted/50 p-4 text-center text-sm text-muted-foreground'}>
+        <div className={'rounded-md border bg-muted/50 p-4 text-center text-sm text-muted-foreground'}>
           Sign in to leave a comment
         </div>
       </Conditional>

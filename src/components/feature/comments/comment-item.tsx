@@ -169,7 +169,7 @@ export const CommentItem = ({
   return (
     <div
       className={cn(
-        'group relative rounded-lg border transition-colors hover:bg-muted/50',
+        'group relative rounded-md border transition-colors hover:bg-muted/50',
         _isDeeplyNested ? 'p-3' : 'p-4',
         getDepthBackgroundClass(depth),
         getDepthBorderClass(depth),

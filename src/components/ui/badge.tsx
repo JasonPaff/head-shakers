@@ -10,7 +10,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 const badgeVariants = cva(
   [
-    'inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border',
+    'inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-sm border',
     'px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]',
     'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
     'aria-invalid:border-destructive aria-invalid:ring-destructive/20',

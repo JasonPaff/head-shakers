@@ -47,7 +47,7 @@ export const CommentSectionSkeleton = ({
 
       {/* Comment Form Skeleton */}
       {shouldShowForm && (
-        <div className={'rounded-lg border bg-card p-4'}>
+        <div className={'rounded-md border bg-card p-4'}>
           <div className={'space-y-4'}>
             <Skeleton className={'h-24 w-full'} />
             <div className={'flex items-center justify-between'}>
@@ -107,7 +107,7 @@ const CommentItemSkeleton = ({ depth = 0 }: CommentItemSkeletonProps) => {
     depth > 0 ? (_depthBorders[Math.min(depth, 3)] ?? 'border-l-4 border-l-primary/30') : '';
 
   return (
-    <div className={cn('rounded-lg border', _padding, _backgroundClass, _borderClass)}>
+    <div className={cn('rounded-md border', _padding, _backgroundClass, _borderClass)}>
       <div className={'space-y-3'}>
         {/* User info skeleton */}
         <div className={'flex items-center gap-3'}>

@@ -136,7 +136,7 @@ export const AppHeaderMobileMenu = () => {
                   <SheetClose asChild key={item.href}>
                     <Link
                       className={cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2.5',
+                        'flex items-center gap-3 rounded-sm px-3 py-2.5',
                         'text-sm font-medium transition-colors',
                         'hover:bg-accent hover:text-accent-foreground',
                       )}
@@ -161,7 +161,7 @@ export const AppHeaderMobileMenu = () => {
                     <SheetClose asChild key={item.href}>
                       <Link
                         className={cn(
-                          'flex items-center gap-3 rounded-md px-3 py-2.5',
+                          'flex items-center gap-3 rounded-sm px-3 py-2.5',
                           'text-sm font-medium transition-colors',
                           'hover:bg-accent hover:text-accent-foreground',
                         )}
@@ -189,7 +189,7 @@ export const AppHeaderMobileMenu = () => {
                     <SheetClose asChild key={item.href}>
                       <Link
                         className={cn(
-                          'flex items-center gap-3 rounded-md px-3 py-2.5',
+                          'flex items-center gap-3 rounded-sm px-3 py-2.5',
                           'text-sm font-medium transition-colors',
                           'hover:bg-accent hover:text-accent-foreground',
                         )}

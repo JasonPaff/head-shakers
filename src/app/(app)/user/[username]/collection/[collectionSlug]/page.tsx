@@ -39,7 +39,7 @@ function CollectionViewPage() {
   return (
     <div className={'container mx-auto max-w-7xl px-4 py-8'}>
       {/* Layout Switcher - For Mockup Preview */}
-      <div className={'mb-6 flex items-center justify-between rounded-lg border bg-muted/50 p-3'}>
+      <div className={'mb-6 flex items-center justify-between rounded-md border bg-muted/50 p-3'}>
         <div className={'text-sm text-muted-foreground'}>
           <span className={'font-medium text-foreground'}>Mockup Preview:</span> Switch between layout
           variations

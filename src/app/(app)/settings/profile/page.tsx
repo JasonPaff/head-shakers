@@ -53,7 +53,7 @@ export default async function ProfileSettingsPage() {
           <CardContent>
             <div className={'space-y-4'}>
               {/* Current username display */}
-              <div className={'rounded-lg bg-muted p-4'}>
+              <div className={'rounded-md bg-muted p-4'}>
                 <p className={'text-sm text-muted-foreground'}>Current Username</p>
                 <p className={'text-lg font-semibold'}>@{user.username}</p>
                 {user.usernameChangedAt && (

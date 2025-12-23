@@ -21,13 +21,13 @@ export const SidebarMenuSkeleton = ({
 
   return (
     <div
-      className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
+      className={cn('flex h-8 items-center gap-2 rounded-sm px-2', className)}
       data-sidebar={'menu-skeleton'}
       data-slot={'sidebar-menu-skeleton'}
       {...props}
     >
       <Conditional isCondition={isShowIcon}>
-        <Skeleton className={'size-4 rounded-md'} data-sidebar={'menu-skeleton-icon'} />
+        <Skeleton className={'size-4 rounded-sm'} data-sidebar={'menu-skeleton-icon'} />
       </Conditional>
       <Skeleton
         className={'h-4 flex-1'}

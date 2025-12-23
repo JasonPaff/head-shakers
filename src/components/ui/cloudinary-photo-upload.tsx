@@ -1169,7 +1169,7 @@ export const CloudinaryPhotoUpload = ({
 
               return (
                 <div
-                  className={'rounded-md border bg-muted/50 p-3 text-sm transition-all'}
+                  className={'rounded-sm border bg-muted/50 p-3 text-sm transition-all'}
                   key={file.filename}
                 >
                   <div className={'mb-2 flex items-center justify-between'}>
@@ -1210,7 +1210,7 @@ export const CloudinaryPhotoUpload = ({
 
       {/* Upload Complete Summary */}
       <Conditional isCondition={!uploadState.isUploading && (_hasCompletedFiles || _hasFailedFiles)}>
-        <div className={'space-y-2 rounded-md border p-4'}>
+        <div className={'space-y-2 rounded-sm border p-4'}>
           <h3 className={'text-sm font-medium'}>Upload Complete</h3>
 
           {/* Completed Files */}
@@ -1262,7 +1262,7 @@ export const CloudinaryPhotoUpload = ({
       <Conditional isCondition={_isNearMaxPhotos && !_isAtMaxPhotos}>
         <div
           className={
-            'flex items-start gap-3 rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30'
+            'flex items-start gap-3 rounded-sm border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30'
           }
         >
           <InfoIcon aria-hidden className={'size-5 shrink-0 text-blue-600 dark:text-blue-400'} />
@@ -1279,7 +1279,7 @@ export const CloudinaryPhotoUpload = ({
       <Conditional isCondition={_isAtMaxPhotos}>
         <div
           className={
-            'flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30'
+            'flex items-start gap-3 rounded-sm border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30'
           }
         >
           <AlertCircleIcon aria-hidden className={'size-5 shrink-0 text-amber-600 dark:text-amber-400'} />
@@ -1295,7 +1295,7 @@ export const CloudinaryPhotoUpload = ({
       </Conditional>
 
       {/* FAQ Section */}
-      <div className={'rounded-md border bg-muted/50'}>
+      <div className={'rounded-sm border bg-muted/50'}>
         <button
           className={
             'flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-muted'
@@ -1348,7 +1348,7 @@ export const CloudinaryPhotoUpload = ({
       <Conditional isCondition={uploadState.isUploading}>
         <div
           className={
-            'flex items-start gap-3 rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30'
+            'flex items-start gap-3 rounded-sm border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30'
           }
         >
           <InfoIcon aria-hidden className={'size-5 shrink-0 text-blue-600 dark:text-blue-400'} />
@@ -1363,7 +1363,7 @@ export const CloudinaryPhotoUpload = ({
 
       {/* Upload Error */}
       <Conditional isCondition={!!uploadState.error && !uploadState.isUploading}>
-        <div className={'rounded-md bg-red-50 p-3 text-sm text-destructive'}>
+        <div className={'rounded-sm bg-red-50 p-3 text-sm text-destructive'}>
           Upload error: {uploadState.error}
         </div>
       </Conditional>
@@ -1412,7 +1412,7 @@ export const CloudinaryPhotoUpload = ({
           <Conditional isCondition={isSelectionMode && _hasSelectedPhotos}>
             <div
               className={cn(
-                'flex items-center justify-between gap-3 rounded-md border border-primary bg-primary/10 p-3',
+                'flex items-center justify-between gap-3 rounded-sm border border-primary bg-primary/10 p-3',
                 'animate-in duration-200 fade-in slide-in-from-top-2',
               )}
             >
@@ -1451,7 +1451,7 @@ export const CloudinaryPhotoUpload = ({
 
           {/* Reorder Status Indicator */}
           <Conditional isCondition={isReorderPending || isReorderSuccess || !!reorderError}>
-            <div className={'flex items-center justify-center gap-2 rounded-md bg-muted p-2 text-sm'}>
+            <div className={'flex items-center justify-center gap-2 rounded-sm bg-muted p-2 text-sm'}>
               <Conditional isCondition={isReorderPending}>
                 <div className={'flex items-center gap-2 text-muted-foreground'}>
                   <div
@@ -1531,7 +1531,7 @@ export const CloudinaryPhotoUpload = ({
                           <Conditional isCondition={photo.isPrimary}>
                             <div
                               className={cn(
-                                'flex items-center gap-2 rounded-md bg-yellow-50 px-3 py-2',
+                                'flex items-center gap-2 rounded-sm bg-yellow-50 px-3 py-2',
                                 'border border-yellow-200 dark:border-yellow-800 dark:bg-yellow-950/30',
                               )}
                             >
@@ -1550,7 +1550,7 @@ export const CloudinaryPhotoUpload = ({
                           {/* Image Preview */}
                           <div
                             className={cn(
-                              'relative aspect-square overflow-hidden rounded-lg',
+                              'relative aspect-square overflow-hidden rounded-md',
                               photo.isUploading && 'animate-pulse ring-2 ring-primary ring-offset-2',
                             )}
                           >
@@ -1820,7 +1820,7 @@ export const CloudinaryPhotoUpload = ({
               <p className={'text-sm font-medium'}>Photos to be deleted:</p>
               <div className={'grid grid-cols-4 gap-2'}>
                 {_selectedPhotosArray.slice(0, 8).map((photo) => (
-                  <div className={'relative aspect-square overflow-hidden rounded-md border'} key={photo.id}>
+                  <div className={'relative aspect-square overflow-hidden rounded-sm border'} key={photo.id}>
                     {photo.blobUrl ?
                       <img
                         alt={photo.altText || 'Photo to delete'}

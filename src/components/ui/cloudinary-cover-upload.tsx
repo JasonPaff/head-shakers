@@ -195,7 +195,7 @@ export const CloudinaryCoverUpload = ({
 
       {/* Upload Error */}
       <Conditional isCondition={!!uploadError}>
-        <div className={'rounded-md bg-red-50 p-3 text-sm text-destructive'}>Upload error: {uploadError}</div>
+        <div className={'rounded-sm bg-red-50 p-3 text-sm text-destructive'}>Upload error: {uploadError}</div>
       </Conditional>
 
       {/* Cover Photo Preview */}
@@ -204,7 +204,7 @@ export const CloudinaryCoverUpload = ({
           <CardContent className={'p-4'}>
             <div className={'space-y-3'}>
               {/* Image Preview */}
-              <div className={'relative aspect-video overflow-hidden rounded-lg'}>
+              <div className={'relative aspect-video overflow-hidden rounded-md'}>
                 <CldImage
                   alt={'Cover photo'}
                   className={'h-full w-full object-cover'}

@@ -43,7 +43,7 @@ export const AppFooter = () => {
                   href={$path({ route: '/' })}
                 >
                   <div
-                    className={`flex aspect-square size-8 items-center justify-center rounded-lg
+                    className={`flex aspect-square size-8 items-center justify-center rounded-md
                       bg-gradient-to-br from-orange-500 to-amber-500 text-sm font-bold text-white`}
                   >
                     HS

@@ -476,7 +476,7 @@ const BobbleheadSearchResult = ({
             <div className={'flex-shrink-0'}>
               <div
                 className={
-                  'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-md bg-muted'
+                  'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-sm bg-muted'
                 }
               >
                 {result.imageUrl ?
@@ -532,7 +532,7 @@ const BobbleheadSearchResult = ({
         <div className={'flex items-start gap-3'}>
           {/* Image Preview */}
           <div className={'flex-shrink-0'}>
-            <div className={'relative h-16 w-16 overflow-hidden rounded-md bg-muted'}>
+            <div className={'relative h-16 w-16 overflow-hidden rounded-sm bg-muted'}>
               <img alt={result.name} className={'object-cover'} sizes={'64px'} src={selectedImageUrl} />
             </div>
           </div>
@@ -594,7 +594,7 @@ const BobbleheadSearchResult = ({
                   <button
                     className={cn(
                       'relative h-16 w-16 cursor-pointer overflow-hidden',
-                      'rounded-md ring-offset-2 transition-all',
+                      'rounded-sm ring-offset-2 transition-all',
                       _isSelected ? 'ring-2 ring-primary' : 'ring-muted-foreground hover:ring-1',
                     )}
                     key={photo.url}

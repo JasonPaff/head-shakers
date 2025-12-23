@@ -38,7 +38,7 @@ export const ItemPhotos = withForm({
       <Card aria-labelledby={'photos-section-title'} role={'region'}>
         <CardHeader className={'relative'}>
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-lg bg-green-500 shadow-sm'}>
               <CameraIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>

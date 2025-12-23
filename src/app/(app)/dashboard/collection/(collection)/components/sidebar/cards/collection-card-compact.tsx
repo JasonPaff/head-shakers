@@ -57,7 +57,7 @@ export const CollectionCardCompact = ({
       <HoverCardTrigger asChild>
         <div
           className={cn(
-            'group relative cursor-pointer rounded-lg border p-3 transition-all',
+            'group relative cursor-pointer rounded-md border p-3 transition-all',
             'hover:border-primary hover:bg-accent',
             isActive ?
               'border-primary bg-linear-to-r from-primary/10 to-primary/5 shadow-md'
@@ -75,7 +75,7 @@ export const CollectionCardCompact = ({
         >
           <div className={'flex items-start gap-3 sm:gap-4'} data-slot={'item-content'}>
             {/* Collection Thumbnail */}
-            <Avatar className={'size-14 rounded-md sm:size-16 md:size-12'}>
+            <Avatar className={'size-14 rounded-sm sm:size-16 md:size-12'}>
               <AvatarImage
                 alt={collection.name}
                 src={collection.coverImageUrl ?? '/images/placeholders/collection-cover-placeholder.png'}
@@ -122,7 +122,7 @@ export const CollectionCardCompact = ({
           {/* Active Indicator with Animated Pulse */}
           <Conditional isCondition={isActive}>
             <div
-              className={'absolute top-0 left-0 h-full w-1 rounded-l-lg bg-primary'}
+              className={'absolute top-0 left-0 h-full w-1 rounded-l-md bg-primary'}
               data-slot={'active-indicator'}
             >
               <div className={'absolute inset-0 animate-pulse bg-primary/50'} />

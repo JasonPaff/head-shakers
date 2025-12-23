@@ -56,7 +56,7 @@ export const CollectionCardCover = ({
       <HoverCardTrigger asChild>
         <div
           className={cn(
-            'group relative cursor-pointer overflow-hidden rounded-xl border transition-all',
+            'group relative cursor-pointer overflow-hidden rounded-lg border transition-all',
             'hover:shadow-lg',
             isActive && 'border-primary shadow-lg ring-2 ring-primary/20',
             !isActive && 'border-border hover:border-primary/50',

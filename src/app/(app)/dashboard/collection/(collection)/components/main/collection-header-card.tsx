@@ -29,7 +29,7 @@ export const CollectionHeaderCard = ({ collection, onDelete, onEdit }: Collectio
         <div className={'flex items-start justify-between'}>
           <div className={'flex items-start gap-4'}>
             {/* Cover Image */}
-            <Avatar className={'size-20 rounded-lg'}>
+            <Avatar className={'size-20 rounded-md'}>
               <AvatarImage alt={collection.name} src={collection.coverImageUrl ?? undefined} />
               <AvatarFallback>{collection.name?.charAt(0)}</AvatarFallback>
             </Avatar>

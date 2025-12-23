@@ -44,7 +44,7 @@ export const CollectionAssignment = withForm({
         <CardHeader>
           {/* Title / Description */}
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl bg-purple-500 shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-lg bg-purple-500 shadow-sm'}>
               <FolderIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>

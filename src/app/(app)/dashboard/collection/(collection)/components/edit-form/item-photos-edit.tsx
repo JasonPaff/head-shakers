@@ -76,7 +76,7 @@ export function ItemPhotosEdit({
     <Card aria-labelledby={'photos-section-title'} role={'region'}>
       <CardHeader className={'relative'}>
         <div className={'flex items-center gap-3'}>
-          <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
+          <div className={'flex size-10 items-center justify-center rounded-lg bg-green-500 shadow-sm'}>
             <CameraIcon aria-hidden className={'size-5 text-white'} />
           </div>
           <div>
@@ -98,7 +98,7 @@ export function ItemPhotosEdit({
                 <Card className={'overflow-hidden'} key={index}>
                   <CardContent className={'p-4'}>
                     <div className={'space-y-3'}>
-                      <Skeleton className={'aspect-square w-full rounded-lg'} />
+                      <Skeleton className={'aspect-square w-full rounded-md'} />
                       <Skeleton className={'h-8 w-full'} />
                       <Skeleton className={'h-16 w-full'} />
                     </div>

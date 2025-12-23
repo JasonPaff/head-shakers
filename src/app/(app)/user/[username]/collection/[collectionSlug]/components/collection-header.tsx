@@ -58,7 +58,7 @@ export const CollectionHeader = ({ collection, collector }: CollectionHeaderProp
     <div className={'mb-8'}>
       {/* Cover Image */}
       {collection.coverImageUrl && (
-        <div className={'relative mb-6 h-40 overflow-hidden rounded-xl sm:h-56 lg:h-64'}>
+        <div className={'relative mb-6 h-40 overflow-hidden rounded-lg sm:h-56 lg:h-64'}>
           {}
           <img
             alt={`${collection.name} cover`}

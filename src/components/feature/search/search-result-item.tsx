@@ -99,7 +99,7 @@ export const SearchResultItem = ({
   return (
     <Link
       className={cn(
-        'group flex items-start gap-3 rounded-md p-2',
+        'group flex items-start gap-3 rounded-sm p-2',
         'transition-all duration-200',
         'hover:bg-accent hover:shadow-sm',
         'focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
@@ -115,7 +115,7 @@ export const SearchResultItem = ({
       <Conditional
         fallback={
           <div
-            className={cn('size-12 shrink-0 rounded-md bg-muted', imageClassName)}
+            className={cn('size-12 shrink-0 rounded-sm bg-muted', imageClassName)}
             data-slot={'search-result-item-image-placeholder'}
           />
         }
@@ -123,7 +123,7 @@ export const SearchResultItem = ({
       >
         <div
           className={cn(
-            'relative size-12 shrink-0 overflow-hidden rounded-md bg-muted',
+            'relative size-12 shrink-0 overflow-hidden rounded-sm bg-muted',
             'transition-transform duration-200 group-hover:scale-105',
             imageClassName,
           )}

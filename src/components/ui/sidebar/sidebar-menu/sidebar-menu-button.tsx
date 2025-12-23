@@ -14,7 +14,7 @@ import { useSidebar } from '../sidebar-provider/use-sidebar';
 
 const styles = cva(
   [
-    'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm',
+    'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-sm p-2 text-left text-sm',
     'ring-sidebar-ring outline-hidden transition-[width,height,padding]',
     'group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8!',
     'group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',

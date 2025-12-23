@@ -35,7 +35,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
       {/* Main Feature Card */}
       <div className={'relative'}>
         <Link
-          className={`group relative block overflow-hidden rounded-3xl border border-primary/20
+          className={`group relative block overflow-hidden rounded-2xl border border-primary/20
             bg-gradient-to-br from-card/80 to-background/50 p-2 shadow-2xl backdrop-blur-sm
             dark:border-border/50 dark:from-secondary/80 dark:to-background/80`}
           data-slot={'hero-featured-card'}
@@ -45,7 +45,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
             routeParams: { bobbleheadSlug: bobblehead.contentSlug ?? '' },
           })}
         >
-          <div className={'relative aspect-square overflow-hidden rounded-2xl'}>
+          <div className={'relative aspect-square overflow-hidden rounded-xl'}>
             {/* Bobblehead Image */}
             <Conditional
               fallback={
@@ -115,7 +115,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         {/* Top Rated This Week Card */}
         <div
           aria-hidden
-          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
+          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-xl border
             border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
             dark:border-border/50 dark:bg-secondary/90`}
           data-slot={'hero-floating-card'}
@@ -123,7 +123,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
           style={{ animationDuration: '3s' }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-gradient-to-br from-gradient-from to-gradient-to p-2'}>
+            <div className={'rounded-lg bg-gradient-to-br from-gradient-from to-gradient-to p-2'}>
               <TrophyIcon aria-hidden className={'size-5 text-primary-foreground'} />
             </div>
             <div>
@@ -136,7 +136,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         {/* Value Growth Card */}
         <div
           aria-hidden
-          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
+          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-xl border
             border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
             dark:border-border/50 dark:bg-secondary/90`}
           data-slot={'hero-floating-card'}
@@ -144,7 +144,7 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
           style={{ animationDelay: '1s', animationDuration: '4s' }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-gradient-to-br from-success to-new p-2'}>
+            <div className={'rounded-lg bg-gradient-to-br from-success to-new p-2'}>
               <TrendingUpIcon aria-hidden className={'size-5 text-success-foreground'} />
             </div>
             <div>

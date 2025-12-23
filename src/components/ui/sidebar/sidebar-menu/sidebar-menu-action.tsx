@@ -7,7 +7,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/utils/tailwind-utils';
 
 const styles = cn(
-  'absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0',
+  'absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-sm p-0',
   'text-sidebar-foreground ring-sidebar-ring outline-hidden transition-transform',
   'peer-hover/menu-button:text-sidebar-accent-foreground hover:bg-sidebar-accent',
   'hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',

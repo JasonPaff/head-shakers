@@ -22,7 +22,7 @@ export const PublicHeader = () => {
             <div
               className={cn(
                 'flex aspect-square size-8 items-center justify-center',
-                'rounded-lg bg-primary text-primary-foreground',
+                'rounded-md bg-primary text-primary-foreground',
               )}
             >
               HS

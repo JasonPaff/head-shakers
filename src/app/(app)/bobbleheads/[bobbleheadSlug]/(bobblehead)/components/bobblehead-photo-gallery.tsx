@@ -105,7 +105,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                   aria-label={`View ${altText} in lightbox`}
                   className={cn(
                     'group relative aspect-square cursor-pointer overflow-hidden',
-                    'rounded-lg bg-muted shadow-sm',
+                    'rounded-md bg-muted shadow-sm',
                     'animate-carousel-fade-in',
                     'transition-all duration-200 ease-out',
                     'hover:shadow-lg hover:ring-2 hover:ring-primary/20',

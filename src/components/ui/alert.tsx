@@ -36,7 +36,7 @@ export const Alert = ({ children, className, testId, variant, ...props }: AlertP
   const alertTestId = testId || generateTestId('ui', 'alert');
 
   return (
-    <div className={'rounded-md border px-4 py-3'} data-testid={alertTestId} {...props}>
+    <div className={'rounded-sm border px-4 py-3'} data-testid={alertTestId} {...props}>
       <p className={'text-sm'}>
         <Icon aria-hidden className={cn(style({ variant }), className)} />
         {children}

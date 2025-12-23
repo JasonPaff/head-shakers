@@ -207,7 +207,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
                 {/* View All Results Link */}
                 <Link
                   className={cn(
-                    'mt-2 flex items-center justify-center gap-2 rounded-md border-t p-2 pt-3',
+                    'mt-2 flex items-center justify-center gap-2 rounded-sm border-t p-2 pt-3',
                     'text-sm font-medium text-primary transition-colors',
                     'hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',
                   )}

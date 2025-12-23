@@ -28,7 +28,7 @@ export const PhysicalAttributes = withForm({
         <CardHeader className={'relative'}>
           {/* Title / Description */}
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-lg bg-green-500 shadow-sm'}>
               <RulerIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>

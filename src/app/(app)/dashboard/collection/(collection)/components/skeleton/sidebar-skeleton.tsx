@@ -25,8 +25,8 @@ export const SidebarSkeleton = () => {
       {/* Collection Cards Skeleton */}
       <div className={'flex-1 space-y-2 p-3'}>
         {Array.from({ length: 6 }).map((_, index) => (
-          <div className={'flex items-start gap-3 rounded-lg border p-3'} key={index}>
-            <Skeleton className={'size-12 rounded-md'} />
+          <div className={'flex items-start gap-3 rounded-md border p-3'} key={index}>
+            <Skeleton className={'size-12 rounded-sm'} />
             <div className={'flex-1 space-y-2'}>
               <Skeleton className={'h-4 w-32'} />
               <Skeleton className={'h-3 w-24'} />

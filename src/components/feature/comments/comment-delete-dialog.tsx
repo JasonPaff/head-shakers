@@ -90,7 +90,7 @@ export const CommentDeleteDialog = ({
               <Conditional isCondition={hasReplies}>
                 <div
                   className={cn(
-                    'rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200',
+                    'rounded-sm border border-amber-200 bg-amber-50 p-3 text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200',
                     _hasManyReplies &&
                       'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200',
                   )}

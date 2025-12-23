@@ -107,7 +107,7 @@ export const Sidebar = ({
       >
         <div
           className={cn(
-            'flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg',
+            'flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-md',
             'group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border',
             'group-data-[variant=floating]:shadow-sm',
           )}

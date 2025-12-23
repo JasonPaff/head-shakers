@@ -38,7 +38,7 @@ export const AppHeaderColorMode = () => {
   const _isDarkMode = isMounted && resolvedTheme === 'dark';
 
   if (!isMounted) {
-    return <Skeleton className={'size-9 rounded-md'} />;
+    return <Skeleton className={'size-9 rounded-sm'} />;
   }
 
   return (

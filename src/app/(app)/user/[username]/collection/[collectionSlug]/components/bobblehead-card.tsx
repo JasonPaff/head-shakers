@@ -56,7 +56,7 @@ export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardP
 
         {/* Photo Container */}
         <div
-          className={'relative mx-6 h-64 flex-shrink-0 overflow-hidden rounded-lg bg-muted'}
+          className={'relative mx-6 h-64 flex-shrink-0 overflow-hidden rounded-md bg-muted'}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
@@ -158,7 +158,7 @@ export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardP
     return (
       <div
         className={
-          'group relative overflow-hidden rounded-xl bg-card shadow-sm transition-all duration-300 hover:shadow-xl'
+          'group relative overflow-hidden rounded-lg bg-card shadow-sm transition-all duration-300 hover:shadow-xl'
         }
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}

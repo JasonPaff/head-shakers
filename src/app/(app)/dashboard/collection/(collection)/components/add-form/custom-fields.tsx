@@ -23,7 +23,7 @@ export const CustomFields = withForm({
         <CardHeader className={'relative'}>
           {/* Title / Description */}
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl bg-indigo-500 shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-lg bg-indigo-500 shadow-sm'}>
               <SettingsIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>

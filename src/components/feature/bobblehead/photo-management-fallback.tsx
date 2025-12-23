@@ -61,7 +61,7 @@ export function PhotoManagementFallback({
     <Card className={'border-destructive'}>
       <CardHeader>
         <div className={'flex items-center gap-3'}>
-          <div className={'flex size-10 items-center justify-center rounded-xl bg-destructive/10 shadow-sm'}>
+          <div className={'flex size-10 items-center justify-center rounded-md bg-destructive/10 shadow-sm'}>
             <AlertCircleIcon aria-hidden className={'size-5 text-destructive'} />
           </div>
           <div>
@@ -120,7 +120,7 @@ export function PhotoManagementFallback({
 
         {/* Development Error Details */}
         <Conditional isCondition={isDevelopment}>
-          <details className={'mt-4 rounded-md border bg-muted p-4 text-xs'}>
+          <details className={'mt-4 rounded-sm border bg-muted p-4 text-xs'}>
             <summary className={'cursor-pointer font-semibold'}>Developer Details</summary>
             <div className={'mt-2 space-y-2'}>
               <div>

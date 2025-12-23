@@ -15,7 +15,7 @@ export const CollectionHeaderSkeleton = () => {
         <div className={'flex items-start justify-between'}>
           <div className={'flex items-start gap-4'}>
             {/* Cover Image Skeleton */}
-            <Skeleton className={'size-20 rounded-lg'} />
+            <Skeleton className={'size-20 rounded-md'} />
 
             {/* Collection Info Skeleton */}
             <div className={'flex-1 space-y-2'}>

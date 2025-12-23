@@ -20,7 +20,7 @@ export const Card = ({ className, testId, ...props }: CardProps) => {
     <div
       className={cn(
         `
-          flex flex-col gap-6 rounded-xl border bg-card py-6
+          flex flex-col gap-6 rounded-md border bg-card py-6
           text-card-foreground shadow-sm
         `,
         className,

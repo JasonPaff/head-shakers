@@ -314,7 +314,7 @@ export const BobbleheadGalleryCard = ({
                transition-all duration-300 group-hover:bg-black/10`}
           >
             <div
-              className={`rounded-md bg-black/50 px-3 py-1 text-sm font-medium text-white
+              className={`rounded-sm bg-black/50 px-3 py-1 text-sm font-medium text-white
                 opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
             >
               View Gallery

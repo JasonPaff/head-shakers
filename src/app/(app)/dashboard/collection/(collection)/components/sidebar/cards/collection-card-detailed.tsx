@@ -65,7 +65,7 @@ export const CollectionCardDetailed = ({
       <HoverCardTrigger asChild>
         <div
           className={cn(
-            'group relative cursor-pointer rounded-lg border p-3 transition-all',
+            'group relative cursor-pointer rounded-md border p-3 transition-all',
             'hover:border-primary hover:bg-accent',
             isActive ?
               'border-primary bg-linear-to-r from-primary/10 to-primary/5 shadow-md'
@@ -147,7 +147,7 @@ export const CollectionCardDetailed = ({
           {/* Active Indicator */}
           <Conditional isCondition={isActive}>
             <div
-              className={'absolute top-0 left-0 h-full w-1 rounded-l-lg bg-primary'}
+              className={'absolute top-0 left-0 h-full w-1 rounded-l-md bg-primary'}
               data-slot={'active-indicator'}
             >
               <div className={'absolute inset-0 animate-pulse bg-primary/50'} />

@@ -238,7 +238,7 @@ export const CommentList = ({
       <Conditional isCondition={isLoading}>
         <div className={'space-y-3'}>
           {Array.from({ length: 3 }).map((_, index) => (
-            <div className={'animate-pulse rounded-lg border bg-card p-4'} key={index}>
+            <div className={'animate-pulse rounded-md border bg-card p-4'} key={index}>
               <div className={'mb-3 flex items-center gap-3'}>
                 <div className={'size-8 rounded-full bg-muted'} />
                 <div className={'flex-1 space-y-2'}>

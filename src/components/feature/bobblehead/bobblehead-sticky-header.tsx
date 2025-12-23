@@ -91,7 +91,7 @@ export const BobbleheadStickyHeader = ({
               <div className={'flex min-w-0 flex-1 items-center gap-1.5 md:gap-2'}>
                 {/* Optional Thumbnail */}
                 <Conditional isCondition={_hasThumbnail}>
-                  <div className={'size-6 flex-shrink-0 overflow-hidden rounded-md bg-muted md:size-8'}>
+                  <div className={'size-6 flex-shrink-0 overflow-hidden rounded-sm bg-muted md:size-8'}>
                     <img
                       alt={''}
                       className={'size-full object-cover'}

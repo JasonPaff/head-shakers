@@ -22,7 +22,7 @@ export const Command = ({ className, ...props }: CommandProps) => {
     <CommandPrimitive
       className={cn(
         'flex h-full w-full flex-col overflow-hidden',
-        'rounded-md bg-popover text-popover-foreground',
+        'rounded-sm bg-popover text-popover-foreground',
         className,
       )}
       data-slot={'command'}
@@ -111,7 +111,7 @@ export const CommandInput = ({ children, className, ...props }: CommandInputProp
       <SearchIcon className={'size-4 shrink-0 opacity-50'} />
       <CommandPrimitive.Input
         className={cn(
-          'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden',
+          'flex h-10 w-full rounded-sm bg-transparent py-3 text-sm outline-hidden',
           'placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}

@@ -11,7 +11,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 const styles = cva(
   [
-    'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2',
+    'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-sm px-2',
     'text-sidebar-foreground ring-sidebar-ring outline-none hover:bg-sidebar-accent',
     // hover styles
     'hover:text-sidebar-accent-foreground',

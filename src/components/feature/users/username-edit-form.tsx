@@ -162,7 +162,7 @@ export const UsernameEditForm = withFocusManagement<UsernameEditFormProps>(
         {shouldShowCooldownWarning && (
           <div
             className={cn(
-              'rounded-lg border border-amber-200 bg-amber-50 p-4',
+              'rounded-md border border-amber-200 bg-amber-50 p-4',
               'text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200',
             )}
             data-testid={'username-cooldown-warning'}
@@ -200,7 +200,7 @@ export const UsernameEditForm = withFocusManagement<UsernameEditFormProps>(
             <div className={'flex justify-end'}>
               <button
                 className={cn(
-                  'inline-flex items-center justify-center rounded-md px-4 py-2',
+                  'inline-flex items-center justify-center rounded-sm px-4 py-2',
                   'bg-primary text-sm font-medium text-primary-foreground',
                   'transition-colors hover:bg-primary/90',
                   'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
