@@ -76,6 +76,7 @@ export const BobbleheadPagination = ({
         {/* Pagination controls */}
         <div className={'flex items-center gap-1'}>
           <Button
+            aria-label={'Go to the previous page'}
             disabled={currentPage === 1}
             onClick={() => {
               onPageChange(currentPage - 1);
@@ -97,6 +98,7 @@ export const BobbleheadPagination = ({
 
             return (
               <Button
+                aria-label={`Go to page ${page}`}
                 key={page}
                 onClick={() => {
                   onPageChange(page);
@@ -110,6 +112,7 @@ export const BobbleheadPagination = ({
           })}
 
           <Button
+            aria-label={'Go to the next page'}
             disabled={currentPage === totalPages}
             onClick={() => {
               onPageChange(currentPage + 1);

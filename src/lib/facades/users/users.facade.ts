@@ -4,7 +4,7 @@ import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/u
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
-import { CACHE_ENTITY_TYPE, OPERATIONS, SCHEMA_LIMITS } from '@/lib/constants';
+import { CACHE_CONFIG, CACHE_ENTITY_TYPE, CACHE_KEYS, OPERATIONS, SCHEMA_LIMITS } from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -161,14 +161,52 @@ export class UsersFacade extends BaseFacade {
   }
 
   /**
-   * get user by username
+   * Get user by username
+   *
+   * Retrieves a user record by their unique username, with caching for performance.
+   * Username lookups are stable and frequently accessed, making them ideal for caching.
+   *
+   * Cache behavior:
+   * - TTL: 30 minutes (MEDIUM) - usernames are stable and change infrequently
+   * - Invalidation: User profile updates, username changes
+   *
+   * @param username - The unique username to look up
+   * @param dbInstance - Optional database instance for transactions
+   * @returns User record if found, null otherwise
    */
-  static async getUserByUsername(
+  static async getUserByUsernameAsync(
     username: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | UserRecord> {
-    const context = createPublicQueryContext({ dbInstance });
-    return UsersQuery.getUserByUsernameAsync(username, context);
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getUserByUsernameAsync',
+        operation: OPERATIONS.USERS.GET_USER_BY_USERNAME,
+      },
+      async () => {
+        return await CacheService.cached(
+          () => {
+            const context = createPublicQueryContext({ dbInstance });
+            return UsersQuery.getUserByUsernameAsync(username, context);
+          },
+          CACHE_KEYS.USERS.BY_USERNAME(username),
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.USER,
+              facade: facadeName,
+              operation: OPERATIONS.USERS.GET_USER_BY_USERNAME,
+            },
+            tags: CacheTagGenerators.user.profile(username),
+            ttl: CACHE_CONFIG.TTL.MEDIUM,
+          },
+        );
+      },
+      {
+        includeResultSummary: (user) =>
+          user ? { found: true, userId: user.id, username: user.username } : { found: false },
+      },
+    );
   }
 
   /**

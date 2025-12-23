@@ -12,6 +12,7 @@ import type {
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
+import type { UserRecord } from '@/lib/queries/users/users-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
@@ -22,12 +23,13 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
+import { CACHE_CONFIG, CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -67,7 +69,7 @@ export interface CollectionMetrics {
   };
 }
 
-export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
+export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicViewAsync>>;
 
 const facadeName = 'COLLECTIONS_FACADE';
 
@@ -561,7 +563,7 @@ export class CollectionsFacade extends BaseFacade {
         if (newCollection) {
           invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
           revalidatePath($path({ route: '/dashboard/collection' }));
-          CacheRevalidationService.collections.onCreate(newCollection.id, userId, newCollection.slug);
+          CacheRevalidationService.collections.onCreate(newCollection.id, userId);
         }
 
         return newCollection;
@@ -606,7 +608,7 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getAllCollectionBobbleheadsWithPhotos(
+  static async getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     viewerUserId?: string,
     options?: { searchTerm?: string; sortBy?: string },
@@ -641,7 +643,7 @@ export class CollectionsFacade extends BaseFacade {
           }
 
           const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
             bobbleheadIds,
             'bobblehead',
             viewerUserId,
@@ -669,7 +671,7 @@ export class CollectionsFacade extends BaseFacade {
       const context: FacadeErrorContext = {
         data: { collectionId },
         facade: 'CollectionsFacade',
-        method: 'getAllCollectionBobbleheadsWithPhotos',
+        method: 'getAllCollectionBobbleheadsWithPhotosAsync',
         operation: 'getAllBobbleheadsWithPhotos',
         userId: viewerUserId,
       };
@@ -814,7 +816,7 @@ export class CollectionsFacade extends BaseFacade {
           }
 
           const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
             bobbleheadIds,
             'bobblehead',
             viewerUserId,
@@ -874,7 +876,7 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getCollectionBySlugWithRelations(
+  static async getCollectionBySlugWithRelationsAsync(
     slug: string,
     userId: string,
     viewerUserId?: string,
@@ -890,7 +892,7 @@ export class CollectionsFacade extends BaseFacade {
       const context: FacadeErrorContext = {
         data: { slug, userId },
         facade: 'CollectionsFacade',
-        method: 'getCollectionBySlugWithRelations',
+        method: 'getCollectionBySlugWithRelationsAsync',
         operation: 'getBySlugWithRelations',
         userId: viewerUserId,
       };
@@ -898,8 +900,107 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getCollectionForPublicView(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
-    const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
+  /**
+   * Get collection by username and slug with user record.
+   * This is useful for public collection pages where you have both identifiers.
+   * Returns null if user is not found or collection is not found.
+   *
+   * Caching: Uses LONG TTL (1 hour) with composite key username:slug.
+   * Invalidated by: collection updates, user profile updates, collection deletion.
+   *
+   * @param username - The owner's username
+   * @param collectionSlug - The collection's slug
+   * @param viewerUserId - Optional viewer ID for permission context
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Object with collection and user record, or null if not found
+   */
+  static async getCollectionByUsernameAndSlugAsync(
+    username: string,
+    collectionSlug: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | { collection: NonNullable<PublicCollection>; user: UserRecord }> {
+    try {
+      // Use CacheService.cached() directly for composite key lookups
+      const cacheKey = `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:by-username-slug:${username}:${collectionSlug}`;
+
+      return await CacheService.cached(
+        async () => {
+          // Step 1: Look up user by username
+          const user = await UsersFacade.getUserByUsernameAsync(username, dbInstance);
+
+          if (!user) {
+            return null;
+          }
+
+          // Step 2: Fetch collection using existing method
+          const collectionWithRelations = await this.getCollectionBySlugWithRelationsAsync(
+            collectionSlug,
+            user.id,
+            viewerUserId,
+            dbInstance,
+          );
+
+          if (!collectionWithRelations) {
+            return null;
+          }
+
+          // Step 3: Transform to public view
+          const publicCollection = await this.getCollectionForPublicViewAsync(
+            collectionWithRelations.id,
+            viewerUserId,
+            dbInstance,
+          );
+
+          if (!publicCollection) {
+            return null;
+          }
+
+          // Step 4: Add breadcrumb on successful fetch
+          Sentry.addBreadcrumb({
+            category: 'business_logic',
+            data: {
+              collectionId: publicCollection.id,
+              collectionSlug,
+              userId: user.id,
+              username,
+            },
+            level: 'info',
+            message: `Fetched collection by username and slug: ${username}/${collectionSlug}`,
+          });
+
+          return { collection: publicCollection, user };
+        },
+        cacheKey,
+        {
+          context: {
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'getByUsernameAndSlug',
+            userId: viewerUserId,
+          },
+          tags: ['collection', 'public'], // Generic tags since we don't have collectionId yet
+          ttl: CACHE_CONFIG.TTL.LONG, // 1 hour - stable entity data
+        },
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionSlug, username },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionByUsernameAndSlugAsync',
+        operation: 'getByUsernameAndSlug',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async getCollectionForPublicViewAsync(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    const collection = await this.getCollectionWithRelationsAsync(id, viewerUserId, dbInstance);
 
     if (!collection) {
       return null;
@@ -985,12 +1086,15 @@ export class CollectionsFacade extends BaseFacade {
     };
     slug: string;
   }> {
-    return CacheService.collections.byId(
+    // Use CacheService.cached() directly for composite key lookups
+    const cacheKey = `${CACHE_CONFIG.NAMESPACES.COLLECTIONS}:seo-metadata:${userId}:${slug}`;
+
+    return CacheService.cached(
       () => {
         const context = createPublicQueryContext({ dbInstance });
         return CollectionsQuery.getCollectionMetadata(slug, userId, context);
       },
-      `${userId}:${slug}`,
+      cacheKey,
       {
         context: {
           entityType: 'collection',
@@ -998,7 +1102,8 @@ export class CollectionsFacade extends BaseFacade {
           operation: 'getSeoMetadata',
           userId,
         },
-        ttl: 1800, // 30 minutes - balance between freshness and performance
+        tags: ['collection', 'public', `user:${userId}`], // Generic tags since we don't have collectionId yet
+        ttl: CACHE_CONFIG.TTL.LONG, // 1 hour - stable entity data
       },
     );
   }
@@ -1064,7 +1169,7 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getCollectionWithRelations(
+  static async getCollectionWithRelationsAsync(
     id: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,

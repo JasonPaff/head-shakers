@@ -18,6 +18,7 @@ interface BobbleheadStickyHeaderProps {
   bobblehead: BobbleheadWithRelations;
   canDelete: boolean;
   collectionName: string;
+  collectionOwnerUsername: string;
   collectionSlug: string;
   commentCount: number;
   isLiked: boolean;
@@ -31,6 +32,7 @@ export const BobbleheadStickyHeader = ({
   bobblehead,
   canDelete,
   collectionName,
+  collectionOwnerUsername,
   collectionSlug,
   commentCount,
   isLiked,
@@ -76,8 +78,8 @@ export const BobbleheadStickyHeader = ({
                   'flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground md:text-sm'
                 }
                 href={$path({
-                  route: '/collections/[collectionSlug]',
-                  routeParams: { collectionSlug },
+                  route: '/user/[username]/collection/[collectionSlug]',
+                  routeParams: { collectionSlug, username: collectionOwnerUsername },
                 })}
               >
                 <ArrowLeftIcon aria-hidden className={'size-3'} />
@@ -141,6 +143,7 @@ export const BobbleheadStickyHeader = ({
                 <Conditional isCondition={canDelete}>
                   <BobbleheadHeaderDelete
                     bobbleheadId={bobblehead.id}
+                    collectionOwnerUsername={collectionOwnerUsername}
                     collectionSlug={collectionSlug}
                     size={'icon'}
                     variant={'ghost'}

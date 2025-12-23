@@ -8,7 +8,7 @@ import type {
   SelectContentReportWithSlugs,
 } from '@/lib/validations/moderation.validation';
 
-import { bobbleheads, collections, comments, contentReports } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, contentReports, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
@@ -319,6 +319,12 @@ export class ContentReportsQuery extends BaseQuery {
           resolvedAt: contentReports.resolvedAt,
           status: contentReports.status,
           targetId: contentReports.targetId,
+          targetOwnerUsername: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'collection' THEN ${users.username}
+              ELSE NULL
+            END
+          `.as('target_owner_username'),
           targetSlug: sql<null | string>`
             CASE
               WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.slug}
@@ -340,6 +346,8 @@ export class ContentReportsQuery extends BaseQuery {
           collections,
           and(eq(contentReports.targetId, collections.id), eq(contentReports.targetType, 'collection')),
         )
+        // LEFT JOIN users for collection owner username
+        .leftJoin(users, eq(collections.userId, users.id))
         // LEFT JOIN comments for comment reports (to check existence)
         .leftJoin(
           comments,

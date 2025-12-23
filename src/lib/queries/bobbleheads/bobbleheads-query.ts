@@ -52,6 +52,7 @@ export type BobbleheadRecord = typeof bobbleheads.$inferSelect;
 
 export type BobbleheadWithRelations = BobbleheadRecord & {
   collectionName: null | string;
+  collectionOwnerUsername: null | string;
   collectionSlug: null | string;
   photos: Array<typeof bobbleheadPhotos.$inferSelect>;
   tags: Array<typeof tags.$inferSelect>;
@@ -320,14 +321,16 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection info
+    // get the bobblehead with collection info and collection owner username
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
+        collectionOwnerUsername: users.username,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(users, eq(collections.userId, users.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
@@ -363,6 +366,7 @@ export class BobbleheadsQuery extends BaseQuery {
     return {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
+      collectionOwnerUsername: result[0].collectionOwnerUsername || null,
       collectionSlug: result[0].collection?.slug || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),
@@ -398,14 +402,16 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection info
+    // get the bobblehead with collection info and collection owner username
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
+        collectionOwnerUsername: users.username,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(users, eq(collections.userId, users.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
@@ -443,6 +449,7 @@ export class BobbleheadsQuery extends BaseQuery {
     return {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
+      collectionOwnerUsername: result[0].collectionOwnerUsername || null,
       collectionSlug: result[0].collection?.slug || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),

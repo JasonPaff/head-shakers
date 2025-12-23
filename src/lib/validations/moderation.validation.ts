@@ -113,6 +113,7 @@ export const adminReportsQuerySchema = z.object({
 export const selectContentReportWithSlugsSchema = selectContentReportSchema.extend({
   commentContent: z.string().nullable(),
   contentExists: z.boolean(),
+  targetOwnerUsername: z.string().nullable(), // for collection owner username
   targetSlug: z.string().nullable(),
 });
 

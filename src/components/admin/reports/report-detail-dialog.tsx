@@ -50,9 +50,14 @@ const isContentLinkAvailable = (report: SelectContentReportWithSlugs): boolean =
     return false;
   }
 
-  // Bobbleheads and collections need targetSlug
-  if (report.targetType === 'bobblehead' || report.targetType === 'collection') {
+  // Bobbleheads need targetSlug
+  if (report.targetType === 'bobblehead') {
     return !!report.targetSlug;
+  }
+
+  // Collections need both targetSlug and targetOwnerUsername
+  if (report.targetType === 'collection') {
+    return !!report.targetSlug && !!report.targetOwnerUsername;
   }
 
   return false;
@@ -71,9 +76,11 @@ const getContentLink = (report: SelectContentReportWithSlugs): null | string => 
         routeParams: { bobbleheadSlug: report.targetSlug! },
       });
     case 'collection':
+      // Collections require username - if not available, return null
+      if (!report.targetOwnerUsername) return null;
       return $path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug: report.targetSlug! },
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: { collectionSlug: report.targetSlug!, username: report.targetOwnerUsername },
       });
     default:
       return null;

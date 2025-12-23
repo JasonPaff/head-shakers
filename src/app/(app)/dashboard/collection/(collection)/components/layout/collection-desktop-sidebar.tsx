@@ -7,7 +7,7 @@ export const CollectionDesktopSidebar = ({ children }: CollectionDesktopSidebarP
     <aside
       className={cn(
         'hidden flex-col border-r lg:flex lg:w-80',
-        'sticky top-[var(--header-height)] h-[calc(100vh-var(--header-height))]',
+        'sticky top-(--header-height) h-[calc(100vh-var(--header-height))]',
         'overflow-y-auto',
         'bg-linear-to-br from-muted/50 via-background/80 to-muted/30',
         'backdrop-blur-sm',

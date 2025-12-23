@@ -50,11 +50,12 @@ export const BobbleheadGridDisplay = ({
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
   const router = useRouter();
+
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useToggle();
   const [isHoverCardEnabled, setHoverCardEnabled] = useToggle(userPreferences.isBobbleheadHoverCardEnabled);
   const [isSelectionMode, setIsSelectionMode] = useToggle();
-  const [deleteTarget, setDeleteTarget] = useState<null | string>(null);
 
+  const [deleteTarget, setDeleteTarget] = useState<null | string>(null);
   const [gridDensity, setGridDensity] = useState<CollectionGridDensity>(
     userPreferences.collectionGridDensity ?? 'compact',
   );

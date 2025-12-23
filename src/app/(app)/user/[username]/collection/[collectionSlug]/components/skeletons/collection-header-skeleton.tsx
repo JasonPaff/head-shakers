@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const CollectionHeaderSkeleton = () => (
   <Fragment>
-    {/* Back to Collections Button and Edit Button */}
+    {/* Back Button and Action Buttons */}
     <div className={'mb-6 flex items-center justify-between gap-4'}>
       <Skeleton className={'h-9 w-40'} />
 

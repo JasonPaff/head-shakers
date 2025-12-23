@@ -65,6 +65,7 @@ describe('CollectionStickyHeader', () => {
     isOwner: false,
     likeCount: 10,
     title: 'Test Collection',
+    username: 'testuser',
   };
 
   it('should render collection title and like button for all users', () => {

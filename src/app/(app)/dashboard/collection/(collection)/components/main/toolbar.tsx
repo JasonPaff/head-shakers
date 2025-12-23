@@ -77,7 +77,7 @@ export const Toolbar = ({
 
   return (
     <div
-      className={`sticky top-[var(--header-height)] z-10 flex flex-col gap-4 border-b bg-background/95 p-4
+      className={`sticky top-(--header-height) z-10 flex flex-col gap-4 border-b bg-background/95 p-4
         backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between`}
       data-slot={'toolbar'}
     >

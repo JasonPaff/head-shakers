@@ -36,6 +36,7 @@ export const BobbleheadHeader = ({
           {bobblehead.collectionSlug && (
             <CollectionBreadcrumb
               collectionName={bobblehead.collectionName}
+              collectionOwnerUsername={bobblehead.collectionOwnerUsername}
               collectionSlug={bobblehead.collectionSlug}
             />
           )}
@@ -56,6 +57,7 @@ export const BobbleheadHeader = ({
             {/* Delete Bobblehead Button */}
             <BobbleheadHeaderDelete
               bobbleheadId={bobblehead.id}
+              collectionOwnerUsername={bobblehead.collectionOwnerUsername ?? undefined}
               collectionSlug={bobblehead.collectionSlug ?? undefined}
             >
               Delete

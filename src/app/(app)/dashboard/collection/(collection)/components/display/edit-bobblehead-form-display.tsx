@@ -21,6 +21,7 @@ import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
+import { useToggle } from '@/hooks/use-toggle';
 import {
   getBobbleheadPhotosAction,
   updateBobbleheadWithPhotosAction,
@@ -77,7 +78,7 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
     const [, setParams] = useQueryStates({ edit: collectionDashboardParsers.edit }, { shallow: false });
 
     // Photo loading state
-    const [isLoadingPhotos, setIsLoadingPhotos] = useState(true);
+    const [isLoadingPhotos, setIsLoadingPhotos] = useToggle(true);
     const [photoFetchError, setPhotoFetchError] = useState<null | string>(null);
     const [photoCount, setPhotoCount] = useState(0);
     const [retryAttempt, setRetryAttempt] = useState(0);
@@ -201,7 +202,7 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
 
     const handleContinueWithoutPhotos = () => {
       setPhotoFetchError(null);
-      setIsLoadingPhotos(false);
+      setIsLoadingPhotos.off();
       form.setFieldValue('photos', []);
 
       Sentry.captureMessage('User chose to continue without photos', {
@@ -231,7 +232,7 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
 
       const fetchPhotos = async () => {
         photosFetchedRef.current = true;
-        setIsLoadingPhotos(true);
+        setIsLoadingPhotos.on();
         setPhotoFetchError(null);
 
         const currentAttempt = retryAttempt;
@@ -326,12 +327,12 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
             });
           }
         } finally {
-          setIsLoadingPhotos(false);
+          setIsLoadingPhotos.off();
         }
       };
 
       void fetchPhotos();
-    }, [bobblehead.id, form, retryAttempt]);
+    }, [bobblehead.id, form, retryAttempt, setIsLoadingPhotos]);
 
     return (
       <form
@@ -384,7 +385,7 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
               <div className={'flex items-center justify-end'}>
                 <div className={'flex items-center gap-4'}>
                   <Button
-                    className={'min-w-[100px]'}
+                    className={'min-w-25'}
                     disabled={isExecuting}
                     onClick={handleClose}
                     type={'button'}

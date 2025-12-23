@@ -22,7 +22,7 @@ type CollectionContextIndicatorProps = {
  * The badge is a link to the collection page.
  */
 export const CollectionContextIndicator = ({ context, maxLength = 25 }: CollectionContextIndicatorProps) => {
-  const { contextName, contextSlug } = context;
+  const { contextName, contextSlug, contextUsername } = context;
   const _isTruncated = contextName.length > maxLength;
   const displayName = _isTruncated ? `${contextName.slice(0, maxLength)}...` : contextName;
   const fullLabel = `Navigating: ${contextName}`;
@@ -30,10 +30,10 @@ export const CollectionContextIndicator = ({ context, maxLength = 25 }: Collecti
   // Build the URL for the collection
   const contextUrl = useMemo(() => {
     return $path({
-      route: '/collections/[collectionSlug]',
-      routeParams: { collectionSlug: contextSlug },
+      route: '/user/[username]/collection/[collectionSlug]',
+      routeParams: { collectionSlug: contextSlug, username: contextUsername },
     });
-  }, [contextSlug]);
+  }, [contextSlug, contextUsername]);
 
   // Test IDs - using bobblehead-nav namespace for consistency with navigation components
   const indicatorTestId = generateTestId('feature', 'bobblehead-nav', 'context');

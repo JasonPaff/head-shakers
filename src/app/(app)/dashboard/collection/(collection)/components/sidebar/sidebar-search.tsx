@@ -80,6 +80,7 @@ export const SidebarSearch = ({
   return (
     <div className={'space-y-2 border-b bg-background/30 p-3 backdrop-blur-sm'} data-slot={'sidebar-search'}>
       <Input
+        aria-label={'Search collections'}
         disabled={isDisabled}
         isClearable
         leftIcon={<SearchIcon aria-hidden className={'size-4'} />}

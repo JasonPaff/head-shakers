@@ -37,6 +37,7 @@ import { BobbleheadShareMenu } from './bobblehead-share-menu';
 interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
     collectionId: string;
+    collectionOwnerUsername?: null | string; // for delete dialog routing
     collectionSlug: null | string;
     description?: null | string;
     featurePhoto?: null | string;
@@ -474,6 +475,7 @@ export const BobbleheadGalleryCard = ({
       <Conditional isCondition={isDeleteDialogOpen}>
         <BobbleheadDeleteDialog
           bobbleheadId={bobblehead.id}
+          collectionOwnerUsername={bobblehead.collectionOwnerUsername!}
           collectionSlug={bobblehead.collectionSlug!}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}

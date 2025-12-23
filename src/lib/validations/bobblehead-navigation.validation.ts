@@ -43,6 +43,8 @@ export const navigationContextSchema = z.object({
   contextType: z.literal('collection', {
     message: 'Context type must be collection',
   }),
+  /** Username of the collection owner */
+  contextUsername: z.string().min(1, { message: 'Context username is required' }),
 });
 
 /**

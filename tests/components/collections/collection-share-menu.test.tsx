@@ -28,6 +28,7 @@ describe('CollectionShareMenu', () => {
   const defaultProps = {
     children: <button>Share</button>,
     collectionSlug: 'test-collection',
+    username: 'testuser',
   };
 
   beforeEach(() => {
@@ -60,7 +61,7 @@ describe('CollectionShareMenu', () => {
     // Setup mocks
     mockClipboard();
     const { copyToClipboard, generateAbsoluteUrl } = vi.mocked(await import('@/lib/utils/share-utils'));
-    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/collections/test-collection');
+    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/user/testuser/collection/test-collection');
     copyToClipboard.mockResolvedValue(true);
 
     const { user } = render(<CollectionShareMenu {...defaultProps} />);
@@ -71,12 +72,14 @@ describe('CollectionShareMenu', () => {
 
     // Verify absolute URL was generated with correct path
     await waitFor(() => {
-      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/collections/test-collection');
+      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/user/testuser/collection/test-collection');
     });
 
     // Verify clipboard operation
     await waitFor(() => {
-      expect(copyToClipboard).toHaveBeenCalledWith('https://headshakers.com/collections/test-collection');
+      expect(copyToClipboard).toHaveBeenCalledWith(
+        'https://headshakers.com/user/testuser/collection/test-collection',
+      );
     });
 
     // Verify success toast was shown
@@ -91,9 +94,9 @@ describe('CollectionShareMenu', () => {
     const { generateAbsoluteUrl, generateSocialShareUrl, openShareWindow } = vi.mocked(
       await import('@/lib/utils/share-utils'),
     );
-    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/collections/test-collection');
+    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/user/testuser/collection/test-collection');
     generateSocialShareUrl.mockReturnValue(
-      'https://twitter.com/intent/tweet?url=https://headshakers.com/collections/test-collection&text=Check%20out%20this%20collection!',
+      'https://twitter.com/intent/tweet?url=https://headshakers.com/user/testuser/collection/test-collection&text=Check%20out%20this%20collection!',
     );
 
     const { user } = render(<CollectionShareMenu {...defaultProps} />);
@@ -104,21 +107,21 @@ describe('CollectionShareMenu', () => {
 
     // Verify absolute URL was generated
     await waitFor(() => {
-      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/collections/test-collection');
+      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/user/testuser/collection/test-collection');
     });
 
     // Verify Twitter share URL was generated
     await waitFor(() => {
       expect(generateSocialShareUrl).toHaveBeenCalledWith('twitter', {
         title: 'Check out this collection!',
-        url: 'https://headshakers.com/collections/test-collection',
+        url: 'https://headshakers.com/user/testuser/collection/test-collection',
       });
     });
 
     // Verify share window was opened
     await waitFor(() => {
       expect(openShareWindow).toHaveBeenCalledWith(
-        'https://twitter.com/intent/tweet?url=https://headshakers.com/collections/test-collection&text=Check%20out%20this%20collection!',
+        'https://twitter.com/intent/tweet?url=https://headshakers.com/user/testuser/collection/test-collection&text=Check%20out%20this%20collection!',
       );
     });
   });
@@ -129,9 +132,9 @@ describe('CollectionShareMenu', () => {
     const { generateAbsoluteUrl, generateSocialShareUrl, openShareWindow } = vi.mocked(
       await import('@/lib/utils/share-utils'),
     );
-    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/collections/test-collection');
+    generateAbsoluteUrl.mockReturnValue('https://headshakers.com/user/testuser/collection/test-collection');
     generateSocialShareUrl.mockReturnValue(
-      'https://www.facebook.com/sharer/sharer.php?u=https://headshakers.com/collections/test-collection',
+      'https://www.facebook.com/sharer/sharer.php?u=https://headshakers.com/user/testuser/collection/test-collection',
     );
 
     const { user } = render(<CollectionShareMenu {...defaultProps} />);
@@ -142,20 +145,20 @@ describe('CollectionShareMenu', () => {
 
     // Verify absolute URL was generated
     await waitFor(() => {
-      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/collections/test-collection');
+      expect(generateAbsoluteUrl).toHaveBeenCalledWith('/user/testuser/collection/test-collection');
     });
 
     // Verify Facebook share URL was generated
     await waitFor(() => {
       expect(generateSocialShareUrl).toHaveBeenCalledWith('facebook', {
-        url: 'https://headshakers.com/collections/test-collection',
+        url: 'https://headshakers.com/user/testuser/collection/test-collection',
       });
     });
 
     // Verify share window was opened
     await waitFor(() => {
       expect(openShareWindow).toHaveBeenCalledWith(
-        'https://www.facebook.com/sharer/sharer.php?u=https://headshakers.com/collections/test-collection',
+        'https://www.facebook.com/sharer/sharer.php?u=https://headshakers.com/user/testuser/collection/test-collection',
       );
     });
   });

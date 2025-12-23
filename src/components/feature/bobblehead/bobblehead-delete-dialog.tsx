@@ -9,6 +9,7 @@ import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.ac
 
 interface BobbleheadDeleteDialogProps {
   bobbleheadId: string;
+  collectionOwnerUsername: string;
   collectionSlug: string;
   isOpen: boolean;
   onClose: () => void;
@@ -16,6 +17,7 @@ interface BobbleheadDeleteDialogProps {
 
 export const BobbleheadDeleteDialog = ({
   bobbleheadId,
+  collectionOwnerUsername,
   collectionSlug,
   isOpen,
   onClose,
@@ -31,9 +33,10 @@ export const BobbleheadDeleteDialog = ({
       // redirect to the parent collection
       router.push(
         $path({
-          route: '/collections/[collectionSlug]',
+          route: '/user/[username]/collection/[collectionSlug]',
           routeParams: {
             collectionSlug,
+            username: collectionOwnerUsername,
           },
         }),
       );

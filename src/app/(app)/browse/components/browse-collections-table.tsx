@@ -39,8 +39,8 @@ export const BrowseCollectionsTable = ({ collections }: BrowseCollectionsTablePr
     >
       {collections.map((record) => {
         const collectionPath = $path({
-          route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: record.collection.slug },
+          route: '/user/[username]/collection/[collectionSlug]',
+          routeParams: { collectionSlug: record.collection.slug, username: record.owner.username },
         }) as Route;
 
         const cardTestId = generateTestId('feature', 'browse-collection-card', record.collection.id);

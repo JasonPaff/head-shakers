@@ -16,8 +16,10 @@ export const FooterFeaturedSectionAsync = async () => {
   const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
   if (featuredContent.length === 0) return null;
 
-  // Filter out collections without slugs before mapping
-  const validCollections = featuredContent.filter((collection) => collection.collectionSlug);
+  // Filter out collections without required data for routing (slug and owner username)
+  const validCollections = featuredContent.filter(
+    (collection) => collection.collectionSlug && collection.ownerUsername,
+  );
 
   return (
     <FooterNavSection
@@ -27,12 +29,13 @@ export const FooterFeaturedSectionAsync = async () => {
       {validCollections.map((collection) => {
         const label = collection.title || collection.collectionName || 'Untitled Collection';
         const collectionSlug = collection.collectionSlug!;
+        const username = collection.ownerUsername!;
 
         return (
           <FooterNavLink
             href={$path({
-              route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug },
+              route: '/user/[username]/collection/[collectionSlug]',
+              routeParams: { collectionSlug, username },
             })}
             key={collection.id}
             label={label}

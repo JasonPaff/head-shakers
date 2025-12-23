@@ -88,6 +88,7 @@ export interface FooterFeaturedContentData {
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
   id: string;
+  ownerUsername: null | string; // collection owner username for routing
   title: null | string;
 }
 
@@ -490,6 +491,7 @@ export class FeaturedContentQuery extends BaseQuery {
         contentId: featuredContent.contentId,
         contentType: featuredContent.contentType,
         id: featuredContent.id,
+        ownerUsername: users.username,
         title: featuredContent.title,
       })
       .from(featuredContent)
@@ -497,6 +499,7 @@ export class FeaturedContentQuery extends BaseQuery {
         collections,
         and(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
       )
+      .leftJoin(users, eq(collections.userId, users.id))
       .where(
         and(
           eq(featuredContent.isActive, true),

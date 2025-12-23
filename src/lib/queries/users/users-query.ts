@@ -39,7 +39,7 @@ export class UsersQuery extends BaseQuery {
     const result = await dbInstance
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.username, username))
+      .where(and(eq(users.username, username), buildSoftDeleteFilter(users.deletedAt, context)))
       .limit(1);
 
     if (result.length === 0) {
@@ -79,7 +79,7 @@ export class UsersQuery extends BaseQuery {
     const result = await dbInstance
       .select({ email: users.email })
       .from(users)
-      .where(eq(users.id, userId))
+      .where(and(eq(users.id, userId), buildSoftDeleteFilter(users.deletedAt, context)))
       .limit(1);
 
     return result[0]?.email || null;
@@ -88,7 +88,11 @@ export class UsersQuery extends BaseQuery {
   static async getUserByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
+    const result = await dbInstance
+      .select()
+      .from(users)
+      .where(and(eq(users.clerkId, clerkId), buildSoftDeleteFilter(users.deletedAt, context)))
+      .limit(1);
 
     return result[0] || null;
   }
@@ -96,7 +100,11 @@ export class UsersQuery extends BaseQuery {
   static async getUserByUserIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
+    const result = await dbInstance
+      .select()
+      .from(users)
+      .where(and(eq(users.id, userId), buildSoftDeleteFilter(users.deletedAt, context)))
+      .limit(1);
 
     return result[0] || null;
   }
@@ -115,7 +123,11 @@ export class UsersQuery extends BaseQuery {
   static async getUserByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.select().from(users).where(eq(users.username, username)).limit(1);
+    const result = await dbInstance
+      .select()
+      .from(users)
+      .where(and(eq(users.username, username), buildSoftDeleteFilter(users.deletedAt, context)))
+      .limit(1);
 
     return result[0] || null;
   }
@@ -147,7 +159,7 @@ export class UsersQuery extends BaseQuery {
     const result = await dbInstance
       .select({ userId: users.id })
       .from(users)
-      .where(eq(users.clerkId, clerkId))
+      .where(and(eq(users.clerkId, clerkId), buildSoftDeleteFilter(users.deletedAt, context)))
       .limit(1);
 
     return result[0]?.userId || null;
@@ -176,7 +188,7 @@ export class UsersQuery extends BaseQuery {
         username: users.username,
       })
       .from(users)
-      .where(eq(users.username, username))
+      .where(and(eq(users.username, username), buildSoftDeleteFilter(users.deletedAt, context)))
       .limit(1);
 
     return result[0] || null;
@@ -243,7 +255,11 @@ export class UsersQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // Verify user exists first
-    const user = await dbInstance.select({ id: users.id }).from(users).where(eq(users.id, userId)).limit(1);
+    const user = await dbInstance
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.id, userId), buildSoftDeleteFilter(users.deletedAt, context)))
+      .limit(1);
 
     if (!user[0]) {
       return null;

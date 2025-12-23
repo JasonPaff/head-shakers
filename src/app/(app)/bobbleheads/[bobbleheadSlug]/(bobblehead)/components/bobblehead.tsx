@@ -30,7 +30,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
 
   const isOwner = await getIsOwnerAsync(bobblehead.userId);
 
-  const likeData = await SocialFacade.getContentLikeData(
+  const likeData = await SocialFacade.getContentLikeDataAsync(
     bobbleheadId,
     'bobblehead',
     currentUserId || undefined,

@@ -45,6 +45,7 @@ export function BobbleheadPageClientWrapper({
                 bobblehead={bobblehead}
                 canDelete={canDelete}
                 collectionName={bobblehead.collectionName || ''}
+                collectionOwnerUsername={bobblehead.collectionOwnerUsername || ''}
                 collectionSlug={bobblehead.collectionSlug || ''}
                 commentCount={bobblehead.commentCount ?? 0}
                 isLiked={likeData?.isLiked ?? false}

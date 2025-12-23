@@ -166,7 +166,7 @@ export class CollectionsQuery extends BaseQuery {
     const permissionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -202,7 +202,7 @@ export class CollectionsQuery extends BaseQuery {
         this.combineFilters(
           eq(collections.slug, slug),
           eq(collections.userId, userId),
-          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       )
       .limit(1);
@@ -221,7 +221,7 @@ export class CollectionsQuery extends BaseQuery {
     const permissionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -261,7 +261,7 @@ export class CollectionsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(collections.userId, userId),
-          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       )
       .orderBy(sql`lower(${collections.name}) asc`);
@@ -295,7 +295,7 @@ export class CollectionsQuery extends BaseQuery {
     const collectionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -338,7 +338,7 @@ export class CollectionsQuery extends BaseQuery {
     const collectionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -379,7 +379,7 @@ export class CollectionsQuery extends BaseQuery {
     const permissionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -387,8 +387,8 @@ export class CollectionsQuery extends BaseQuery {
     const searchFilter =
       filters?.query ?
         or(
-          ilike(collections.name, `%${filters.query}%`),
-          ilike(collections.description, `%${filters.query}%`),
+          ilike(collections.name, `%${this._escapeSqlLikePattern(filters.query)}%`),
+          ilike(collections.description, `%${this._escapeSqlLikePattern(filters.query)}%`),
         )
       : undefined;
 
@@ -402,8 +402,6 @@ export class CollectionsQuery extends BaseQuery {
     const dateFromFilter = filters?.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;
     const dateToFilter = filters?.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;
 
-    const isNotDeleted = isNull(collections.deletedAt);
-
     // combine all filters for collections
     const collectionFilters = this.combineFilters(
       permissionFilter,
@@ -411,7 +409,6 @@ export class CollectionsQuery extends BaseQuery {
       ownerFilter,
       dateFromFilter,
       dateToFilter,
-      isNotDeleted,
     );
 
     // build sort order
@@ -657,7 +654,7 @@ export class CollectionsQuery extends BaseQuery {
     const permissionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -665,8 +662,8 @@ export class CollectionsQuery extends BaseQuery {
     const searchFilter =
       filters?.query ?
         or(
-          ilike(collections.name, `%${filters.query}%`),
-          ilike(collections.description, `%${filters.query}%`),
+          ilike(collections.name, `%${this._escapeSqlLikePattern(filters.query)}%`),
+          ilike(collections.description, `%${this._escapeSqlLikePattern(filters.query)}%`),
         )
       : undefined;
 
@@ -832,7 +829,7 @@ export class CollectionsQuery extends BaseQuery {
     const collectionFilter = this.buildBaseFilters(
       collections.isPublic,
       collections.userId,
-      undefined,
+      collections.deletedAt,
       context,
     );
 
@@ -917,7 +914,7 @@ export class CollectionsQuery extends BaseQuery {
         this.combineFilters(
           eq(collections.slug, slug),
           eq(collections.userId, userId),
-          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       )
       .limit(1);
@@ -970,7 +967,7 @@ export class CollectionsQuery extends BaseQuery {
         this.combineFilters(
           isNotNull(bobbleheads.category),
           isNull(bobbleheads.deletedAt),
-          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       )
       .groupBy(bobbleheads.category)
@@ -1025,6 +1022,14 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Escape special SQL characters in search terms to prevent SQL injection
+   * Escapes: % (wildcard for any characters), _ (wildcard for single character), \ (escape character)
+   */
+  private static _escapeSqlLikePattern(searchTerm: string): string {
+    return searchTerm.replace(/[%_\\]/g, '\\$&');
+  }
+
   private static _getBrowseSortOrder(sortBy: string, sortOrder: string) {
     const column = (() => {
       switch (sortBy) {
@@ -1043,10 +1048,11 @@ export class CollectionsQuery extends BaseQuery {
 
   private static _getSearchCondition(searchTerm?: string) {
     if (!searchTerm) return undefined;
+    const escapedTerm = this._escapeSqlLikePattern(searchTerm);
     return or(
-      ilike(bobbleheads.name, `%${searchTerm}%`),
-      ilike(bobbleheads.description, `%${searchTerm}%`),
-      ilike(bobbleheads.characterName, `%${searchTerm}%`),
+      ilike(bobbleheads.name, `%${escapedTerm}%`),
+      ilike(bobbleheads.description, `%${escapedTerm}%`),
+      ilike(bobbleheads.characterName, `%${escapedTerm}%`),
     );
   }
 

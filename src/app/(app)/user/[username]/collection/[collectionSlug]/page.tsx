@@ -1,78 +1,215 @@
-/**
- * Collection View Page Mockup
- *
- * This is a frontend-only mockup for the new public collection view page.
- * It demonstrates 3 layout variations:
- * 1. Grid - Traditional card grid with search/sort bar (default)
- * 2. Gallery - Larger images, minimal text, hover interactions
- * 3. List - Compact horizontal cards with more metadata visible
- *
- * All data is mocked - no backend connections.
- * Use the layout switcher in the top-right to preview different layouts.
- */
-'use client';
+import 'server-only';
 
-import { GridIcon, ImageIcon, ListIcon } from 'lucide-react';
+import type { Metadata } from 'next';
+
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
-import { useState } from 'react';
+import { notFound } from 'next/navigation';
+import { Fragment, Suspense } from 'react';
 
+import type { LayoutVariant } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/bobblehead-grid';
+import type { PageProps } from '@/app/(app)/user/[username]/collection/[collectionSlug]/route-type';
+
+import { CollectionBobbleheadsAsync } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/async/collection-bobbleheads-async';
+import { CollectionHeader } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/collection-header';
+import { CollectionPageClientWrapper } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/collection-page-client-wrapper';
+import { LayoutToggle } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/layout-toggle';
+import { CollectionBobbleheadsSkeleton } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-bobbleheads-skeleton';
+import { CollectionHeaderSkeleton } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-header-skeleton';
 import { Route } from '@/app/(app)/user/[username]/collection/[collectionSlug]/route-type';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/utils/tailwind-utils';
+import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
+import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
-import type { LayoutVariant } from './components/bobblehead-grid';
+type CollectionPageProps = PageProps;
 
-import { BobbleheadGrid } from './components/bobblehead-grid';
-import { CollectionHeader } from './components/collection-header';
-import { CommentsPlaceholder } from './components/comments-placeholder';
-import { mockBobbleheads, mockCollection, mockCollector } from './mock-data';
+export default withParamValidation(CollectionPage, Route);
 
-const layoutOptions: Array<{ icon: typeof GridIcon; label: string; value: LayoutVariant }> = [
-  { icon: GridIcon, label: 'Grid', value: 'grid' },
-  { icon: ImageIcon, label: 'Gallery', value: 'gallery' },
-  { icon: ListIcon, label: 'List', value: 'list' },
-];
+export const revalidate = 60;
 
-function CollectionViewPage() {
-  const [layoutVariant, setLayoutVariant] = useState<LayoutVariant>('grid');
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ collectionSlug: string; username: string }>;
+}): Promise<Metadata> {
+  const { collectionSlug, username } = await params;
 
-  return (
-    <div className={'container mx-auto max-w-7xl px-4 py-8'}>
-      {/* Layout Switcher - For Mockup Preview */}
-      <div className={'mb-6 flex items-center justify-between rounded-lg border bg-muted/50 p-3'}>
-        <div className={'text-sm text-muted-foreground'}>
-          <span className={'font-medium text-foreground'}>Mockup Preview:</span> Switch between layout
-          variations
-        </div>
-        <div className={'flex items-center gap-1 rounded-md border bg-background p-1'}>
-          {layoutOptions.map((option) => (
-            <Button
-              className={cn(
-                'gap-2',
-                layoutVariant === option.value && 'bg-primary text-primary-foreground hover:bg-primary/90',
-              )}
-              key={option.value}
-              onClick={() => setLayoutVariant(option.value)}
-              size={'sm'}
-              variant={layoutVariant === option.value ? 'default' : 'ghost'}
-            >
-              <option.icon className={'size-4'} />
-              <span className={'hidden sm:inline'}>{option.label}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
+  // Fetch collection by username and slug
+  const result = await CollectionsFacade.getCollectionByUsernameAndSlugAsync(username, collectionSlug);
 
-      {/* Collection Header */}
-      <CollectionHeader collection={mockCollection} collector={mockCollector} />
+  // Handle collection not found
+  if (!result) {
+    return {
+      description: 'Collection not found',
+      robots: 'noindex, nofollow',
+      title: 'Collection Not Found | Head Shakers',
+    };
+  }
 
-      {/* Bobblehead Grid with selected layout */}
-      <BobbleheadGrid bobbleheads={mockBobbleheads} layoutVariant={layoutVariant} />
+  // Fetch full SEO metadata
+  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, result.user.id);
 
-      {/* Comments Section */}
-      <CommentsPlaceholder commentCount={12} />
-    </div>
+  // Handle metadata not available
+  if (!seoData) {
+    return {
+      description: 'Collection not found',
+      robots: 'noindex, nofollow',
+      title: 'Collection Not Found | Head Shakers',
+    };
+  }
+
+  // Generate canonical URL for this collection
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/user/[username]/collection/[collectionSlug]',
+    routeParams: { collectionSlug, username },
+  })}`;
+
+  // Prepare cover image URL for social sharing
+  let coverImage: string = FALLBACK_METADATA.imageUrl;
+
+  if (seoData.coverImage) {
+    const publicId = extractPublicIdFromCloudinaryUrl(seoData.coverImage);
+    coverImage = generateOpenGraphImageUrl(publicId);
+  }
+
+  // Use collection description or fallback to a default
+  const description =
+    seoData.description ||
+    `${seoData.name} by ${seoData.owner.username} - Browse ${seoData.itemCount} bobbleheads in this collection`;
+
+  // Private collections should not be indexed
+  const isPublic = seoData.isPublic;
+
+  // Generate page metadata with OG and Twitter cards
+  return generatePageMetadata(
+    'collection',
+    {
+      creatorHandle: seoData.owner.username ? `@${seoData.owner.username}` : undefined,
+      description,
+      images: [coverImage],
+      title: seoData.name,
+      url: canonicalUrl,
+    },
+    {
+      isIndexable: isPublic,
+      isPublic,
+      shouldIncludeOpenGraph: true,
+      shouldIncludeTwitterCard: true,
+      shouldUseTitleTemplate: true,
+    },
   );
 }
 
-export default withParamValidation(CollectionViewPage, Route);
+async function CollectionPage({ routeParams, searchParams }: CollectionPageProps) {
+  const { collectionSlug, username } = await routeParams;
+  const resolvedSearchParams = await searchParams;
+
+  // Extract layout from search params with default
+  const layoutVariant: LayoutVariant = resolvedSearchParams?.layout || 'grid';
+
+  const currentUserId = await getUserIdAsync();
+
+  // Fetch collection by username and slug
+  const result = await CollectionsFacade.getCollectionByUsernameAndSlugAsync(
+    username,
+    collectionSlug,
+    currentUserId || undefined,
+  );
+
+  if (!result || !result.collection) {
+    notFound();
+  }
+
+  const { collection, user } = result;
+  const collectionId = collection.id;
+
+  // Fetch like data
+  const likeData = await SocialFacade.getContentLikeDataAsync(
+    collectionId,
+    'collection',
+    currentUserId || undefined,
+  );
+
+  // Compute permission flags
+  const isOwner = await getIsOwnerAsync(collection.userId);
+
+  // Fetch SEO data for JSON-LD schemas
+  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, user.id);
+
+  // Generate canonical URL for JSON-LD schemas
+  const collectionUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/user/[username]/collection/[collectionSlug]',
+    routeParams: { collectionSlug, username },
+  })}`;
+
+  // Generate CollectionPage schema
+  const collectionPageSchema =
+    seoData ?
+      generateCollectionPageSchema({
+        description: seoData.description || undefined,
+        itemsCount: seoData.itemCount,
+        name: seoData.name,
+        url: collectionUrl,
+      })
+    : null;
+
+  // Generate Breadcrumb schema for navigation context
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: DEFAULT_SITE_METADATA.url },
+    { name: username, url: `${DEFAULT_SITE_METADATA.url}/user/${username}` },
+    { name: seoData?.name || collection.name },
+  ]);
+
+  return (
+    <Fragment>
+      {/* JSON-LD structured data */}
+      {collectionPageSchema && (
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionPageSchema) }}
+          type={'application/ld+json'}
+        />
+      )}
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }}
+        type={'application/ld+json'}
+      />
+
+      <CollectionPageClientWrapper collection={collection} collectionId={collectionId}>
+        {/* Header Section with Suspense */}
+        <Suspense fallback={<CollectionHeaderSkeleton />}>
+          <CollectionHeader
+            collection={collection}
+            isOwner={isOwner}
+            likeData={likeData}
+            user={{ avatarUrl: user.avatarUrl, username: user.username }}
+          />
+        </Suspense>
+
+        {/* Layout Toggle */}
+        <LayoutToggle className={'mb-6'} />
+
+        {/* Bobbleheads Section with Suspense */}
+        <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
+          <CollectionBobbleheadsAsync
+            collectionId={collectionId}
+            collectionSlug={collectionSlug}
+            isOwner={isOwner}
+            layoutVariant={layoutVariant}
+            searchParams={resolvedSearchParams}
+          />
+        </Suspense>
+
+        {/* Comments Section with Suspense */}
+        <Suspense fallback={<CommentSectionSkeleton />}>
+          <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
+        </Suspense>
+      </CollectionPageClientWrapper>
+    </Fragment>
+  );
+}

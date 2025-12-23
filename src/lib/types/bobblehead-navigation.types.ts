@@ -67,4 +67,6 @@ export type NavigationContext = {
   contextSlug: string;
   /** Type is always collection */
   contextType: 'collection';
+  /** Username of the collection owner */
+  contextUsername: string;
 };

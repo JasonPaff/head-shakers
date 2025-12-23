@@ -79,7 +79,7 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
       {
         data: { collectionSlug, userId },
         facade,
-        method: 'getCategoriesForCollectionAsync',
+        method: 'getCategoriesByCollectionSlugAsync',
         operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_CATEGORIES_FOR_COLLECTION,
       },
       async () => {

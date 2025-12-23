@@ -3,7 +3,6 @@
  * provides enterprise-grade cache invalidation patterns using revalidateTag
  */
 
-import { $path } from 'next-typesafe-url';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import {
@@ -329,7 +328,7 @@ export class CacheRevalidationService {
       bobbleheadId: string,
       userId: string,
       operation: 'add' | 'remove',
-      collectionSlug?: string,
+      _collectionSlug?: string,
       bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = [
@@ -341,12 +340,13 @@ export class CacheRevalidationService {
       // This ensures all bobbleheads in the collection have their navigation updated
       CacheRevalidationService.bobbleheads.onNavigationChange(collectionId, bobbleheadId);
 
-      // Path-based revalidation using slugs if provided
+      // Path-based revalidation - only for bobblehead, collection routes now require username
       if (isCacheEnabled()) {
         try {
-          if (collectionSlug) {
-            revalidatePath(`/collections/${collectionSlug}`, 'page');
-          }
+          // Collection path revalidation disabled - routes now require username
+          // if (collectionSlug) {
+          //   revalidatePath(`/user/[username]/collection/${collectionSlug}`, 'page');
+          // }
           if (bobbleheadSlug) {
             revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
           }
@@ -367,25 +367,27 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection creation
      */
-    onCreate: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
+    onCreate: (collectionId: string, userId: string): RevalidationResult => {
       const tags = CacheTagGenerators.collection.create(collectionId, userId);
 
-      // Path-based revalidation using slug if provided
-      if (isCacheEnabled() && collectionSlug) {
-        try {
-          revalidatePath(
-            $path({
-              route: '/collections/[collectionSlug]',
-              routeParams: {
-                collectionSlug,
-              },
-            }),
-            'page',
-          );
-        } catch (error) {
-          console.error('[CacheRevalidation] Path revalidation error on create:', error);
-        }
-      }
+      // Path-based revalidation disabled - collection routes now require username
+      // Tag-based cache invalidation handles this case
+      // if (isCacheEnabled() && collectionSlug) {
+      //   try {
+      //     revalidatePath(
+      //       $path({
+      //         route: '/user/[username]/collection/[collectionSlug]',
+      //         routeParams: {
+      //           collectionSlug,
+      //           username, // not available in this context
+      //         },
+      //       }),
+      //       'page',
+      //     );
+      //   } catch (error) {
+      //     console.error('[CacheRevalidation] Path revalidation error on create:', error);
+      //   }
+      // }
 
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
@@ -399,17 +401,18 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection deletion
      */
-    onDelete: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
+    onDelete: (collectionId: string, userId: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
 
-      // Path-based revalidation using slug if provided
-      if (isCacheEnabled() && collectionSlug) {
-        try {
-          revalidatePath(`/collections/${collectionSlug}`, 'page');
-        } catch (error) {
-          console.error('[CacheRevalidation] Path revalidation error on delete:', error);
-        }
-      }
+      // Path-based revalidation disabled - collection routes now require username
+      // Tag-based cache invalidation handles this case
+      // if (isCacheEnabled() && collectionSlug) {
+      //   try {
+      //     revalidatePath(`/user/[username]/collection/${collectionSlug}`, 'page');
+      //   } catch (error) {
+      //     console.error('[CacheRevalidation] Path revalidation error on delete:', error);
+      //   }
+      // }
 
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
@@ -423,17 +426,18 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection update
      */
-    onUpdate: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
+    onUpdate: (collectionId: string, userId: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
 
-      // Path-based revalidation using slug if provided
-      if (isCacheEnabled() && collectionSlug) {
-        try {
-          revalidatePath(`/collections/${collectionSlug}`, 'page');
-        } catch (error) {
-          console.error('[CacheRevalidation] Path revalidation error on update:', error);
-        }
-      }
+      // Path-based revalidation disabled - collection routes now require username
+      // Tag-based cache invalidation handles this case
+      // if (isCacheEnabled() && collectionSlug) {
+      //   try {
+      //     revalidatePath(`/user/[username]/collection/${collectionSlug}`, 'page');
+      //   } catch (error) {
+      //     console.error('[CacheRevalidation] Path revalidation error on update:', error);
+      //   }
+      // }
 
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
@@ -573,7 +577,8 @@ export class CacheRevalidationService {
               revalidatePath(`/bobbleheads/${entitySlug}`, 'page');
               break;
             case 'collection':
-              revalidatePath(`/collections/${entitySlug}`, 'page');
+              // Collection path revalidation disabled - routes now require username
+              // revalidatePath(`/user/[username]/collection/${entitySlug}`, 'page');
               break;
           }
         } catch (error) {
@@ -628,7 +633,8 @@ export class CacheRevalidationService {
               revalidatePath(`/bobbleheads/${entitySlug}`, 'page');
               break;
             case 'collection':
-              revalidatePath(`/collections/${entitySlug}`, 'page');
+              // Collection path revalidation disabled - routes now require username
+              // revalidatePath(`/user/[username]/collection/${entitySlug}`, 'page');
               break;
           }
         } catch (error) {

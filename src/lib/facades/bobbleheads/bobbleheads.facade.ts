@@ -35,6 +35,7 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { UsersQuery } from '@/lib/queries/users/users-query';
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
@@ -689,12 +690,17 @@ export class BobbleheadsFacade extends BaseFacade {
           let contextData: BobbleheadNavigationDataSchema['context'] = null;
           const collection = await CollectionsFacade.getByIdAsync(collectionId, viewerUserId);
           if (collection) {
-            contextData = {
-              contextId: collection.id,
-              contextName: collection.name,
-              contextSlug: collection.slug,
-              contextType: 'collection',
-            };
+            // Fetch the owner's username
+            const owner = await UsersQuery.getUserByUserIdAsync(collection.userId, context);
+            if (owner?.username) {
+              contextData = {
+                contextId: collection.id,
+                contextName: collection.name,
+                contextSlug: collection.slug,
+                contextType: 'collection',
+                contextUsername: owner.username,
+              };
+            }
           }
 
           // Transform result to match the expected schema (minimal navigation data)

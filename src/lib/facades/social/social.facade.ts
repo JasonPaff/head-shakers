@@ -500,7 +500,7 @@ export class SocialFacade {
    * Fetches root comments (parentCommentId is null) with recursively loaded replies
    * Returns comments in a threaded structure with depth tracking
    */
-  static async getCommentsWithReplies(
+  static async getCommentsWithRepliesAsync(
     targetId: string,
     targetType: CommentTargetType,
     options: FindOptions = {},
@@ -555,7 +555,7 @@ export class SocialFacade {
       const errorContext: FacadeErrorContext = {
         data: { options, targetId, targetType },
         facade: facadeName,
-        method: 'getCommentsWithReplies',
+        method: 'getCommentsWithRepliesAsync',
         operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         userId: viewerUserId,
       };
@@ -563,7 +563,7 @@ export class SocialFacade {
     }
   }
 
-  static async getContentLikeData(
+  static async getContentLikeDataAsync(
     targetId: string,
     targetType: LikeTargetType,
     viewerUserId?: string,
@@ -577,7 +577,7 @@ export class SocialFacade {
 
       // get like count and user status in parallel
       const [likeCount, userStatus] = await Promise.all([
-        SocialFacade.getLikeCount(targetId, targetType, dbInstance),
+        SocialFacade.getLikeCountAsync(targetId, targetType, dbInstance),
         viewerUserId ?
           SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
         : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
@@ -594,7 +594,7 @@ export class SocialFacade {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
         facade: facadeName,
-        method: 'getContentLikeData',
+        method: 'getContentLikeDataAsync',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
         userId: viewerUserId,
       };
@@ -602,7 +602,7 @@ export class SocialFacade {
     }
   }
 
-  static async getLikeCount(
+  static async getLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
     dbInstance?: DatabaseExecutor,
@@ -628,14 +628,14 @@ export class SocialFacade {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
         facade: facadeName,
-        method: 'getLikeCount',
+        method: 'getLikeCountAsync',
         operation: OPERATIONS.SOCIAL.GET_LIKE_COUNT,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  static async getLikesForMultipleContentItems(
+  static async getLikesForMultipleContentItemsAsync(
     contentIds: Array<string>,
     contentType: LikeTargetType,
     viewerUserId?: string,
@@ -652,7 +652,7 @@ export class SocialFacade {
       const context: FacadeErrorContext = {
         data: { contentIds, contentType },
         facade: facadeName,
-        method: 'getLikesForMultipleContentItems',
+        method: 'getLikesForMultipleContentItemsAsync',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
         userId: viewerUserId,
       };

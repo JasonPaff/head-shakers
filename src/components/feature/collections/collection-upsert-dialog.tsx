@@ -104,7 +104,7 @@ export const CollectionUpsertDialog = withFocusManagement(
                 )}
 
                 {/* Cancel / Submit */}
-                <div className={isEditMode ? 'flex gap-2' : undefined}>
+                <div className={'flex gap-2'}>
                   <Button
                     disabled={isSubmitting}
                     onClick={handleCancelClick}

@@ -1,7 +1,14 @@
 'use client';
 
-import { ChevronLeftIcon, ChevronRightIcon, ExternalLinkIcon, HeartIcon, ShareIcon } from 'lucide-react';
-import { Fragment, type MouseEvent, useState } from 'react';
+import type { ComponentProps } from 'react';
+
+import { ExternalLinkIcon, HeartIcon, ShareIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,128 +19,121 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-import type { MockBobblehead } from '../mock-data';
-
-interface BobbleheadCardProps {
-  bobblehead: MockBobblehead;
-  variant?: 'gallery' | 'grid' | 'list';
-}
-
-export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardProps) => {
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(bobblehead.isLiked);
-  const [likeCount, setLikeCount] = useState(bobblehead.likeCount);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const photos = bobblehead.photos.length > 0 ? bobblehead.photos : [bobblehead.featurePhoto];
-  const currentPhoto = photos[currentPhotoIndex] || bobblehead.featurePhoto;
-  const _hasMultiplePhotos = photos.length > 1;
-
-  const handlePrevPhoto = (e: MouseEvent) => {
-    e.stopPropagation();
-    setCurrentPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+type BobbleheadCardProps = ComponentProps<'div'> &
+  ComponentTestIdProps & {
+    bobblehead: BobbleheadListRecord & {
+      featurePhoto?: null | string;
+      likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+    };
+    collectionSlug: string;
+    variant?: 'grid' | 'list';
   };
 
-  const handleNextPhoto = (e: MouseEvent) => {
-    e.stopPropagation();
-    setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+export const BobbleheadCard = ({ bobblehead, testId, variant = 'grid', ...props }: BobbleheadCardProps) => {
+  // 1. useState hooks
+  const [isLiked, setIsLiked] = useState(bobblehead.likeData?.isLiked ?? false);
+  const [likeCount, setLikeCount] = useState(bobblehead.likeData?.likeCount ?? 0);
+
+  // 5. Utility functions
+  const getBobbleheadUrl = (): string => {
+    return $path({
+      route: '/bobbleheads/[bobbleheadSlug]',
+      routeParams: { bobbleheadSlug: bobblehead.slug },
+    });
   };
 
+  // 6. Event handlers
   const handleLikeToggle = () => {
     setIsLiked((prev) => !prev);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
   };
 
+  // 7. Derived variables
+  const _bobbleheadName = bobblehead.name ?? 'Untitled Bobblehead';
+  const _photoUrl = bobblehead.featurePhoto ?? '';
+
+  const cardTestId = testId || generateTestId('feature', 'bobblehead-card', bobblehead.slug);
+
   // Grid variant - standard card layout
   if (variant === 'grid') {
     return (
-      <Card className={'group h-[480px] overflow-hidden transition-all duration-200 hover:shadow-lg'}>
-        <CardHeader className={'h-14 flex-shrink-0'}>
-          <CardTitle className={'line-clamp-1 text-lg'}>{bobblehead.name}</CardTitle>
+      <Card
+        className={'group h-120 overflow-hidden transition-all duration-200 hover:shadow-lg'}
+        data-slot={'bobblehead-card'}
+        data-testid={cardTestId}
+        {...props}
+      >
+        {/* Card Header */}
+        <CardHeader className={'h-14 shrink-0'} data-slot={'bobblehead-card-header'}>
+          <CardTitle className={'line-clamp-1 text-lg'} data-slot={'bobblehead-card-title'}>
+            {_bobbleheadName}
+          </CardTitle>
         </CardHeader>
 
         {/* Photo Container */}
         <div
-          className={'relative mx-6 h-64 flex-shrink-0 overflow-hidden rounded-lg bg-muted'}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
+          className={'relative mx-6 h-64 shrink-0 overflow-hidden rounded-lg bg-muted'}
+          data-slot={'photo'}
         >
           <img
-            alt={bobblehead.name}
+            alt={_bobbleheadName}
             className={'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'}
-            src={currentPhoto ?? ''}
+            data-slot={'photo-image'}
+            src={_photoUrl}
           />
-
-          {/* Photo Navigation (shown on hover) */}
-          {isHovering && _hasMultiplePhotos && (
-            <Fragment>
-              <button
-                className={
-                  'absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-black/60 p-1.5 text-white transition-opacity hover:bg-black/80'
-                }
-                onClick={handlePrevPhoto}
-              >
-                <ChevronLeftIcon className={'size-4'} />
-              </button>
-              <button
-                className={
-                  'absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-black/60 p-1.5 text-white transition-opacity hover:bg-black/80'
-                }
-                onClick={handleNextPhoto}
-              >
-                <ChevronRightIcon className={'size-4'} />
-              </button>
-
-              {/* Photo Indicators */}
-              <div className={'absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1'}>
-                {photos.map((_, index) => (
-                  <div
-                    className={cn(
-                      'size-1.5 rounded-full transition-colors',
-                      index === currentPhotoIndex ? 'bg-white' : 'bg-white/50',
-                    )}
-                    key={index}
-                  />
-                ))}
-              </div>
-            </Fragment>
-          )}
 
           {/* Category Badge */}
           {bobblehead.category && (
-            <Badge className={'absolute top-2 left-2'} variant={'secondary'}>
+            <Badge className={'absolute top-2 left-2'} data-slot={'category-badge'} variant={'secondary'}>
               {bobblehead.category}
             </Badge>
           )}
         </div>
 
         {/* Description */}
-        <CardContent className={'h-20 flex-shrink-0 py-3'}>
-          <p className={'line-clamp-3 text-sm text-muted-foreground'}>{bobblehead.description}</p>
+        <CardContent className={'h-20 shrink-0 py-3'} data-slot={'bobblehead-card-content'}>
+          <p className={'line-clamp-3 text-sm text-muted-foreground'} data-slot={'description'}>
+            {bobblehead.description}
+          </p>
         </CardContent>
 
         {/* Separator */}
-        <div className={'mx-6 border-t'} />
+        <div className={'mx-6 border-t'} data-slot={'separator'} />
 
         {/* Footer */}
-        <CardFooter className={'mt-auto flex items-center justify-between pt-4'}>
-          <div className={'flex items-center gap-2'}>
+        <CardFooter
+          className={'mt-auto flex items-center justify-between pt-4'}
+          data-slot={'bobblehead-card-footer'}
+        >
+          <div className={'flex items-center gap-2'} data-slot={'actions'}>
             {/* Like Button */}
             <button
               className={'inline-flex items-center gap-1.5 text-sm transition-colors hover:text-red-500'}
+              data-slot={'like-button'}
+              data-testid={`${cardTestId}-like-button`}
               onClick={handleLikeToggle}
             >
-              <HeartIcon className={cn('size-4 transition-colors', isLiked && 'fill-red-500 text-red-500')} />
+              <HeartIcon
+                aria-hidden
+                className={cn('size-4 transition-colors', isLiked && 'fill-red-500 text-red-500')}
+              />
               <span>{likeCount}</span>
             </button>
 
             {/* Share Button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className={'size-8'} size={'icon'} variant={'ghost'}>
-                  <ShareIcon className={'size-4'} />
+                <Button
+                  className={'size-8'}
+                  data-slot={'share-button'}
+                  data-testid={`${cardTestId}-share-button`}
+                  size={'icon'}
+                  variant={'ghost'}
+                >
+                  <ShareIcon aria-hidden className={'size-4'} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={'start'}>
@@ -144,169 +144,58 @@ export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardP
             </DropdownMenu>
           </div>
 
-          <Button size={'sm'} variant={'outline'}>
-            <ExternalLinkIcon className={'mr-1.5 size-3.5'} />
-            View Details
+          <Button asChild data-slot={'view-details-button'} size={'sm'} variant={'outline'}>
+            <Link href={getBobbleheadUrl()}>
+              <ExternalLinkIcon aria-hidden className={'mr-1.5 size-3.5'} />
+              View Details
+            </Link>
           </Button>
         </CardFooter>
       </Card>
     );
   }
 
-  // Gallery variant - larger image, minimal text
-  if (variant === 'gallery') {
-    return (
-      <div
-        className={
-          'group relative overflow-hidden rounded-xl bg-card shadow-sm transition-all duration-300 hover:shadow-xl'
-        }
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
-        {/* Photo Container */}
-        <div className={'relative aspect-[3/4] overflow-hidden'}>
-          <img
-            alt={bobblehead.name}
-            className={'h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'}
-            src={currentPhoto ?? ''}
-          />
-
-          {/* Gradient overlay on hover */}
-          <div
-            className={cn(
-              'absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300',
-              isHovering ? 'opacity-100' : 'opacity-0',
-            )}
-          />
-
-          {/* Photo Navigation */}
-          {isHovering && _hasMultiplePhotos && (
-            <Fragment>
-              <button
-                className={
-                  'absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition-all hover:bg-white/30'
-                }
-                onClick={handlePrevPhoto}
-              >
-                <ChevronLeftIcon className={'size-5'} />
-              </button>
-              <button
-                className={
-                  'absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition-all hover:bg-white/30'
-                }
-                onClick={handleNextPhoto}
-              >
-                <ChevronRightIcon className={'size-5'} />
-              </button>
-            </Fragment>
-          )}
-
-          {/* Like Button - Top Right */}
-          <button
-            className={cn(
-              'absolute top-3 right-3 rounded-full p-2 transition-all',
-              isLiked ? 'bg-red-500 text-white' : 'bg-black/40 text-white backdrop-blur-sm hover:bg-black/60',
-            )}
-            onClick={handleLikeToggle}
-          >
-            <HeartIcon className={cn('size-5', isLiked && 'fill-current')} />
-          </button>
-
-          {/* Content overlay on hover */}
-          <div
-            className={cn(
-              'absolute inset-x-0 bottom-0 p-4 transition-all duration-300',
-              isHovering ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-            )}
-          >
-            <h3 className={'mb-1 text-lg font-semibold text-white'}>{bobblehead.name}</h3>
-            <p className={'line-clamp-2 text-sm text-white/80'}>{bobblehead.description}</p>
-
-            <div className={'mt-3 flex items-center justify-between'}>
-              <div className={'flex items-center gap-3 text-sm text-white/70'}>
-                <span className={'flex items-center gap-1'}>
-                  <HeartIcon className={'size-3.5'} />
-                  {likeCount}
-                </span>
-                {bobblehead.year && <span>{bobblehead.year}</span>}
-              </div>
-
-              <Button className={'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30'} size={'sm'}>
-                View
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Photo Indicators */}
-        {_hasMultiplePhotos && (
-          <div className={'absolute bottom-16 left-1/2 flex -translate-x-1/2 gap-1.5'}>
-            {photos.map((_, index) => (
-              <div
-                className={cn(
-                  'size-1.5 rounded-full transition-colors',
-                  index === currentPhotoIndex ? 'bg-white' : 'bg-white/40',
-                )}
-                key={index}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   // List variant - compact horizontal layout
   return (
-    <Card className={'group flex flex-row overflow-hidden transition-all duration-200 hover:shadow-lg'}>
+    <Card
+      className={'group flex flex-row overflow-hidden transition-all duration-200 hover:shadow-lg'}
+      data-slot={'bobblehead-card'}
+      data-testid={cardTestId}
+      {...props}
+    >
       {/* Photo */}
-      <div
-        className={'relative w-32 flex-shrink-0 overflow-hidden sm:w-40'}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
+      <div className={'relative w-32 shrink-0 overflow-hidden sm:w-40'} data-slot={'photo'}>
         <img
-          alt={bobblehead.name}
+          alt={_bobbleheadName}
           className={'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'}
-          src={currentPhoto ?? ''}
+          data-slot={'photo-image'}
+          src={_photoUrl}
         />
-
-        {/* Photo Navigation */}
-        {isHovering && _hasMultiplePhotos && (
-          <div className={'absolute inset-x-0 bottom-2 flex justify-center gap-1'}>
-            {photos.map((_, index) => (
-              <button
-                className={cn(
-                  'size-1.5 rounded-full transition-colors',
-                  index === currentPhotoIndex ? 'bg-white' : 'bg-white/50',
-                )}
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentPhotoIndex(index);
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Content */}
-      <div className={'flex flex-1 flex-col justify-between p-4'}>
+      <div className={'flex flex-1 flex-col justify-between p-4'} data-slot={'content'}>
         <div>
-          <div className={'mb-1 flex items-start justify-between'}>
-            <h3 className={'font-semibold'}>{bobblehead.name}</h3>
+          <div className={'mb-1 flex items-start justify-between'} data-slot={'header'}>
+            <h3 className={'font-semibold'} data-slot={'title'}>
+              {_bobbleheadName}
+            </h3>
             {bobblehead.category && (
-              <Badge className={'ml-2 flex-shrink-0'} variant={'secondary'}>
+              <Badge className={'ml-2 shrink-0'} data-slot={'category-badge'} variant={'secondary'}>
                 {bobblehead.category}
               </Badge>
             )}
           </div>
 
-          <p className={'mb-2 line-clamp-2 text-sm text-muted-foreground'}>{bobblehead.description}</p>
+          <p className={'mb-2 line-clamp-2 text-sm text-muted-foreground'} data-slot={'description'}>
+            {bobblehead.description}
+          </p>
 
           {/* Metadata */}
-          <div className={'flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground'}>
+          <div
+            className={'flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground'}
+            data-slot={'metadata'}
+          >
             {bobblehead.manufacturer && <span>By {bobblehead.manufacturer}</span>}
             {bobblehead.year && <span>{bobblehead.year}</span>}
             {bobblehead.condition && <span>{bobblehead.condition}</span>}
@@ -314,20 +203,31 @@ export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardP
         </div>
 
         {/* Actions */}
-        <div className={'mt-3 flex items-center justify-between'}>
-          <div className={'flex items-center gap-3'}>
+        <div className={'mt-3 flex items-center justify-between'} data-slot={'actions'}>
+          <div className={'flex items-center gap-3'} data-slot={'social-actions'}>
+            {/* Like Button */}
             <button
               className={'inline-flex items-center gap-1 text-sm transition-colors hover:text-red-500'}
+              data-slot={'like-button'}
+              data-testid={`${cardTestId}-like-button`}
               onClick={handleLikeToggle}
             >
-              <HeartIcon className={cn('size-4 transition-colors', isLiked && 'fill-red-500 text-red-500')} />
+              <HeartIcon
+                aria-hidden
+                className={cn('size-4 transition-colors', isLiked && 'fill-red-500 text-red-500')}
+              />
               <span>{likeCount}</span>
             </button>
 
+            {/* Share Button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className={'text-muted-foreground transition-colors hover:text-foreground'}>
-                  <ShareIcon className={'size-4'} />
+                <button
+                  className={'text-muted-foreground transition-colors hover:text-foreground'}
+                  data-slot={'share-button'}
+                  data-testid={`${cardTestId}-share-button`}
+                >
+                  <ShareIcon aria-hidden className={'size-4'} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -337,9 +237,11 @@ export const BobbleheadCard = ({ bobblehead, variant = 'grid' }: BobbleheadCardP
             </DropdownMenu>
           </div>
 
-          <Button size={'sm'} variant={'ghost'}>
-            View Details
-            <ExternalLinkIcon className={'ml-1.5 size-3.5'} />
+          <Button asChild data-slot={'view-details-button'} size={'sm'} variant={'ghost'}>
+            <Link href={getBobbleheadUrl()}>
+              View Details
+              <ExternalLinkIcon aria-hidden className={'ml-1.5 size-3.5'} />
+            </Link>
           </Button>
         </div>
       </div>

@@ -466,7 +466,7 @@ export const getCommentsAction = publicActionClient
       });
 
       try {
-        const result = await SocialFacade.getCommentsWithReplies(
+        const result = await SocialFacade.getCommentsWithRepliesAsync(
           input.targetId,
           input.targetType,
           {

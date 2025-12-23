@@ -108,7 +108,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   // Fetch bobblehead with relations and like data for sticky header
   const [bobblehead, likeData] = await Promise.all([
     BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
-    SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),
+    SocialFacade.getContentLikeDataAsync(bobbleheadId, 'bobblehead', currentUserId || undefined),
   ]);
 
   if (!bobblehead) {

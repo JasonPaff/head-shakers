@@ -13,6 +13,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 interface TrendingContentItem {
   averageViewDuration?: number; // in seconds
+  ownerUsername?: string; // for collection links - owner's username
   rank: number;
   targetId: string;
   targetSlug: string;
@@ -79,9 +80,11 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
           routeParams: { bobbleheadSlug: item.targetSlug },
         });
       case 'collection':
+        // Collections require username - if not available, return placeholder
+        if (!item.ownerUsername) return '#';
         return $path({
-          route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: item.targetSlug },
+          route: '/user/[username]/collection/[collectionSlug]',
+          routeParams: { collectionSlug: item.targetSlug, username: item.ownerUsername },
         });
       case 'user':
         return $path({ route: '/users/profile/[userId]', routeParams: { userId: item.targetId } });

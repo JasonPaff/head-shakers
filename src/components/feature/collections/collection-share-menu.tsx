@@ -18,14 +18,15 @@ import {
 
 type CollectionShareMenuProps = Children & {
   collectionSlug: string;
+  username: string;
 };
 
-export function CollectionShareMenu({ children, collectionSlug }: CollectionShareMenuProps) {
+export function CollectionShareMenu({ children, collectionSlug, username }: CollectionShareMenuProps) {
   const handleCopyLink = async () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug },
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: { collectionSlug, username },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const success = await copyToClipboard(absoluteUrl);
@@ -43,8 +44,8 @@ export function CollectionShareMenu({ children, collectionSlug }: CollectionShar
   const handleShareToTwitter = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug },
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: { collectionSlug, username },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('twitter', {
@@ -60,8 +61,8 @@ export function CollectionShareMenu({ children, collectionSlug }: CollectionShar
   const handleShareToFacebook = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug },
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: { collectionSlug, username },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('facebook', {

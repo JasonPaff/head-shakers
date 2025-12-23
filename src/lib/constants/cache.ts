@@ -246,6 +246,7 @@ export const CACHE_KEYS = {
    */
   USERS: {
     ACTIVITY: (userId: string) => `${CACHE_CONFIG.NAMESPACES.USERS}:activity:${userId}`,
+    BY_USERNAME: (username: string) => `${CACHE_CONFIG.NAMESPACES.USERS}:by-username:${username}`,
     PREFERENCES: (userId: string) => `${CACHE_CONFIG.NAMESPACES.USERS}:preferences:${userId}`,
     PROFILE: (userId: string) => `${CACHE_CONFIG.NAMESPACES.USERS}:profile:${userId}`,
     STATS: (userId: string) => `${CACHE_CONFIG.NAMESPACES.USERS}:stats:${userId}`,

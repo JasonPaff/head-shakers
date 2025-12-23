@@ -131,8 +131,8 @@ export const FeaturedContentDisplay = ({
     const contentUrl =
       content.contentType === 'collection' ?
         $path({
-          route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: content.contentSlug },
+          route: '/user/[username]/collection/[collectionSlug]',
+          routeParams: { collectionSlug: content.contentSlug, username: content.ownerDisplayName },
         })
       : content.contentType === 'bobblehead' ?
         $path({
