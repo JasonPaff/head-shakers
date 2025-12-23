@@ -209,6 +209,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Prerequisites validation results
    - Safety check results
 9. **CHECKPOINT**: Pre-checks complete, ready to proceed
+10. **Progress Marker**: Output `MILESTONE:PHASE_1_COMPLETE`
 
 **Dry-Run Mode**: If `--dry-run` flag present, output what would be done and exit after this phase.
 
@@ -264,6 +265,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Files mentioned per step summary
 7. **UPDATE INDEX**: Append setup summary to implementation index
 8. **CHECKPOINT**: Setup complete, beginning implementation
+9. **Progress Markers**: Output `MILESTONE:PHASE_2_COMPLETE` then `MILESTONE:PHASE_3_START`
 
 **Orchestrator Note**: No files are loaded into context at this phase. Each subagent will load only the files it needs.
 
@@ -286,6 +288,7 @@ When the user runs this command, execute this comprehensive workflow:
 4. **Determine Specialist Agent** (Orchestrator):
    - Look up specialist type from routing table (created in Phase 2)
    - Log the selected specialist: "Routing to {specialist-type} for step {N}"
+   - **Progress Marker**: Output `MILESTONE:SPECIALIST_START:{specialist-type}:Step {N}`
 5. **Prepare Specialist Subagent Input** (Orchestrator):
    - Gather step details from parsed plan:
      - Step number and title
@@ -426,6 +429,7 @@ When the user runs this command, execute this comprehensive workflow:
      - Success criteria verification
      - Errors/warnings
      - Notes for next steps
+   - **Progress Marker**: Output `MILESTONE:SPECIALIST_END:{specialist-type}:Step {N}:{SUCCESS|FAILURE}`
 9. **Step Logging** (Orchestrator):
    - Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/0{N+2}-step-{N}-results.md`:
      - Step metadata (number, title, timestamp, duration)
@@ -484,6 +488,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Assess complexity (simple commands vs complex test suites)
 3. **Mark Quality Gate Todo** (Orchestrator):
    - Mark quality gates todo as "in_progress"
+   - **Progress Marker**: Output `MILESTONE:PHASE_4_START`
 4. **Execute Quality Gates**:
 
    **Option A - Simple Validation** (Orchestrator runs directly):
@@ -518,6 +523,7 @@ When the user runs this command, execute this comprehensive workflow:
      - Summary of issues found
      - Blockers vs warnings categorization
 8. **Gate Status Check** (Orchestrator):
+   - For each gate, **Progress Marker**: Output `MILESTONE:QUALITY_GATE:{gate-name}:{PASS|FAIL}`
    - If all gates pass: Mark quality gates todo as "completed"
    - If any gate fails:
      - Log failure details
@@ -525,6 +531,7 @@ When the user runs this command, execute this comprehensive workflow:
      - Determine if blocking (critical vs non-critical failures)
      - Provide recommendations for fixes
 9. **UPDATE INDEX** (Orchestrator): Append quality gates summary to implementation index
+10. **Progress Marker**: Output `MILESTONE:PHASE_4_COMPLETE`
 
 ### Phase 5: Implementation Summary and Completion
 
@@ -626,7 +633,8 @@ When the user runs this command, execute this comprehensive workflow:
      - Output message: "Worktree removed. Feature branch 'feat/{feature-slug}' preserved."
      - Provide merge instruction: "To merge later: git merge feat/{feature-slug}"
    - Log worktree cleanup action to implementation summary
-9. **Final Output to User**:
+9. **Progress Markers**: Output `MILESTONE:PHASE_5_COMPLETE` then `MILESTONE:IMPLEMENT_PLAN_SUCCESS`
+10. **Final Output to User**:
 
    ```
    ## Implementation Complete

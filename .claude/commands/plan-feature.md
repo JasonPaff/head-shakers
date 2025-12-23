@@ -72,6 +72,7 @@ When the user runs this command, execute this simple 3-step workflow:
    - **Scope Analysis**: Assessment of intent preservation
    - Validation results and any warnings
 8. **CHECKPOINT**: Step 1 markdown log now available for review/debugging
+9. **Progress Marker**: Output `MILESTONE:STEP_1_COMPLETE`
 
 ### Step 2: AI-Powered File Discovery
 
@@ -108,9 +109,10 @@ When the user runs this command, execute this simple 3-step workflow:
    - Discovered files list with AI-generated categorization and priorities
    - File path validation results and existence checks
    - AI analysis metrics (API cost, duration, tokens used)
-   - Discovery statistics and coverage analysis7
+   - Discovery statistics and coverage analysis
 7. **UPDATE INDEX**: Append Step 2 summary to orchestration index
 8. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
+9. **Progress Marker**: Output `MILESTONE:STEP_2_COMPLETE`
 
 ### Step 3: Implementation Planning
 
@@ -156,6 +158,7 @@ When the user runs this command, execute this simple 3-step workflow:
 8. **SAVE IMPLEMENTATION PLAN**: Create separate `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md` file
    - Ensure plan is saved in proper markdown format
    - If agent returned XML, convert to markdown or flag for manual review
+9. **Progress Markers**: Output `MILESTONE:STEP_3_COMPLETE` then `MILESTONE:PLAN_FEATURE_SUCCESS`
 
 ## Logging and Output
 
