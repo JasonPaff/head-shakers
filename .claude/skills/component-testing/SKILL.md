@@ -1,6 +1,6 @@
 ---
 name: component-testing
-description: Enforces Head Shakers React component testing conventions using Testing Library with proper rendering, user interactions, and accessibility testing.
+description: Enforces project React component testing conventions using Testing Library with proper rendering, user interactions, and accessibility testing.
 ---
 
 # Component Testing Skill

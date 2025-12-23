@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Cloudinary for image storage and optimization via the `next-cloudinary` package and custom service layer. Images are organized in hierarchical folder paths, transformed for different use cases (thumbnails, social sharing, etc.), and managed through type-safe utilities.
+The project uses Cloudinary for image storage and optimization via the `next-cloudinary` package and custom service layer. Images are organized in hierarchical folder paths, transformed for different use cases (thumbnails, social sharing, etc.), and managed through type-safe utilities.
 
 ## File Structure
 

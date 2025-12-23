@@ -1,6 +1,6 @@
 ---
 name: test-infrastructure
-description: Enforces Head Shakers test infrastructure conventions for factories, MSW handlers, mock data, Page Objects, and shared test utilities.
+description: Enforces project test infrastructure conventions for factories, MSW handlers, mock data, Page Objects, and shared test utilities.
 ---
 
 # Test Infrastructure Skill

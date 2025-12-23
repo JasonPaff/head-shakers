@@ -1,13 +1,13 @@
 ---
 name: database-schema
-description: Enforces Head Shakers database schema conventions when creating or modifying Drizzle ORM table definitions, including constraints, indexes, relations, and column patterns. This skill should be used proactively whenever working with schema files to ensure consistent schema design for PostgreSQL with Neon serverless.
+description: Enforces project database schema conventions when creating or modifying Drizzle ORM table definitions, including constraints, indexes, relations, and column patterns. This skill should be used proactively whenever working with schema files to ensure consistent schema design for PostgreSQL with Neon serverless.
 ---
 
 # Database Schema Conventions Enforcer
 
 ## Purpose
 
-This skill enforces the Head Shakers database schema conventions automatically during schema development. It ensures consistent patterns for table definitions, constraints, indexes, foreign keys, and column naming in Drizzle ORM with PostgreSQL (Neon serverless).
+This skill enforces the project database schema conventions automatically during schema development. It ensures consistent patterns for table definitions, constraints, indexes, foreign keys, and column naming in Drizzle ORM with PostgreSQL (Neon serverless).
 
 ## When to Use This Skill
 
@@ -173,4 +173,4 @@ The complete conventions are detailed in `references/Database-Schema-Conventions
 6. Present corrected code to user with brief summary of fixes applied
 ```
 
-This workflow ensures every database schema in the Head Shakers project maintains consistent, high-quality definitions that follow all established conventions.
+This workflow ensures every database schema in the project project maintains consistent, high-quality definitions that follow all established conventions.

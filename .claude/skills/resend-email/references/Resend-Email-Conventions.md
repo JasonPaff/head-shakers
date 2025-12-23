@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Resend for all email operations including transactional emails, batch sending, and newsletter broadcasts. The ResendService provides a resilient abstraction with circuit breaker protection, retry logic, and comprehensive Sentry monitoring.
+The project uses Resend for all email operations including transactional emails, batch sending, and newsletter broadcasts. The ResendService provides a resilient abstraction with circuit breaker protection, retry logic, and comprehensive Sentry monitoring.
 
 ## Required Imports
 
@@ -89,9 +89,9 @@ static async sendWaitlistConfirmationAsync(email: string): Promise<boolean> {
   return this.sendEmailWithRetry(
     async () => {
       return resend.emails.send({
-        from: 'Head Shakers <noreply@send.head-shakers.com>',
+        from: 'The project <noreply@send.example.com>',
         html: this.getConfirmationEmailHtml(),
-        subject: "You're on the Head Shakers launch list!",
+        subject: "You're on the The project launch list!",
         to: email,
       });
     },
@@ -124,9 +124,9 @@ static async sendLaunchNotificationsAsync(
         this.sendEmailWithRetry(
           async () => {
             return resend.emails.send({
-              from: 'Head Shakers <noreply@send.head-shakers.com>',
+              from: 'The project <noreply@send.example.com>',
               html: this.getLaunchEmailHtml(),
-              subject: 'Head Shakers is now live!',
+              subject: 'The project is now live!',
               to: email,
             });
           },
@@ -170,13 +170,13 @@ static async sendLaunchNotificationsAsync(
 // For sending different emails to different recipients
 const { data, error } = await resend.batch.send([
   {
-    from: 'Head Shakers <noreply@send.head-shakers.com>',
+    from: 'The project <noreply@send.example.com>',
     to: ['user1@example.com'],
     subject: 'Personalized Subject 1',
     html: '<h1>Content for user 1</h1>',
   },
   {
-    from: 'Head Shakers <noreply@send.head-shakers.com>',
+    from: 'The project <noreply@send.example.com>',
     to: ['user2@example.com'],
     subject: 'Personalized Subject 2',
     html: '<h1>Content for user 2</h1>',
@@ -190,7 +190,7 @@ const { data, error } = await resend.batch.send([
 // Prevent duplicate sends with idempotency keys
 const { data, error } = await resend.emails.send(
   {
-    from: 'Head Shakers <noreply@send.head-shakers.com>',
+    from: 'The project <noreply@send.example.com>',
     to: email,
     subject: 'Order Confirmation',
     html: this.getOrderConfirmationHtml(orderId),
@@ -298,11 +298,11 @@ private static getConfirmationEmailHtml(): string {
             <h1>You're on the list!</h1>
           </div>
           <div class="content">
-            <p>Thanks for your interest in Head Shakers!</p>
+            <p>Thanks for your interest in The project!</p>
             <p>We've added your email to our launch notification list.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2025 Head Shakers. All rights reserved.</p>
+            <p>&copy; 2025 The project. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -371,10 +371,10 @@ export function NewsletterTemplate({
       <Body style={main}>
         <Container style={container}>
           <Img
-            src="https://head-shakers.com/logo.png"
+            src="https://example.com/logo.png"
             width="150"
             height="50"
-            alt="Head Shakers"
+            alt="The project"
           />
           <Heading style={heading}>
             Hey {firstName}!
@@ -389,7 +389,7 @@ export function NewsletterTemplate({
           )}
           <Hr style={hr} />
           <Text style={footer}>
-            Head Shakers - The Bobblehead Collector Community
+            The project - The Bobblehead Collector Community
           </Text>
           <Link href={unsubscribeUrl} style={unsubscribeLink}>
             Unsubscribe
@@ -467,14 +467,14 @@ static async sendNewsletterAsync(
   return this.sendEmailWithRetry(
     async () => {
       return resend.emails.send({
-        from: 'Head Shakers <noreply@send.head-shakers.com>',
+        from: 'The project <noreply@send.example.com>',
         react: NewsletterTemplate({
           firstName,
           previewText: 'Your weekly bobblehead news',
           content,
           unsubscribeUrl,
         }),
-        subject: 'Head Shakers Weekly Newsletter',
+        subject: 'The project Weekly Newsletter',
         to: email,
       });
     },
@@ -512,7 +512,7 @@ const { data: contact, error } = await resend.contacts.create({
 // Step 1: Create the broadcast
 const { data: broadcast, error: createError } = await resend.broadcasts.create({
   audienceId: 'audience_id_here',
-  from: 'Head Shakers <noreply@send.head-shakers.com>',
+  from: 'The project <noreply@send.example.com>',
   subject: 'Weekly Bobblehead Roundup',
   html: `
     <h1>Hey {{{FIRST_NAME|there}}}!</h1>
@@ -595,13 +595,13 @@ Sentry.captureException(new Error(`Resend error: ${JSON.stringify(error)}`), {
 
 ```typescript
 // Standard transactional
-from: 'Head Shakers <noreply@send.head-shakers.com>';
+from: 'The project <noreply@send.example.com>';
 
 // Newsletter/Marketing
-from: 'Head Shakers Newsletter <newsletter@send.head-shakers.com>';
+from: 'The project Newsletter <newsletter@send.example.com>';
 
 // Support
-from: 'Head Shakers Support <support@send.head-shakers.com>';
+from: 'The project Support <support@send.example.com>';
 ```
 
 ## Result Patterns

@@ -1,13 +1,13 @@
 ---
 name: cloudinary-media
-description: Enforces Head Shakers Cloudinary media conventions when working with image uploads, URL generation, transformations, social sharing images, and photo management components. This skill covers the complete media workflow including CloudinaryService operations, URL utilities, CldImage/CldUploadWidget components, path organization, type definitions, and Sentry integration.
+description: Enforces project Cloudinary media conventions when working with image uploads, URL generation, transformations, social sharing images, and photo management components. This skill covers the complete media workflow including CloudinaryService operations, URL utilities, CldImage/CldUploadWidget components, path organization, type definitions, and Sentry integration.
 ---
 
 # Cloudinary Media Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers Cloudinary media conventions automatically during media-related development. It ensures consistent patterns for image uploads, URL transformations, social sharing images, photo management, error handling with Sentry, and proper type usage across the application.
+This skill enforces the project Cloudinary media conventions automatically during media-related development. It ensures consistent patterns for image uploads, URL transformations, social sharing images, photo management, error handling with Sentry, and proper type usage across the application.
 
 ## Activation
 

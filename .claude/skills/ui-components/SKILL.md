@@ -1,13 +1,13 @@
 ---
 name: ui-components
-description: Enforces Head Shakers UI component conventions when creating or modifying React components, forms, dialogs, and other UI elements. This skill ensures consistent patterns for Radix UI integration, form handling with TanStack Form, test IDs, accessibility, and component composition.
+description: Enforces project UI component conventions when creating or modifying React components, forms, dialogs, and other UI elements. This skill ensures consistent patterns for Radix UI integration, form handling with TanStack Form, test IDs, accessibility, and component composition.
 ---
 
 # UI Components Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers UI component conventions automatically during UI development. It ensures consistent patterns for Radix UI integration, form handling with TanStack Form, test ID generation, accessibility, and component composition.
+This skill enforces the project UI component conventions automatically during UI development. It ensures consistent patterns for Radix UI integration, form handling with TanStack Form, test ID generation, accessibility, and component composition.
 
 ## Activation
 

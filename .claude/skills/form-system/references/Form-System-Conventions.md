@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses a custom form system built on TanStack Form with integrated field components, focus management, and accessibility features. Forms integrate with server actions via the `useServerAction` hook.
+The project uses a custom form system built on TanStack Form with integrated field components, focus management, and accessibility features. Forms integrate with server actions via the `useServerAction` hook.
 
 ## Architecture
 

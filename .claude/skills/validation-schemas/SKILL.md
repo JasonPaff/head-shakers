@@ -1,13 +1,13 @@
 ---
 name: validation-schemas
-description: Enforces Head Shakers Zod validation schema conventions when creating or modifying validation schemas. This skill ensures consistent patterns for drizzle-zod integration, custom zod utilities, schema composition, type exports, and form/action integration.
+description: Enforces project Zod validation schema conventions when creating or modifying validation schemas. This skill ensures consistent patterns for drizzle-zod integration, custom zod utilities, schema composition, type exports, and form/action integration.
 ---
 
 # Validation Schemas Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers Zod validation schema conventions automatically during schema development. It ensures consistent patterns for:
+This skill enforces the project Zod validation schema conventions automatically during schema development. It ensures consistent patterns for:
 
 - Drizzle-zod schema generation from database tables
 - Custom zod utility functions for common patterns

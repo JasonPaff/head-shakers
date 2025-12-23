@@ -2,7 +2,7 @@
 
 ## Overview
 
-Server actions in Head Shakers use the `next-safe-action` library with custom middleware chains for authentication, sanitization, transactions, and database access. Actions are thin orchestrators that delegate business logic to facades.
+Server actions in The project use the `next-safe-action` library with custom middleware chains for authentication, sanitization, transactions, and database access. Actions are thin orchestrators that delegate business logic to facades.
 
 ## File Structure
 

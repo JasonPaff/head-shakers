@@ -1,6 +1,6 @@
 ---
 name: integration-testing
-description: Enforces Head Shakers integration testing conventions for facades, server actions, and database operations using Testcontainers with real PostgreSQL.
+description: Enforces project integration testing conventions for facades, server actions, and database operations using Testcontainers with real PostgreSQL.
 ---
 
 # Integration Testing Skill

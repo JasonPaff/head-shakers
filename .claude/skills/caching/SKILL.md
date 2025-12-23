@@ -1,13 +1,13 @@
 ---
 name: caching
-description: Enforces Head Shakers caching conventions when implementing cache layers using React cache(), Next.js unstable_cache, Upstash Redis, and Cloudinary. This skill ensures consistent patterns for cache keys, tags, TTL configuration, cache invalidation, and domain-specific CacheService helpers.
+description: Enforces project caching conventions when implementing cache layers using React cache(), Next.js unstable_cache, Upstash Redis, and Cloudinary. This skill ensures consistent patterns for cache keys, tags, TTL configuration, cache invalidation, and domain-specific CacheService helpers.
 ---
 
 # Caching Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers caching conventions automatically during cache implementation. It ensures consistent patterns across the 4-layer caching strategy:
+This skill enforces the project caching conventions automatically during cache implementation. It ensures consistent patterns across the 4-layer caching strategy:
 
 1. **React `cache()`** - Same-request deduplication (e.g., `getCurrentClerkUserId`, `getOptionalUserId`)
 2. **Next.js `unstable_cache()`** - Cross-request caching with tag-based invalidation (primary)

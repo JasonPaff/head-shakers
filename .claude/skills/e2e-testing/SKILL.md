@@ -1,6 +1,6 @@
 ---
 name: e2e-testing
-description: Enforces Head Shakers E2E testing conventions using Playwright with custom fixtures, Page Object Model, and authentication contexts.
+description: Enforces project E2E testing conventions using Playwright with custom fixtures, Page Object Model, and authentication contexts.
 ---
 
 # E2E Testing Skill
