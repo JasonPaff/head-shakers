@@ -15,7 +15,7 @@ export async function EditBobbleheadFormAsync() {
     return (
       <div className={'p-6'}>
         <Alert variant={'error'}>
-          <strong>Invalid Request:</strong> No bobblehead specified for editing.
+          <span className={'font-bold'}>Invalid Request:</span> No bobblehead specified for editing.
         </Alert>
       </div>
     );

@@ -28,7 +28,7 @@ import { Route } from './route-type';
 type CollectionPageProps = PageProps;
 
 interface MainContentProps {
-  mode: 'add' | 'edit';
+  mode: 'add' | 'edit' | null;
 }
 
 export function generateMetadata(): Metadata {
@@ -80,7 +80,14 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
           </ErrorBoundary>
 
           {/* Conditional: Add Form, Edit Form, or Bobblehead Grid */}
-          <MainContent mode={params.add === true ? 'add' : 'edit'} />
+          <MainContent
+            mode={
+              params.add === true ? 'add'
+              : params.edit ?
+                'edit'
+              : null
+            }
+          />
         </Fragment>
       }
       sidebar={

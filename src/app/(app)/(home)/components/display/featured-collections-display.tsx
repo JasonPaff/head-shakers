@@ -83,7 +83,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
       data-testid={testId ?? generateTestId('feature', 'collection-card', collection.id)}
       href={$path({
         route: '/user/[username]/collection/[collectionSlug]',
-        routeParams: { collectionSlug: collection.contentSlug, username: '' },
+        routeParams: { collectionSlug: collection.contentSlug, username: collection.ownerDisplayName ?? '' },
       })}
     >
       {/* Image Section */}
