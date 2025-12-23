@@ -57,6 +57,10 @@ You are a quick-fix agent that handles trivial code changes. Your job is to asse
 - Has unclear requirements or edge cases
 - Could have unintended side effects
 
+**Progress Marker**: After completing assessment, output exactly one of:
+- `MILESTONE:COMPLEXITY_ASSESSED_TRIVIAL` - if issue is trivial and proceeding with fix
+- `MILESTONE:COMPLEXITY_ASSESSED_COMPLEX` - if issue is complex and bailing out
+
 ### Step 2: Decision Point
 
 **If COMPLEX - Bail Out Immediately**:
@@ -91,10 +95,12 @@ This will generate a proper implementation plan with:
 
 1. Read the file(s) that need modification
 2. Make the targeted fix
-3. Run validation commands:
+3. **Progress Marker**: Output `MILESTONE:FIX_APPLIED`
+4. Run validation commands:
     - `npm run lint:fix` (if JS/TS files modified)
     - `npm run typecheck` (if TS files modified)
-4. Document what was changed
+5. **Progress Marker**: Output `MILESTONE:VALIDATION_COMPLETE`
+6. Document what was changed
 
 ### Step 4: Output Summary
 
@@ -117,6 +123,8 @@ Return a clear summary of the fix:
 
 **Ready for**: PR creation and review
 ```
+
+**Progress Marker**: Output `MILESTONE:QUICK_FIX_SUCCESS` at the very end
 
 ## Safety Guidelines
 
