@@ -1,13 +1,13 @@
 ---
 name: server-actions
-description: Enforces Head Shakers server actions coding conventions when creating or modifying server actions using next-safe-action, and ensures consistent client-side consumption patterns using the project's useServerAction hook. This skill covers both server-side action implementation and frontend integration patterns.
+description: Enforces project server actions coding conventions when creating or modifying server actions using next-safe-action, and ensures consistent client-side consumption patterns using the project's useServerAction hook. This skill covers both server-side action implementation and frontend integration patterns.
 ---
 
 # Server Actions Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers server actions coding conventions automatically during server action development. It ensures consistent patterns for authentication, validation, error handling, Sentry integration, cache invalidation, and client-side consumption via the `useServerAction` hook.
+This skill enforces the project server actions coding conventions automatically during server action development. It ensures consistent patterns for authentication, validation, error handling, Sentry integration, cache invalidation, and client-side consumption via the `useServerAction` hook.
 
 ## Activation
 

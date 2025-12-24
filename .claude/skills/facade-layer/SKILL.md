@@ -1,13 +1,13 @@
 ---
 name: facade-layer
-description: Enforces Head Shakers facade layer coding conventions when creating or modifying business logic facades. This skill ensures consistent patterns for transaction handling, error management, cache integration, query coordination, and cross-service orchestration.
+description: Enforces project facade layer coding conventions when creating or modifying business logic facades. This skill ensures consistent patterns for transaction handling, error management, cache integration, query coordination, and cross-service orchestration.
 ---
 
 # Facade Layer Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers facade layer coding conventions automatically during business logic development. It ensures consistent patterns for transaction handling, error management, cache integration, query coordination, and cross-service orchestration with Sentry monitoring.
+This skill enforces the project facade layer coding conventions automatically during business logic development. It ensures consistent patterns for transaction handling, error management, cache integration, query coordination, and cross-service orchestration with Sentry monitoring.
 
 ## Activation
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Zod with drizzle-zod for type-safe validation that stays in sync with the database schema. Validation schemas serve as the single source of truth for input validation, type generation, and API contracts.
+The project uses Zod with drizzle-zod for type-safe validation that stays in sync with the database schema. Validation schemas serve as the single source of truth for input validation, type generation, and API contracts.
 
 **Key Integration Points:**
 

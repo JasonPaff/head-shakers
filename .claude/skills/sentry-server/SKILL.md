@@ -1,13 +1,13 @@
 ---
 name: sentry-server
-description: Enforces Head Shakers server-side Sentry monitoring conventions when implementing error tracking, performance monitoring, and breadcrumb logging in server actions, facades, middleware, and API routes. This skill ensures consistent patterns for context setting, breadcrumb categories, error capture, and performance spans.
+description: Enforces project server-side Sentry monitoring conventions when implementing error tracking, performance monitoring, and breadcrumb logging in server actions, facades, middleware, and API routes. This skill ensures consistent patterns for context setting, breadcrumb categories, error capture, and performance spans.
 ---
 
 # Sentry Server Monitoring Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers **server-side** Sentry monitoring conventions automatically during error tracking implementation. It ensures consistent patterns for context setting, breadcrumb categories, error capture, performance spans, and middleware integration.
+This skill enforces the project **server-side** Sentry monitoring conventions automatically during error tracking implementation. It ensures consistent patterns for context setting, breadcrumb categories, error capture, performance spans, and middleware integration.
 
 **Note:** For client-side/front-end Sentry patterns, use the `sentry-client` skill instead.
 

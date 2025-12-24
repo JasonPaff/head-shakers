@@ -84,7 +84,7 @@ When the user runs this command, execute this simple 3-step workflow:
 2. Use Task tool with `subagent_type: "file-discovery-agent"`:
 3. **AI-Powered Discovery**: Use integrated Claude API for intelligent file analysis:
    - **Context-Aware Analysis**: AI examines the refined feature request and understands implementation requirements
-   - **Codebase Structure Analysis**: AI analyzes the Head Shakers project architecture and patterns
+   - **Codebase Structure Analysis**: AI analyzes the the target project architecture and patterns
    - **Content-Based Discovery**: AI reads and analyzes file contents for relevance (not just filenames)
    - **Smart Prioritization**: AI categorizes files by implementation priority (Critical/High/Medium/Low)
    - **Comprehensive Coverage**: AI searches across all architectural layers (schemas, actions, queries, validations, components, pages)

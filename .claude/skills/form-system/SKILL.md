@@ -1,13 +1,13 @@
 ---
 name: form-system
-description: Enforces Head Shakers form system conventions when creating or modifying forms using the custom TanStack Form integration. This skill covers useAppForm hook usage, field components, focus management, validation patterns, and accessibility requirements.
+description: Enforces project form system conventions when creating or modifying forms using the custom TanStack Form integration. This skill covers useAppForm hook usage, field components, focus management, validation patterns, and accessibility requirements.
 ---
 
 # Form System Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers form system conventions automatically during form development. It ensures consistent patterns for form hooks, field components, focus management, validation, server action integration, and accessibility.
+This skill enforces the project form system conventions automatically during form development. It ensures consistent patterns for form hooks, field components, focus management, validation, server action integration, and accessibility.
 
 ## Activation
 

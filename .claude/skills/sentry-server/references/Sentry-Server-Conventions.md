@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Sentry for error tracking, performance monitoring, and debugging. This document covers **server-side** Sentry integration patterns used across server actions, middleware, facades, and API routes with consistent patterns for context, breadcrumbs, and error capture.
+The project uses Sentry for error tracking, performance monitoring, and debugging. This document covers **server-side** Sentry integration patterns used across server actions, middleware, facades, and API routes with consistent patterns for context, breadcrumbs, and error capture.
 
 **Note:** For client-side/front-end Sentry patterns, see the `sentry-client` skill.
 

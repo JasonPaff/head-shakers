@@ -1,6 +1,6 @@
 ---
 name: testing-base
-description: Enforces Head Shakers shared testing conventions for test structure, file naming, description patterns, assertions, and anti-patterns. This base skill is loaded by all test-type specialists.
+description: Enforces project shared testing conventions for test structure, file naming, description patterns, assertions, and anti-patterns. This base skill is loaded by all test-type specialists.
 ---
 
 # Testing Base Skill

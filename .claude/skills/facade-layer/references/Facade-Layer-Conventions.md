@@ -2,7 +2,7 @@
 
 ## Overview
 
-The facade layer in Head Shakers provides a business logic abstraction between server actions and database queries. Facades coordinate multiple queries, manage transactions, handle caching, orchestrate cross-service operations, and enforce business rules with Sentry monitoring.
+The facade layer in The project provides a business logic abstraction between server actions and database queries. Facades coordinate multiple queries, manage transactions, handle caching, orchestrate cross-service operations, and enforce business rules with Sentry monitoring.
 
 ## File Structure
 

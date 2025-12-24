@@ -1,6 +1,6 @@
 ---
 name: client-components
-description: Enforces Head Shakers client component conventions for interactive React components with hooks, event handlers, Radix UI integration, and server action consumption. Extends react-coding-conventions with client-specific patterns.
+description: Enforces project client component conventions for interactive React components with hooks, event handlers, Radix UI integration, and server action consumption. Extends react-coding-conventions with client-specific patterns.
 ---
 
 # Client Components Skill

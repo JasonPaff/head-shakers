@@ -1,13 +1,13 @@
 ---
 name: sentry-client
-description: Enforces Head Shakers client-side Sentry monitoring conventions when implementing error boundaries, route-level error pages, user interaction tracking, and client component error handling. This skill ensures consistent patterns for global error handling, breadcrumbs, and front-end error capture.
+description: Enforces project client-side Sentry monitoring conventions when implementing error boundaries, route-level error pages, user interaction tracking, and client component error handling. This skill ensures consistent patterns for global error handling, breadcrumbs, and front-end error capture.
 ---
 
 # Sentry Client Monitoring Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers **client-side/front-end** Sentry monitoring conventions automatically during error tracking implementation. It ensures consistent patterns for error boundaries, route-level error pages, user interaction tracking, and client component error handling.
+This skill enforces the project **client-side/front-end** Sentry monitoring conventions automatically during error tracking implementation. It ensures consistent patterns for error boundaries, route-level error pages, user interaction tracking, and client component error handling.
 
 **Note:** For server-side Sentry patterns (server actions, facades, middleware), use the `sentry-server` skill instead.
 

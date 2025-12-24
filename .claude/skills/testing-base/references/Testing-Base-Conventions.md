@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Vitest 4.0.3 for unit, integration, and component tests, Testing Library for component tests, and Playwright 1.56.1 for E2E tests. Tests follow a consistent structure and naming convention.
+The project uses Vitest 4.0.3 for unit, integration, and component tests, Testing Library for component tests, and Playwright 1.56.1 for E2E tests. Tests follow a consistent structure and naming convention.
 
 **Key Libraries**:
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Server components in Head Shakers handle async data fetching, caching, streaming, and SEO. This document covers patterns UNIQUE to server components. For shared React conventions, see React-Coding-Conventions.md.
+Server components in The project handle async data fetching, caching, streaming, and SEO. This document covers patterns UNIQUE to server components. For shared React conventions, see React-Coding-Conventions.md.
 
 ## Prerequisites
 
@@ -249,7 +249,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
       description: 'Not found',
       robots: 'noindex, nofollow',
-      title: 'Not Found | Head Shakers',
+      title: 'Not Found | The project',
     };
   }
 
@@ -481,7 +481,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
       description: 'Not found',
       robots: 'noindex, nofollow',
-      title: 'Not Found | Head Shakers',
+      title: 'Not Found | The project',
     };
   }
 

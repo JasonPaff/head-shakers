@@ -1,6 +1,6 @@
 ---
 name: server-components
-description: Enforces Head Shakers server component conventions for async data fetching, caching integration, streaming with Suspense, and SEO metadata generation. Extends react-coding-conventions with server-specific patterns.
+description: Enforces project server component conventions for async data fetching, caching integration, streaming with Suspense, and SEO metadata generation. Extends react-coding-conventions with server-specific patterns.
 ---
 
 # Server Components Skill

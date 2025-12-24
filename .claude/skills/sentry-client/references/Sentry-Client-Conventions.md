@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Sentry for client-side error tracking, session replay, and user interaction monitoring. This document covers **front-end/client-side** Sentry integration patterns used in error boundaries, route-level error pages, client components, and the client instrumentation configuration.
+The project uses Sentry for client-side error tracking, session replay, and user interaction monitoring. This document covers **front-end/client-side** Sentry integration patterns used in error boundaries, route-level error pages, client components, and the client instrumentation configuration.
 
 **Note:** For server-side Sentry patterns (server actions, facades, middleware), see the `sentry-server` skill.
 

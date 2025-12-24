@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Drizzle ORM with PostgreSQL (Neon serverless). Schema definitions follow strict conventions for consistency, performance, and maintainability.
+The project uses Drizzle ORM with PostgreSQL (Neon serverless). Schema definitions follow strict conventions for consistency, performance, and maintainability.
 
 ## File Structure
 
