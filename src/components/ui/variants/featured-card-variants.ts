@@ -11,7 +11,7 @@ import { cva } from 'class-variance-authority';
 export const featuredCardVariants = cva(
   [
     // Base structure
-    'group relative overflow-hidden rounded-xl',
+    'group relative overflow-hidden rounded-lg',
     // Default shadow and border
     'border border-border/50 shadow-md',
     // Transition utilities for smooth interactions
@@ -159,7 +159,7 @@ export const featuredCardContentVariants = cva(
     // Dark gradient background for text readability on any background
     'bg-gradient-to-t from-black/80 via-black/60 to-transparent',
     // Rounded bottom corners to match card
-    'rounded-b-xl',
+    'rounded-b-lg',
   ],
   {
     defaultVariants: {
@@ -278,7 +278,7 @@ export const featuredCardBadgeVariants = cva(
 export const featuredCardSkeletonVariants = cva(
   [
     // Base skeleton styles
-    'rounded-xl',
+    'rounded-lg',
     'animate-shimmer',
   ],
   {
