@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses Drizzle ORM with PostgreSQL (Neon serverless). All queries follow a class-based pattern extending `BaseQuery` with standardized context handling, permission filtering, circuit breaker resilience, and error handling.
+The project uses Drizzle ORM with PostgreSQL (Neon serverless). All queries follow a class-based pattern extending `BaseQuery` with standardized context handling, permission filtering, circuit breaker resilience, and error handling.
 
 ## File Structure
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers uses a 4-layer caching strategy:
+The project uses a 4-layer caching strategy:
 
 1. **React `cache()`** - Same-request deduplication for server components
 2. **Next.js `unstable_cache()`** - Cross-request caching with tag-based invalidation (primary)

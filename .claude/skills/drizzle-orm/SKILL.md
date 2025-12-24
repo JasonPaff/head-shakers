@@ -1,13 +1,13 @@
 ---
 name: drizzle-orm
-description: Enforces Head Shakers Drizzle ORM coding conventions when creating or modifying database queries, schemas, and migrations. This skill ensures consistent patterns for query structure, type safety, permission filtering, pagination, resilience, and database operations.
+description: Enforces project Drizzle ORM coding conventions when creating or modifying database queries, schemas, and migrations. This skill ensures consistent patterns for query structure, type safety, permission filtering, pagination, resilience, and database operations.
 ---
 
 # Drizzle ORM Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers Drizzle ORM coding conventions automatically during database query development. It ensures consistent patterns for query structure, type safety, permission filtering, pagination, circuit breaker resilience, and database operations.
+This skill enforces the project Drizzle ORM coding conventions automatically during database query development. It ensures consistent patterns for query structure, type safety, permission filtering, pagination, circuit breaker resilience, and database operations.
 
 ## Activation
 

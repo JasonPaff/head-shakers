@@ -1,13 +1,13 @@
 ---
 name: react-coding-conventions
-description: Enforces Head Shakers React coding conventions automatically when creating or modifying React components. This skill should be used proactively whenever working with .tsx/.jsx files to ensure consistent code style, naming conventions, component structure, and TypeScript patterns across the codebase.
+description: Enforces project React coding conventions automatically when creating or modifying React components. This skill should be used proactively whenever working with .tsx/.jsx files to ensure consistent code style, naming conventions, component structure, and TypeScript patterns across the codebase.
 ---
 
 # React Coding Conventions Enforcer
 
 ## Purpose
 
-This skill enforces the Head Shakers React coding conventions automatically during component development. It ensures consistent code quality, maintainable patterns, and adherence to project-specific standards for all React/TypeScript files.
+This skill enforces the project React coding conventions automatically during component development. It ensures consistent code quality, maintainable patterns, and adherence to project-specific standards for all React/TypeScript files.
 
 ## When to Use This Skill
 
@@ -165,4 +165,4 @@ The complete conventions are detailed in `references/React-Coding-Conventions.md
 6. Present corrected code to user with brief summary of fixes applied
 ```
 
-This workflow ensures every React component in the Head Shakers project maintains consistent, high-quality code that follows all established conventions.
+This workflow ensures every React component in the project project maintains consistent, high-quality code that follows all established conventions.

@@ -1,6 +1,6 @@
 ---
 name: unit-testing
-description: Enforces Head Shakers unit testing conventions for pure functions, validation schemas, and utility modules using Vitest with proper isolation and mocking.
+description: Enforces project unit testing conventions for pure functions, validation schemas, and utility modules using Vitest with proper isolation and mocking.
 ---
 
 # Unit Testing Skill

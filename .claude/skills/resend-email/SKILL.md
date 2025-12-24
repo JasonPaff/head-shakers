@@ -1,13 +1,13 @@
 ---
 name: resend-email
-description: Enforces Head Shakers Resend email conventions when implementing email sending, templates, batch operations, and newsletter broadcasts. This skill ensures consistent patterns for email service methods, error handling, retry logic, and Sentry integration.
+description: Enforces project Resend email conventions when implementing email sending, templates, batch operations, and newsletter broadcasts. This skill ensures consistent patterns for email service methods, error handling, retry logic, and Sentry integration.
 ---
 
 # Resend Email Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers Resend email conventions automatically during email implementation. It ensures consistent patterns for service architecture, email sending operations, template management, broadcast handling, error handling, and Sentry integration.
+This skill enforces the project Resend email conventions automatically during email implementation. It ensures consistent patterns for service architecture, email sending operations, template management, broadcast handling, error handling, and Sentry integration.
 
 ## Activation
 

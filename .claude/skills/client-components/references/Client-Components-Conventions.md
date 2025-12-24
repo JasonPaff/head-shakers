@@ -2,7 +2,7 @@
 
 ## Overview
 
-Client components in Head Shakers handle interactivity, state management, event handling, and server action consumption. This document covers patterns UNIQUE to client components. For shared React conventions, see React-Coding-Conventions.md.
+Client components in The project handle interactivity, state management, event handling, and server action consumption. This document covers patterns UNIQUE to client components. For shared React conventions, see React-Coding-Conventions.md.
 
 ## Prerequisites
 

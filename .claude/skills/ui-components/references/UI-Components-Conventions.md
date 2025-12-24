@@ -2,7 +2,7 @@
 
 ## Overview
 
-Head Shakers UI components are built with Radix UI primitives, styled with Tailwind CSS, and use TanStack Form for form handling. Components follow React 19 conventions with test ID support and consistent patterns.
+The project UI components are built with Radix UI primitives, styled with Tailwind CSS, and use TanStack Form for form handling. Components follow React 19 conventions with test ID support and consistent patterns.
 
 ## Component Structure
 
