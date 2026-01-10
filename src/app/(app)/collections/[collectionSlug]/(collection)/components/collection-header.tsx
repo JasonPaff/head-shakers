@@ -14,6 +14,7 @@ import { ReportButton } from '@/components/feature/content-reports/report-button
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
+import { formatShortDate } from '@/lib/utils/date.utils';
 import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
 interface CollectionHeaderProps {
@@ -102,7 +103,7 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
             {/* Creation Date */}
             <div className={'flex items-center gap-2'}>
               <CalendarIcon aria-hidden className={'size-4'} />
-              Created {new Date(collection.createdAt).toLocaleDateString()}
+              Created {formatShortDate(collection.createdAt)}
             </div>
           </div>
         </div>

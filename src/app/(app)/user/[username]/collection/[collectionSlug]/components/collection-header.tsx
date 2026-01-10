@@ -29,6 +29,7 @@ import {
 import { useLike } from '@/hooks/use-like';
 import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
+import { formatShortDate } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import type { CollectionViewData, CollectorData } from '../types';
@@ -62,11 +63,7 @@ export const CollectionHeader = ({
 
   // 3. useMemo hooks
   const formattedDate = useMemo(() => {
-    return new Intl.DateTimeFormat('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).format(collection.lastUpdatedAt);
+    return formatShortDate(collection.lastUpdatedAt) ?? 'N/A';
   }, [collection.lastUpdatedAt]);
 
   const collectorProfileUrl = useMemo(() => {
@@ -267,24 +264,15 @@ export const CollectionHeader = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={'end'} data-testid={`${headerTestId}-share-menu`}>
-              <DropdownMenuItem
-                data-testid={`${headerTestId}-share-copy-link`}
-                onClick={handleCopyLink}
-              >
+              <DropdownMenuItem data-testid={`${headerTestId}-share-copy-link`} onClick={handleCopyLink}>
                 <LinkIcon aria-hidden className={'mr-2 size-4'} />
                 Copy Link
               </DropdownMenuItem>
-              <DropdownMenuItem
-                data-testid={`${headerTestId}-share-twitter`}
-                onClick={handleShareTwitter}
-              >
+              <DropdownMenuItem data-testid={`${headerTestId}-share-twitter`} onClick={handleShareTwitter}>
                 <TwitterIcon aria-hidden className={'mr-2 size-4'} />
                 Share on Twitter
               </DropdownMenuItem>
-              <DropdownMenuItem
-                data-testid={`${headerTestId}-share-facebook`}
-                onClick={handleShareFacebook}
-              >
+              <DropdownMenuItem data-testid={`${headerTestId}-share-facebook`} onClick={handleShareFacebook}>
                 <FacebookIcon aria-hidden className={'mr-2 size-4'} />
                 Share on Facebook
               </DropdownMenuItem>

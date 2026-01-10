@@ -18,6 +18,7 @@ import { generateBreadcrumbSchema, generatePersonSchema } from '@/lib/seo/jsonld
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
+import { formatLongDate } from '@/lib/utils/date.utils';
 import { getIsOwnerAsync } from '@/utils/auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -169,13 +170,7 @@ async function UserPage({ routeParams }: UserPageProps) {
                   <CardTitle>Member Since</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className={'text-lg font-semibold'}>
-                    {new Date(user.createdAt).toLocaleDateString('en-US', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </p>
+                  <p className={'text-lg font-semibold'}>{formatLongDate(user.createdAt)}</p>
                 </CardContent>
               </Card>
 

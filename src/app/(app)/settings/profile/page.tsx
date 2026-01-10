@@ -6,6 +6,7 @@ import { UsernameEditForm } from '@/components/feature/users/username-edit-form'
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { formatLongDate } from '@/lib/utils/date.utils';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 export function generateMetadata(): Metadata {
@@ -58,12 +59,7 @@ export default async function ProfileSettingsPage() {
                 <p className={'text-lg font-semibold'}>@{user.username}</p>
                 {user.usernameChangedAt && (
                   <p className={'mt-2 text-xs text-muted-foreground'}>
-                    Last changed on{' '}
-                    {new Date(user.usernameChangedAt).toLocaleDateString('en-US', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                    Last changed on {formatLongDate(user.usernameChangedAt)}
                   </p>
                 )}
               </div>
@@ -117,13 +113,7 @@ export default async function ProfileSettingsPage() {
               {/* Member Since */}
               <div>
                 <p className={'text-sm font-medium text-muted-foreground'}>Member Since</p>
-                <p className={'mt-1 text-base'}>
-                  {new Date(user.createdAt).toLocaleDateString('en-US', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
+                <p className={'mt-1 text-base'}>{formatLongDate(user.createdAt)}</p>
               </div>
             </div>
           </CardContent>

@@ -40,6 +40,7 @@ import {
   unlockUserAction,
 } from '@/lib/actions/admin/admin-users.actions';
 import { generateTestId } from '@/lib/test-ids';
+import { formatDateTime, formatShortDate } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserDetailsData = {
@@ -177,28 +178,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
     }
   };
 
-  const _formatDate = (date: Date | null | string | undefined): string => {
-    if (!date) return 'N/A';
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const _formatDateTime = (date: Date | null | string | undefined): string => {
-    if (!date) return 'N/A';
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleString('en-US', {
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
   const dialogTestId = generateTestId('feature', 'dialog', 'user-details');
 
   return (
@@ -318,17 +297,17 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
                 <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-created-at'}>
                   <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Created:</span>
-                  <span>{_formatDate(userDetails?.user.createdAt)}</span>
+                  <span>{formatShortDate(userDetails?.user.createdAt)}</span>
                 </div>
                 <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-updated-at'}>
                   <ClockIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Updated:</span>
-                  <span>{_formatDate(userDetails?.user.updatedAt)}</span>
+                  <span>{formatShortDate(userDetails?.user.updatedAt)}</span>
                 </div>
                 <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-last-active'}>
                   <ClockIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Last Active:</span>
-                  <span>{_formatDateTime(userDetails?.user.lastActiveAt)}</span>
+                  <span>{formatDateTime(userDetails?.user.lastActiveAt)}</span>
                 </div>
               </div>
             </section>

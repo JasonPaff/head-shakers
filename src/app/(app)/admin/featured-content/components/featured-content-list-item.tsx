@@ -24,15 +24,7 @@ import {
   deleteFeaturedContentAction,
   toggleFeaturedContentActiveAction,
 } from '@/lib/actions/featured-content/featured-content.actions';
-
-const formatDate = (date: Date | null) => {
-  if (!date) return null;
-  return new Date(date).toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-};
+import { formatShortDate } from '@/lib/utils/date.utils';
 
 const getFeatureTypeLabel = (type: string) => {
   switch (type) {
@@ -135,11 +127,11 @@ export const FeaturedContentListItem = ({ onEdit, ...content }: FeaturedContentL
 
             {/* Dates Info */}
             <div className={'mt-1 flex items-center gap-4 text-xs text-muted-foreground'}>
-              <span>Start: {formatDate(content.startDate) || 'Not set'}</span>
+              <span>Start: {formatShortDate(content.startDate) || 'Not set'}</span>
               <Conditional isCondition={!!content.endDate}>
-                <span>End: {formatDate(content.endDate)}</span>
+                <span>End: {formatShortDate(content.endDate)}</span>
               </Conditional>
-              <span>Updated: {formatDate(content.updatedAt)}</span>
+              <span>Updated: {formatShortDate(content.updatedAt)}</span>
             </div>
           </div>
 

@@ -44,6 +44,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { formatDateOnly, formatTimeOnly } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ReportsTableProps extends ComponentPropsWithRef<'div'> {
@@ -386,11 +387,10 @@ export const ReportsTable = ({
       {
         accessorKey: 'createdAt',
         cell: ({ row }) => {
-          const date = new Date(row.original.createdAt);
           return (
             <div className={'space-y-0.5'}>
-              <div className={'text-sm'}>{date.toLocaleDateString()}</div>
-              <div className={'text-xs text-muted-foreground'}>{date.toLocaleTimeString()}</div>
+              <div className={'text-sm'}>{formatDateOnly(row.original.createdAt)}</div>
+              <div className={'text-xs text-muted-foreground'}>{formatTimeOnly(row.original.createdAt)}</div>
             </div>
           );
         },

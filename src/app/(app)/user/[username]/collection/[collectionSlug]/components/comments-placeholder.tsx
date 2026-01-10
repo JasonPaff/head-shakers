@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatMonthDay } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 // Mock comments data
@@ -52,13 +53,6 @@ interface CommentsPlaceholderProps {
 
 export const CommentsPlaceholder = ({ commentCount = 12 }: CommentsPlaceholderProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      day: 'numeric',
-      month: 'short',
-    }).format(date);
-  };
 
   return (
     <Card className={'mt-8'}>
@@ -107,7 +101,9 @@ export const CommentsPlaceholder = ({ commentCount = 12 }: CommentsPlaceholderPr
                 <div className={'flex-1'}>
                   <div className={'flex items-baseline gap-2'}>
                     <span className={'text-sm font-medium'}>{comment.author.displayName}</span>
-                    <span className={'text-xs text-muted-foreground'}>{formatDate(comment.createdAt)}</span>
+                    <span className={'text-xs text-muted-foreground'}>
+                      {formatMonthDay(comment.createdAt)}
+                    </span>
                   </div>
                   <p className={'mt-1 text-sm text-foreground/90'}>{comment.content}</p>
                   <button className={'mt-1 text-xs text-muted-foreground hover:text-foreground'}>

@@ -6,6 +6,7 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatShortDate } from '@/lib/utils/date.utils';
 
 interface CollectionStatsProps {
   collection: PublicCollection;
@@ -40,7 +41,7 @@ export const CollectionStats = ({ collection, collectionId }: CollectionStatsPro
             <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
             <span className={'text-sm text-muted-foreground'}>Last Updated:</span>
             <span className={'text-sm font-medium'}>
-              {collection.lastUpdatedAt ? new Date(collection.lastUpdatedAt).toLocaleDateString() : 'N/A'}
+              {formatShortDate(collection.lastUpdatedAt) ?? 'N/A'}
             </span>
           </li>
         </ul>

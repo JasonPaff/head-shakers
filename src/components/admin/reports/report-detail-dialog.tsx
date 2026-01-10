@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { formatDateTime, formatShortDate } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ReportDetailDialogProps extends ComponentPropsWithRef<'div'> {
@@ -125,26 +126,6 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
   const _contentExists = report?.contentExists ?? false;
 
   // Utility functions
-  const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const formatDateTime = (date: Date | string) => {
-    const dateObj = new Date(date);
-    return `${dateObj.toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })} at ${dateObj.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}`;
-  };
-
   const formatReason = (reason: string) => {
     return reason
       .split('_')
@@ -327,7 +308,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                     <div className={'flex-1'}>
                       <div className={'font-medium'}>Report Created</div>
                       <div className={'text-xs text-muted-foreground'}>
-                        {report && formatDate(report.createdAt)}
+                        {report && formatShortDate(report.createdAt)}
                       </div>
                     </div>
                   </div>
@@ -339,7 +320,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                       <div className={'flex-1'}>
                         <div className={'font-medium'}>Status Updated</div>
                         <div className={'text-xs text-muted-foreground'}>
-                          {report && formatDate(report.updatedAt)}
+                          {report && formatShortDate(report.updatedAt)}
                         </div>
                       </div>
                     </div>
@@ -352,7 +333,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                       <div className={'flex-1'}>
                         <div className={'font-medium'}>Report {_isResolved ? 'Resolved' : 'Dismissed'}</div>
                         <div className={'text-xs text-muted-foreground'}>
-                          {report?.resolvedAt && formatDate(report.resolvedAt)}
+                          {report?.resolvedAt && formatShortDate(report.resolvedAt)}
                         </div>
                         <Conditional isCondition={!!report?.moderatorId}>
                           <div className={'mt-1 truncate font-mono text-xs text-muted-foreground'}>

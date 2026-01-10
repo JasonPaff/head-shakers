@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDateOnly, formatTimeOnly } from '@/lib/utils/date.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserAction = 'change-role' | 'lock' | 'unlock' | 'view-details';
@@ -197,10 +198,8 @@ export const UsersDataTable = ({
             <div data-slot={'users-table-created-at'}>
               <Conditional isCondition={_hasDate}>
                 <div className={'space-y-0.5'}>
-                  <div className={'text-sm'}>{new Date(createdAt).toLocaleDateString()}</div>
-                  <div className={'text-xs text-muted-foreground'}>
-                    {new Date(createdAt).toLocaleTimeString()}
-                  </div>
+                  <div className={'text-sm'}>{formatDateOnly(createdAt)}</div>
+                  <div className={'text-xs text-muted-foreground'}>{formatTimeOnly(createdAt)}</div>
                 </div>
               </Conditional>
               <Conditional isCondition={!_hasDate}>
@@ -223,10 +222,8 @@ export const UsersDataTable = ({
             <div data-slot={'users-table-last-active'}>
               <Conditional isCondition={_hasDate}>
                 <div className={'space-y-0.5'}>
-                  <div className={'text-sm'}>{new Date(lastActiveAt!).toLocaleDateString()}</div>
-                  <div className={'text-xs text-muted-foreground'}>
-                    {new Date(lastActiveAt!).toLocaleTimeString()}
-                  </div>
+                  <div className={'text-sm'}>{formatDateOnly(lastActiveAt)}</div>
+                  <div className={'text-xs text-muted-foreground'}>{formatTimeOnly(lastActiveAt)}</div>
                 </div>
               </Conditional>
               <Conditional isCondition={!_hasDate}>
