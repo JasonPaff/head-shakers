@@ -1,5 +1,7 @@
 'use client';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { CollectionDelete } from '@/components/feature/collections/collection-delete';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,10 +15,25 @@ import {
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { generateTestId } from '@/lib/test-ids';
 
-import type { CollectionUpsertDialogProps } from './collection-upsert-dialog.types';
+import type { CollectionForUpsert } from './collection-upsert-dialog.types';
+import type { CollectionCreatedResult } from './hooks/use-collection-upsert-form';
 
 import { CollectionFormFields } from './collection-form-fields';
 import { useCollectionUpsertForm } from './hooks/use-collection-upsert-form';
+
+interface CollectionUpsertDialogProps extends ComponentTestIdProps {
+  /**
+   * When provided, dialog is in edit mode.
+   * When undefined, dialog is in create mode.
+   */
+  collection?: CollectionForUpsert;
+  isOpen: boolean;
+  onClose: () => void;
+  /**
+   * Called on successful create (with new collection) or edit (with updated collection).
+   */
+  onSuccess?: (collection: CollectionCreatedResult) => void;
+}
 
 export const CollectionUpsertDialog = withFocusManagement(
   ({ collection, isOpen, onClose, onSuccess, testId }: CollectionUpsertDialogProps) => {
@@ -113,7 +130,7 @@ export const CollectionUpsertDialog = withFocusManagement(
                   >
                     Cancel
                   </Button>
-                  <form.SubmitButton testId={submitButtonTestId}>
+                  <form.SubmitButton isDisabled={isSubmitting} testId={submitButtonTestId}>
                     {isSubmitting ? labels.submitButtonLoading : labels.submitButton}
                   </form.SubmitButton>
                 </div>
