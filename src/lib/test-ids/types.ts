@@ -47,6 +47,7 @@ export type ComponentTestId =
   | 'collection-edit-submit'
   | 'collection-form'
   | 'collection-grid'
+  | 'collection-header'
   | 'collections-empty-state'
   | 'collections-empty-state-cta'
   | 'command'

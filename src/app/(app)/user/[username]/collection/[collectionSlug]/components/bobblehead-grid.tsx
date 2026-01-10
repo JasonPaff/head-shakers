@@ -1,72 +1,56 @@
 'use client';
 
-import { PackageIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import type { ComponentProps } from 'react';
 
+import { PackageIcon } from 'lucide-react';
+import { parseAsStringEnum, useQueryState } from 'nuqs';
+import { useMemo } from 'react';
+
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-import type { MockBobblehead, SortOption } from '../mock-data';
+import type { BobbleheadGridProps as BobbleheadGridPropsFromTypes, BobbleheadViewData } from '../types';
 
 import { BobbleheadCard } from './bobblehead-card';
 import { SearchControls } from './search-controls';
 
-export type LayoutVariant = 'gallery' | 'grid' | 'list';
+const LAYOUT_VALUES = ['grid', 'gallery', 'list'] as const;
 
-interface BobbleheadGridProps {
-  bobbleheads: Array<MockBobblehead>;
-  layoutVariant: LayoutVariant;
-}
+export type LayoutVariant = (typeof LAYOUT_VALUES)[number];
+
+type BobbleheadGridProps = BobbleheadGridPropsFromTypes &
+  ComponentProps<'div'> &
+  ComponentTestIdProps;
 
 /**
  * BobbleheadGrid component with 3 layout variations:
  * 1. Grid - Traditional card grid with search/sort bar (default)
  * 2. Gallery - Larger images, masonry-like layout, minimal text
  * 3. List - Compact horizontal cards with more metadata visible
+ *
+ * Receives pre-filtered/sorted data from server. Uses URL state for layout preference only.
  */
-export const BobbleheadGrid = ({ bobbleheads, layoutVariant }: BobbleheadGridProps) => {
-  const [searchValue, setSearchValue] = useState('');
-  const [sortValue, setSortValue] = useState<SortOption>('newest');
+export const BobbleheadGrid = ({
+  bobbleheads,
+  className,
+  collectionSlug,
+  ownerUsername,
+  testId,
+  ...props
+}: BobbleheadGridProps) => {
+  // Other hooks - Only layout from URL state (filtering/sorting handled server-side)
+  const [layout] = useQueryState(
+    'layout',
+    parseAsStringEnum([...LAYOUT_VALUES]).withDefault('grid'),
+  );
 
-  // Filter and sort bobbleheads
-  const filteredAndSortedBobbleheads = useMemo(() => {
-    let result = [...bobbleheads];
-
-    // Filter by search
-    if (searchValue.trim()) {
-      const search = searchValue.toLowerCase();
-      result = result.filter(
-        (b) =>
-          b.name.toLowerCase().includes(search) ||
-          (b.description && b.description.toLowerCase().includes(search)),
-      );
-    }
-
-    // Sort
-    switch (sortValue) {
-      case 'name_asc':
-        result = result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name_desc':
-        result = result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'newest':
-        // Mock: keep original order (assuming newest first)
-        break;
-      case 'oldest':
-        result = result.reverse();
-        break;
-    }
-
-    return result;
-  }, [bobbleheads, searchValue, sortValue]);
-
-  const _isGalleryLayout = layoutVariant === 'gallery';
-  const _matchingText = searchValue ? ` matching "${searchValue}"` : '';
-
-  // Grid layout classes based on variant
+  // useMemo hooks - Grid layout classes based on variant
   const gridClasses = useMemo(() => {
-    switch (layoutVariant) {
+    switch (layout) {
       case 'gallery':
         // Masonry-like: varying sizes for visual interest
         return 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
@@ -78,46 +62,61 @@ export const BobbleheadGrid = ({ bobbleheads, layoutVariant }: BobbleheadGridPro
         // Standard responsive grid
         return 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3';
     }
-  }, [layoutVariant]);
+  }, [layout]);
+
+  // Derived variables for conditional rendering
+  const _isGalleryLayout = layout === 'gallery';
+  const _hasNoBobbleheads = bobbleheads.length === 0;
+
+  const gridTestId = testId || generateTestId('feature', 'bobblehead-grid');
 
   return (
-    <div>
+    <div
+      className={cn(className)}
+      data-slot={'bobblehead-grid'}
+      data-testid={gridTestId}
+      {...props}
+    >
       {/* Search and Sort Controls */}
-      <SearchControls
-        className={'mb-6'}
-        onSearchChange={setSearchValue}
-        onSortChange={setSortValue}
-        searchValue={searchValue}
-        sortValue={sortValue}
-      />
+      <SearchControls className={'mb-6'} testId={`${gridTestId}-controls`} />
 
       {/* Results Count */}
-      <p className={'mb-4 text-sm text-muted-foreground'}>
-        {filteredAndSortedBobbleheads.length} bobblehead{filteredAndSortedBobbleheads.length !== 1 ? 's' : ''}
-        {_matchingText}
+      <p className={'mb-4 text-sm text-muted-foreground'} data-slot={'bobblehead-grid-count'}>
+        {bobbleheads.length} bobblehead{bobbleheads.length !== 1 ? 's' : ''}
       </p>
 
       {/* Empty State */}
-      {filteredAndSortedBobbleheads.length === 0 ?
+      <Conditional
+        fallback={
+          <div className={cn(gridClasses)} data-slot={'bobblehead-grid-items'}>
+            {bobbleheads.map((bobblehead: BobbleheadViewData, index: number) => (
+              <div
+                className={cn(
+                  // Add size variations for gallery layout
+                  _isGalleryLayout && index % 5 === 0 && 'sm:col-span-2 sm:row-span-2',
+                )}
+                key={bobblehead.id}
+              >
+                <BobbleheadCard
+                  bobblehead={bobblehead}
+                  collectionSlug={collectionSlug}
+                  ownerUsername={ownerUsername}
+                  testId={`${gridTestId}-card-${bobblehead.id}`}
+                  variant={layout}
+                />
+              </div>
+            ))}
+          </div>
+        }
+        isCondition={_hasNoBobbleheads}
+      >
         <EmptyState
           description={'Try adjusting your search or filters.'}
           icon={PackageIcon}
+          testId={`${gridTestId}-empty`}
           title={'No bobbleheads found'}
         />
-      : <div className={cn(gridClasses)}>
-          {filteredAndSortedBobbleheads.map((bobblehead, index) => (
-            <div
-              className={cn(
-                // Add size variations for gallery layout
-                _isGalleryLayout && index % 5 === 0 && 'sm:col-span-2 sm:row-span-2',
-              )}
-              key={bobblehead.id}
-            >
-              <BobbleheadCard bobblehead={bobblehead} variant={layoutVariant} />
-            </div>
-          ))}
-        </div>
-      }
+      </Conditional>
     </div>
   );
 };
