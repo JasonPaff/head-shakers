@@ -44,14 +44,17 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
     };
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
+      breadcrumbContext: {
+        action: 'add-bobblehead',
+        component: 'AddBobbleheadFormDisplay',
+      },
       loadingMessage: 'Adding your bobblehead to the collection...',
-      onSuccess: () => {
-        // Return to grid view after successful creation
+      onAfterSuccess: () => {
         handleClose();
       },
     });
 
-    const form = useAppForm({
+    const formContext = useAppForm({
       ...addItemFormOptions,
       canSubmitWhenInvalid: true,
       defaultValues: {
@@ -65,7 +68,7 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
         focusFirstError(formApi);
       },
       validationLogic: revalidateLogic({
-        mode: 'blur',
+        mode: 'submit',
         modeAfterSubmission: 'change',
       }),
       validators: {
@@ -78,21 +81,21 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          void form.handleSubmit();
+          void formContext.handleSubmit();
         }}
       >
-        <div className={'space-y-8 p-6'}>
-          <AddItemHeader />
-          <CollectionAssignment collections={collections} form={form} />
-          <BasicInformation form={form} />
-          <ItemPhotos form={form} />
-          <AcquisitionDetails form={form} />
-          <PhysicalAttributes form={form} />
-          <ItemTags form={form} />
-          <CustomFields form={form} />
-          <ItemSettings form={form} />
+        <formContext.AppForm>
+          <div className={'space-y-8 p-6'}>
+            <AddItemHeader />
+            <CollectionAssignment collections={collections} form={formContext as never} />
+            <BasicInformation form={formContext as never} />
+            <ItemPhotos form={formContext as never} />
+            <AcquisitionDetails form={formContext as never} />
+            <PhysicalAttributes form={formContext as never} />
+            <ItemTags form={formContext as never} />
+            <CustomFields form={formContext as never} />
+            <ItemSettings form={formContext as never} />
 
-          <form.AppForm>
             <div
               className={
                 'sticky bottom-0 z-10 -mx-6 border-t border-border/50 bg-background/80 p-6 backdrop-blur-sm'
@@ -104,7 +107,7 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
                   <Button className={'min-w-25'} onClick={handleClose} type={'button'} variant={'outline'}>
                     Cancel
                   </Button>
-                  <form.SubmitButton isDisabled={isExecuting}>
+                  <formContext.SubmitButton isDisabled={isExecuting}>
                     <Conditional
                       fallback={
                         <div className={'flex items-center gap-2'}>
@@ -123,12 +126,12 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
                         <span>Adding...</span>
                       </div>
                     </Conditional>
-                  </form.SubmitButton>
+                  </formContext.SubmitButton>
                 </div>
               </div>
             </div>
-          </form.AppForm>
-        </div>
+          </div>
+        </formContext.AppForm>
       </form>
     );
   },
