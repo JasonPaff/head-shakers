@@ -184,6 +184,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'collection-card',
     'collection-form',
     'collection-grid',
+    'collection-header',
     'collections-empty-state',
     'collections-empty-state-cta',
     'command',
