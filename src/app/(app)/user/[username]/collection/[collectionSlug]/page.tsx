@@ -25,13 +25,16 @@ import { CollectionHeaderAsync } from '@/app/(app)/user/[username]/collection/[c
 import { CollectionBobbleheadsSkeleton } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-bobbleheads-skeleton';
 import { CollectionHeaderSkeleton } from '@/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-header-skeleton';
 import { Route } from '@/app/(app)/user/[username]/collection/[collectionSlug]/route-type';
+import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
+import { ContentLayout } from '@/components/layout/content-layout';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-
 
 type CollectionPageProps = PageProps;
 
@@ -196,6 +199,17 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
             }}
           />
         </Suspense>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <ErrorBoundary name={'collection-comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
+              </Suspense>
+            </ErrorBoundary>
+          </ContentLayout>
+        </div>
       </div>
     </Fragment>
   );
