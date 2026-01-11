@@ -286,23 +286,6 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
             </ErrorBoundary>
           </ContentLayout>
         </div>
-
-        {/* Bottom Navigation Section */}
-        <div className={'mt-8'}>
-          <ContentLayout>
-            <ErrorBoundary name={'bobblehead-navigation'}>
-              <Suspense fallback={<BobbleheadNavigationSkeleton />}>
-                <BobbleheadNavigationAsync
-                  bobbleheadId={bobbleheadId}
-                  collectionId={collectionId}
-                  collectionSlug={collectionSlug}
-                  isKeyboardNavigationEnabled={false}
-                  ownerUsername={username}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          </ContentLayout>
-        </div>
       </BobbleheadPageClientWrapper>
     </Fragment>
   );

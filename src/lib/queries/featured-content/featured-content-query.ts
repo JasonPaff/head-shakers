@@ -375,7 +375,7 @@ export class FeaturedContentQuery extends BaseQuery {
       .from(featuredContent)
       .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
-      .innerJoin(users, eq(bobbleheads.userId, users.id))
+      .innerJoin(users, eq(collections.userId, users.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),

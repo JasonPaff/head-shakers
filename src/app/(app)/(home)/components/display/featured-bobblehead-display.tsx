@@ -33,6 +33,10 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
   const topRatedCardTestId = `${heroTestId}-top-rated-card`;
   const valueGrowthCardTestId = `${heroTestId}-value-growth-card`;
 
+  console.log('content slug', bobblehead.contentSlug);
+  console.log('collection slug', bobblehead.collectionSlug);
+  console.log('owner username', bobblehead.ownerUsername);
+
   const bobbleheadHref =
     _hasValidRouteParams ?
       $path({

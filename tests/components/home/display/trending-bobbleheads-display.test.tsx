@@ -23,8 +23,8 @@ vi.mock('next-cloudinary', () => ({
 vi.mock('next-typesafe-url', () => ({
   $path: vi.fn(({ route, routeParams }: { route: string; routeParams?: Record<string, string> }): string => {
     if (route === '/browse') return '/browse';
-    if (routeParams?.bobbleheadSlug) {
-      return `/bobbleheads/${routeParams.bobbleheadSlug}`;
+    if (routeParams?.bobbleheadSlug && routeParams?.username && routeParams?.collectionSlug) {
+      return `/user/${routeParams.username}/collection/${routeParams.collectionSlug}/bobbleheads/${routeParams.bobbleheadSlug}`;
     }
     return route;
   }),
