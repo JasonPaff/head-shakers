@@ -272,31 +272,6 @@ export const AnalyticsFacade = {
   },
 
   /**
-   * Get view trends over time
-   */
-  async getViewTrends(
-    options: {
-      endDate?: Date;
-      groupBy?: 'day' | 'hour' | 'month' | 'week';
-      isIncludingAnonymous?: boolean;
-      startDate?: Date;
-      targetType?: 'bobblehead' | 'collection' | 'profile';
-    } = {},
-    dbInstance?: DatabaseExecutor,
-  ): Promise<
-    Array<{
-      averageViewDuration: null | number;
-      period: string;
-      uniqueViewers: number;
-      viewCount: number;
-    }>
-  > {
-    const context = { dbInstance: dbInstance };
-
-    return await ViewAnalyticsQuery.getViewTrendsAsync(options, context);
-  },
-
-  /**
    * Record a single view with deduplication and privacy enforcement
    */
   async recordView(

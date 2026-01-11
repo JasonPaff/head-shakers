@@ -18,15 +18,12 @@ type AdminReportsFilterInput = z.infer<typeof adminReportsFilterSchema>;
 type AdminUpdateReportInput = z.infer<typeof adminUpdateReportSchema>;
 type CreateContentReportInput = z.infer<typeof createContentReportSchema>;
 
-import { ENUMS, OPERATIONS } from '@/lib/constants';
+import { OPERATIONS } from '@/lib/constants';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
-import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
-import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import {
   ContentReportsQuery,
   type ReportsStatsResult,
 } from '@/lib/queries/content-reports/content-reports.query';
-import { SocialQuery } from '@/lib/queries/social/social.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'ContentReportsFacade';
@@ -36,13 +33,6 @@ export interface RateLimitStatus {
   isAllowed: boolean;
   nextAllowedTime?: Date;
   reportsToday: number;
-}
-
-export interface ReportValidationResult {
-  canReport: boolean;
-  isTargetExists: boolean;
-  isValid: boolean;
-  reason?: string;
 }
 
 export class ContentReportsFacade {
@@ -115,38 +105,6 @@ export class ContentReportsFacade {
         method: 'checkRateLimitAsync',
         operation: OPERATIONS.MODERATION.CHECK_RATE_LIMIT,
         userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
-   * check rate limiting for user reports
-   */
-  static async checkReportRateLimitAsync(
-    userId: string,
-    hoursWindow: number = 1,
-    maxReports: number = 3,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<{ canReport: boolean; recentReportCount: number }> {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const recentReports = await ContentReportsQuery.getRecentReportsByUserAsync(
-        userId,
-        hoursWindow,
-        context,
-      );
-
-      return {
-        canReport: recentReports.length < maxReports,
-        recentReportCount: recentReports.length,
-      };
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { hoursWindow, maxReports },
-        facade: facadeName,
-        method: 'checkReportRateLimitAsync',
-        operation: OPERATIONS.MODERATION.CHECK_RATE_LIMIT,
       };
       throw createFacadeError(context, error);
     }
@@ -286,39 +244,6 @@ export class ContentReportsFacade {
   }
 
   /**
-   * get report status for a target (for UI display)
-   */
-  static getReportStatus(
-    targetId: string,
-    targetType: string,
-    userId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<{ hasUserReported: boolean; reportCount: number }> {
-    try {
-      if (userId) {
-        createUserQueryContext(userId, { dbInstance });
-      } else {
-        createUserQueryContext('anonymous', { dbInstance });
-      }
-
-      // this will be implemented when we create the queries
-      return Promise.resolve({
-        hasUserReported: false,
-        reportCount: 0,
-      });
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { targetId, targetType },
-        facade: facadeName,
-        method: 'getReportStatus',
-        operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
    * check if the user has already reported content
    */
   static async getReportStatusAsync(
@@ -365,98 +290,6 @@ export class ContentReportsFacade {
         facade: facadeName,
         method: 'updateReportStatusAsync',
         operation: OPERATIONS.ADMIN.UPDATE_REPORT_STATUS,
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
-   * validate that the target exists and can be reported
-   */
-  static async validateReportTarget(
-    targetId: string,
-    targetType: string,
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<ReportValidationResult> {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-
-      // validate target type
-      const validTargetTypes = ENUMS.CONTENT_REPORT.TARGET_TYPE;
-      if (!validTargetTypes.includes(targetType as (typeof validTargetTypes)[number])) {
-        return {
-          canReport: false,
-          isTargetExists: false,
-          isValid: false,
-          reason: 'Invalid target type',
-        };
-      }
-
-      // check if the target exists based on type
-      let isTargetExists = false;
-      let canReport = true;
-      let reason: string | undefined;
-
-      switch (targetType) {
-        case 'bobblehead': {
-          const bobblehead = await BobbleheadsQuery.findByIdAsync(targetId, context);
-          isTargetExists = !!bobblehead;
-
-          // prevent self-reporting
-          if (bobblehead?.userId === userId) {
-            canReport = false;
-            reason = 'Cannot report your own content';
-          }
-          break;
-        }
-        case 'collection': {
-          const collection = await CollectionsQuery.getByIdAsync(targetId, context);
-          isTargetExists = !!collection;
-
-          // prevent self-reporting
-          if (collection?.userId === userId) {
-            canReport = false;
-            reason = 'Cannot report your own content';
-          }
-          break;
-        }
-        case 'comment': {
-          const comment = await SocialQuery.getCommentByIdAsync(targetId, context);
-          isTargetExists = !!comment;
-
-          // prevent self-reporting
-          if (comment?.userId === userId) {
-            canReport = false;
-            reason = 'Cannot report your own content';
-          }
-          break;
-        }
-        case 'user':
-          // these will be implemented in future phases
-          isTargetExists = false;
-          canReport = false;
-          reason = 'Target type not yet supported';
-          break;
-        default:
-          isTargetExists = false;
-          canReport = false;
-          reason = 'Unknown target type';
-      }
-
-      return {
-        canReport,
-        isTargetExists,
-        isValid: isTargetExists && canReport,
-        reason,
-      };
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { targetId, targetType },
-        facade: facadeName,
-        method: 'validateReportTarget',
-        operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET,
         userId,
       };
       throw createFacadeError(context, error);

@@ -4,44 +4,12 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
-import type { SelectLaunchNotification } from '@/lib/validations/launch-notification.validations';
 
 import { ACTION_NAMES, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { LaunchNotificationFacade } from '@/lib/facades/launch-notifications/launch-notification.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
-
-/**
- * get all launch notification waitlist signups (admin only)
- */
-export const getLaunchNotificationsAction = adminActionClient
-  .metadata({
-    actionName: ACTION_NAMES.ADMIN.GET_LAUNCH_NOTIFICATIONS,
-    isTransactionRequired: false,
-  })
-  .action(async ({ ctx }): Promise<ActionResponse<Array<SelectLaunchNotification>>> => {
-    try {
-      const signups = await LaunchNotificationFacade.getAllWaitlistAsync(ctx.db);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          count: signups.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: 'Fetched all launch notification signups',
-      });
-
-      return actionSuccess(signups);
-    } catch (error) {
-      return handleActionError(error, {
-        metadata: { actionName: ACTION_NAMES.ADMIN.GET_LAUNCH_NOTIFICATIONS },
-        operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
-        userId: ctx.userId,
-      });
-    }
-  });
 
 /**
  * get launch notification statistics (admin only)

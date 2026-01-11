@@ -6,6 +6,8 @@ import { BrowseCollectionsContent } from '@/app/(app)/browse/components/browse-c
 import { BrowseCollectionsSkeleton } from '@/app/(app)/browse/components/skeletons/browse-collections-skeleton';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 
+export const dynamic = 'force-dynamic';
+
 export default function BrowsePage() {
   return (
     <div className={'container mx-auto space-y-6 py-8'}>

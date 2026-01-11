@@ -38,6 +38,8 @@ export function generateMetadata(): Metadata {
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 async function CollectionPage({ searchParams }: CollectionPageProps) {
   const params = await collectionDashboardSearchParamsCache.parse(searchParams);
 
