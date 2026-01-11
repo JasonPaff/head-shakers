@@ -7,6 +7,38 @@ import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo/seo.constants';
 
 import { render, screen } from '../../setup/test-utils';
 
+// Mock Redis client to prevent initialization error
+vi.mock('@/lib/utils/redis-client', () => ({
+  getRedisClient: vi.fn(() => ({
+    del: vi.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
+  })),
+  RedisOperations: class {
+    static del = vi.fn();
+    static get = vi.fn();
+    static set = vi.fn();
+  },
+}));
+
+// Mock CacheService to prevent cache operations
+vi.mock('@/lib/services/cache.service', () => ({
+  CacheService: {
+    featured: {
+      collections: vi.fn(),
+      content: vi.fn(),
+      featuredBobblehead: vi.fn(),
+      trendingBobbleheads: vi.fn(),
+    },
+    invalidatePattern: vi.fn(),
+  },
+}));
+
+// Mock getCurrentUserWithRole to prevent database access
+vi.mock('@/lib/utils/admin.utils', () => ({
+  getCurrentUserWithRole: vi.fn().mockResolvedValue(null),
+}));
+
 // Mock all section components
 vi.mock('@/app/(app)/(home)/components/sections/hero-section', () => ({
   HeroSection: (): JSX.Element => <div data-testid={'hero-section-mock'}>Hero Section</div>,
@@ -32,8 +64,9 @@ vi.mock('@/app/(app)/(home)/components/sections/join-community-section', () => (
 
 describe('HomePage', () => {
   describe('Page Composition', () => {
-    it('should render all 4 sections', () => {
-      render(<HomePage />);
+    it('should render all 4 sections', async () => {
+      const Component = await HomePage();
+      render(Component);
 
       const heroSection = screen.getByTestId('hero-section-mock');
       const featuredCollections = screen.getByTestId('featured-collections-section-mock');
@@ -49,8 +82,6 @@ describe('HomePage', () => {
 
   describe('JSON-LD Schema', () => {
     it('should include Organization schema with correct structure', () => {
-      render(<HomePage />);
-
       // Verify the ORGANIZATION_SCHEMA constant has the expected structure
       expect(ORGANIZATION_SCHEMA).toHaveProperty('@context', 'https://schema.org');
       expect(ORGANIZATION_SCHEMA).toHaveProperty('@type', 'Organization');
@@ -61,8 +92,6 @@ describe('HomePage', () => {
     });
 
     it('should include WebSite schema with correct structure', () => {
-      render(<HomePage />);
-
       // Verify the WEBSITE_SCHEMA constant has the expected structure
       expect(WEBSITE_SCHEMA).toHaveProperty('@context', 'https://schema.org');
       expect(WEBSITE_SCHEMA).toHaveProperty('@type', 'WebSite');
@@ -73,8 +102,6 @@ describe('HomePage', () => {
     });
 
     it('should have WebSite schema with SearchAction', () => {
-      render(<HomePage />);
-
       expect(WEBSITE_SCHEMA).toHaveProperty('potentialAction');
       expect(WEBSITE_SCHEMA.potentialAction!).toHaveProperty('@type', 'SearchAction');
       expect(WEBSITE_SCHEMA.potentialAction!).toHaveProperty('target');
@@ -83,8 +110,6 @@ describe('HomePage', () => {
     });
 
     it('should have valid Organization schema properties', () => {
-      render(<HomePage />);
-
       expect(typeof ORGANIZATION_SCHEMA.name).toBe('string');
       expect(typeof ORGANIZATION_SCHEMA.url).toBe('string');
       expect(typeof ORGANIZATION_SCHEMA.description).toBe('string');
@@ -93,8 +118,6 @@ describe('HomePage', () => {
     });
 
     it('should have valid WebSite schema properties', () => {
-      render(<HomePage />);
-
       expect(typeof WEBSITE_SCHEMA.name).toBe('string');
       expect(typeof WEBSITE_SCHEMA.url).toBe('string');
       expect(typeof WEBSITE_SCHEMA.description).toBe('string');
@@ -169,8 +192,9 @@ describe('HomePage', () => {
   });
 
   describe('Page Structure', () => {
-    it('should have proper semantic structure with all sections', () => {
-      render(<HomePage />);
+    it('should have proper semantic structure with all sections', async () => {
+      const Component = await HomePage();
+      render(Component);
 
       // All sections should be rendered
       expect(screen.getByTestId('hero-section-mock')).toBeInTheDocument();
