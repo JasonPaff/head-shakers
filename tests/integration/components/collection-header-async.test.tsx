@@ -65,7 +65,7 @@ vi.mock('@/lib/utils/redis-client', () => ({
 }));
 
 // Mock route-type search params cache
-vi.mock('@/app/(app)/dashboard/collection/(collection)/route-type', () => ({
+vi.mock('@/app/(app)/dashboard/collection/route-type', () => ({
   collectionDashboardSearchParamsCache: {
     get: vi.fn(),
   },
