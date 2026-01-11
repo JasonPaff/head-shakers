@@ -7,7 +7,6 @@ import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadHeaderDelete } from '@/app/(app)/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]/components/bobblehead-header-delete';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,6 @@ import { LikeCompactButton } from '@/components/ui/like-button';
 
 interface BobbleheadStickyHeaderProps {
   bobblehead: BobbleheadWithRelations;
-  canDelete: boolean;
   collectionName: string;
   collectionSlug: string;
   commentCount: number;
@@ -30,7 +28,6 @@ interface BobbleheadStickyHeaderProps {
 
 export const BobbleheadStickyHeader = ({
   bobblehead,
-  canDelete,
   collectionName,
   collectionSlug,
   commentCount,
@@ -140,20 +137,6 @@ export const BobbleheadStickyHeader = ({
                   <ShareIcon aria-hidden className={'size-4'} />
                 </Button>
               </BobbleheadShareMenu>
-
-              {/* Owner Actions */}
-              <Conditional isCondition={isOwner}>
-                {/* Delete Button */}
-                <Conditional isCondition={canDelete}>
-                  <BobbleheadHeaderDelete
-                    bobbleheadId={bobblehead.id}
-                    collectionSlug={collectionSlug}
-                    ownerUsername={username}
-                    size={'icon'}
-                    variant={'ghost'}
-                  />
-                </Conditional>
-              </Conditional>
 
               {/* Non-Owner Report Button */}
               <Conditional isCondition={!isOwner}>

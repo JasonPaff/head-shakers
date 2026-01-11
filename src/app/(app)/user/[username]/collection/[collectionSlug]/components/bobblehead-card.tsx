@@ -117,18 +117,18 @@ export const BobbleheadCard = ({
   if (variant === 'grid') {
     return (
       <Card
-        className={'group h-[480px] overflow-hidden transition-all duration-200 hover:shadow-lg'}
+        className={'group h-131.25 overflow-hidden transition-all duration-200 hover:shadow-lg'}
         data-slot={'bobblehead-card'}
         data-testid={cardTestId}
       >
         {/* Header */}
-        <CardHeader className={'h-14 flex-shrink-0'} data-slot={'bobblehead-card-header'}>
+        <CardHeader className={'h-14 shrink-0'} data-slot={'bobblehead-card-header'}>
           <CardTitle className={'line-clamp-1 text-lg'}>{bobblehead.name}</CardTitle>
         </CardHeader>
 
         {/* Photo Container */}
         <div
-          className={'relative mx-6 h-52 flex-shrink-0 overflow-hidden rounded-lg bg-muted'}
+          className={'relative mx-6 h-52 shrink-0 overflow-hidden rounded-lg bg-muted'}
           data-slot={'bobblehead-card-photo'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -170,7 +170,7 @@ export const BobbleheadCard = ({
         </div>
 
         {/* Description */}
-        <CardContent className={'h-16 flex-shrink-0 py-3'} data-slot={'bobblehead-card-content'}>
+        <CardContent className={'h-16 shrink-0 py-3'} data-slot={'bobblehead-card-content'}>
           <p className={'line-clamp-3 text-sm text-muted-foreground'}>
             {bobblehead.description || 'No description available.'}
           </p>
@@ -240,7 +240,7 @@ export const BobbleheadCard = ({
         onMouseLeave={handleMouseLeave}
       >
         {/* Photo Container */}
-        <div className={'relative aspect-[3/4] overflow-hidden'} data-slot={'bobblehead-card-photo'}>
+        <div className={'relative aspect-3/4 overflow-hidden'} data-slot={'bobblehead-card-photo'}>
           <Conditional isCondition={_hasImage}>
             <CldImage
               alt={bobblehead.name}
@@ -272,7 +272,7 @@ export const BobbleheadCard = ({
           {/* Gradient overlay on hover */}
           <div
             className={cn(
-              'absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300',
+              'absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300',
               isHovering ? 'opacity-100' : 'opacity-0',
             )}
             data-slot={'bobblehead-card-overlay'}
@@ -342,7 +342,7 @@ export const BobbleheadCard = ({
     >
       {/* Photo */}
       <div
-        className={'relative w-32 flex-shrink-0 overflow-hidden sm:w-40'}
+        className={'relative w-32 shrink-0 overflow-hidden sm:w-40'}
         data-slot={'bobblehead-card-photo'}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -382,7 +382,7 @@ export const BobbleheadCard = ({
           <div className={'mb-1 flex items-start justify-between'}>
             <h3 className={'font-semibold'}>{bobblehead.name}</h3>
             <Conditional isCondition={bobblehead.category !== null}>
-              <Badge className={'ml-2 flex-shrink-0'} variant={'secondary'}>
+              <Badge className={'ml-2 shrink-0'} variant={'secondary'}>
                 {bobblehead.category}
               </Badge>
             </Conditional>

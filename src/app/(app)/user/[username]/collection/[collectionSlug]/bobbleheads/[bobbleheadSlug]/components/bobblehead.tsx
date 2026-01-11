@@ -6,7 +6,7 @@ import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 import { BobbleheadFeatureCard } from './bobblehead-feature-card';
 import { BobbleheadHeader } from './bobblehead-header';
@@ -31,8 +31,6 @@ export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }
     notFound();
   }
 
-  const isOwner = await getIsOwnerAsync(bobblehead.userId);
-
   const likeData = await SocialFacade.getContentLikeData(
     bobbleheadId,
     'bobblehead',
@@ -46,13 +44,7 @@ export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <ContentLayout>
-          <BobbleheadHeader
-            bobblehead={bobblehead}
-            collectionSlug={collectionSlug}
-            currentUserId={currentUserId}
-            isOwner={isOwner}
-            ownerUsername={ownerUsername}
-          />
+          <BobbleheadHeader bobblehead={bobblehead} />
         </ContentLayout>
       </div>
 

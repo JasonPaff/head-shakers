@@ -155,7 +155,6 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
 
   // Compute permission flags
   const isOwner = await getIsOwnerAsync(bobblehead.userId);
-  const canDelete = isOwner;
 
   // Fetch SEO metadata for JSON-LD schemas
   const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
@@ -211,7 +210,6 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
         bobblehead={bobblehead}
         bobbleheadId={bobbleheadId}
         bobbleheadSlug={bobbleheadSlug}
-        canDelete={canDelete}
         collectionId={collectionId}
         collectionSlug={collectionSlug}
         isOwner={isOwner}
@@ -223,11 +221,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
           <ContentLayout>
             <ErrorBoundary name={'bobblehead-header'}>
               <Suspense fallback={<BobbleheadHeaderSkeleton />}>
-                <BobbleheadHeaderAsync
-                  bobbleheadId={bobbleheadId}
-                  collectionSlug={collectionSlug}
-                  ownerUsername={username}
-                />
+                <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
               </Suspense>
             </ErrorBoundary>
           </ContentLayout>

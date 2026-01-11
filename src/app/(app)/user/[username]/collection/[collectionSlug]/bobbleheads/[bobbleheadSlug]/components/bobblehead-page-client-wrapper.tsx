@@ -13,7 +13,6 @@ interface BobbleheadPageClientWrapperProps {
   bobblehead: BobbleheadWithRelations;
   bobbleheadId: string;
   bobbleheadSlug: string;
-  canDelete: boolean;
   children: ReactNode;
   collectionId: string;
   collectionSlug: string;
@@ -26,7 +25,6 @@ export function BobbleheadPageClientWrapper({
   bobblehead,
   bobbleheadId,
   bobbleheadSlug,
-  canDelete,
   children,
   collectionId,
   collectionSlug,
@@ -47,7 +45,6 @@ export function BobbleheadPageClientWrapper({
             {isSticky && (
               <BobbleheadStickyHeader
                 bobblehead={bobblehead}
-                canDelete={canDelete}
                 collectionName={bobblehead.collectionName || ''}
                 collectionSlug={collectionSlug}
                 commentCount={bobblehead.commentCount ?? 0}
