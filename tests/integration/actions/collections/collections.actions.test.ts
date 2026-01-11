@@ -59,9 +59,9 @@ vi.mock('@sentry/nextjs', () => ({
 vi.mock('@/lib/services/cache.service', () => ({
   CacheService: {
     bobbleheads: {
-      byCollection: <T>(_callback: () => T, _collectionId: string, _optionsHash?: string): T => _callback(),
-      byId: <T>(_callback: () => T, _bobbleheadId: string): T => _callback(),
-      byUser: <T>(_callback: () => T, _userId: string, _optionsHash?: string): T => _callback(),
+      byCollection: <T>(callback: () => T): T => callback(),
+      byId: <T>(callback: () => T): T => callback(),
+      byUser: <T>(callback: () => T): T => callback(),
     },
     collections: {
       browseResults: <T>(_key: unknown, callback: () => T): T => callback(),
@@ -74,8 +74,8 @@ vi.mock('@/lib/services/cache.service', () => ({
       withRelations: <T>(_key: unknown, callback: () => T): T => callback(),
     },
     users: {
-      profile: <T>(callback: () => T, _userId: string): T => callback(),
-      stats: <T>(callback: () => T, _userId: string): T => callback(),
+      profile: <T>(callback: () => T): T => callback(),
+      stats: <T>(callback: () => T): T => callback(),
     },
   },
 }));
