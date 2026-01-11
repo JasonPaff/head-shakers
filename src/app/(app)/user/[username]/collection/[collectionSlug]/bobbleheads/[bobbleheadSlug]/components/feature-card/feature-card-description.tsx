@@ -38,7 +38,7 @@ export const FeatureCardDescription = ({
       data-testid={descriptionTestId}
       {...props}
     >
-      <FeatureCardSection isDefaultOpen={true} title={'Description'}>
+      <FeatureCardSection isDefaultOpen title={'Description'}>
         <Conditional
           fallback={
             <p

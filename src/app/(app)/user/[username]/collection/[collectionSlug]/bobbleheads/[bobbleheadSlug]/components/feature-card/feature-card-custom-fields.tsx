@@ -100,7 +100,7 @@ export const FeatureCardCustomFields = ({
       data-testid={customFieldsTestId}
       {...props}
     >
-      <FeatureCardSection isDefaultOpen={false} itemCount={fieldEntries.length} title={'Custom Fields'}>
+      <FeatureCardSection isDefaultOpen itemCount={fieldEntries.length} title={'Custom Fields'}>
         <Conditional
           fallback={
             <div className={'flex items-center gap-3 py-2'}>

@@ -67,7 +67,7 @@ export const FeatureCardAcquisition = ({
       data-testid={acquisitionTestId}
       {...props}
     >
-      <FeatureCardSection isDefaultOpen={false} itemCount={_itemCount} title={'Acquisition Details'}>
+      <FeatureCardSection isDefaultOpen itemCount={_itemCount} title={'Acquisition Details'}>
         {/* Empty State */}
         <Conditional isCondition={!_hasAcquisitionData}>
           <div className={'py-4 text-center'}>

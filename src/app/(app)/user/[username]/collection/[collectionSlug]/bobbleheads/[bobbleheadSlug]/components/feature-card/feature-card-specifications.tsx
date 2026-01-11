@@ -50,7 +50,7 @@ export const FeatureCardSpecifications = ({ bobblehead }: FeatureCardSpecificati
 
   return (
     <FeatureCardSection
-      isDefaultOpen={false}
+      isDefaultOpen
       itemCount={_populatedSpecsCount}
       testId={specsTestId}
       title={'Specifications'}

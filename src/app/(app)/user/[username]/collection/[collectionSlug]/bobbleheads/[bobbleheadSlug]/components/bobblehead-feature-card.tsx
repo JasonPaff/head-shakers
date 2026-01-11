@@ -91,7 +91,7 @@ export const BobbleheadFeatureCard = ({
           {/* Primary Image Section - constrained height on desktop */}
           <FeatureCardPrimaryImage
             bobbleheadName={bobblehead.name}
-            className={'lg:aspect-[4/5] xl:aspect-[3/4]'}
+            className={'lg:aspect-4/5 xl:aspect-3/4'}
             currentCondition={bobblehead.currentCondition}
             currentIndex={mainPhotoIndex}
             isFeatured={bobblehead.isFeatured}
@@ -136,7 +136,7 @@ export const BobbleheadFeatureCard = ({
             <Separator />
 
             {/* Collapsible Sections */}
-            <div className={'flex-1 space-y-4 overflow-y-auto'}>
+            <div className={'flex-1 space-y-4 overflow-y-auto px-1'}>
               <FeatureCardDescription bobblehead={bobblehead} />
               <FeatureCardSpecifications bobblehead={bobblehead} />
               <FeatureCardAcquisition bobblehead={bobblehead} />

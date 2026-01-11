@@ -53,7 +53,7 @@ export const FeatureCardStatus = ({ bobblehead, className, testId, ...props }: F
 
   return (
     <div className={cn(className)} data-slot={'feature-card-status'} data-testid={statusTestId} {...props}>
-      <FeatureCardSection isDefaultOpen={false} itemCount={_itemCount} title={'Status & Visibility'}>
+      <FeatureCardSection isDefaultOpen itemCount={_itemCount} title={'Status & Visibility'}>
         <div className={'space-y-3'}>
           {/* Status */}
           <Conditional isCondition={_hasStatus}>
