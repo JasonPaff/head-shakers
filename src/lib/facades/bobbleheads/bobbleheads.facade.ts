@@ -60,21 +60,6 @@ export interface CreateBobbleheadResult {
 }
 
 export class BobbleheadsFacade extends BaseFacade {
-  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
-    return await executeFacadeOperation(
-      {
-        data: { data },
-        facade,
-        method: 'addPhotoAsync',
-        operation: OPERATIONS.BOBBLEHEADS.UPLOAD_PHOTO,
-      },
-      async () => {
-        const context = this.getPublicContext(dbInstance);
-        return BobbleheadsQuery.addPhotoAsync(data, context);
-      },
-    );
-  }
-
   /**
    * Add photos to an existing bobblehead.
    * Filters to only process new temp photos, moves them to permanent Cloudinary location,
