@@ -13,7 +13,6 @@ import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { BobbleheadHeaderDelete } from './bobblehead-header-delete';
 import { CollectionBreadcrumb } from './collection-breadcrumb';
 
 interface BobbleheadHeaderProps {
@@ -59,18 +58,6 @@ export const BobbleheadHeader = ({
               Share
             </Button>
           </BobbleheadShareMenu>
-
-          {/* Owner Actions */}
-          <Conditional isCondition={isOwner}>
-            {/* Delete Bobblehead Button */}
-            <BobbleheadHeaderDelete
-              bobbleheadId={bobblehead.id}
-              collectionSlug={collectionSlug}
-              ownerUsername={ownerUsername}
-            >
-              Delete
-            </BobbleheadHeaderDelete>
-          </Conditional>
 
           {/* Non-Owner Actions */}
           <Conditional isCondition={!isOwner && !!currentUserId}>
