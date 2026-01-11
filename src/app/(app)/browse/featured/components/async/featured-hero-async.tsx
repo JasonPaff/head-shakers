@@ -6,10 +6,9 @@ import { SocialFacade } from '@/lib/facades/social/social.facade';
 
 export interface FeaturedHeroAsyncProps {
   currentUserId: null | string;
-  isTrackViews?: boolean;
 }
 
-export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }: FeaturedHeroAsyncProps) {
+export async function FeaturedHeroAsync({ currentUserId }: FeaturedHeroAsyncProps) {
   let transformedData: {
     collection_of_week: Array<{
       comments: number;
@@ -125,20 +124,5 @@ export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }:
     console.error('Failed to fetch hero content:', error);
   }
 
-  return (
-    <FeaturedHeroDisplay
-      heroData={transformedData}
-      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-    />
-  );
-}
-
-async function incrementViewCountAction(contentId: string) {
-  'use server';
-
-  try {
-    await FeaturedContentFacade.incrementViewCount(contentId);
-  } catch (error) {
-    console.error('Failed to increment view count:', error);
-  }
+  return <FeaturedHeroDisplay heroData={transformedData} />;
 }

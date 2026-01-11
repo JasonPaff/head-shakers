@@ -44,7 +44,7 @@ export const Loading = ({ message, testId }: LoadingProps) => {
         {/* Message with Animated Dots */}
         <div className={'space-y-2'}>
           <p className={'font-medium text-foreground'}>{message}</p>
-          <p className={'min-h-[20px] text-sm text-muted-foreground'}>Please wait{dots}</p>
+          <p className={'min-h-5 text-sm text-muted-foreground'}>Please wait{dots}</p>
         </div>
       </div>
     </div>

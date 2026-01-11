@@ -93,6 +93,7 @@ export const ACTION_NAMES = {
   PUBLIC: {
     ADD_TO_LAUNCH_WAITLIST: 'addToLaunchWaitlist',
     GET_SEARCH_DROPDOWN_RESULTS: 'getPublicSearchDropdownResults',
+    INCREMENT_FEATURED_VIEW_COUNT: 'incrementFeaturedViewCount',
     SEARCH_CONTENT: 'searchPublicContent',
   },
   SOCIAL: {

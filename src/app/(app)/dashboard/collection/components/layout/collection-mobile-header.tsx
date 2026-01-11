@@ -3,10 +3,9 @@
 import { MenuIcon, PlusIcon } from 'lucide-react';
 import { useQueryStates } from 'nuqs';
 
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/tailwind-utils';
-
-import { collectionDashboardParsers } from '../../route-type';
 
 type CollectionMobileHeaderProps = {
   collectionName?: string;
@@ -26,7 +25,7 @@ export const CollectionMobileHeader = ({
   return (
     <div
       className={cn(
-        'sticky top-[var(--header-height)] z-30 flex items-center gap-3 border-b bg-background/95 p-4 backdrop-blur-sm',
+        'sticky top-(--header-height) z-30 flex items-center gap-3 border-b bg-background/95 p-4 backdrop-blur-sm',
         'lg:hidden',
       )}
       data-slot={'mobile-header'}

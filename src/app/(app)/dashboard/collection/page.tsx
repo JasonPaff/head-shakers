@@ -4,9 +4,10 @@ import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { redirect } from 'next/navigation';
 import { Fragment, Suspense } from 'react';
 
-import type { PageProps } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import type { PageProps } from '@/app/(app)/dashboard/collection/route-type';
 
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { CollectionLayout } from '@/app/(app)/dashboard/collection/components/layout/collection-layout';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { sortCollections } from '@/lib/utils/collection.utils';
@@ -19,7 +20,6 @@ import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
 import { EditBobbleheadFormAsync } from './components/async/edit-bobblehead-form-async';
 import { SidebarAsync } from './components/async/sidebar-async';
-import { CollectionLayout } from './components/layout/collection-layout';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';

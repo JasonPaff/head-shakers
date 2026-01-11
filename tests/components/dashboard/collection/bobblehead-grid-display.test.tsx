@@ -60,7 +60,7 @@ vi.mock('@/lib/actions/bobbleheads/bobbleheads.actions');
 
 import type { UserPreferences } from '@/hooks/use-user-preferences';
 
-import { BobbleheadGridDisplay } from '@/app/(app)/dashboard/collection/(collection)/components/display/bobblehead-grid-display';
+import { BobbleheadGridDisplay } from '@/app/(app)/dashboard/collection/components/display/bobblehead-grid-display';
 
 import {
   createMockBobbleheadDashboardRecords,

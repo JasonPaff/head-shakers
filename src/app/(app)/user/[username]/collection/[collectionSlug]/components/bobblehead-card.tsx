@@ -128,7 +128,7 @@ export const BobbleheadCard = ({
 
         {/* Photo Container */}
         <div
-          className={'relative mx-6 h-64 flex-shrink-0 overflow-hidden rounded-lg bg-muted'}
+          className={'relative mx-6 h-52 flex-shrink-0 overflow-hidden rounded-lg bg-muted'}
           data-slot={'bobblehead-card-photo'}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -143,7 +143,7 @@ export const BobbleheadCard = ({
               )}
               crop={'fill'}
               format={'auto'}
-              height={256}
+              height={208}
               onLoad={handleImageLoad}
               placeholder={'blur'}
               quality={'auto:good'}
@@ -170,7 +170,7 @@ export const BobbleheadCard = ({
         </div>
 
         {/* Description */}
-        <CardContent className={'h-20 flex-shrink-0 py-3'} data-slot={'bobblehead-card-content'}>
+        <CardContent className={'h-16 flex-shrink-0 py-3'} data-slot={'bobblehead-card-content'}>
           <p className={'line-clamp-3 text-sm text-muted-foreground'}>
             {bobblehead.description || 'No description available.'}
           </p>

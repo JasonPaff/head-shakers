@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Route } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { Route } from '@/app/(app)/dashboard/collection/route-type';
 
 describe('Route.searchParams Zod schema', () => {
   describe('sortBy parameter', () => {

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
 import { ENUMS } from '@/lib/constants';
 import { BobbleheadsDashboardFacade } from '@/lib/facades/bobbleheads/bobbleheads-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';

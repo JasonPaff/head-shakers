@@ -6,7 +6,7 @@ import { Fragment, useState } from 'react';
 import type { CollectionForUpsert } from '@/components/feature/collections/collection-upsert-dialog.types';
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
 
-import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';

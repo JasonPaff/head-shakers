@@ -11,6 +11,7 @@ import { ReportButton } from '@/components/feature/content-reports/report-button
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { BobbleheadHeaderDelete } from './bobblehead-header-delete';
 import { CollectionBreadcrumb } from './collection-breadcrumb';
@@ -115,7 +116,7 @@ export const BobbleheadHeader = ({
             {/* View Count */}
             <div className={'flex items-center gap-2'}>
               <span className={'text-sm font-medium'}>
-                <Suspense fallback={'-- views'}>
+                <Suspense fallback={<Skeleton className={'h-4 w-16'} />}>
                   <ViewCountAsync targetId={bobblehead.id} targetType={'bobblehead'} />
                 </Suspense>
               </span>

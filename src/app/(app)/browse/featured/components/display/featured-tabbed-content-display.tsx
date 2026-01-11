@@ -22,6 +22,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useServerAction } from '@/hooks/use-server-action';
+import { incrementFeaturedViewCountAction } from '@/lib/actions/featured-content/featured-content.actions';
 import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentItem {
@@ -47,7 +49,6 @@ export interface FeaturedContentItem {
 }
 
 export interface FeaturedTabbedContentDisplayProps {
-  onViewContent?: (contentId: string) => Promise<void>;
   tabbedData: {
     editor_pick: Array<FeaturedContentItem>;
     trending: Array<FeaturedContentItem>;
@@ -93,24 +94,16 @@ const getContentTypeColor = (type: string) => {
   }
 };
 
-export const FeaturedTabbedContentDisplay = ({
-  onViewContent,
-  tabbedData,
-}: FeaturedTabbedContentDisplayProps) => {
+export const FeaturedTabbedContentDisplay = ({ tabbedData }: FeaturedTabbedContentDisplayProps) => {
   const [activeTab, setActiveTab] = useState('all');
+  const { execute: incrementViewCount } = useServerAction(incrementFeaturedViewCountAction);
 
   const getAllFeaturedContent = () => {
     return [...tabbedData.editor_pick, ...tabbedData.trending].sort((a, b) => a.priority - b.priority);
   };
 
-  const handleContentView = async (contentId: string) => {
-    if (onViewContent) {
-      try {
-        await onViewContent(contentId);
-      } catch (error) {
-        console.error('Failed to track content view:', error);
-      }
-    }
+  const handleContentView = (contentId: string) => {
+    incrementViewCount({ contentId });
   };
 
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {

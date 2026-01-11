@@ -7,7 +7,7 @@ import { CameraIcon } from 'lucide-react';
 
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
-import { AnimatedMotivationalMessage } from '@/app/(app)/dashboard/collection/(collection)/components/add-form/animated-motivational-message';
+import { AnimatedMotivationalMessage } from '@/app/(app)/dashboard/collection/components/add-form/animated-motivational-message';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

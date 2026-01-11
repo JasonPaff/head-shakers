@@ -9,7 +9,7 @@ import type { BrowseCollectionsResult } from '@/lib/queries/collections/collecti
 import { BrowseCollectionsFilters } from '@/app/(app)/browse/components/browse-collections-filters';
 import { BrowseCollectionsPagination } from '@/app/(app)/browse/components/browse-collections-pagination';
 import { BrowseCollectionsTable } from '@/app/(app)/browse/components/browse-collections-table';
-import { Spinner } from '@/components/ui/spinner';
+import { BrowseCollectionsGridSkeleton } from '@/app/(app)/browse/components/skeletons/browse-collections-skeleton';
 import { browseCollectionsAction } from '@/lib/actions/collections/collections-browse.actions';
 import { CONFIG } from '@/lib/constants';
 import {
@@ -253,11 +253,7 @@ export function BrowseCollectionsContent() {
       />
 
       {/* Loading State */}
-      {isPending && (
-        <div className={'flex min-h-[400px] items-center justify-center'}>
-          <Spinner className={'size-16'} />
-        </div>
-      )}
+      {isPending && <BrowseCollectionsGridSkeleton />}
 
       {/* Error State */}
       {error && !isPending && (

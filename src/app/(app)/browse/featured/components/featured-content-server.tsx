@@ -5,11 +5,7 @@ import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-c
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
-export interface FeaturedContentServerProps {
-  isTrackViews?: boolean;
-}
-
-export async function FeaturedContentServer({ isTrackViews = false }: FeaturedContentServerProps) {
+export async function FeaturedContentServer() {
   let featuredContentData: {
     collection_of_week: Array<{
       comments: number;
@@ -184,20 +180,5 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     console.error('Failed to fetch featured content:', error);
   }
 
-  return (
-    <FeaturedContentDisplay
-      featuredContentData={featuredContentData}
-      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-    />
-  );
-}
-
-async function incrementViewCountAction(contentId: string) {
-  'use server';
-
-  try {
-    await FeaturedContentFacade.incrementViewCount(contentId);
-  } catch (error) {
-    console.error('Failed to increment view count:', error);
-  }
+  return <FeaturedContentDisplay featuredContentData={featuredContentData} />;
 }

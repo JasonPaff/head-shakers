@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { SidebarHeader } from '@/app/(app)/dashboard/collection/(collection)/components/sidebar/sidebar-header';
+import { SidebarHeader } from '@/app/(app)/dashboard/collection/components/sidebar/sidebar-header';
 
 import { render, screen } from '../../../setup/test-utils';
 

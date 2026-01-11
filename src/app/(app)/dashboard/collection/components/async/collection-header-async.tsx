@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
 import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 

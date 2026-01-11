@@ -1,7 +1,7 @@
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BobbleheadCard } from '@/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-card';
+import { BobbleheadCard } from '@/app/(app)/dashboard/collection/components/main/bobblehead-card';
 
 import { createMockBobbleheadDashboardRecord } from '../../../fixtures/bobblehead-grid.factory';
 import { render, screen } from '../../../setup/test-utils';

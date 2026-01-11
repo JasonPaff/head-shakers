@@ -22,7 +22,7 @@ import { CacheRevalidationService } from '@/lib/services/cache-revalidation.serv
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { adminActionClient, authActionClient } from '@/lib/utils/next-safe-action';
+import { adminActionClient, authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   adminCreateFeaturedContentSchema,
   adminGetFeaturedContentByIdSchema,
@@ -321,6 +321,39 @@ export const getFeaturedContentByIdAction = adminActionClient
         },
         operation: OPERATIONS.ADMIN.GET_FEATURED_CONTENT_BY_ID,
         userId: ctx.userId,
+      });
+    }
+  });
+
+const incrementViewCountSchema = z.object({
+  contentId: z.string().uuid(),
+});
+
+/**
+ * increment view count for featured content (public - no auth required)
+ */
+export const incrementFeaturedViewCountAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.PUBLIC.INCREMENT_FEATURED_VIEW_COUNT,
+  })
+  .inputSchema(incrementViewCountSchema)
+  .action(async ({ ctx }): Promise<ActionResponse<null>> => {
+    const { contentId } = incrementViewCountSchema.parse(ctx.sanitizedInput);
+
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
+      data: { contentId },
+      level: SENTRY_LEVELS.INFO,
+      message: 'Incrementing featured content view count',
+    });
+
+    try {
+      await FeaturedContentFacade.incrementViewCount(contentId);
+      return actionSuccess(null);
+    } catch (error) {
+      return handleActionError(error, {
+        metadata: { contentId },
+        operation: ACTION_NAMES.PUBLIC.INCREMENT_FEATURED_VIEW_COUNT,
       });
     }
   });

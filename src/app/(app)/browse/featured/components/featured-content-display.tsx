@@ -23,6 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useServerAction } from '@/hooks/use-server-action';
+import { incrementFeaturedViewCountAction } from '@/lib/actions/featured-content/featured-content.actions';
 import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentDisplayProps {
@@ -32,7 +34,6 @@ export interface FeaturedContentDisplayProps {
     homepage_banner: Array<FeaturedContentItem>;
     trending: Array<FeaturedContentItem>;
   };
-  onViewContent?: (contentId: string) => Promise<void>;
 }
 
 export interface FeaturedContentItem {
@@ -103,9 +104,9 @@ export const FeaturedContentDisplay = ({
     homepage_banner: [],
     trending: [],
   },
-  onViewContent,
 }: FeaturedContentDisplayProps) => {
   const [activeTab, setActiveTab] = useState('all');
+  const { execute: incrementViewCount } = useServerAction(incrementFeaturedViewCountAction);
 
   const getAllFeaturedContent = () => {
     return [
@@ -116,14 +117,8 @@ export const FeaturedContentDisplay = ({
     ].sort((a, b) => a.priority - b.priority);
   };
 
-  const handleContentView = async (contentId: string) => {
-    if (onViewContent) {
-      try {
-        await onViewContent(contentId);
-      } catch (error) {
-        console.error('Failed to track content view:', error);
-      }
-    }
+  const handleContentView = (contentId: string) => {
+    incrementViewCount({ contentId });
   };
 
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {

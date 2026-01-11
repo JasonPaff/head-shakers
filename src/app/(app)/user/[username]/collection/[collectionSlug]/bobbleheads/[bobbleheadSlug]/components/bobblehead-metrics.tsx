@@ -6,6 +6,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadMetricsProps {
@@ -67,7 +68,7 @@ export const BobbleheadMetrics = ({ bobblehead, bobbleheadId }: BobbleheadMetric
               <p className={'text-sm text-muted-foreground'}>Engagement</p>
               <div className={'flex items-center gap-3'}>
                 <span className={'text-sm font-medium'}>
-                  <Suspense fallback={'-- views'}>
+                  <Suspense fallback={<Skeleton className={'h-4 w-16'} />}>
                     <ViewCountAsync targetId={bobbleheadId} targetType={'bobblehead'} />
                   </Suspense>
                 </span>

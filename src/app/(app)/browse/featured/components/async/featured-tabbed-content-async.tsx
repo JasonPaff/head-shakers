@@ -6,13 +6,9 @@ import { SocialFacade } from '@/lib/facades/social/social.facade';
 
 export interface FeaturedTabbedContentAsyncProps {
   currentUserId: null | string;
-  isTrackViews?: boolean;
 }
 
-export async function FeaturedTabbedContentAsync({
-  currentUserId,
-  isTrackViews = false,
-}: FeaturedTabbedContentAsyncProps) {
+export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabbedContentAsyncProps) {
   let transformedData: {
     editor_pick: Array<{
       comments: number;
@@ -128,20 +124,5 @@ export async function FeaturedTabbedContentAsync({
     console.error('Failed to fetch tabbed content:', error);
   }
 
-  return (
-    <FeaturedTabbedContentDisplay
-      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-      tabbedData={transformedData}
-    />
-  );
-}
-
-async function incrementViewCountAction(contentId: string) {
-  'use server';
-
-  try {
-    await FeaturedContentFacade.incrementViewCount(contentId);
-  } catch (error) {
-    console.error('Failed to increment view count:', error);
-  }
+  return <FeaturedTabbedContentDisplay tabbedData={transformedData} />;
 }

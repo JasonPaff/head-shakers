@@ -1,29 +1,12 @@
 import type { Metadata } from 'next';
 
-import * as Sentry from '@sentry/nextjs';
 import { Suspense } from 'react';
 
 import { BrowseCollectionsContent } from '@/app/(app)/browse/components/browse-collections-content';
-import { Spinner } from '@/components/ui/spinner';
-
-export const dynamic = 'force-static';
+import { BrowseCollectionsSkeleton } from '@/app/(app)/browse/components/skeletons/browse-collections-skeleton';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 
 export default function BrowsePage() {
-  // Set Sentry context for this page
-  Sentry.setContext('browse_page', {
-    page: 'browse-collections',
-    version: '1.0',
-  });
-
-  Sentry.addBreadcrumb({
-    category: 'page-load',
-    data: {
-      page: 'browse-collections',
-    },
-    level: 'info',
-    message: 'Browse collections page loaded',
-  });
-
   return (
     <div className={'container mx-auto space-y-6 py-8'}>
       {/* Page Header */}
@@ -35,15 +18,11 @@ export default function BrowsePage() {
       </div>
 
       {/* Browse Content */}
-      <Suspense
-        fallback={
-          <div className={'flex min-h-[400px] items-center justify-center'}>
-            <Spinner className={'size-16'} />
-          </div>
-        }
-      >
-        <BrowseCollectionsContent />
-      </Suspense>
+      <ErrorBoundary name={'browse-collections'}>
+        <Suspense fallback={<BrowseCollectionsSkeleton />}>
+          <BrowseCollectionsContent />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

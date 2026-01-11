@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LikeCompactButton } from '@/components/ui/like-button';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
@@ -319,9 +319,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
         </Conditional>
 
         <Conditional isCondition={!isCurrentImageLoaded}>
-          <div className={'absolute inset-0 flex items-center justify-center bg-black/10'}>
-            <Spinner className={'size-8'} />
-          </div>
+          <Skeleton className={'absolute inset-0 rounded-none'} />
         </Conditional>
 
         {/* Controls */}

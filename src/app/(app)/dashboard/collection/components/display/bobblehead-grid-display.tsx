@@ -8,7 +8,7 @@ import { useDebounce } from 'use-debounce';
 import type { CollectionGridDensity, UserPreferences } from '@/hooks/use-user-preferences';
 import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
-import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/(collection)/route-type';
+import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
 import { useServerAction } from '@/hooks/use-server-action';

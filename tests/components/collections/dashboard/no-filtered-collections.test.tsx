@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { NoFilteredCollections } from '@/app/(app)/dashboard/collection/(collection)/components/empty-states/no-filtered-collections';
+import { NoFilteredCollections } from '@/app/(app)/dashboard/collection/components/empty-states/no-filtered-collections';
 
 import { render, screen } from '../../../setup/test-utils';
 

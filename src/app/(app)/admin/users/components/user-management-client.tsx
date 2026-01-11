@@ -2,7 +2,7 @@
 
 import type { ComponentPropsWithRef } from 'react';
 
-import { LockIcon, RefreshCwIcon, SearchIcon, ShieldAlertIcon, UsersIcon } from 'lucide-react';
+import { LoaderIcon, LockIcon, RefreshCwIcon, SearchIcon, ShieldAlertIcon, UsersIcon } from 'lucide-react';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -17,7 +17,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
 import { useServerAction } from '@/hooks/use-server-action';
 import {
   getAdminUsersAction,
@@ -346,7 +345,7 @@ export const UserManagementClient = ({ className, initialData, ...props }: UserM
           variant={'outline'}
         >
           <Conditional isCondition={_isLoading}>
-            <Spinner className={'mr-2 size-4'} />
+            <LoaderIcon aria-hidden className={'mr-2 size-4 animate-spin'} />
           </Conditional>
           <Conditional isCondition={!_isLoading}>
             <RefreshCwIcon aria-hidden className={'mr-2 size-4'} />

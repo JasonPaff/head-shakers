@@ -8,7 +8,7 @@ import type { PageProps } from '@/app/(app)/browse/categories/[category]/route-t
 
 import { Route } from '@/app/(app)/browse/categories/[category]/route-type';
 import { BrowseCategoriesContent } from '@/app/(app)/browse/categories/components/browse-categories-content';
-import { Spinner } from '@/components/ui/spinner';
+import { BrowseCollectionsSkeleton } from '@/app/(app)/browse/components/skeletons/browse-collections-skeleton';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
@@ -95,13 +95,7 @@ async function CategoryPage({ routeParams }: CategoryPageProps) {
         </div>
 
         {/* Browse Content */}
-        <Suspense
-          fallback={
-            <div className={'flex min-h-[400px] items-center justify-center'}>
-              <Spinner className={'size-16'} />
-            </div>
-          }
-        >
+        <Suspense fallback={<BrowseCollectionsSkeleton />}>
           <BrowseCategoriesContent defaultCategory={category} />
         </Suspense>
       </div>

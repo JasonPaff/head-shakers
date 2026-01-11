@@ -21,6 +21,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
+import { useServerAction } from '@/hooks/use-server-action';
+import { incrementFeaturedViewCountAction } from '@/lib/actions/featured-content/featured-content.actions';
 import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentItem {
@@ -50,7 +52,6 @@ export interface FeaturedHeroDisplayProps {
     collection_of_week: Array<FeaturedContentItem>;
     homepage_banner: Array<FeaturedContentItem>;
   };
-  onViewContent?: (contentId: string) => Promise<void>;
 }
 
 const getContentTypeLabel = (type: string) => {
@@ -92,15 +93,11 @@ const getContentTypeColor = (type: string) => {
   }
 };
 
-export const FeaturedHeroDisplay = ({ heroData, onViewContent }: FeaturedHeroDisplayProps) => {
-  const handleContentView = async (contentId: string) => {
-    if (onViewContent) {
-      try {
-        await onViewContent(contentId);
-      } catch (error) {
-        console.error('Failed to track content view:', error);
-      }
-    }
+export const FeaturedHeroDisplay = ({ heroData }: FeaturedHeroDisplayProps) => {
+  const { execute: incrementViewCount } = useServerAction(incrementFeaturedViewCountAction);
+
+  const handleContentView = (contentId: string) => {
+    incrementViewCount({ contentId });
   };
 
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {

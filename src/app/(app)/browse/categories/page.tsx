@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/nextjs';
 import { Suspense } from 'react';
 
 import { BrowseCategoriesContent } from '@/app/(app)/browse/categories/components/browse-categories-content';
-import { Spinner } from '@/components/ui/spinner';
+import { BrowseCollectionsSkeleton } from '@/app/(app)/browse/components/skeletons/browse-collections-skeleton';
 
 export const dynamic = 'force-static';
 
@@ -33,13 +33,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Browse Content */}
-      <Suspense
-        fallback={
-          <div className={'flex min-h-[400px] items-center justify-center'}>
-            <Spinner className={'size-16'} />
-          </div>
-        }
-      >
+      <Suspense fallback={<BrowseCollectionsSkeleton />}>
         <BrowseCategoriesContent />
       </Suspense>
     </div>

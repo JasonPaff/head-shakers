@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
-import { SidebarDisplay } from '@/app/(app)/dashboard/collection/(collection)/components/display/sidebar-display';
+import { SidebarDisplay } from '@/app/(app)/dashboard/collection/components/display/sidebar-display';
 
 import {
   createMockCollectionDashboardRecord,

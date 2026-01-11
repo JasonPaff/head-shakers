@@ -3,7 +3,7 @@ import type { JSX, ReactNode } from 'react';
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { CollectionHeaderDisplay } from '@/app/(app)/dashboard/collection/(collection)/components/display/collection-header-display';
+import { CollectionHeaderDisplay } from '@/app/(app)/dashboard/collection/components/display/collection-header-display';
 
 import { createMockCollectionHeader } from '../../../fixtures/collection-header.factory';
 import { render, screen } from '../../../setup/test-utils';
