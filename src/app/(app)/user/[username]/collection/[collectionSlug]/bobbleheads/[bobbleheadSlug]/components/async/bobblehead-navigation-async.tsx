@@ -1,25 +1,25 @@
 import 'server-only';
 
-import { BobbleheadNavigation } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
+import { BobbleheadNavigation } from '../bobblehead-navigation';
+
 interface BobbleheadNavigationAsyncProps {
   bobbleheadId: string;
-  collectionId: null | string;
+  collectionId: string;
+  collectionSlug: string;
   isKeyboardNavigationEnabled?: boolean;
+  ownerUsername: string;
 }
 
 export const BobbleheadNavigationAsync = async ({
   bobbleheadId,
   collectionId,
+  collectionSlug,
   isKeyboardNavigationEnabled,
+  ownerUsername,
 }: BobbleheadNavigationAsyncProps) => {
-  // Navigation only applies within collection context
-  if (!collectionId) {
-    return null;
-  }
-
   const currentUserId = await getUserIdAsync();
 
   const navigationData = await BobbleheadsFacade.getBobbleheadNavigationData(
@@ -37,8 +37,10 @@ export const BobbleheadNavigationAsync = async ({
 
   return (
     <BobbleheadNavigation
+      collectionSlug={collectionSlug}
       isKeyboardNavigationEnabled={isKeyboardNavigationEnabled}
       navigationData={navigationData}
+      ownerUsername={ownerUsername}
     />
   );
 };

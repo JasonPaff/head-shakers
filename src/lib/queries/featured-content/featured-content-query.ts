@@ -25,6 +25,7 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
  * minimal data needed for hero featured bobblehead display
  */
 export interface FeaturedBobblehead {
+  collectionSlug: null | string;
   contentId: string;
   contentName: null | string;
   contentSlug: null | string;
@@ -32,6 +33,7 @@ export interface FeaturedBobblehead {
   imageUrl: null | string;
   likes: number;
   owner: null | string;
+  ownerUsername: null | string;
   viewCount: number;
 }
 
@@ -88,6 +90,7 @@ export interface FooterFeaturedContentData {
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
   id: string;
+  ownerUsername: null | string;
   title: null | string;
 }
 
@@ -96,6 +99,7 @@ export interface FooterFeaturedContentData {
  */
 export interface TrendingBobblehead {
   category: null | string;
+  collectionSlug: null | string;
   contentId: string;
   contentSlug: null | string;
   featureType: 'editor_pick' | 'new_badge' | 'popular' | 'trending';
@@ -103,6 +107,7 @@ export interface TrendingBobblehead {
   imageUrl: null | string;
   likeCount: number;
   name: null | string;
+  ownerUsername: null | string;
   title: null | string;
   viewCount: number;
   year: null | number;
@@ -356,6 +361,7 @@ export class FeaturedContentQuery extends BaseQuery {
 
     const results = await dbInstance
       .select({
+        collectionSlug: collections.slug,
         contentId: featuredContent.contentId,
         contentName: bobbleheads.name,
         contentSlug: bobbleheads.slug,
@@ -363,10 +369,13 @@ export class FeaturedContentQuery extends BaseQuery {
         imageUrl: bobbleheadPhotos.url,
         likes: bobbleheads.likeCount,
         owner: bobbleheads.userId,
+        ownerUsername: users.username,
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)
       .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(users, eq(bobbleheads.userId, users.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
@@ -490,6 +499,7 @@ export class FeaturedContentQuery extends BaseQuery {
         contentId: featuredContent.contentId,
         contentType: featuredContent.contentType,
         id: featuredContent.id,
+        ownerUsername: users.username,
         title: featuredContent.title,
       })
       .from(featuredContent)
@@ -497,6 +507,7 @@ export class FeaturedContentQuery extends BaseQuery {
         collections,
         and(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
       )
+      .leftJoin(users, eq(collections.userId, users.id))
       .where(
         and(
           eq(featuredContent.isActive, true),
@@ -525,6 +536,7 @@ export class FeaturedContentQuery extends BaseQuery {
     return dbInstance
       .select({
         category: bobbleheads.category,
+        collectionSlug: collections.slug,
         contentId: featuredContent.contentId,
         contentSlug: bobbleheads.slug,
         featureType: sql<'editor_pick' | 'trending'>`${featuredContent.featureType}`,
@@ -532,12 +544,15 @@ export class FeaturedContentQuery extends BaseQuery {
         imageUrl: sql<null | string>`COALESCE(${featuredContent.imageUrl}, ${bobbleheadPhotos.url})`,
         likeCount: bobbleheads.likeCount,
         name: bobbleheads.name,
+        ownerUsername: users.username,
         title: featuredContent.title,
         viewCount: featuredContent.viewCount,
         year: bobbleheads.year,
       })
       .from(featuredContent)
       .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(users, eq(bobbleheads.userId, users.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),

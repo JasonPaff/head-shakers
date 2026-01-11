@@ -12,23 +12,26 @@
 ## File Discovery Results
 
 ### Critical Priority (Must Modify)
-| File | Action |
-|------|--------|
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx` | Add Suspense-wrapped CommentSectionAsync |
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/components/comments-placeholder.tsx` | Delete after integration |
+
+| File                                                                                            | Action                                   |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx`                            | Add Suspense-wrapped CommentSectionAsync |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/components/comments-placeholder.tsx` | Delete after integration                 |
 
 ### High Priority (Must Import)
-| File | Usage |
-|------|-------|
-| `src/components/feature/comments/async/comment-section-async.tsx` | Server component to integrate |
-| `src/components/feature/comments/skeletons/comment-section-skeleton.tsx` | Suspense fallback |
+
+| File                                                                     | Usage                         |
+| ------------------------------------------------------------------------ | ----------------------------- |
+| `src/components/feature/comments/async/comment-section-async.tsx`        | Server component to integrate |
+| `src/components/feature/comments/skeletons/comment-section-skeleton.tsx` | Suspense fallback             |
 
 ### Reference (Integration Pattern)
-| File | Usage |
-|------|-------|
+
+| File                                                               | Usage                           |
+| ------------------------------------------------------------------ | ------------------------------- |
 | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Shows exact integration pattern |
-| `src/components/ui/error-boundary/error-boundary.tsx` | Error wrapper |
-| `src/components/layout/content-layout.tsx` | Layout wrapper |
+| `src/components/ui/error-boundary/error-boundary.tsx`              | Error wrapper                   |
+| `src/components/layout/content-layout.tsx`                         | Layout wrapper                  |
 
 ---
 
@@ -61,9 +64,11 @@ Replace the mock CommentsPlaceholder component on the collection page with the f
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx` - Add imports and render comment section
 
 **Changes:**
+
 - Add import for `CommentSectionAsync` from `@/components/feature/comments/async/comment-section-async`
 - Add import for `CommentSectionSkeleton` from `@/components/feature/comments/skeletons/comment-section-skeleton`
 - Add import for `ContentLayout` from `@/components/layout/content-layout`
@@ -75,11 +80,13 @@ Replace the mock CommentsPlaceholder component on the collection page with the f
 - Inside Suspense, render `<CommentSectionAsync targetId={collectionId} targetType={'collection'} />`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] TypeScript compiles without errors
 - [ ] ESLint passes without errors
 - [ ] CommentSectionAsync renders with correct props (targetId=collectionId, targetType='collection')
@@ -97,18 +104,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Delete:**
+
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/components/comments-placeholder.tsx`
 
 **Changes:**
+
 - Delete the entire file from the filesystem
 - Verify no other files import CommentsPlaceholder (it was never imported in page.tsx based on current code)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] File is deleted from filesystem
 - [ ] No import errors anywhere in the codebase
 - [ ] TypeScript compiles without errors
@@ -125,9 +136,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Review:**
+
 - None (manual testing step)
 
 **Changes:**
+
 - Navigate to a collection page (e.g., `/user/[username]/collection/[collectionSlug]`)
 - Verify the comment section renders below the bobbleheads grid
 - Verify loading skeleton appears briefly during data fetch
@@ -138,11 +151,13 @@ npm run lint:fix && npm run typecheck
 - Verify unauthenticated users see appropriate messaging
 
 **Validation Commands:**
+
 ```bash
 npm run dev
 ```
 
 **Success Criteria:**
+
 - [ ] Comment section renders in correct position on page
 - [ ] Loading skeleton displays during initial data fetch
 - [ ] ErrorBoundary gracefully handles any rendering errors

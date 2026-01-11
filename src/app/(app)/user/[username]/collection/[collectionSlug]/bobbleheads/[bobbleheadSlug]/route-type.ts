@@ -4,13 +4,6 @@ import { z } from 'zod';
 
 import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/slug';
 
-const searchParamsSchema = z.object({
-  // Use .catch(undefined) to handle empty strings gracefully - they fail UUID validation but we want them treated as undefined
-  collectionId: z.uuid('Invalid collection ID').optional().catch(undefined),
-});
-
-export type BobbleheadNavigationContext = z.infer<typeof searchParamsSchema>;
-
 export const Route = {
   routeParams: z.object({
     bobbleheadSlug: z
@@ -18,8 +11,14 @@ export const Route = {
       .min(SLUG_MIN_LENGTH, 'Bobblehead slug is required')
       .max(SLUG_MAX_LENGTH, `Bobblehead slug must be ${SLUG_MAX_LENGTH} characters or less`)
       .regex(SLUG_PATTERN, 'Bobblehead slug must contain only lowercase letters, numbers, and hyphens'),
+    collectionSlug: z
+      .string()
+      .min(SLUG_MIN_LENGTH, 'Collection slug is required')
+      .max(SLUG_MAX_LENGTH, `Collection slug must be ${SLUG_MAX_LENGTH} characters or less`)
+      .regex(SLUG_PATTERN, 'Collection slug must contain only lowercase letters, numbers, and hyphens'),
+    username: z.string().min(10, 'Username is required'),
   }),
-  searchParams: searchParamsSchema,
+  searchParams: z.object({}),
 } satisfies DynamicRoute;
 
 export type PageProps = InferPagePropsType<RouteType>;

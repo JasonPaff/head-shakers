@@ -5,8 +5,6 @@ import { Fragment, Suspense } from 'react';
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-delete';
-import { CollectionBreadcrumb } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb';
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
@@ -14,18 +12,25 @@ import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
 
+import { BobbleheadHeaderDelete } from './bobblehead-header-delete';
+import { CollectionBreadcrumb } from './collection-breadcrumb';
+
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
+  collectionSlug: string;
   currentUserId: null | string;
   isOwner?: boolean;
   likeData: ContentLikeData;
+  ownerUsername: string;
 }
 
 export const BobbleheadHeader = ({
   bobblehead,
+  collectionSlug,
   currentUserId,
   isOwner = false,
   likeData,
+  ownerUsername,
 }: BobbleheadHeaderProps) => {
   return (
     <Fragment>
@@ -33,18 +38,21 @@ export const BobbleheadHeader = ({
       <div className={'mb-6 flex items-center justify-between gap-4'}>
         {/* Collection Breadcrumb - Left Side */}
         <div className={'min-w-0 flex-1'}>
-          {bobblehead.collectionSlug && (
-            <CollectionBreadcrumb
-              collectionName={bobblehead.collectionName}
-              collectionSlug={bobblehead.collectionSlug}
-            />
-          )}
+          <CollectionBreadcrumb
+            collectionName={bobblehead.collectionName}
+            collectionSlug={collectionSlug}
+            ownerUsername={ownerUsername}
+          />
         </div>
 
         {/* Action Buttons - Right Side */}
         <div className={'flex shrink-0 items-center gap-2'}>
           {/* Share Menu */}
-          <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
+          <BobbleheadShareMenu
+            bobbleheadSlug={bobblehead.slug}
+            collectionSlug={collectionSlug}
+            ownerUsername={ownerUsername}
+          >
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share
@@ -56,7 +64,8 @@ export const BobbleheadHeader = ({
             {/* Delete Bobblehead Button */}
             <BobbleheadHeaderDelete
               bobbleheadId={bobblehead.id}
-              collectionSlug={bobblehead.collectionSlug ?? undefined}
+              collectionSlug={collectionSlug}
+              ownerUsername={ownerUsername}
             >
               Delete
             </BobbleheadHeaderDelete>

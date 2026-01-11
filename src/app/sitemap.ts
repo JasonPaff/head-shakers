@@ -124,7 +124,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           },
         );
 
-        // Query all public bobbleheads
+        // Query all public bobbleheads with collection and owner info for new route
         const publicBobbleheads = await Sentry.startSpan(
           {
             name: 'seo.sitemap.query.bobbleheads',
@@ -133,11 +133,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           async () => {
             const result = await db
               .select({
+                collectionSlug: collections.slug,
                 id: bobbleheads.id,
+                ownerUsername: users.username,
                 slug: bobbleheads.slug,
                 updatedAt: bobbleheads.updatedAt,
               })
               .from(bobbleheads)
+              .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+              .innerJoin(users, eq(bobbleheads.userId, users.id))
+              .where(eq(bobbleheads.isPublic, true))
               .orderBy(bobbleheads.createdAt);
 
             Sentry.addBreadcrumb({
@@ -195,7 +200,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: 'weekly',
           lastModified: bobblehead.updatedAt,
           priority: 0.6,
-          url: `${baseUrl}/bobbleheads/${bobblehead.slug}`,
+          url: `${baseUrl}/user/${bobblehead.ownerUsername}/collection/${bobblehead.collectionSlug}/bobbleheads/${bobblehead.slug}`,
         }));
 
         // Generate dynamic routes for collections
@@ -203,7 +208,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: 'weekly',
           lastModified: collection.updatedAt,
           priority: 0.6,
-          url: `${baseUrl}/collections/${collection.slug}`,
+          url: `${baseUrl}/user/${collection.username}/collection/${collection.slug}`,
         }));
 
         // Combine all routes

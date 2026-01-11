@@ -17,6 +17,7 @@ import { cn } from '@/utils/tailwind-utils';
 type BobbleheadDeleteProps = Children<{
   bobbleheadId: string;
   collectionSlug: string;
+  username: string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
@@ -24,6 +25,7 @@ export const BobbleheadDelete = ({
   bobbleheadId,
   children,
   collectionSlug,
+  username,
   ...props
 }: BobbleheadDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
@@ -39,9 +41,10 @@ export const BobbleheadDelete = ({
       // redirect to parent collection
       router.push(
         $path({
-          route: '/collections/[collectionSlug]',
+          route: '/user/[username]/collection/[collectionSlug]',
           routeParams: {
             collectionSlug,
+            username,
           },
         }),
       );

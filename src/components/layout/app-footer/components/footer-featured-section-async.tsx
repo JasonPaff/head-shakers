@@ -28,11 +28,17 @@ export const FooterFeaturedSectionAsync = async () => {
         const label = collection.title || collection.collectionName || 'Untitled Collection';
         const collectionSlug = collection.collectionSlug!;
 
+        // Skip collections without owner username
+        if (!collection.ownerUsername) return null;
+
         return (
           <FooterNavLink
             href={$path({
-              route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug },
+              route: '/user/[username]/collection/[collectionSlug]',
+              routeParams: {
+                collectionSlug,
+                username: collection.ownerUsername,
+              },
             })}
             key={collection.id}
             label={label}

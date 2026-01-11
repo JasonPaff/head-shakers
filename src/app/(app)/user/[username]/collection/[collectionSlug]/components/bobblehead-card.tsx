@@ -70,12 +70,13 @@ export const BobbleheadCard = ({
   const bobbleheadDetailHref = useMemo(
     () =>
       $path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug: bobblehead.slug },
-        searchParams: {
-          fromCollection: collectionSlug,
-          fromUser: ownerUsername,
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: {
+          bobbleheadSlug: bobblehead.slug,
+          collectionSlug,
+          username: ownerUsername,
         },
+        searchParams: {},
       }),
     [bobblehead.slug, collectionSlug, ownerUsername],
   );

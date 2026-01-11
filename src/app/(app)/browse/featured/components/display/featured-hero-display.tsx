@@ -24,6 +24,7 @@ import { LikeCompactButton } from '@/components/ui/like-button';
 import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentItem {
+  collectionSlug?: null | string;
   comments: number;
   contentId: string;
   contentSlug: string;
@@ -37,6 +38,7 @@ export interface FeaturedContentItem {
   likes: number;
   owner: string;
   ownerDisplayName: string;
+  ownerUsername?: null | string;
   priority: number;
   startDate: string;
   title: string;
@@ -109,13 +111,21 @@ export const FeaturedHeroDisplay = ({ heroData, onViewContent }: FeaturedHeroDis
     const contentUrl =
       content.contentType === 'collection' ?
         $path({
-          route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: content.contentSlug },
+          route: '/user/[username]/collection/[collectionSlug]',
+          routeParams: {
+            collectionSlug: content.contentSlug,
+            username: content.ownerUsername ?? '',
+          },
         })
       : content.contentType === 'bobblehead' ?
         $path({
-          route: '/bobbleheads/[bobbleheadSlug]',
-          routeParams: { bobbleheadSlug: content.contentSlug },
+          route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+          routeParams: {
+            bobbleheadSlug: content.contentSlug,
+            collectionSlug: content.collectionSlug ?? '',
+            username: content.ownerUsername ?? '',
+          },
+          searchParams: {},
         })
       : $path({
           route: '/users/profile/[userId]',

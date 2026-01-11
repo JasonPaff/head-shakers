@@ -7,12 +7,14 @@ Replace mock data in the new collection page (`/user/[username]/collection/[coll
 ## Current State
 
 **New Page (Mock):** `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx`
+
 - Client component with `'use client'` directive
 - Uses mock data from `mock-data.ts`
 - Client-side search/sort via local state
 - Has 3 layout variants (grid, gallery, list)
 
 **Old Page (Real):** `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
+
 - Server component with Suspense boundaries
 - Uses `CollectionsFacade`, `SocialFacade`, `ViewTrackingFacade`
 - URL-based search/sort via search params
@@ -27,14 +29,14 @@ The new route is `/user/[username]/collection/[collectionSlug]` which requires r
 
 ## Data Sources
 
-| Data Need | Facade Method |
-|-----------|---------------|
-| Resolve username | `UsersFacade.getUserByUsername(username)` |
-| Get collection by slug + owner | `CollectionsFacade.getCollectionBySlug(slug, userId)` |
-| Public collection metadata | `CollectionsFacade.getCollectionForPublicView(id, viewerUserId)` |
-| Bobbleheads with photos | `CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(id, viewerId, options)` |
-| View count | `CollectionsFacade.getCollectionViewCountAsync(id)` |
-| Like status | `SocialFacade.getContentLikeData(id, type, viewerId)` |
+| Data Need                      | Facade Method                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------- |
+| Resolve username               | `UsersFacade.getUserByUsername(username)`                                        |
+| Get collection by slug + owner | `CollectionsFacade.getCollectionBySlug(slug, userId)`                            |
+| Public collection metadata     | `CollectionsFacade.getCollectionForPublicView(id, viewerUserId)`                 |
+| Bobbleheads with photos        | `CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(id, viewerId, options)` |
+| View count                     | `CollectionsFacade.getCollectionViewCountAsync(id)`                              |
+| Like status                    | `SocialFacade.getContentLikeData(id, type, viewerId)`                            |
 
 ---
 
@@ -49,6 +51,7 @@ The new route is `/user/[username]/collection/[collectionSlug]` which requires r
 **Task:** Update the route type file to add search params for server-side filtering following project conventions.
 
 **Requirements:**
+
 1. Import from `next-typesafe-url` and `zod`
 2. Use slug validation constants from `@/lib/constants/slugs`
 3. Add search params schema:
@@ -60,6 +63,7 @@ The new route is `/user/[username]/collection/[collectionSlug]` which requires r
 6. Reference existing route-type at `src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts` for patterns
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -74,6 +78,7 @@ The new route is `/user/[username]/collection/[collectionSlug]` which requires r
 **Task:** Create type definitions that match component expectations using real data shapes.
 
 **Requirements:**
+
 1. Define interfaces that align with facade return types
 2. Include all fields needed by components:
 
@@ -120,6 +125,7 @@ export interface BobbleheadViewData {
 4. Do NOT create barrel exports (index.ts)
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -130,12 +136,14 @@ export interface BobbleheadViewData {
 **Specialist Agent:** `server-component-specialist`
 
 **Files to Create:**
+
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/components/async/collection-header-async.tsx`
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/components/async/collection-bobbleheads-async.tsx`
 
 **Task:** Create async server components that fetch and render data following the established async component pattern.
 
 **Requirements for collection-header-async.tsx:**
+
 1. Add `import 'server-only';` at top
 2. Accept props: `{ collectionId: string; userId: string }`
 3. Fetch in parallel using `Promise.all()`:
@@ -149,6 +157,7 @@ export interface BobbleheadViewData {
 7. Reference pattern at `src/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-header-async.tsx`
 
 **Requirements for collection-bobbleheads-async.tsx:**
+
 1. Add `import 'server-only';` at top
 2. Accept props: `{ collectionId: string; ownerUsername: string; collectionSlug: string; searchParams?: SearchParams }`
 3. Use `getUserIdAsync()` for current viewer
@@ -158,6 +167,7 @@ export interface BobbleheadViewData {
 7. Reference pattern at `src/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-bobbleheads-async.tsx`
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -172,6 +182,7 @@ export interface BobbleheadViewData {
 **Task:** Convert the page from client component to server component with proper data fetching, Suspense boundaries, and SEO metadata.
 
 **Requirements:**
+
 1. Remove `'use client'` directive
 2. Add `async` to component function
 3. Use `withParamValidation(CollectionPage, Route)` HOC pattern
@@ -192,6 +203,7 @@ export interface BobbleheadViewData {
 8. Reference old page at `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 - Run `npm run build` - must pass
@@ -207,6 +219,7 @@ export interface BobbleheadViewData {
 **Task:** Create a client component for URL-based layout switching.
 
 **Requirements:**
+
 1. Add `'use client'` directive
 2. Use `nuqs` for URL state management (follow existing patterns in codebase)
 3. Accept props: `{ currentLayout: 'grid' | 'gallery' | 'list' }`
@@ -218,6 +231,7 @@ export interface BobbleheadViewData {
 9. Reference existing URL state patterns in codebase (search for `nuqs` usage)
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -232,6 +246,7 @@ export interface BobbleheadViewData {
 **Task:** Update the collection header to use real data types and wire up the like button.
 
 **Requirements:**
+
 1. Change props interface from `MockCollection`/`MockCollector` to `CollectionViewData`/`CollectorData`
 2. Accept `initialIsLiked` and `initialLikeCount` as props for optimistic updates
 3. Wire up like button to existing `toggleLikeAction` server action:
@@ -243,6 +258,7 @@ export interface BobbleheadViewData {
 7. Handle loading/error states for like action
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -257,6 +273,7 @@ export interface BobbleheadViewData {
 **Task:** Convert search controls to URL-based search using nuqs.
 
 **Requirements:**
+
 1. Add `'use client'` directive (if not present)
 2. Remove local state management for search/sort
 3. Use `nuqs` for URL state:
@@ -269,6 +286,7 @@ export interface BobbleheadViewData {
 8. Maintain existing styling and UX
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -283,6 +301,7 @@ export interface BobbleheadViewData {
 **Task:** Update bobblehead grid to use real data types and remove client-side filtering.
 
 **Requirements:**
+
 1. Change props interface from `MockBobblehead[]` to `BobbleheadViewData[]`
 2. Remove client-side filtering/sorting logic (now handled server-side)
 3. Keep layout variant rendering logic (grid, gallery, list)
@@ -291,6 +310,7 @@ export interface BobbleheadViewData {
 6. Ensure proper key props on mapped items
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -305,6 +325,7 @@ export interface BobbleheadViewData {
 **Task:** Update bobblehead card to use real data types and wire up interactions.
 
 **Requirements:**
+
 1. Change props interface from `MockBobblehead` to `BobbleheadViewData`
 2. Wire up like button to `toggleLikeAction`:
    - Use optimistic updates
@@ -317,6 +338,7 @@ export interface BobbleheadViewData {
 6. Maintain layout variant styling (grid, gallery, list)
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -327,12 +349,14 @@ export interface BobbleheadViewData {
 **Specialist Agent:** `server-component-specialist`
 
 **Files to Create:**
+
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-header-skeleton.tsx`
 - `src/app/(app)/user/[username]/collection/[collectionSlug]/components/skeletons/collection-bobbleheads-skeleton.tsx`
 
 **Task:** Create skeleton loading components for Suspense fallbacks.
 
 **Requirements:**
+
 1. Match the layout/dimensions of actual components
 2. Use `Skeleton` component from `@/components/ui/skeleton`
 3. Include appropriate aria-label for accessibility
@@ -341,6 +365,7 @@ export interface BobbleheadViewData {
 5. Export from individual files (no barrel exports)
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 
@@ -355,11 +380,13 @@ export interface BobbleheadViewData {
 **Task:** Remove the mock data file after all components use real data.
 
 **Requirements:**
+
 1. Verify no imports of `mock-data.ts` exist in the codebase
 2. Delete the file
 3. Run full build to ensure nothing is broken
 
 **Validation:**
+
 - Run `npm run typecheck` - must pass
 - Run `npm run lint:fix` - must pass
 - Run `npm run build` - must pass
@@ -373,12 +400,14 @@ export interface BobbleheadViewData {
 **Task:** Run all tests and perform manual verification.
 
 **Requirements:**
+
 1. Run existing test suite: `npm run test`
 2. Run type checking: `npm run typecheck`
 3. Run linting: `npm run lint:fix`
 4. Run build: `npm run build`
 
 **Manual Testing Checklist:**
+
 - [ ] Navigate to `/user/{username}/collection/{slug}` with real user/collection
 - [ ] Verify collection header displays correct data (name, description, cover image)
 - [ ] Verify collector info displays correctly (avatar, display name, username link)
@@ -399,21 +428,21 @@ export interface BobbleheadViewData {
 
 ## Files Summary
 
-| File | Action | Specialist Agent |
-|------|--------|------------------|
-| `route-type.ts` | Modify | validation-specialist |
-| `types.ts` | Create | validation-specialist |
-| `components/async/collection-header-async.tsx` | Create | server-component-specialist |
-| `components/async/collection-bobbleheads-async.tsx` | Create | server-component-specialist |
-| `page.tsx` | Modify | server-component-specialist |
-| `components/layout-switcher.tsx` | Create | client-component-specialist |
-| `components/collection-header.tsx` | Modify | client-component-specialist |
-| `components/search-controls.tsx` | Modify | client-component-specialist |
-| `components/bobblehead-grid.tsx` | Modify | client-component-specialist |
-| `components/bobblehead-card.tsx` | Modify | client-component-specialist |
-| `components/skeletons/collection-header-skeleton.tsx` | Create | server-component-specialist |
+| File                                                       | Action | Specialist Agent            |
+| ---------------------------------------------------------- | ------ | --------------------------- |
+| `route-type.ts`                                            | Modify | validation-specialist       |
+| `types.ts`                                                 | Create | validation-specialist       |
+| `components/async/collection-header-async.tsx`             | Create | server-component-specialist |
+| `components/async/collection-bobbleheads-async.tsx`        | Create | server-component-specialist |
+| `page.tsx`                                                 | Modify | server-component-specialist |
+| `components/layout-switcher.tsx`                           | Create | client-component-specialist |
+| `components/collection-header.tsx`                         | Modify | client-component-specialist |
+| `components/search-controls.tsx`                           | Modify | client-component-specialist |
+| `components/bobblehead-grid.tsx`                           | Modify | client-component-specialist |
+| `components/bobblehead-card.tsx`                           | Modify | client-component-specialist |
+| `components/skeletons/collection-header-skeleton.tsx`      | Create | server-component-specialist |
 | `components/skeletons/collection-bobbleheads-skeleton.tsx` | Create | server-component-specialist |
-| `mock-data.ts` | Delete | general-purpose |
+| `mock-data.ts`                                             | Delete | general-purpose             |
 
 ## Dependencies Between Steps
 
@@ -438,25 +467,31 @@ All Steps (1-10) ─→ Step 11 (delete mock) ─→ Step 12 (testing)
 ## Parallel Execution Groups
 
 **Group 1 (can run in parallel):**
+
 - Step 1: route-type.ts
 - Step 2: types.ts
 
 **Group 2 (can run in parallel after Group 1):**
+
 - Step 3: async components
 - Step 5: layout-switcher
 - Step 10: skeleton components
 
 **Group 3 (can run in parallel after Group 2):**
+
 - Step 6: collection-header
 - Step 7: search-controls
 - Step 8: bobblehead-grid
 - Step 9: bobblehead-card
 
 **Group 4 (after Group 3):**
+
 - Step 4: page.tsx (integrates all components)
 
 **Group 5 (after Group 4):**
+
 - Step 11: delete mock data
 
 **Group 6 (after Group 5):**
+
 - Step 12: final testing

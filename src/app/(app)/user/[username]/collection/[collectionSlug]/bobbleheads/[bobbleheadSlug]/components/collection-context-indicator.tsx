@@ -14,6 +14,7 @@ type CollectionContextIndicatorProps = {
   context: NavigationContext;
   /** Maximum characters before truncation (default: 25) */
   maxLength?: number;
+  ownerUsername: string;
 };
 
 /**
@@ -21,7 +22,11 @@ type CollectionContextIndicatorProps = {
  * Shows a badge with the collection name, truncating long names with a tooltip.
  * The badge is a link to the collection page.
  */
-export const CollectionContextIndicator = ({ context, maxLength = 25 }: CollectionContextIndicatorProps) => {
+export const CollectionContextIndicator = ({
+  context,
+  maxLength = 25,
+  ownerUsername,
+}: CollectionContextIndicatorProps) => {
   const { contextName, contextSlug } = context;
   const _isTruncated = contextName.length > maxLength;
   const displayName = _isTruncated ? `${contextName.slice(0, maxLength)}...` : contextName;
@@ -30,10 +35,10 @@ export const CollectionContextIndicator = ({ context, maxLength = 25 }: Collecti
   // Build the URL for the collection
   const contextUrl = useMemo(() => {
     return $path({
-      route: '/collections/[collectionSlug]',
-      routeParams: { collectionSlug: contextSlug },
+      route: '/user/[username]/collection/[collectionSlug]',
+      routeParams: { collectionSlug: contextSlug, username: ownerUsername },
     });
-  }, [contextSlug]);
+  }, [contextSlug, ownerUsername]);
 
   // Test IDs - using bobblehead-nav namespace for consistency with navigation components
   const indicatorTestId = generateTestId('feature', 'bobblehead-nav', 'context');

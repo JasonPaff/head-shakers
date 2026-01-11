@@ -46,6 +46,7 @@ describe('TrendingBobbleheadsDisplay', () => {
   const mockBobbleheads: Array<TrendingBobblehead> = [
     {
       category: 'Sports',
+      collectionSlug: 'test-collection-1',
       contentId: 'content-1',
       contentSlug: 'baseball-star',
       featureType: 'trending',
@@ -53,12 +54,14 @@ describe('TrendingBobbleheadsDisplay', () => {
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo1.jpg',
       likeCount: 125,
       name: 'Baseball Star',
+      ownerUsername: 'testuser1',
       title: 'Baseball Star',
       viewCount: 543,
       year: 2023,
     },
     {
       category: 'Movies',
+      collectionSlug: 'test-collection-2',
       contentId: 'content-2',
       contentSlug: 'action-hero',
       featureType: 'editor_pick',
@@ -66,12 +69,14 @@ describe('TrendingBobbleheadsDisplay', () => {
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo2.jpg',
       likeCount: 234,
       name: 'Action Hero',
+      ownerUsername: 'testuser2',
       title: 'Action Hero',
       viewCount: 876,
       year: 2022,
     },
     {
       category: 'TV',
+      collectionSlug: 'test-collection-3',
       contentId: 'content-3',
       contentSlug: 'detective',
       featureType: 'new_badge',
@@ -79,12 +84,14 @@ describe('TrendingBobbleheadsDisplay', () => {
       imageUrl: null,
       likeCount: 89,
       name: 'Detective',
+      ownerUsername: 'testuser3',
       title: 'Detective',
       viewCount: 321,
       year: 2024,
     },
     {
       category: 'Games',
+      collectionSlug: 'test-collection-4',
       contentId: 'content-4',
       contentSlug: 'hero-character',
       featureType: 'popular',
@@ -92,6 +99,7 @@ describe('TrendingBobbleheadsDisplay', () => {
       imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/photo4.jpg',
       likeCount: 456,
       name: 'Hero Character',
+      ownerUsername: 'testuser4',
       title: 'Hero Character',
       viewCount: 1234,
       year: 2021,
@@ -163,16 +171,29 @@ describe('TrendingBobbleheadsDisplay', () => {
     render(<TrendingBobbleheadsDisplay bobbleheads={mockBobbleheads} />);
 
     const links = screen.getAllByRole('link');
-    expect(links[0]).toHaveAttribute('href', '/bobbleheads/baseball-star');
-    expect(links[1]).toHaveAttribute('href', '/bobbleheads/action-hero');
-    expect(links[2]).toHaveAttribute('href', '/bobbleheads/detective');
-    expect(links[3]).toHaveAttribute('href', '/bobbleheads/hero-character');
+    expect(links[0]).toHaveAttribute(
+      'href',
+      '/user/testuser1/collection/test-collection-1/bobbleheads/baseball-star',
+    );
+    expect(links[1]).toHaveAttribute(
+      'href',
+      '/user/testuser2/collection/test-collection-2/bobbleheads/action-hero',
+    );
+    expect(links[2]).toHaveAttribute(
+      'href',
+      '/user/testuser3/collection/test-collection-3/bobbleheads/detective',
+    );
+    expect(links[3]).toHaveAttribute(
+      'href',
+      '/user/testuser4/collection/test-collection-4/bobbleheads/hero-character',
+    );
   });
 
   it('should format like counts and view counts with toLocaleString', () => {
     const largeCounts: Array<TrendingBobblehead> = [
       {
         category: 'Sports',
+        collectionSlug: 'test-collection-5',
         contentId: 'content-5',
         contentSlug: 'popular-star',
         featureType: 'trending',
@@ -180,6 +201,7 @@ describe('TrendingBobbleheadsDisplay', () => {
         imageUrl: null,
         likeCount: 15234,
         name: 'Popular Star',
+        ownerUsername: 'testuser5',
         title: 'Popular Star',
         viewCount: 98765,
         year: 2023,
@@ -206,6 +228,7 @@ describe('TrendingBobbleheadsDisplay', () => {
     const noImageBobblehead: Array<TrendingBobblehead> = [
       {
         category: 'Music',
+        collectionSlug: 'test-collection-6',
         contentId: 'content-6',
         contentSlug: 'rock-star',
         featureType: 'trending',
@@ -213,6 +236,7 @@ describe('TrendingBobbleheadsDisplay', () => {
         imageUrl: null,
         likeCount: 50,
         name: 'Rock Star',
+        ownerUsername: 'testuser6',
         title: 'Rock Star',
         viewCount: 200,
         year: 2024,

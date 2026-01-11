@@ -12,6 +12,7 @@ interface BobbleheadDeleteDialogProps {
   collectionSlug: string;
   isOpen: boolean;
   onClose: () => void;
+  username: string;
 }
 
 export const BobbleheadDeleteDialog = ({
@@ -19,6 +20,7 @@ export const BobbleheadDeleteDialog = ({
   collectionSlug,
   isOpen,
   onClose,
+  username,
 }: BobbleheadDeleteDialogProps) => {
   const router = useRouter();
 
@@ -31,9 +33,10 @@ export const BobbleheadDeleteDialog = ({
       // redirect to the parent collection
       router.push(
         $path({
-          route: '/collections/[collectionSlug]',
+          route: '/user/[username]/collection/[collectionSlug]',
           routeParams: {
             collectionSlug,
+            username,
           },
         }),
       );

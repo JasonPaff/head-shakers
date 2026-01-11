@@ -4,7 +4,6 @@ import { CameraIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useEffect, useMemo } from 'react';
 
 import type { BobbleheadNavigationData } from '@/lib/types/bobblehead-navigation.types';
@@ -17,42 +16,34 @@ import { BobbleheadNavigationPreview } from './bobblehead-navigation-preview';
 import { CollectionContextIndicator } from './collection-context-indicator';
 
 type BobbleheadNavigationProps = {
+  collectionSlug: string;
   isKeyboardNavigationEnabled?: boolean;
   navigationData: BobbleheadNavigationData;
+  ownerUsername: string;
 };
 
 export const BobbleheadNavigation = ({
+  collectionSlug,
   isKeyboardNavigationEnabled = true,
   navigationData,
+  ownerUsername,
 }: BobbleheadNavigationProps) => {
-  // Other hooks
-  const [{ collectionId }] = useQueryStates(
-    {
-      collectionId: parseAsString,
-    },
-    {
-      shallow: false,
-    },
-  );
-
   const router = useRouter();
 
-  // Build navigation URLs
+  // Build navigation URLs using the new route structure
   const buildNavigationUrl = useCallback(
     (bobbleheadSlug: string) => {
-      const searchParams: Record<string, string> = {};
-
-      if (collectionId) {
-        searchParams.collectionId = collectionId;
-      }
-
       return $path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug },
-        searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: {
+          bobbleheadSlug,
+          collectionSlug,
+          username: ownerUsername,
+        },
+        searchParams: {},
       });
     },
-    [collectionId],
+    [collectionSlug, ownerUsername],
   );
 
   // Memoize URLs for links
@@ -193,7 +184,7 @@ export const BobbleheadNavigation = ({
           <div className={'flex flex-col items-center justify-center gap-1'}>
             {/* Collection Context Indicator */}
             <Conditional isCondition={_hasContext}>
-              <CollectionContextIndicator context={navigationData.context!} />
+              <CollectionContextIndicator context={navigationData.context!} ownerUsername={ownerUsername} />
             </Conditional>
 
             {/* Position Indicator */}

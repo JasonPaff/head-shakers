@@ -27,10 +27,7 @@ export const CollectionHeaderSkeleton = () => {
           <Skeleton className={'mb-2 h-8 w-64 sm:h-10 sm:w-80'} />
 
           {/* Collector Byline Skeleton */}
-          <div
-            className={'mb-3 flex items-center gap-2'}
-            data-slot={'collection-header-skeleton-byline'}
-          >
+          <div className={'mb-3 flex items-center gap-2'} data-slot={'collection-header-skeleton-byline'}>
             {/* Avatar */}
             <Skeleton className={'size-6 rounded-full'} />
             {/* "by" text and name */}
@@ -44,10 +41,7 @@ export const CollectionHeaderSkeleton = () => {
           </div>
 
           {/* Stats Skeleton */}
-          <div
-            className={'flex flex-wrap items-center gap-4'}
-            data-slot={'collection-header-skeleton-stats'}
-          >
+          <div className={'flex flex-wrap items-center gap-4'} data-slot={'collection-header-skeleton-stats'}>
             {/* Items count */}
             <div className={'flex items-center gap-1.5'}>
               <Skeleton className={'size-4'} />

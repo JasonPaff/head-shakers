@@ -685,6 +685,28 @@ export class BobbleheadsFacade extends BaseFacade {
           const currentPosition = positionResult?.currentPosition ?? 0;
           const totalCount = positionResult?.totalCount ?? 0;
 
+          // Extract adjacent bobbleheads with loop-around logic
+          let { nextBobblehead, previousBobblehead } = adjacentResult;
+
+          // Loop-around navigation: when at boundaries, wrap to the other end
+          if (totalCount > 1) {
+            // At newest bobblehead (no previous) - loop to oldest
+            if (!previousBobblehead) {
+              previousBobblehead = await BobbleheadsQuery.getLastBobbleheadInCollectionAsync(
+                collectionId,
+                context,
+              );
+            }
+
+            // At oldest bobblehead (no next) - loop to newest
+            if (!nextBobblehead) {
+              nextBobblehead = await BobbleheadsQuery.getFirstBobbleheadInCollectionAsync(
+                collectionId,
+                context,
+              );
+            }
+          }
+
           // Fetch collection information
           let contextData: BobbleheadNavigationDataSchema['context'] = null;
           const collection = await CollectionsFacade.getByIdAsync(collectionId, viewerUserId);
@@ -718,16 +740,17 @@ export class BobbleheadsFacade extends BaseFacade {
             contextName: contextData?.contextName || null,
             contextType: contextData?.contextType || null,
             currentPosition,
-            hasNext: !!adjacentResult.nextBobblehead,
-            hasPrevious: !!adjacentResult.previousBobblehead,
+            hasNext: !!nextBobblehead,
+            hasPrevious: !!previousBobblehead,
+            isLoopAround: !adjacentResult.previousBobblehead || !adjacentResult.nextBobblehead,
             totalCount,
           });
 
           return {
             context: contextData,
             currentPosition,
-            nextBobblehead: transformBobblehead(adjacentResult.nextBobblehead),
-            previousBobblehead: transformBobblehead(adjacentResult.previousBobblehead),
+            nextBobblehead: transformBobblehead(nextBobblehead),
+            previousBobblehead: transformBobblehead(previousBobblehead),
             totalCount,
           };
         },

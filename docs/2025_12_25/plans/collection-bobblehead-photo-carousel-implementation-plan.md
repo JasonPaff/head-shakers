@@ -14,34 +14,38 @@
 ## File Discovery Results
 
 ### Critical Priority
-| File | Purpose |
-|------|---------|
+
+| File                                                                                  | Purpose                                                         |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-card.tsx` | Primary target - displays single featured photo, needs carousel |
-| `src/components/ui/carousel.tsx` | Existing Embla carousel with all required components |
-| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts` | Dashboard query - needs to return all photos |
+| `src/components/ui/carousel.tsx`                                                      | Existing Embla carousel with all required components            |
+| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts`                          | Dashboard query - needs to return all photos                    |
 
 ### High Priority
-| File | Purpose |
-|------|---------|
-| `src/app/(app)/dashboard/collection/(collection)/components/display/bobblehead-grid-display.tsx` | Client wrapper passing data to cards |
-| `src/lib/db/schema/bobbleheads.schema.ts` | Database schema with bobbleheadPhotos table |
-| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts` | Facade with getListByCollectionSlugAsync |
-| `src/lib/utils/cloudinary.utils.ts` | Cloudinary utilities for image optimization |
+
+| File                                                                                             | Purpose                                     |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| `src/app/(app)/dashboard/collection/(collection)/components/display/bobblehead-grid-display.tsx` | Client wrapper passing data to cards        |
+| `src/lib/db/schema/bobbleheads.schema.ts`                                                        | Database schema with bobbleheadPhotos table |
+| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts`                                    | Facade with getListByCollectionSlugAsync    |
+| `src/lib/utils/cloudinary.utils.ts`                                                              | Cloudinary utilities for image optimization |
 
 ### Medium Priority
-| File | Purpose |
-|------|---------|
+
+| File                                                                                              | Purpose                               |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery.tsx` | Reference for CldImage usage patterns |
-| `src/components/feature/bobblehead/bobblehead-photo-gallery-modal.tsx` | Pattern reference for navigation UI |
-| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-grid.tsx` | Grid layout component |
-| `src/app/(app)/dashboard/collection/(collection)/components/async/bobblehead-grid-async.tsx` | Server component for data fetch |
+| `src/components/feature/bobblehead/bobblehead-photo-gallery-modal.tsx`                            | Pattern reference for navigation UI   |
+| `src/app/(app)/dashboard/collection/(collection)/components/main/bobblehead-grid.tsx`             | Grid layout component                 |
+| `src/app/(app)/dashboard/collection/(collection)/components/async/bobblehead-grid-async.tsx`      | Server component for data fetch       |
 
 ### Low Priority
-| File | Purpose |
-|------|---------|
-| `tests/components/dashboard/collection/bobblehead-card.test.tsx` | Existing tests to update |
-| `tests/fixtures/bobblehead-grid.factory.ts` | Test factory for mock data |
-| `src/components/ui/conditional.tsx` | Conditional rendering utility |
+
+| File                                                             | Purpose                       |
+| ---------------------------------------------------------------- | ----------------------------- |
+| `tests/components/dashboard/collection/bobblehead-card.test.tsx` | Existing tests to update      |
+| `tests/fixtures/bobblehead-grid.factory.ts`                      | Test factory for mock data    |
+| `src/components/ui/conditional.tsx`                              | Conditional rendering utility |
 
 ---
 

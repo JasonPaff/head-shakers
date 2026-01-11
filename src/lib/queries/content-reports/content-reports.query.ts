@@ -8,7 +8,7 @@ import type {
   SelectContentReportWithSlugs,
 } from '@/lib/validations/moderation.validation';
 
-import { bobbleheads, collections, comments, contentReports } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, contentReports, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
@@ -295,6 +295,12 @@ export class ContentReportsQuery extends BaseQuery {
       // Select all content report fields plus computed slug fields
       let query = dbInstance
         .select({
+          collectionSlug: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'bobblehead' THEN ${collections.slug}
+              ELSE NULL
+            END
+          `.as('collection_slug'),
           commentContent: sql<null | string>`
             CASE
               WHEN ${contentReports.targetType} = 'comment' THEN ${comments.content}
@@ -314,6 +320,12 @@ export class ContentReportsQuery extends BaseQuery {
           id: contentReports.id,
           moderatorId: contentReports.moderatorId,
           moderatorNotes: contentReports.moderatorNotes,
+          ownerUsername: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'bobblehead' THEN ${users.username}
+              ELSE NULL
+            END
+          `.as('owner_username'),
           reason: contentReports.reason,
           reporterId: contentReports.reporterId,
           resolvedAt: contentReports.resolvedAt,
@@ -335,11 +347,14 @@ export class ContentReportsQuery extends BaseQuery {
           bobbleheads,
           and(eq(contentReports.targetId, bobbleheads.id), eq(contentReports.targetType, 'bobblehead')),
         )
-        // LEFT JOIN collections for collection reports
+        // LEFT JOIN collections for bobblehead reports (to get collection slug) and collection reports
         .leftJoin(
           collections,
-          and(eq(contentReports.targetId, collections.id), eq(contentReports.targetType, 'collection')),
+          sql`(${contentReports.targetType} = 'bobblehead' AND ${bobbleheads.collectionId} = ${collections.id})
+              OR (${contentReports.targetType} = 'collection' AND ${contentReports.targetId} = ${collections.id})`,
         )
+        // LEFT JOIN users for bobblehead reports (to get owner username)
+        .leftJoin(users, and(eq(bobbleheads.userId, users.id), eq(contentReports.targetType, 'bobblehead')))
         // LEFT JOIN comments for comment reports (to check existence)
         .leftJoin(
           comments,

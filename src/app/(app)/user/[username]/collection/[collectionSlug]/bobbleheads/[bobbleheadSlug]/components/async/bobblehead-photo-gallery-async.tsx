@@ -1,9 +1,10 @@
 import 'server-only';
 import { notFound } from 'next/navigation';
 
-import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
+
+import { BobbleheadPhotoGalleryCard } from '../bobblehead-photo-gallery';
 
 interface BobbleheadPhotoGalleryAsyncProps {
   bobbleheadId: string;

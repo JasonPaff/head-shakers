@@ -7,7 +7,7 @@ import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-delete';
+import { BobbleheadHeaderDelete } from '@/app/(app)/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]/components/bobblehead-header-delete';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ interface BobbleheadStickyHeaderProps {
   likeCount: number;
   thumbnailUrl?: null | string;
   title: string;
+  username: string;
 }
 
 export const BobbleheadStickyHeader = ({
@@ -38,6 +39,7 @@ export const BobbleheadStickyHeader = ({
   likeCount,
   thumbnailUrl,
   title,
+  username,
 }: BobbleheadStickyHeaderProps) => {
   const handleCommentsClick = () => {
     const commentsSection = document.getElementById('comments-section');
@@ -76,8 +78,8 @@ export const BobbleheadStickyHeader = ({
                   'flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground md:text-sm'
                 }
                 href={$path({
-                  route: '/collections/[collectionSlug]',
-                  routeParams: { collectionSlug },
+                  route: '/user/[username]/collection/[collectionSlug]',
+                  routeParams: { collectionSlug, username },
                 })}
               >
                 <ArrowLeftIcon aria-hidden className={'size-3'} />
@@ -129,7 +131,11 @@ export const BobbleheadStickyHeader = ({
               </Button>
 
               {/* Share Menu */}
-              <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
+              <BobbleheadShareMenu
+                bobbleheadSlug={bobblehead.slug}
+                collectionSlug={collectionSlug}
+                ownerUsername={username}
+              >
                 <Button aria-label={'Share bobblehead'} size={'icon'} variant={'ghost'}>
                   <ShareIcon aria-hidden className={'size-4'} />
                 </Button>
@@ -142,6 +148,7 @@ export const BobbleheadStickyHeader = ({
                   <BobbleheadHeaderDelete
                     bobbleheadId={bobblehead.id}
                     collectionSlug={collectionSlug}
+                    ownerUsername={username}
                     size={'icon'}
                     variant={'ghost'}
                   />

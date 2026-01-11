@@ -1,10 +1,6 @@
 import 'server-only';
 import { notFound } from 'next/navigation';
 
-import { BobbleheadFeatureCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card';
-import { BobbleheadHeader } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header';
-import { BobbleheadMetrics } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-metrics';
-import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
@@ -12,11 +8,18 @@ import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade'
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
+import { BobbleheadFeatureCard } from './bobblehead-feature-card';
+import { BobbleheadHeader } from './bobblehead-header';
+import { BobbleheadMetrics } from './bobblehead-metrics';
+import { BobbleheadPhotoGalleryCard } from './bobblehead-photo-gallery';
+
 interface BobbleheadProps {
   bobbleheadId: string;
+  collectionSlug: string;
+  ownerUsername: string;
 }
 
-export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
+export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }: BobbleheadProps) => {
   const currentUserId = await getUserIdAsync();
 
   const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
@@ -45,9 +48,11 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
         <ContentLayout>
           <BobbleheadHeader
             bobblehead={bobblehead}
+            collectionSlug={collectionSlug}
             currentUserId={currentUserId}
             isOwner={isOwner}
             likeData={likeData}
+            ownerUsername={ownerUsername}
           />
         </ContentLayout>
       </div>
@@ -64,7 +69,12 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       {/* Feature Card Section */}
       <div className={'mt-4'}>
         <ContentLayout>
-          <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />
+          <BobbleheadFeatureCard
+            bobblehead={bobblehead}
+            collectionSlug={collectionSlug}
+            likeData={likeData}
+            ownerUsername={ownerUsername}
+          />
         </ContentLayout>
       </div>
 

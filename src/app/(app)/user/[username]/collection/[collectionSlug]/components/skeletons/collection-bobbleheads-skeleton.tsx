@@ -51,11 +51,7 @@ const BobbleheadCardSkeleton = () => (
  */
 export const CollectionBobbleheadsSkeleton = () => {
   return (
-    <div
-      aria-busy={'true'}
-      aria-label={'Loading bobbleheads'}
-      data-slot={'collection-bobbleheads-skeleton'}
-    >
+    <div aria-busy={'true'} aria-label={'Loading bobbleheads'} data-slot={'collection-bobbleheads-skeleton'}>
       {/* Search and Sort Controls - matches SearchControls layout */}
       <div
         className={'mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}

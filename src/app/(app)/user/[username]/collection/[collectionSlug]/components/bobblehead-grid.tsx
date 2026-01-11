@@ -22,9 +22,7 @@ const LAYOUT_VALUES = ['grid', 'gallery', 'list'] as const;
 
 export type LayoutVariant = (typeof LAYOUT_VALUES)[number];
 
-type BobbleheadGridProps = BobbleheadGridPropsFromTypes &
-  ComponentProps<'div'> &
-  ComponentTestIdProps;
+type BobbleheadGridProps = BobbleheadGridPropsFromTypes & ComponentProps<'div'> & ComponentTestIdProps;
 
 /**
  * BobbleheadGrid component with 3 layout variations:
@@ -43,10 +41,7 @@ export const BobbleheadGrid = ({
   ...props
 }: BobbleheadGridProps) => {
   // Other hooks - Only layout from URL state (filtering/sorting handled server-side)
-  const [layout] = useQueryState(
-    'layout',
-    parseAsStringEnum([...LAYOUT_VALUES]).withDefault('grid'),
-  );
+  const [layout] = useQueryState('layout', parseAsStringEnum([...LAYOUT_VALUES]).withDefault('grid'));
 
   // useMemo hooks - Grid layout classes based on variant
   const gridClasses = useMemo(() => {
@@ -71,12 +66,7 @@ export const BobbleheadGrid = ({
   const gridTestId = testId || generateTestId('feature', 'bobblehead-grid');
 
   return (
-    <div
-      className={cn(className)}
-      data-slot={'bobblehead-grid'}
-      data-testid={gridTestId}
-      {...props}
-    >
+    <div className={cn(className)} data-slot={'bobblehead-grid'} data-testid={gridTestId} {...props}>
       {/* Search and Sort Controls */}
       <SearchControls className={'mb-6'} testId={`${gridTestId}-controls`} />
 

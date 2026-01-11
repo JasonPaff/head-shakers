@@ -27,15 +27,16 @@ const isPublicRoute = createRouteMatcher([
   // search functionality uses publicActionClient with rate limiting to prevent abuse
   '/search(.*)',
 
-  // public collection views (read-only)
-  '/collections/:slug', // matches /collections/[collectionSlug]
-  '/collections/:slug/share(.*)', // sharing routes
+  // public collection views (read-only) - nested under user
+  '/user/:username/collection/:collectionSlug', // matches /user/[username]/collection/[collectionSlug]
+  '/user/:username/collection/:collectionSlug/share(.*)', // sharing routes
 
-  // public bobblehead views (read-only)
-  '/bobbleheads/:slug', // matches /bobbleheads/[bobbleheadSlug]
-  '/bobbleheads/:slug/share(.*)', // sharing routes
+  // public bobblehead views (read-only) - nested under user/collection
+  '/user/:username/collection/:collectionSlug/bobbleheads/:bobbleheadSlug',
+  '/user/:username/collection/:collectionSlug/bobbleheads/:bobbleheadSlug/share(.*)', // sharing routes
 
   // public user profiles (read-only)
+  '/user/:username(.*)', // matches /user/[username] and nested routes
   '/users/:username',
   '/users/:username/collections(.*)',
   '/users/:username/following(.*)',
@@ -54,13 +55,8 @@ const isProtectedRoute = createRouteMatcher([
   // examples - always protected
   '/examples(.*)',
 
-  // creation routes - require auth
-  '/collections/create(.*)',
-
   // edit routes - require auth + ownership check
-  '/collections/:slug/edit(.*)',
-  '/collections/:slug/settings(.*)',
-  '/bobbleheads/:slug/edit(.*)', // updated from items to bobbleheads
+  '/user/:username/collection/:collectionSlug/bobbleheads/:bobbleheadSlug/edit(.*)', // bobblehead edit routes
 ]);
 
 const isAdminRoute = createRouteMatcher([

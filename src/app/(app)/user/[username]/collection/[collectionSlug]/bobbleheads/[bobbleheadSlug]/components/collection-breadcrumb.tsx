@@ -8,11 +8,12 @@ import { generateTestId } from '@/lib/test-ids';
 
 type CollectionBreadcrumbProps = {
   collectionName: null | string;
-  collectionSlug: null | string;
+  collectionSlug: string;
   /** Maximum characters before truncation on desktop (default: 25) */
   maxLength?: number;
   /** Maximum characters for mobile truncation (default: 15) */
   maxLengthMobile?: number;
+  ownerUsername: string;
 };
 
 /**
@@ -38,6 +39,7 @@ export const CollectionBreadcrumb = ({
   collectionSlug,
   maxLength = 25,
   maxLengthMobile = 15,
+  ownerUsername,
 }: CollectionBreadcrumbProps) => {
   // Don't render if no collection data
   if (!collectionSlug || !collectionName) {
@@ -56,8 +58,8 @@ export const CollectionBreadcrumb = ({
   const needsMobileTooltip = collectionTruncatedMobile.isTruncated;
 
   const linkHref = $path({
-    route: '/collections/[collectionSlug]',
-    routeParams: { collectionSlug },
+    route: '/user/[username]/collection/[collectionSlug]',
+    routeParams: { collectionSlug, username: ownerUsername },
   });
 
   // Mobile collection link

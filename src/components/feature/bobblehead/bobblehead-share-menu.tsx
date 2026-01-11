@@ -18,14 +18,22 @@ import {
 
 type BobbleheadShareMenuProps = Children & {
   bobbleheadSlug: string;
+  collectionSlug: string;
+  ownerUsername: string;
 };
 
-export function BobbleheadShareMenu({ bobbleheadSlug, children }: BobbleheadShareMenuProps) {
+export function BobbleheadShareMenu({
+  bobbleheadSlug,
+  children,
+  collectionSlug,
+  ownerUsername,
+}: BobbleheadShareMenuProps) {
   const handleCopyLink = async () => {
     try {
       const relativePath = $path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug },
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug, collectionSlug, username: ownerUsername },
+        searchParams: {},
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const success = await copyToClipboard(absoluteUrl);
@@ -43,8 +51,9 @@ export function BobbleheadShareMenu({ bobbleheadSlug, children }: BobbleheadShar
   const handleShareToTwitter = () => {
     try {
       const relativePath = $path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug },
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug, collectionSlug, username: ownerUsername },
+        searchParams: {},
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('twitter', {
@@ -60,8 +69,9 @@ export function BobbleheadShareMenu({ bobbleheadSlug, children }: BobbleheadShar
   const handleShareToFacebook = () => {
     try {
       const relativePath = $path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug },
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug, collectionSlug, username: ownerUsername },
+        searchParams: {},
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('facebook', {

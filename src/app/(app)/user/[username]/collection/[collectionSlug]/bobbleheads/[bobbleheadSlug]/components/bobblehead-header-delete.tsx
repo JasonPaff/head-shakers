@@ -16,7 +16,8 @@ import { cn } from '@/utils/tailwind-utils';
 
 type BobbleheadHeaderDeleteProps = Children<{
   bobbleheadId: string;
-  collectionSlug?: null | string;
+  collectionSlug: string;
+  ownerUsername: string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
@@ -24,6 +25,7 @@ export const BobbleheadHeaderDelete = ({
   bobbleheadId,
   children,
   collectionSlug,
+  ownerUsername,
   ...props
 }: BobbleheadHeaderDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
@@ -37,19 +39,15 @@ export const BobbleheadHeaderDelete = ({
   const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
       // redirect to parent collection
-      if (collectionSlug) {
-        router.push(
-          $path({
-            route: '/collections/[collectionSlug]',
-            routeParams: {
-              collectionSlug,
-            },
-          }),
-        );
-      } else {
-        // fallback to home if no collection
-        router.push($path({ route: '/' }));
-      }
+      router.push(
+        $path({
+          route: '/user/[username]/collection/[collectionSlug]',
+          routeParams: {
+            collectionSlug,
+            username: ownerUsername,
+          },
+        }),
+      );
     });
   };
 

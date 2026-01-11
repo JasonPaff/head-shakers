@@ -44,10 +44,26 @@ export const SearchResultCard = ({
   // Memoized entity URL based on type
   const entityUrl = useMemo(() => {
     if (entityType === 'collection') {
-      return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: result.slug } });
+      const collectionResult = result as CollectionSearchResult;
+      return $path({
+        route: '/user/[username]/collection/[collectionSlug]',
+        routeParams: {
+          collectionSlug: result.slug,
+          username: collectionResult.ownerUsername ?? '',
+        },
+      });
     }
 
-    return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: result.slug } });
+    const bobbleheadResult = result as BobbleheadSearchResult;
+    return $path({
+      route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+      routeParams: {
+        bobbleheadSlug: result.slug,
+        collectionSlug: bobbleheadResult.collectionSlug ?? '',
+        username: bobbleheadResult.ownerUsername ?? '',
+      },
+      searchParams: {},
+    });
   }, [entityType, result]);
 
   // Memoized entity-specific display data

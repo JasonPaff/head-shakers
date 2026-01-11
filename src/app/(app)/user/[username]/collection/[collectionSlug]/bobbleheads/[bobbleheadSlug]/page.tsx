@@ -5,39 +5,52 @@ import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Fragment, Suspense } from 'react';
 
-import type { PageProps } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
-
-import { BobbleheadFeatureCardAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-feature-card-async';
-import { BobbleheadHeaderAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async';
-import { BobbleheadNavigationAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async';
-import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
-import { BobbleheadPageClientWrapper } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper';
-import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
-import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
-import { BobbleheadNavigationSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-navigation-skeleton';
-import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
-import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
-import { Conditional } from '@/components/ui/conditional';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
-type ItemPageProps = PageProps;
+import type { PageProps } from './route-type';
+
+import { BobbleheadFeatureCardAsync } from './components/async/bobblehead-feature-card-async';
+import { BobbleheadHeaderAsync } from './components/async/bobblehead-header-async';
+import { BobbleheadNavigationAsync } from './components/async/bobblehead-navigation-async';
+import { BobbleheadPhotoGalleryAsync } from './components/async/bobblehead-photo-gallery-async';
+import { BobbleheadPageClientWrapper } from './components/bobblehead-page-client-wrapper';
+import { BobbleheadFeatureCardSkeleton } from './components/skeletons/bobblehead-feature-card-skeleton';
+import { BobbleheadHeaderSkeleton } from './components/skeletons/bobblehead-header-skeleton';
+import { BobbleheadNavigationSkeleton } from './components/skeletons/bobblehead-navigation-skeleton';
+import { BobbleheadPhotoGallerySkeleton } from './components/skeletons/bobblehead-photo-gallery-skeleton';
+import { Route } from './route-type';
+
+type BobbleheadPageProps = PageProps;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ bobbleheadSlug: string }>;
+  params: Promise<{ bobbleheadSlug: string; collectionSlug: string; username: string }>;
 }): Promise<Metadata> {
-  const { bobbleheadSlug } = await params;
+  const { bobbleheadSlug, collectionSlug, username } = await params;
+
+  // Resolve username to user
+  const user = await UsersFacade.getUserByUsername(username);
+
+  if (!user) {
+    return {
+      description: 'Bobblehead not found',
+      robots: 'noindex, nofollow',
+      title: 'Bobblehead Not Found | Head Shakers',
+    };
+  }
 
   // Fetch bobblehead SEO metadata
   const bobblehead = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
@@ -52,7 +65,11 @@ export async function generateMetadata({
   }
 
   // Generate canonical URL for this bobblehead
-  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug } })}`;
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+    routeParams: { bobbleheadSlug, collectionSlug, username },
+    searchParams: {},
+  })}`;
 
   // Prepare primary image URL for social sharing
   let productImage: string = FALLBACK_METADATA.imageUrl;
@@ -89,17 +106,38 @@ export async function generateMetadata({
 
 export const revalidate = 60;
 
-async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
-  const { bobbleheadSlug } = await routeParams;
-  const { collectionId } = await searchParams;
+async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
+  const { bobbleheadSlug, collectionSlug, username } = await routeParams;
   const currentUserId = await getUserIdAsync();
 
+  // Resolve username to user
+  const user = await UsersFacade.getUserByUsername(username);
+
+  if (!user) {
+    notFound();
+  }
+
+  // Get collection by slug and owner
+  const collection = await CollectionsFacade.getCollectionBySlug(collectionSlug, user.id);
+
+  if (!collection) {
+    notFound();
+  }
+
+  const collectionId = collection.id;
+
+  // Get the bobblehead
   const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
     bobbleheadSlug,
     currentUserId ?? undefined,
   );
 
   if (!basicBobblehead) {
+    notFound();
+  }
+
+  // Validate bobblehead belongs to this collection
+  if (basicBobblehead.collectionId !== collectionId) {
     notFound();
   }
 
@@ -142,7 +180,20 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
     seoMetadata ?
       generateBreadcrumbSchema([
         { name: 'Home', url: DEFAULT_SITE_METADATA.url },
-        { name: 'Bobbleheads', url: `${DEFAULT_SITE_METADATA.url}/bobbleheads` },
+        {
+          name: user.username ?? 'User',
+          url: `${DEFAULT_SITE_METADATA.url}${$path({
+            route: '/users/profile/[userId]',
+            routeParams: { userId: user.id },
+          })}`,
+        },
+        {
+          name: collection.name,
+          url: `${DEFAULT_SITE_METADATA.url}${$path({
+            route: '/user/[username]/collection/[collectionSlug]',
+            routeParams: { collectionSlug, username },
+          })}`,
+        },
         { name: seoMetadata.name }, // Current page - no URL
       ])
     : null;
@@ -168,36 +219,42 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         bobbleheadId={bobbleheadId}
         bobbleheadSlug={bobbleheadSlug}
         canDelete={canDelete}
-        collectionId={basicBobblehead.collectionId ?? undefined}
+        collectionId={collectionId}
+        collectionSlug={collectionSlug}
         isOwner={isOwner}
         likeData={likeData}
+        ownerUsername={username}
       >
         {/* Header Section */}
         <div className={'border-b border-border'}>
           <ContentLayout>
             <ErrorBoundary name={'bobblehead-header'}>
               <Suspense fallback={<BobbleheadHeaderSkeleton />}>
-                <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
+                <BobbleheadHeaderAsync
+                  bobbleheadId={bobbleheadId}
+                  collectionSlug={collectionSlug}
+                  ownerUsername={username}
+                />
               </Suspense>
             </ErrorBoundary>
           </ContentLayout>
         </div>
 
-        {/* Navigation Section */}
-        <Conditional isCondition={!!collectionId}>
-          <div className={'mt-4'}>
-            <ContentLayout>
-              <ErrorBoundary name={'bobblehead-navigation'}>
-                <Suspense fallback={<BobbleheadNavigationSkeleton />}>
-                  <BobbleheadNavigationAsync
-                    bobbleheadId={bobbleheadId}
-                    collectionId={collectionId ?? null}
-                  />
-                </Suspense>
-              </ErrorBoundary>
-            </ContentLayout>
-          </div>
-        </Conditional>
+        {/* Navigation Section - Always shown since we're in collection context */}
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <ErrorBoundary name={'bobblehead-navigation'}>
+              <Suspense fallback={<BobbleheadNavigationSkeleton />}>
+                <BobbleheadNavigationAsync
+                  bobbleheadId={bobbleheadId}
+                  collectionId={collectionId}
+                  collectionSlug={collectionSlug}
+                  ownerUsername={username}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          </ContentLayout>
+        </div>
 
         {/* Feature Card Section */}
         <div className={'mt-4'}>
@@ -231,24 +288,24 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         </div>
 
         {/* Bottom Navigation Section */}
-        <Conditional isCondition={!!collectionId}>
-          <div className={'mt-8'}>
-            <ContentLayout>
-              <ErrorBoundary name={'bobblehead-navigation'}>
-                <Suspense fallback={<BobbleheadNavigationSkeleton />}>
-                  <BobbleheadNavigationAsync
-                    bobbleheadId={bobbleheadId}
-                    collectionId={collectionId ?? null}
-                    isKeyboardNavigationEnabled={false}
-                  />
-                </Suspense>
-              </ErrorBoundary>
-            </ContentLayout>
-          </div>
-        </Conditional>
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <ErrorBoundary name={'bobblehead-navigation'}>
+              <Suspense fallback={<BobbleheadNavigationSkeleton />}>
+                <BobbleheadNavigationAsync
+                  bobbleheadId={bobbleheadId}
+                  collectionId={collectionId}
+                  collectionSlug={collectionSlug}
+                  isKeyboardNavigationEnabled={false}
+                  ownerUsername={username}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          </ContentLayout>
+        </div>
       </BobbleheadPageClientWrapper>
     </Fragment>
   );
 }
 
-export default withParamValidation(ItemPage, Route);
+export default withParamValidation(BobbleheadPage, Route);

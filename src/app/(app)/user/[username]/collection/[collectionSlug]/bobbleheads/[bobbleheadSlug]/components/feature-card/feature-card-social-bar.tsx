@@ -19,18 +19,22 @@ type FeatureCardSocialBarProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     bobbleheadId: string;
     bobbleheadSlug: string;
+    collectionSlug: string;
     commentCount?: number;
     isOwner?: boolean;
     likeData: ContentLikeData;
+    ownerUsername: string;
   };
 
 export const FeatureCardSocialBar = ({
   bobbleheadId,
   bobbleheadSlug,
   className,
+  collectionSlug,
   commentCount = 0,
   isOwner = false,
   likeData,
+  ownerUsername,
   testId,
   ...props
 }: FeatureCardSocialBarProps) => {
@@ -91,7 +95,11 @@ export const FeatureCardSocialBar = ({
         </Button>
 
         {/* Share Button */}
-        <BobbleheadShareMenu bobbleheadSlug={bobbleheadSlug}>
+        <BobbleheadShareMenu
+          bobbleheadSlug={bobbleheadSlug}
+          collectionSlug={collectionSlug}
+          ownerUsername={ownerUsername}
+        >
           <Button
             aria-label={'Share this bobblehead'}
             className={'gap-2 text-muted-foreground hover:text-foreground'}

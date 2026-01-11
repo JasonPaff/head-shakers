@@ -47,6 +47,7 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
       likeId: null | string;
     };
     name: null | string;
+    ownerUsername: string;
     slug: string;
   };
   isOwner: boolean;
@@ -55,12 +56,7 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   };
 }
 
-export const BobbleheadGalleryCard = ({
-  bobblehead,
-  isOwner,
-  navigationContext,
-  testId,
-}: BobbleheadGalleryCardProps) => {
+export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: BobbleheadGalleryCardProps) => {
   const cardTestId = testId || generateTestId('feature', 'bobblehead-card');
   const photoAreaTestId = generateTestId('feature', 'bobblehead-photo', 'clickable');
   const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'prev');
@@ -407,7 +403,11 @@ export const BobbleheadGalleryCard = ({
           />
 
           {/* Share */}
-          <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
+          <BobbleheadShareMenu
+            bobbleheadSlug={bobblehead.slug}
+            collectionSlug={bobblehead.collectionSlug ?? ''}
+            ownerUsername={bobblehead.ownerUsername}
+          >
             <Button
               className={'h-8 px-2'}
               onClick={(e) => {
@@ -427,11 +427,13 @@ export const BobbleheadGalleryCard = ({
           <Button asChild size={'sm'} testId={viewDetailsButtonTestId} variant={'outline'}>
             <Link
               href={$path({
-                route: '/bobbleheads/[bobbleheadSlug]',
-                routeParams: { bobbleheadSlug: bobblehead.slug },
-                searchParams: {
-                  collectionId: navigationContext?.collectionId,
+                route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+                routeParams: {
+                  bobbleheadSlug: bobblehead.slug,
+                  collectionSlug: bobblehead.collectionSlug ?? '',
+                  username: bobblehead.ownerUsername,
                 },
+                searchParams: {},
               })}
             >
               View Details
@@ -477,6 +479,7 @@ export const BobbleheadGalleryCard = ({
           collectionSlug={bobblehead.collectionSlug!}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
+          username={bobblehead.ownerUsername}
         />
       </Conditional>
     </Card>

@@ -10,9 +10,11 @@
 ## Input: Refined Request and File Discovery
 
 ### Refined Request
+
 Complete the comments functionality on the /user/[username]/collection/[collectionSlug] page by replacing the current CommentsPlaceholder component with the fully-functional CommentSectionAsync server component. Pass collection's ID as targetId and 'collection' as targetType. Remove CommentsPlaceholder after integration.
 
 ### Key Files Identified
+
 - **Modify**: page.tsx (add comments section)
 - **Delete**: comments-placeholder.tsx
 - **Import**: CommentSectionAsync, CommentSectionSkeleton, ErrorBoundary, ContentLayout

@@ -28,6 +28,7 @@ describe('CollectionShareMenu', () => {
   const defaultProps = {
     children: <button>Share</button>,
     collectionSlug: 'test-collection',
+    username: 'testuser123',
   };
 
   beforeEach(() => {

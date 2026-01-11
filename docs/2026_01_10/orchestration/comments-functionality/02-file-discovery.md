@@ -49,44 +49,44 @@ Output a comprehensive list of all discovered files with their categorization.
 
 #### Critical Priority (Must Modify)
 
-| File Path | Action Required |
-|-----------|-----------------|
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx` | Add Suspense-wrapped CommentSectionAsync |
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/components/comments-placeholder.tsx` | Remove/delete after integration |
+| File Path                                                                                       | Action Required                          |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/page.tsx`                            | Add Suspense-wrapped CommentSectionAsync |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/components/comments-placeholder.tsx` | Remove/delete after integration          |
 
 #### High Priority (Reference - Must Import)
 
-| File Path | Usage |
-|-----------|-------|
-| `src/components/feature/comments/async/comment-section-async.tsx` | Server component to integrate |
-| `src/components/feature/comments/skeletons/comment-section-skeleton.tsx` | Suspense fallback |
+| File Path                                                                | Usage                         |
+| ------------------------------------------------------------------------ | ----------------------------- |
+| `src/components/feature/comments/async/comment-section-async.tsx`        | Server component to integrate |
+| `src/components/feature/comments/skeletons/comment-section-skeleton.tsx` | Suspense fallback             |
 
 #### Medium Priority (Supporting Infrastructure)
 
-| File Path | Role |
-|-----------|------|
+| File Path                                                          | Role                         |
+| ------------------------------------------------------------------ | ---------------------------- |
 | `src/components/feature/comments/async/comment-section-client.tsx` | Client wrapper for mutations |
-| `src/components/feature/comments/comment-section.tsx` | Main orchestrator |
-| `src/components/feature/comments/comment-form.tsx` | Comment submission form |
-| `src/components/feature/comments/comment-list.tsx` | Thread rendering |
-| `src/components/feature/comments/comment-item.tsx` | Individual comment display |
-| `src/components/feature/comments/comment-edit-dialog.tsx` | Edit modal |
-| `src/components/feature/comments/comment-delete-dialog.tsx` | Delete confirmation |
-| `src/lib/actions/social/social.actions.ts` | Server actions |
-| `src/lib/facades/social/social.facade.ts` | Business logic |
-| `src/lib/validations/comment.validation.ts` | Zod schemas |
-| `src/lib/queries/social/social.query.ts` | Database queries |
-| `src/lib/constants/enums.ts` | CommentTargetType enum |
+| `src/components/feature/comments/comment-section.tsx`              | Main orchestrator            |
+| `src/components/feature/comments/comment-form.tsx`                 | Comment submission form      |
+| `src/components/feature/comments/comment-list.tsx`                 | Thread rendering             |
+| `src/components/feature/comments/comment-item.tsx`                 | Individual comment display   |
+| `src/components/feature/comments/comment-edit-dialog.tsx`          | Edit modal                   |
+| `src/components/feature/comments/comment-delete-dialog.tsx`        | Delete confirmation          |
+| `src/lib/actions/social/social.actions.ts`                         | Server actions               |
+| `src/lib/facades/social/social.facade.ts`                          | Business logic               |
+| `src/lib/validations/comment.validation.ts`                        | Zod schemas                  |
+| `src/lib/queries/social/social.query.ts`                           | Database queries             |
+| `src/lib/constants/enums.ts`                                       | CommentTargetType enum       |
 
 #### Low Priority (Optional/Reference)
 
-| File Path | Role |
-|-----------|------|
-| `src/components/ui/error-boundary/error-boundary.tsx` | Optional error handling wrapper |
-| `src/components/layout/content-layout.tsx` | Optional layout wrapper |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Reference pattern |
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/types.ts` | Type definitions |
-| `src/app/(app)/user/[username]/collection/[collectionSlug]/route-type.ts` | Route params |
+| File Path                                                                 | Role                            |
+| ------------------------------------------------------------------------- | ------------------------------- |
+| `src/components/ui/error-boundary/error-boundary.tsx`                     | Optional error handling wrapper |
+| `src/components/layout/content-layout.tsx`                                | Optional layout wrapper         |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`        | Reference pattern               |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/types.ts`      | Type definitions                |
+| `src/app/(app)/user/[username]/collection/[collectionSlug]/route-type.ts` | Route params                    |
 
 ## File Path Validation Results
 

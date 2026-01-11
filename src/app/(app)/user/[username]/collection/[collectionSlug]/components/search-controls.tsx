@@ -121,7 +121,10 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
           >
             <SelectValue placeholder={'Sort by...'} />
           </SelectTrigger>
-          <SelectContent data-slot={'search-controls-sort-content'} data-testid={`${componentTestId}-sort-content`}>
+          <SelectContent
+            data-slot={'search-controls-sort-content'}
+            data-testid={`${componentTestId}-sort-content`}
+          >
             {sortOptions.map((option) => (
               <SelectItem
                 data-testid={`${componentTestId}-sort-option-${option.value}`}

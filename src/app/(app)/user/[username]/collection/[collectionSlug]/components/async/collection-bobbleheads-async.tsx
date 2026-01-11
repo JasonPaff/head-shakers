@@ -45,8 +45,9 @@ export const CollectionBobbleheadsAsync = async ({
   const _hasBobbleheads = bobbleheads && bobbleheads.length > 0;
 
   // Transform to BobbleheadViewData[] with routing context
-  const bobbleheadData: Array<BobbleheadViewData> = _hasBobbleheads
-    ? bobbleheads.map((bobblehead) => ({
+  const bobbleheadData: Array<BobbleheadViewData> =
+    _hasBobbleheads ?
+      bobbleheads.map((bobblehead) => ({
         category: bobblehead.category,
         collectionSlug,
         condition: bobblehead.condition,

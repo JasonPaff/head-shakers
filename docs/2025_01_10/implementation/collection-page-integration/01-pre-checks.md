@@ -24,6 +24,7 @@
 ## Prerequisites Validation
 
 All prerequisites from existing codebase:
+
 - UsersFacade - exists
 - CollectionsFacade - exists
 - SocialFacade - exists

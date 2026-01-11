@@ -80,8 +80,13 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       data-slot={'trending-bobblehead-card'}
       data-testid={cardTestId}
       href={$path({
-        route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug: bobblehead.contentSlug ?? '' },
+        route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+        routeParams: {
+          bobbleheadSlug: bobblehead.contentSlug ?? '',
+          collectionSlug: bobblehead.collectionSlug ?? '',
+          username: bobblehead.ownerUsername ?? '',
+        },
+        searchParams: {},
       })}
     >
       {/* Image Section */}

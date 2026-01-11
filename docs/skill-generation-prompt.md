@@ -6,7 +6,7 @@ Use this prompt with an agentic AI to generate a comprehensive skills system for
 
 ## The Prompt
 
-```
+````
 You are a Claude Code skills architect. Your task is to analyze this codebase and create a comprehensive skills system that will guide AI assistants to follow the project's conventions, patterns, and best practices consistently.
 
 ## What Are Skills?
@@ -26,9 +26,10 @@ Structure:
 name: {skill-name}  # kebab-case identifier
 description: {One sentence describing what conventions this skill enforces and when to use it}
 ---
-```
+````
 
 Followed by markdown with:
+
 - **Purpose**: What this skill enforces
 - **Activation**: When to use this skill (file patterns, import patterns, task types)
 - **Workflow**: Steps to follow when the skill activates
@@ -37,9 +38,11 @@ Followed by markdown with:
 - **References**: Link to the detailed conventions file
 
 ### 2. References File (Complete Conventions)
+
 Located at: `.claude/skills/{skill-name}/references/{Skill-Name}-Conventions.md`
 
 This is the comprehensive conventions document containing:
+
 - File structure and organization
 - Naming conventions with examples
 - Code patterns with complete code samples
@@ -97,6 +100,7 @@ For each identified domain, extract:
 Based on analysis, create skills for these categories (where applicable):
 
 #### Frontend Skills
+
 - `react-coding-conventions` - Base React/TypeScript conventions
 - `client-components` - Interactive components with hooks and handlers
 - `server-components` - Async data fetching components
@@ -104,6 +108,7 @@ Based on analysis, create skills for these categories (where applicable):
 - `form-system` - Form handling patterns
 
 #### Backend Skills
+
 - `server-actions` - Server action patterns (if using)
 - `api-routes` - API route patterns (if using)
 - `facade-layer` or `service-layer` - Business logic layer
@@ -112,6 +117,7 @@ Based on analysis, create skills for these categories (where applicable):
 - `validation-schemas` - Validation schema patterns
 
 #### Infrastructure Skills
+
 - `caching` - Caching strategy and patterns
 - `{auth-provider}` - Authentication patterns
 - `{error-tracking}` - Error tracking integration (sentry-client, sentry-server)
@@ -119,6 +125,7 @@ Based on analysis, create skills for these categories (where applicable):
 - `{email-provider}` - Email patterns (resend-email, sendgrid-email, etc.)
 
 #### Testing Skills
+
 - `testing-base` - Shared testing conventions
 - `unit-testing` - Unit test patterns
 - `component-testing` - Component test patterns
@@ -200,10 +207,11 @@ This skill activates when:
 - **{Integration 2}**: {How this integrates}
 
 ## File Structure
+```
 
-```
 {directory structure showing where files go}
-```
+
+````
 
 ## File Naming
 
@@ -214,7 +222,7 @@ This skill activates when:
 
 ```typescript
 {Standard imports for this domain}
-```
+````
 
 ---
 
@@ -226,10 +234,14 @@ This skill activates when:
 
 ```typescript
 // Good example
-{code}
+{
+  code;
+}
 
 // Bad example (what to avoid)
-{code}
+{
+  code;
+}
 ```
 
 ---
@@ -255,6 +267,7 @@ This skill activates when:
 ### 2. {Anti-pattern title}
 
 {Continue...}
+
 ```
 
 ## Execution Instructions
@@ -302,14 +315,14 @@ Output each skill's SKILL.md and references file as you complete analysis of eac
 
 ## Skill Categories Quick Reference
 
-| Category | Skills to Consider |
-|----------|-------------------|
-| **Frontend** | react-coding-conventions, client-components, server-components, ui-components, form-system |
-| **Data** | database-schema, {orm}-orm, validation-schemas |
-| **Business Logic** | facade-layer/service-layer, server-actions/api-routes |
-| **Infrastructure** | caching, authentication, error-tracking, media-handling |
-| **Testing** | testing-base, unit-testing, component-testing, integration-testing, e2e-testing |
-| **Monitoring** | sentry-client, sentry-server (or equivalent) |
+| Category           | Skills to Consider                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| **Frontend**       | react-coding-conventions, client-components, server-components, ui-components, form-system |
+| **Data**           | database-schema, {orm}-orm, validation-schemas                                             |
+| **Business Logic** | facade-layer/service-layer, server-actions/api-routes                                      |
+| **Infrastructure** | caching, authentication, error-tracking, media-handling                                    |
+| **Testing**        | testing-base, unit-testing, component-testing, integration-testing, e2e-testing            |
+| **Monitoring**     | sentry-client, sentry-server (or equivalent)                                               |
 
 ## Extending with Agents and Commands
 
@@ -356,35 +369,41 @@ This agent handles files matching:
 ## Output Format
 
 When completing work, provide:
-
 ```
+
 ## RESULTS
 
 **Status**: success | failure
 
 **Skills Loaded**:
+
 - {skill1}: references/{Skill1}-Conventions.md
 - {skill2}: references/{Skill2}-Conventions.md
 
 **Files Modified**:
+
 - path/to/file.ts - Description
 
 **Conventions Applied**:
+
 - [List key conventions followed]
 
 **Validation Results**:
+
 - Command: {validation command}
   Result: PASS | FAIL
+
 ```
+
 ```
 
 ### Command Template (`.claude/commands/{command-name}.md`)
 
 ```markdown
 ---
-allowed-tools: {tool permissions}
-argument-hint: {usage hint}
-description: {What this command does}
+allowed-tools: { tool permissions }
+argument-hint: { usage hint }
+description: { What this command does }
 ---
 
 You are a {purpose} orchestrator.
@@ -392,9 +411,10 @@ You are a {purpose} orchestrator.
 @CLAUDE.MD
 
 ## Command Usage
-
 ```
+
 /{command-name} {arguments}
+
 ```
 
 ## Workflow

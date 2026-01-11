@@ -40,6 +40,7 @@ vi.mock('@/lib/utils/cloudinary.utils', () => ({
 
 describe('FeaturedBobbleheadDisplay', () => {
   const mockBobblehead: FeaturedBobblehead = {
+    collectionSlug: 'test-collection',
     contentId: '00000000-0000-0000-0000-000000000000',
     contentName: 'Vintage Baseball Player',
     contentSlug: 'bobblehead-1',
@@ -47,6 +48,7 @@ describe('FeaturedBobbleheadDisplay', () => {
     imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/bobbleheads/photo.jpg',
     likes: 125,
     owner: '@jason-paff',
+    ownerUsername: 'testuser123',
     viewCount: 1543,
   };
 

@@ -19,6 +19,7 @@ export type BobbleheadSearchResult = {
   category: null | string;
   characterName: null | string;
   collectionName: null | string;
+  collectionSlug: null | string;
   description: null | string;
   id: string;
   isPublic: boolean;
@@ -100,6 +101,7 @@ export class ContentSearchQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         collectionName: collections.name,
+        collectionSlug: collections.slug,
         description: bobbleheads.description,
         id: bobbleheads.id,
         isPublic: bobbleheads.isPublic,
@@ -518,6 +520,7 @@ export class ContentSearchQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         collectionName: collections.name,
+        collectionSlug: collections.slug,
         description: bobbleheads.description,
         id: bobbleheads.id,
         isPublic: bobbleheads.isPublic,
@@ -736,6 +739,7 @@ export class ContentSearchQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         collectionName: collections.name,
+        collectionSlug: collections.slug,
         description: bobbleheads.description,
         id: bobbleheads.id,
         isPublic: bobbleheads.isPublic,

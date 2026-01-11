@@ -15,9 +15,11 @@ interface BobbleheadPageClientWrapperProps {
   bobbleheadSlug: string;
   canDelete: boolean;
   children: ReactNode;
-  collectionId?: string;
+  collectionId: string;
+  collectionSlug: string;
   isOwner: boolean;
   likeData: ContentLikeData | null;
+  ownerUsername: string;
 }
 
 export function BobbleheadPageClientWrapper({
@@ -27,8 +29,10 @@ export function BobbleheadPageClientWrapper({
   canDelete,
   children,
   collectionId,
+  collectionSlug,
   isOwner,
   likeData,
+  ownerUsername,
 }: BobbleheadPageClientWrapperProps) {
   return (
     <BobbleheadViewTracker
@@ -45,13 +49,14 @@ export function BobbleheadPageClientWrapper({
                 bobblehead={bobblehead}
                 canDelete={canDelete}
                 collectionName={bobblehead.collectionName || ''}
-                collectionSlug={bobblehead.collectionSlug || ''}
+                collectionSlug={collectionSlug}
                 commentCount={bobblehead.commentCount ?? 0}
                 isLiked={likeData?.isLiked ?? false}
                 isOwner={isOwner}
                 likeCount={likeData?.likeCount ?? 0}
                 thumbnailUrl={bobblehead.photos?.[0]?.url}
                 title={bobblehead.name}
+                username={ownerUsername}
               />
             )}
 

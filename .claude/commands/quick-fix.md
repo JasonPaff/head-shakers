@@ -58,6 +58,7 @@ You are a quick-fix agent that handles trivial code changes. Your job is to asse
 - Could have unintended side effects
 
 **Progress Marker**: After completing assessment, output exactly one of:
+
 - `MILESTONE:COMPLEXITY_ASSESSED_TRIVIAL` - if issue is trivial and proceeding with fix
 - `MILESTONE:COMPLEXITY_ASSESSED_COMPLEX` - if issue is complex and bailing out
 
@@ -80,6 +81,7 @@ This issue is too complex for a quick fix.
 \`\`\`
 
 This will generate a proper implementation plan with:
+
 - Feature request refinement
 - Comprehensive file discovery
 - Step-by-step implementation plan with validation
@@ -97,8 +99,8 @@ This will generate a proper implementation plan with:
 2. Make the targeted fix
 3. **Progress Marker**: Output `MILESTONE:FIX_APPLIED`
 4. Run validation commands:
-    - `npm run lint:fix` (if JS/TS files modified)
-    - `npm run typecheck` (if TS files modified)
+   - `npm run lint:fix` (if JS/TS files modified)
+   - `npm run typecheck` (if TS files modified)
 5. **Progress Marker**: Output `MILESTONE:VALIDATION_COMPLETE`
 6. Document what was changed
 
@@ -112,12 +114,14 @@ Return a clear summary of the fix:
 **Issue**: {brief description of the issue}
 
 **Files Modified**:
+
 - `path/to/file.ts` - {description of change}
 
 **Changes Made**:
 {Concise description of what was changed and why}
 
 **Validation**:
+
 - ✅ Lint check passed
 - ✅ Type check passed
 
@@ -142,6 +146,7 @@ Return a clear summary of the fix:
 ## Examples of Trivial vs Complex
 
 **Trivial (OK for quick-fix)**:
+
 - Fix typo: "recieve" → "receive"
 - Update constant: `const MAX_ITEMS = 10` → `const MAX_ITEMS = 20`
 - Fix import path: `from './utlis'` → `from './utils'`
@@ -151,6 +156,7 @@ Return a clear summary of the fix:
 - Fix broken markdown link
 
 **Complex (use /plan-feature)**:
+
 - "Add validation to the form" - requires understanding form structure
 - "Fix the bug where users can't log in" - could have multiple causes
 - "Update the API response format" - affects multiple consumers
@@ -161,6 +167,7 @@ Return a clear summary of the fix:
 ## Integration Notes
 
 This command is designed for the AI DevOps pipeline:
+
 - Called via `/quick-fix "$TITLE - $DESCRIPTION"` from the pipeline
 - On success: Pipeline creates branch and PR
 - On bail-out: Pipeline should move ticket back and notify user

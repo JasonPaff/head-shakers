@@ -9,12 +9,10 @@ declare module "@@@next-typesafe-url" {
   import type { InferRoute, StaticRoute } from "next-typesafe-url";
 
   interface DynamicRouter {
-    "/bobbleheads/[bobbleheadSlug]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type").RouteType>;
-    "/bobbleheads/[bobbleheadSlug]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
-    "/collections/[collectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/(collection)/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
+    "/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]": InferRoute<import("./src/app/(app)/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]/route-type").RouteType>;
     "/user/[username]/collection/[collectionSlug]": InferRoute<import("./src/app/(app)/user/[username]/collection/[collectionSlug]/route-type").RouteType>;
     "/users/profile/[userId]": InferRoute<import("./src/app/(app)/users/profile/[userId]/route-type").RouteType>;
   }

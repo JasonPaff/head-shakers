@@ -53,6 +53,7 @@ export type BobbleheadRecord = typeof bobbleheads.$inferSelect;
 export type BobbleheadWithRelations = BobbleheadRecord & {
   collectionName: null | string;
   collectionSlug: null | string;
+  ownerUsername: null | string;
   photos: Array<typeof bobbleheadPhotos.$inferSelect>;
   tags: Array<typeof tags.$inferSelect>;
 };
@@ -320,14 +321,16 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection info
+    // get the bobblehead with collection info and owner username
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
+        ownerUsername: users.username,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(users, eq(bobbleheads.userId, users.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
@@ -364,6 +367,7 @@ export class BobbleheadsQuery extends BaseQuery {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
       collectionSlug: result[0].collection?.slug || null,
+      ownerUsername: result[0].ownerUsername || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
@@ -398,14 +402,16 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection info
+    // get the bobblehead with collection info and owner username
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
+        ownerUsername: users.username,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(users, eq(bobbleheads.userId, users.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
@@ -444,6 +450,7 @@ export class BobbleheadsQuery extends BaseQuery {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
       collectionSlug: result[0].collection?.slug || null,
+      ownerUsername: result[0].ownerUsername || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
@@ -727,6 +734,70 @@ export class BobbleheadsQuery extends BaseQuery {
       currentPosition,
       totalCount,
     };
+  }
+
+  /**
+   * Get the first (newest) bobblehead in a collection for loop-around navigation.
+   * Used when at the last bobblehead and navigating to "next".
+   */
+  static async getFirstBobbleheadInCollectionAsync(
+    collectionId: string,
+    context: QueryContext,
+  ): Promise<AdjacentBobblehead | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        photoUrl: bobbleheadPhotos.url,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.collectionId, collectionId),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
+        ),
+      )
+      .orderBy(desc(bobbleheads.createdAt))
+      .limit(1);
+
+    return result[0] ? { ...result[0].bobblehead, photoUrl: result[0].photoUrl } : null;
+  }
+
+  /**
+   * Get the last (oldest) bobblehead in a collection for loop-around navigation.
+   * Used when at the first bobblehead and navigating to "previous".
+   */
+  static async getLastBobbleheadInCollectionAsync(
+    collectionId: string,
+    context: QueryContext,
+  ): Promise<AdjacentBobblehead | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        photoUrl: bobbleheadPhotos.url,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.collectionId, collectionId),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
+        ),
+      )
+      .orderBy(asc(bobbleheads.createdAt))
+      .limit(1);
+
+    return result[0] ? { ...result[0].bobblehead, photoUrl: result[0].photoUrl } : null;
   }
 
   /**

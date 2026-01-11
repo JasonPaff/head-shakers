@@ -9,20 +9,20 @@
 
 ## Step Routing Table with Specialist Assignments
 
-| Step | Title | Specialist | Primary Domain | Files |
-|------|-------|------------|----------------|-------|
-| 1 | Update Route Types | validation-specialist | validation | `route-type.ts` |
-| 2 | Create Type Definitions | validation-specialist | validation | `types.ts` |
-| 3 | Create Async Data Components | server-component-specialist | server-components | `async/collection-header-async.tsx`, `async/collection-bobbleheads-async.tsx` |
-| 4 | Convert Page to Server Component | server-component-specialist | server-components | `page.tsx` |
-| 5 | Create Layout Switcher Component | client-component-specialist | client-components | `layout-switcher.tsx` |
-| 6 | Update Collection Header Component | client-component-specialist | client-components | `collection-header.tsx` |
-| 7 | Update Search Controls Component | client-component-specialist | client-components | `search-controls.tsx` |
-| 8 | Update Bobblehead Grid Component | client-component-specialist | client-components | `bobblehead-grid.tsx` |
-| 9 | Update Bobblehead Card Component | client-component-specialist | client-components | `bobblehead-card.tsx` |
-| 10 | Create Skeleton Components | server-component-specialist | server-components | `skeletons/*.tsx` |
-| 11 | Delete Mock Data | general-purpose | cleanup | `mock-data.ts` |
-| 12 | Final Integration Testing | test-executor | testing | All files |
+| Step | Title                              | Specialist                  | Primary Domain    | Files                                                                         |
+| ---- | ---------------------------------- | --------------------------- | ----------------- | ----------------------------------------------------------------------------- |
+| 1    | Update Route Types                 | validation-specialist       | validation        | `route-type.ts`                                                               |
+| 2    | Create Type Definitions            | validation-specialist       | validation        | `types.ts`                                                                    |
+| 3    | Create Async Data Components       | server-component-specialist | server-components | `async/collection-header-async.tsx`, `async/collection-bobbleheads-async.tsx` |
+| 4    | Convert Page to Server Component   | server-component-specialist | server-components | `page.tsx`                                                                    |
+| 5    | Create Layout Switcher Component   | client-component-specialist | client-components | `layout-switcher.tsx`                                                         |
+| 6    | Update Collection Header Component | client-component-specialist | client-components | `collection-header.tsx`                                                       |
+| 7    | Update Search Controls Component   | client-component-specialist | client-components | `search-controls.tsx`                                                         |
+| 8    | Update Bobblehead Grid Component   | client-component-specialist | client-components | `bobblehead-grid.tsx`                                                         |
+| 9    | Update Bobblehead Card Component   | client-component-specialist | client-components | `bobblehead-card.tsx`                                                         |
+| 10   | Create Skeleton Components         | server-component-specialist | server-components | `skeletons/*.tsx`                                                             |
+| 11   | Delete Mock Data                   | general-purpose             | cleanup           | `mock-data.ts`                                                                |
+| 12   | Final Integration Testing          | test-executor               | testing           | All files                                                                     |
 
 ## Todo List Created
 

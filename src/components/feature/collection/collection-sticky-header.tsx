@@ -24,6 +24,7 @@ interface CollectionStickyHeaderProps {
   isOwner: boolean;
   likeCount: number;
   title: string;
+  username: string;
 }
 
 export const CollectionStickyHeader = ({
@@ -36,6 +37,7 @@ export const CollectionStickyHeader = ({
   isOwner,
   likeCount,
   title,
+  username,
 }: CollectionStickyHeaderProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
@@ -68,7 +70,7 @@ export const CollectionStickyHeader = ({
               />
 
               {/* Share Menu */}
-              <CollectionShareMenu collectionSlug={collectionSlug}>
+              <CollectionShareMenu collectionSlug={collectionSlug} username={username}>
                 <Button aria-label={'Share collection'} size={'icon'} variant={'ghost'}>
                   <ShareIcon aria-hidden className={'size-4'} />
                 </Button>

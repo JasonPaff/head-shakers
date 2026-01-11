@@ -28,14 +28,18 @@ const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
 
 type BobbleheadFeatureCardProps = {
   bobblehead: BobbleheadWithRelations;
+  collectionSlug: string;
   isOwner?: boolean;
   likeData: ContentLikeData;
+  ownerUsername: string;
 };
 
 export const BobbleheadFeatureCard = ({
   bobblehead,
+  collectionSlug,
   isOwner = false,
   likeData,
+  ownerUsername,
 }: BobbleheadFeatureCardProps) => {
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useToggle();
   const [mainPhotoIndex, setMainPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
@@ -126,9 +130,11 @@ export const BobbleheadFeatureCard = ({
             <FeatureCardSocialBar
               bobbleheadId={bobblehead.id}
               bobbleheadSlug={bobblehead.slug}
+              collectionSlug={collectionSlug}
               commentCount={bobblehead.commentCount}
               isOwner={isOwner}
               likeData={likeData}
+              ownerUsername={ownerUsername}
             />
 
             <Separator />
@@ -156,9 +162,11 @@ export const BobbleheadFeatureCard = ({
         <FeatureCardSocialBar
           bobbleheadId={bobblehead.id}
           bobbleheadSlug={bobblehead.slug}
+          collectionSlug={collectionSlug}
           commentCount={bobblehead.commentCount}
           isOwner={isOwner}
           likeData={likeData}
+          ownerUsername={ownerUsername}
         />
 
         <Separator />
