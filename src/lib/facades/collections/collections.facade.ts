@@ -469,20 +469,6 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  private static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
-    // count featured bobbleheads
-    const featuredBobbleheads = collection.bobbleheads.filter((b) => b.isFeatured).length;
-
-    // find the most recent update
-    const lastUpdated = collection.updatedAt;
-
-    return {
-      featuredBobbleheads,
-      lastUpdated,
-      totalBobbleheads: collection.bobbleheads.length,
-    };
-  }
-
   /**
    * Compute metrics with view data included
    */
@@ -1231,5 +1217,19 @@ export class CollectionsFacade extends BaseFacade {
       };
       throw createFacadeError(context, error);
     }
+  }
+
+  private static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
+    // count featured bobbleheads
+    const featuredBobbleheads = collection.bobbleheads.filter((b) => b.isFeatured).length;
+
+    // find the most recent update
+    const lastUpdated = collection.updatedAt;
+
+    return {
+      featuredBobbleheads,
+      lastUpdated,
+      totalBobbleheads: collection.bobbleheads.length,
+    };
   }
 }
