@@ -109,10 +109,7 @@ const getContentLink = (report: SelectContentReportWithSlugs): null | string => 
         },
       });
     case 'user':
-      return $path({
-        route: '/users/profile/[userId]',
-        routeParams: { userId: report.targetId },
-      });
+      return null;
     default:
       return null;
   }

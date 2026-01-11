@@ -156,13 +156,6 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   // Generate Breadcrumb schema for navigation context
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: DEFAULT_SITE_METADATA.url },
-    {
-      name: user.username ?? 'User',
-      url: `${DEFAULT_SITE_METADATA.url}${$path({
-        route: '/users/profile/[userId]',
-        routeParams: { userId: user.id },
-      })}`,
-    },
     { name: seoData?.name || collection.name },
   ]);
 

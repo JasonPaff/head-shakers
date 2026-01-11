@@ -181,13 +181,6 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
       generateBreadcrumbSchema([
         { name: 'Home', url: DEFAULT_SITE_METADATA.url },
         {
-          name: user.username ?? 'User',
-          url: `${DEFAULT_SITE_METADATA.url}${$path({
-            route: '/users/profile/[userId]',
-            routeParams: { userId: user.id },
-          })}`,
-        },
-        {
           name: collection.name,
           url: `${DEFAULT_SITE_METADATA.url}${$path({
             route: '/user/[username]/collection/[collectionSlug]',

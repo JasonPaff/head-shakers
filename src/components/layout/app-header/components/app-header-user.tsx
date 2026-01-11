@@ -1,7 +1,7 @@
 'use client';
 
-import { SignInButton, SignUpButton, useAuth, UserButton, useUser } from '@clerk/nextjs';
-import { ShieldIcon, User } from 'lucide-react';
+import { SignInButton, SignUpButton, useAuth, UserButton } from '@clerk/nextjs';
+import { ShieldIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,6 @@ import { generateTestId } from '@/lib/test-ids';
 
 export const AppHeaderUser = () => {
   const { isLoaded, isSignedIn } = useAuth();
-  const { user } = useUser();
   const { isAdmin, isLoading: isAdminLoading, isModerator } = useAdminRole();
 
   const isShowAdminLink = !isAdminLoading && (isModerator || isAdmin);
@@ -22,25 +21,19 @@ export const AppHeaderUser = () => {
 
   if (isSignedIn) {
     const userMenuTestId = generateTestId('layout', 'user-avatar', 'button');
-    if (!user) return null;
 
     return (
       <div data-testid={userMenuTestId}>
         <UserButton>
-          <UserButton.MenuItems>
-            <UserButton.Link
-              href={$path({ route: '/users/profile/[userId]', routeParams: { userId: user.id } })}
-              label={'View Profile'}
-              labelIcon={<User aria-hidden size={16} />}
-            />
-            {isShowAdminLink && (
+          {isShowAdminLink && (
+            <UserButton.MenuItems>
               <UserButton.Link
                 href={$path({ route: '/admin' })}
                 label={'Admin Panel'}
                 labelIcon={<ShieldIcon aria-hidden size={16} />}
               />
-            )}
-          </UserButton.MenuItems>
+            </UserButton.MenuItems>
+          )}
         </UserButton>
       </div>
     );

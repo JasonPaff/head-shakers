@@ -13,8 +13,6 @@ import {
   ShareIcon,
   TwitterIcon,
 } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -65,13 +63,6 @@ export const CollectionHeader = ({
   const formattedDate = useMemo(() => {
     return formatShortDate(collection.lastUpdatedAt) ?? 'N/A';
   }, [collection.lastUpdatedAt]);
-
-  const collectorProfileUrl = useMemo(() => {
-    return $path({
-      route: '/users/profile/[userId]',
-      routeParams: { userId: collector.userId },
-    });
-  }, [collector.userId]);
 
   // 5. Utility functions
   const getInitials = (name: string): string => {
@@ -181,13 +172,9 @@ export const CollectionHeader = ({
             </Avatar>
             <span className={'text-sm text-muted-foreground'}>
               by{' '}
-              <Link
-                className={'font-medium text-foreground hover:underline'}
-                data-testid={`${headerTestId}-collector-link`}
-                href={collectorProfileUrl}
-              >
+              <span className={'font-medium text-foreground'} data-testid={`${headerTestId}-collector-name`}>
                 {_collectorDisplayName}
-              </Link>
+              </span>
             </span>
           </div>
 

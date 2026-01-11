@@ -145,10 +145,7 @@ export const FeaturedContentDisplay = ({
           },
           searchParams: {},
         })
-      : $path({
-          route: '/users/profile/[userId]',
-          routeParams: { userId: content.contentSlug },
-        });
+      : '#';
 
     return (
       <Card className={cardClasses} key={content.id}>
