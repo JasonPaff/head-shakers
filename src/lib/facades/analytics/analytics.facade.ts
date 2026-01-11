@@ -243,6 +243,31 @@ export const AnalyticsFacade = {
   },
 
   /**
+   * Get view trends over time with aggregation
+   */
+  async getViewTrends(
+    options: {
+      endDate?: Date;
+      groupBy?: 'day' | 'hour' | 'month' | 'week';
+      isIncludingAnonymous?: boolean;
+      startDate?: Date;
+      targetType?: 'bobblehead' | 'collection' | 'profile';
+    } = {},
+    dbInstance?: DatabaseExecutor,
+  ): Promise<
+    Array<{
+      averageViewDuration: null | number;
+      period: string;
+      uniqueViewers: number;
+      viewCount: number;
+    }>
+  > {
+    const context = { dbInstance: dbInstance };
+
+    return ViewAnalyticsQuery.getViewTrendsAsync(options, context);
+  },
+
+  /**
    * Get detailed view statistics for a target
    */
   async getViewStats(

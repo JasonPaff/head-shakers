@@ -43,16 +43,6 @@ import { createFacadeError } from '@/lib/utils/error-builders';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
-export interface CollectionDashboardData {
-  coverImageUrl: null | string;
-  description: null | string;
-  id: string;
-  isPublic: boolean;
-  metrics: CollectionMetrics;
-  name: string;
-  slug: string;
-}
-
 export interface CollectionMetrics {
   featuredBobbleheads: number;
   lastUpdated: Date;
@@ -479,7 +469,7 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
+  private static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
     // count featured bobbleheads
     const featuredBobbleheads = collection.bobbleheads.filter((b) => b.isFeatured).length;
 
@@ -1188,20 +1178,6 @@ export class CollectionsFacade extends BaseFacade {
       };
       throw createFacadeError(context, error);
     }
-  }
-
-  static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {
-    const metrics = this.computeMetrics(collection);
-
-    return {
-      coverImageUrl: collection.coverImageUrl,
-      description: collection.description,
-      id: collection.id,
-      isPublic: collection.isPublic,
-      metrics,
-      name: collection.name,
-      slug: collection.slug,
-    };
   }
 
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {
