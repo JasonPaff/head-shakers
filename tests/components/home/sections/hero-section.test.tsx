@@ -156,7 +156,7 @@ describe('HeroSection', () => {
 
     it('should render my collection button for authenticated users', () => {
       mockSignedInUser();
-      render(<HeroSection />);
+      render(<HeroSection username={'test-user'} />);
 
       expect(screen.getByRole('link', { name: /My Collection/i })).toBeInTheDocument();
     });

@@ -149,7 +149,7 @@ describe('JoinCommunitySection', () => {
   describe('Auth-Aware CTAs - Signed In', () => {
     it('should render my collection button for authenticated users', () => {
       mockSignedInUser();
-      render(<JoinCommunitySection />);
+      render(<JoinCommunitySection username={'test-user'} />);
 
       expect(screen.getByRole('link', { name: /My Collection/i })).toBeInTheDocument();
     });
