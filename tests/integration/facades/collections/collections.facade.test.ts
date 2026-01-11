@@ -54,6 +54,9 @@ vi.mock('@/lib/services/cache.service', () => ({
       user: <T>(callback: () => T): T => callback(),
       withRelations: <T>(callback: () => T): T => callback(),
     },
+    users: {
+      profile: <T>(callback: () => T): T => callback(),
+    },
   },
 }));
 
