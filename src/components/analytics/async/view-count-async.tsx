@@ -22,20 +22,16 @@ export async function ViewCountAsync({
 }: ViewCountAsyncProps) {
   let formattedCount = '--';
 
-  try {
-    const currentUserId = (await getUserIdAsync()) || undefined;
+  const currentUserId = await getUserIdAsync();
 
-    const viewCount = await ViewTrackingFacade.getViewCountAsync(
-      targetType,
-      targetId,
-      shouldIncludeAnonymous,
-      currentUserId,
-    );
+  const viewCount = await ViewTrackingFacade.getViewCountAsync(
+    targetType,
+    targetId,
+    shouldIncludeAnonymous,
+    currentUserId ?? undefined,
+  );
 
-    formattedCount = viewCount.toLocaleString();
-  } catch (error) {
-    console.warn('Failed to fetch view count:', error);
-  }
+  formattedCount = viewCount.toLocaleString();
 
   return <span>{isShowingLabel ? `${formattedCount} views` : formattedCount}</span>;
 }

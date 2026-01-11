@@ -20,13 +20,6 @@ import type { CollectionForUpsert } from '../collection-upsert-dialog.types';
 
 export type CollectionCreatedResult = { id: string; name: string; slug: string };
 
-export interface UseCollectionUpsertFormLabels {
-  description: string;
-  submitButton: string;
-  submitButtonLoading: string;
-  title: string;
-}
-
 export interface UseCollectionUpsertFormOptions {
   collection?: CollectionForUpsert;
   onSuccess?: (result: CollectionCreatedResult) => void;
