@@ -2,6 +2,8 @@ import type { VariantProps } from 'class-variance-authority';
 
 import { cva } from 'class-variance-authority';
 import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import { useRouter } from 'next/navigation';
 
 import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
@@ -45,6 +47,7 @@ export type BobbleheadCardProps = {
   onEdit: (id: string) => void;
   onFeatureToggle: (id: string) => void;
   onSelectionChange: (id: string, checked: boolean) => void;
+  username: string;
 };
 
 type ConditionVariantProps = VariantProps<typeof conditionVariants>;
@@ -58,7 +61,10 @@ export const BobbleheadCard = ({
   onEdit,
   onFeatureToggle,
   onSelectionChange,
+  username,
 }: BobbleheadCardProps) => {
+  const router = useRouter();
+
   const handleCheckboxChange = (checked: boolean) => {
     onSelectionChange(bobblehead.id, checked);
   };
@@ -78,6 +84,18 @@ export const BobbleheadCard = ({
   const handleCardClick = () => {
     if (isSelectionMode) {
       onSelectionChange(bobblehead.id, !isSelected);
+    } else {
+      router.push(
+        $path({
+          route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+          routeParams: {
+            bobbleheadSlug: bobblehead.slug,
+            collectionSlug: bobblehead.collectionSlug,
+            username,
+          },
+          searchParams: {},
+        }),
+      );
     }
   };
 

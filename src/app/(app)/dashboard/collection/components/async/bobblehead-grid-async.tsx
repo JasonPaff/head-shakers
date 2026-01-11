@@ -3,6 +3,7 @@ import 'server-only';
 import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
 import { ENUMS } from '@/lib/constants';
 import { BobbleheadsDashboardFacade } from '@/lib/facades/bobbleheads/bobbleheads-dashboard.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
@@ -23,7 +24,8 @@ export async function BobbleheadGridAsync() {
   const pageSize = collectionDashboardSearchParamsCache.get('pageSize');
   const search = collectionDashboardSearchParamsCache.get('search');
   const sortBy = collectionDashboardSearchParamsCache.get('sortBy');
-  const preferences = await getUserPreferences();
+  const [preferences, user] = await Promise.all([getUserPreferences(), UsersFacade.getUserByIdAsync(userId)]);
+  const username = user?.username ?? '';
 
   if (!collectionSlug) {
     return (
@@ -31,6 +33,7 @@ export async function BobbleheadGridAsync() {
         bobbleheads={[]}
         categories={[]}
         conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+        username={username}
         userPreferences={preferences}
       />
     );
@@ -55,6 +58,7 @@ export async function BobbleheadGridAsync() {
       categories={categories}
       conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
       pagination={data.pagination}
+      username={username}
       userPreferences={preferences}
     />
   );

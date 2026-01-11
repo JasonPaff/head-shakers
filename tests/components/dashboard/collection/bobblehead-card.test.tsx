@@ -23,6 +23,7 @@ describe('BobbleheadCard', () => {
     onEdit: vi.fn(),
     onFeatureToggle: vi.fn(),
     onSelectionChange: vi.fn(),
+    username: 'testuser123',
   };
 
   describe('Display Tests', () => {

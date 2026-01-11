@@ -39,6 +39,7 @@ type BobbleheadGridDisplayProps = {
     totalCount: number;
     totalPages: number;
   };
+  username: string;
   userPreferences: UserPreferences;
 };
 
@@ -47,6 +48,7 @@ export const BobbleheadGridDisplay = ({
   categories,
   conditions,
   pagination,
+  username,
   userPreferences,
 }: BobbleheadGridDisplayProps) => {
   const router = useRouter();
@@ -293,6 +295,7 @@ export const BobbleheadGridDisplay = ({
               onEdit={handleEditBobblehead}
               onFeatureToggle={handleFeatureToggle}
               onSelectionChange={handleSelectionChange}
+              username={username}
             />
           ))}
         </Conditional>

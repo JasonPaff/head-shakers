@@ -10,6 +10,7 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadDashboardListRecord = BobbleheadListRecord & {
   collectionId: string;
+  collectionSlug: string;
   commentCount: number;
   featurePhoto?: null | string;
   likeCount: number;

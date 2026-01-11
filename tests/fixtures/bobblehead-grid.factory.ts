@@ -32,6 +32,7 @@ export function createMockBobbleheadDashboardRecord(
     category: 'Sports',
     characterName: 'Baseball Player',
     collectionId: 'collection-1',
+    collectionSlug: 'my-collection',
     commentCount: 0,
     condition: 'mint',
     customFields: null,

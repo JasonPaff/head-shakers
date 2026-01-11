@@ -81,6 +81,7 @@ describe('BobbleheadGridDisplay', () => {
     categories: ['Sports', 'Movies', 'Music'],
     conditions: ['mint', 'good', 'fair', 'poor'],
     pagination: createMockPagination(1, 24, 100),
+    username: 'testuser123',
     userPreferences: defaultUserPreferences,
   };
 
