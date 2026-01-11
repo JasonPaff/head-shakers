@@ -11,10 +11,20 @@ import { AppHeaderSearch } from '@/components/layout/app-header/components/app-h
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
 import { AuthContent } from '@/components/ui/auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { generateTestId } from '@/lib/test-ids';
+import { getUserIdAsync } from '@/utils/auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
-export const AppHeader = () => {
+export const AppHeader = async () => {
+  const userId = await getUserIdAsync();
+
+  let username = '';
+  if (userId) {
+    const user = await UsersFacade.getUserByIdAsync(userId);
+    username = user?.username ?? '';
+  }
+
   return (
     <header
       className={'sticky top-0 z-50 w-full border-b bg-background'}
@@ -70,16 +80,16 @@ export const AppHeader = () => {
           </div>
 
           {/* Auth Nav Menus (Collections) - Hidden on mobile and tablet, shown on desktop */}
-          <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>
+          <AuthContent loadingSkeleton={<Skeleton className={'h-8.75 w-7'} />}>
             <div className={'hidden lg:block'}>
-              <AppHeaderAuthNavMenu />
+              <AppHeaderAuthNavMenu username={username} />
             </div>
           </AuthContent>
 
           {/* Auth Nav Menus - Show on tablet only when search is below */}
-          <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>
+          <AuthContent loadingSkeleton={<Skeleton className={'h-8.75 w-7'} />}>
             <div className={'hidden items-center gap-2 md:flex lg:hidden'}>
-              <AppHeaderAuthNavMenu />
+              <AppHeaderAuthNavMenu username={username} />
             </div>
           </AuthContent>
 
