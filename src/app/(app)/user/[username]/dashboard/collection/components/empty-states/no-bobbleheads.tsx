@@ -3,7 +3,7 @@
 import { BoxIcon, PlusIcon } from 'lucide-react';
 import { useQueryStates } from 'nuqs';
 
-import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
+import { collectionDashboardParsers } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { Button } from '@/components/ui/button';
 
 export const NoBobbleheads = () => {

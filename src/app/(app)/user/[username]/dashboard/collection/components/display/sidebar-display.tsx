@@ -7,7 +7,7 @@ import type { CollectionCreatedResult } from '@/components/feature/collections/h
 import type { CollectionSortOption, UserPreferences } from '@/hooks/use-user-preferences';
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
-import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
+import { collectionDashboardParsers } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Conditional } from '@/components/ui/conditional';

@@ -9,7 +9,7 @@ export default function BobbleheadNotFound() {
       <div className={'text-center'}>
         <h1 className={'mb-4 text-2xl font-bold text-foreground'}>Bobblehead Not Found</h1>
         <Button asChild>
-          <Link href={$path({ route: '/dashboard/collection' })}>Back to Collections</Link>
+          <Link href={$path({ route: '/browse' })}>Browse Collections</Link>
         </Button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { SidebarCollectionList } from '@/app/(app)/dashboard/collection/components/sidebar/sidebar-collection-list';
+import { SidebarCollectionList } from '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-collection-list';
 
 import { render, screen } from '../../../setup/test-utils';
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { NoCollections } from '@/app/(app)/dashboard/collection/components/empty-states/no-collections';
+import { NoCollections } from '@/app/(app)/user/[username]/dashboard/collection/components/empty-states/no-collections';
 
 import { render, screen } from '../../../setup/test-utils';
 

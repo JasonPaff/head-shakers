@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { BulkActionsBar } from '@/app/(app)/dashboard/collection/components/main/bulk-actions-bar';
+import { BulkActionsBar } from '@/app/(app)/user/[username]/dashboard/collection/components/main/bulk-actions-bar';
 
 import { render, screen } from '../../../setup/test-utils';
 

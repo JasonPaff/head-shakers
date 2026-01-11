@@ -16,7 +16,7 @@ vi.mock('nuqs/server', () => ({
 }));
 
 // Mock route-type BEFORE importing the component to avoid server-only import issues
-vi.mock('@/app/(app)/dashboard/collection/(collection)/route-type', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/(collection)/route-type', () => ({
   collectionDashboardParsers: {
     add: {},
     category: {},
@@ -60,7 +60,7 @@ vi.mock('@/lib/actions/bobbleheads/bobbleheads.actions');
 
 import type { UserPreferences } from '@/hooks/use-user-preferences';
 
-import { BobbleheadGridDisplay } from '@/app/(app)/dashboard/collection/components/display/bobblehead-grid-display';
+import { BobbleheadGridDisplay } from '@/app/(app)/user/[username]/dashboard/collection/components/display/bobblehead-grid-display';
 
 import {
   createMockBobbleheadDashboardRecords,

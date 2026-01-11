@@ -23,6 +23,9 @@ const FEATURED_FILTER_OPTIONS = ['all', 'featured', 'not-featured'] as const;
 const CONDITION_FILTER_OPTIONS = ['all', ...ENUMS.BOBBLEHEAD.CONDITION] as const;
 
 export const Route = {
+  routeParams: z.object({
+    username: z.string().min(1),
+  }),
   searchParams: z.object({
     add: z.coerce.boolean().optional().default(false),
     category: z.string().optional().default('all'),

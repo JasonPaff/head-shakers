@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { BobbleheadGrid } from '@/app/(app)/dashboard/collection/components/main/bobblehead-grid';
+import { BobbleheadGrid } from '@/app/(app)/user/[username]/dashboard/collection/components/main/bobblehead-grid';
 
 import { render, screen } from '../../../setup/test-utils';
 

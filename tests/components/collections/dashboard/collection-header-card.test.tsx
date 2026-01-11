@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { CollectionHeaderCard } from '@/app/(app)/dashboard/collection/components/main/collection-header-card';
+import { CollectionHeaderCard } from '@/app/(app)/user/[username]/dashboard/collection/components/main/collection-header-card';
 
 import { createMockCollectionHeader } from '../../../fixtures/collection-header.factory';
 import { render, screen } from '../../../setup/test-utils';

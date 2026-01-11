@@ -14,7 +14,11 @@ import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 
-export const HeroSection = () => {
+interface HeroSectionProps {
+  username?: null | string;
+}
+
+export const HeroSection = ({ username }: HeroSectionProps) => {
   return (
     <section
       className={`relative overflow-hidden bg-gradient-to-b from-orange-50 via-white to-orange-50/50
@@ -100,20 +104,27 @@ export const HeroSection = () => {
                 }
                 loadingSkeleton={<Skeleton className={'h-11 w-52 rounded-md'} />}
               >
-                <Button
-                  asChild
-                  className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
-                    font-semibold text-primary-foreground shadow-lg shadow-primary/25
-                    hover:from-orange-600 hover:to-amber-600`}
-                  size={'lg'}
-                >
-                  <Link href={$path({ route: '/dashboard/collection' })}>
-                    <span>My Collection</span>
-                    <ArrowRightIcon
-                      className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
-                    />
-                  </Link>
-                </Button>
+                {username && (
+                  <Button
+                    asChild
+                    className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                      font-semibold text-primary-foreground shadow-lg shadow-primary/25
+                      hover:from-orange-600 hover:to-amber-600`}
+                    size={'lg'}
+                  >
+                    <Link
+                      href={$path({
+                        route: '/user/[username]/dashboard/collection',
+                        routeParams: { username },
+                      })}
+                    >
+                      <span>My Collection</span>
+                      <ArrowRightIcon
+                        className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+                      />
+                    </Link>
+                  </Button>
+                )}
               </AuthContent>
 
               <Button

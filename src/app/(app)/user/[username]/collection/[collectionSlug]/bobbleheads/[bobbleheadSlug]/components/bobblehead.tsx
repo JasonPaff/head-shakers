@@ -51,7 +51,6 @@ export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }
             collectionSlug={collectionSlug}
             currentUserId={currentUserId}
             isOwner={isOwner}
-            likeData={likeData}
             ownerUsername={ownerUsername}
           />
         </ContentLayout>

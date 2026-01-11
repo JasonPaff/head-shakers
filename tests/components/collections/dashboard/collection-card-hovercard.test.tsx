@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CollectionHoverCardContent } from '@/app/(app)/dashboard/collection/components/sidebar/cards/collection-card-hovercard';
+import { CollectionHoverCardContent } from '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/cards/collection-card-hovercard';
 import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card';
 
 import {

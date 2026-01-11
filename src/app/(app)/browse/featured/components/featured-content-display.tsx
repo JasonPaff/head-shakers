@@ -1,6 +1,6 @@
 'use client';
 
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import { SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
 import {
   CalendarIcon,
   EyeIcon,
@@ -107,6 +107,7 @@ export const FeaturedContentDisplay = ({
 }: FeaturedContentDisplayProps) => {
   const [activeTab, setActiveTab] = useState('all');
   const { execute: incrementViewCount } = useServerAction(incrementFeaturedViewCountAction);
+  const { user } = useUser();
 
   const getAllFeaturedContent = () => {
     return [
@@ -316,14 +317,31 @@ export const FeaturedContentDisplay = ({
               </div>
             }
           >
-            <Button asChild>
-              <Link href={$path({ route: '/dashboard/collection' })}>Create Collection</Link>
-            </Button>
-            <Button asChild variant={'outline'}>
-              <Link href={$path({ route: '/dashboard/collection', searchParams: { add: true } })}>
-                Add Bobblehead
-              </Link>
-            </Button>
+            {user?.username && (
+              <Fragment>
+                <Button asChild>
+                  <Link
+                    href={$path({
+                      route: '/user/[username]/dashboard/collection',
+                      routeParams: { username: user.username },
+                    })}
+                  >
+                    Create Collection
+                  </Link>
+                </Button>
+                <Button asChild variant={'outline'}>
+                  <Link
+                    href={$path({
+                      route: '/user/[username]/dashboard/collection',
+                      routeParams: { username: user.username },
+                      searchParams: { add: true },
+                    })}
+                  >
+                    Add Bobblehead
+                  </Link>
+                </Button>
+              </Fragment>
+            )}
           </AuthContent>
         </div>
       </section>

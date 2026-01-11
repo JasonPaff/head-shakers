@@ -14,8 +14,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Mock server-only to allow importing server components in tests
 vi.mock('server-only', () => ({}));
 
-import { CollectionHeaderAsync } from '@/app/(app)/dashboard/collection/components/async/collection-header-async';
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
+import { CollectionHeaderAsync } from '@/app/(app)/user/[username]/dashboard/collection/components/async/collection-header-async';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { createTestCollection } from '../../fixtures/collection.factory';
@@ -65,7 +65,7 @@ vi.mock('@/lib/utils/redis-client', () => ({
 }));
 
 // Mock route-type search params cache
-vi.mock('@/app/(app)/dashboard/collection/route-type', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/route-type', () => ({
   collectionDashboardSearchParamsCache: {
     get: vi.fn(),
   },
@@ -77,11 +77,14 @@ vi.mock('@/utils/auth-utils', () => ({
 }));
 
 // Mock the display component to simplify testing
-vi.mock('@/app/(app)/dashboard/collection/(collection)/components/display/collection-header-display', () => ({
-  CollectionHeaderDisplay: ({ collection }: { collection: unknown }) => (
-    <div data-testid={'collection-header-display'}>{JSON.stringify(collection)}</div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/(collection)/components/display/collection-header-display',
+  () => ({
+    CollectionHeaderDisplay: ({ collection }: { collection: unknown }) => (
+      <div data-testid={'collection-header-display'}>{JSON.stringify(collection)}</div>
+    ),
+  }),
+);
 
 describe('CollectionHeaderAsync', () => {
   let testUserId: string;

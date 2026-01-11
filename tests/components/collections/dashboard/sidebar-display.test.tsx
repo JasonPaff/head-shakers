@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
-import { SidebarDisplay } from '@/app/(app)/dashboard/collection/components/display/sidebar-display';
+import { SidebarDisplay } from '@/app/(app)/user/[username]/dashboard/collection/components/display/sidebar-display';
 
 import {
   createMockCollectionDashboardRecord,
@@ -21,7 +21,7 @@ vi.mock('nuqs', () => ({
 }));
 
 // Mock child components
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-header', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-header', () => ({
   SidebarHeader: ({ onCreateClick }: { onCreateClick?: () => void }): JSX.Element => (
     <div data-testid={'sidebar-header'}>
       <h2>Collections</h2>
@@ -30,7 +30,7 @@ vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-header', ()
   ),
 }));
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-search', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-search', () => ({
   SidebarSearch: ({
     onSearchChange,
     onSearchClear,
@@ -63,37 +63,49 @@ vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-search', ()
   ),
 }));
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-collection-list', () => ({
-  SidebarCollectionList: ({ children }: { children: ReactNode }): JSX.Element => (
-    <div data-testid={'sidebar-collection-list'}>{children}</div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-collection-list',
+  () => ({
+    SidebarCollectionList: ({ children }: { children: ReactNode }): JSX.Element => (
+      <div data-testid={'sidebar-collection-list'}>{children}</div>
+    ),
+  }),
+);
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/cards/collection-card-compact', () => ({
-  CollectionCardCompact: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
-    <div data-testid={`collection-card-${collection.id}`}>
-      <span>{collection.name}</span>
-    </div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/cards/collection-card-compact',
+  () => ({
+    CollectionCardCompact: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
+      <div data-testid={`collection-card-${collection.id}`}>
+        <span>{collection.name}</span>
+      </div>
+    ),
+  }),
+);
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/cards/collection-card-cover', () => ({
-  CollectionCardCover: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
-    <div data-testid={`collection-card-cover-${collection.id}`}>
-      <span>{collection.name}</span>
-    </div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/cards/collection-card-cover',
+  () => ({
+    CollectionCardCover: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
+      <div data-testid={`collection-card-cover-${collection.id}`}>
+        <span>{collection.name}</span>
+      </div>
+    ),
+  }),
+);
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/cards/collection-card-detailed', () => ({
-  CollectionCardDetailed: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
-    <div data-testid={`collection-card-detailed-${collection.id}`}>
-      <span>{collection.name}</span>
-    </div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/cards/collection-card-detailed',
+  () => ({
+    CollectionCardDetailed: ({ collection }: { collection: CollectionDashboardListRecord }): JSX.Element => (
+      <div data-testid={`collection-card-detailed-${collection.id}`}>
+        <span>{collection.name}</span>
+      </div>
+    ),
+  }),
+);
 
-vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-footer', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-footer', () => ({
   SidebarFooter: ({ totalCount }: { totalCount: number }): JSX.Element => (
     <div data-testid={'sidebar-footer'}>
       <span>{totalCount} collections</span>
@@ -101,7 +113,7 @@ vi.mock('@/app/(app)/dashboard/collection/components/sidebar/sidebar-footer', ()
   ),
 }));
 
-vi.mock('@/app/(app)/dashboard/collection/components/empty-states/no-collections', () => ({
+vi.mock('@/app/(app)/user/[username]/dashboard/collection/components/empty-states/no-collections', () => ({
   NoCollections: ({ onCreateClick }: { onCreateClick?: () => void }): JSX.Element => (
     <div data-testid={'no-collections-empty-state'}>
       <p>No collections yet</p>
@@ -110,14 +122,17 @@ vi.mock('@/app/(app)/dashboard/collection/components/empty-states/no-collections
   ),
 }));
 
-vi.mock('@/app/(app)/dashboard/collection/components/empty-states/no-filtered-collections', () => ({
-  NoFilteredCollections: ({ onClearSearch }: { onClearSearch: () => void }): JSX.Element => (
-    <div data-testid={'no-filtered-collections-empty-state'}>
-      <p>No collections match your search</p>
-      <button onClick={onClearSearch}>Clear search</button>
-    </div>
-  ),
-}));
+vi.mock(
+  '@/app/(app)/user/[username]/dashboard/collection/components/empty-states/no-filtered-collections',
+  () => ({
+    NoFilteredCollections: ({ onClearSearch }: { onClearSearch: () => void }): JSX.Element => (
+      <div data-testid={'no-filtered-collections-empty-state'}>
+        <p>No collections match your search</p>
+        <button onClick={onClearSearch}>Clear search</button>
+      </div>
+    ),
+  }),
+);
 
 // Mock server actions
 vi.mock('@/lib/actions/collections/collections.actions', () => ({

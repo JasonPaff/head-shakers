@@ -1,16 +1,12 @@
 import 'server-only';
-import { CalendarIcon, HeartIcon, ShareIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { Fragment, Suspense } from 'react';
 
-import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
-import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
-import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeIconButton } from '@/components/ui/like-button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { CollectionBreadcrumb } from './collection-breadcrumb';
@@ -20,7 +16,6 @@ interface BobbleheadHeaderProps {
   collectionSlug: string;
   currentUserId: null | string;
   isOwner?: boolean;
-  likeData: ContentLikeData;
   ownerUsername: string;
 }
 
@@ -29,7 +24,6 @@ export const BobbleheadHeader = ({
   collectionSlug,
   currentUserId,
   isOwner = false,
-  likeData,
   ownerUsername,
 }: BobbleheadHeaderProps) => {
   return (
@@ -47,18 +41,6 @@ export const BobbleheadHeader = ({
 
         {/* Action Buttons - Right Side */}
         <div className={'flex shrink-0 items-center gap-2'}>
-          {/* Share Menu */}
-          <BobbleheadShareMenu
-            bobbleheadSlug={bobblehead.slug}
-            collectionSlug={collectionSlug}
-            ownerUsername={ownerUsername}
-          >
-            <Button size={'sm'} variant={'outline'}>
-              <ShareIcon aria-hidden className={'mr-2 size-4'} />
-              Share
-            </Button>
-          </BobbleheadShareMenu>
-
           {/* Non-Owner Actions */}
           <Conditional isCondition={!isOwner && !!currentUserId}>
             <ReportButton targetId={bobblehead.id} targetType={'bobblehead'} variant={'outline'} />
@@ -73,41 +55,21 @@ export const BobbleheadHeader = ({
           <p className={'text-lg text-pretty text-muted-foreground'}>{bobblehead.description}</p>
         </div>
 
-        {/* Metadata & Like Button */}
-        <div className={'flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground'}>
-          {/* Like Button */}
-          <Conditional isCondition={!!likeData}>
-            <LikeIconButton
-              initialLikeCount={likeData?.likeCount ?? bobblehead.likeCount}
-              isInitiallyLiked={likeData?.isLiked ?? false}
-              targetId={bobblehead.id}
-              targetType={'bobblehead'}
-            />
-          </Conditional>
+        {/* Metadata */}
+        <div className={'flex items-center gap-4 text-sm text-muted-foreground'}>
+          {/* Creation Date */}
+          <div className={'flex items-center gap-2'}>
+            <CalendarIcon aria-hidden className={'size-4'} />
+            {/*Added {bobblehead.createdAt.toLocaleDateString()}*/}
+          </div>
 
-          {/* Fallback static display if no like data */}
-          <Conditional isCondition={!likeData}>
-            <div className={'flex items-center gap-2'}>
-              <HeartIcon aria-hidden className={'size-4'} />
-              {bobblehead.likeCount} likes
-            </div>
-          </Conditional>
-
-          <div className={'flex items-center gap-4'}>
-            {/* Creation Date */}
-            <div className={'flex items-center gap-2'}>
-              <CalendarIcon aria-hidden className={'size-4'} />
-              {/*Added {bobblehead.createdAt.toLocaleDateString()}*/}
-            </div>
-
-            {/* View Count */}
-            <div className={'flex items-center gap-2'}>
-              <span className={'text-sm font-medium'}>
-                <Suspense fallback={<Skeleton className={'h-4 w-16'} />}>
-                  <ViewCountAsync targetId={bobblehead.id} targetType={'bobblehead'} />
-                </Suspense>
-              </span>
-            </div>
+          {/* View Count */}
+          <div className={'flex items-center gap-2'}>
+            <span className={'text-sm font-medium'}>
+              <Suspense fallback={<Skeleton className={'h-4 w-16'} />}>
+                <ViewCountAsync targetId={bobblehead.id} targetType={'bobblehead'} />
+              </Suspense>
+            </span>
           </div>
         </div>
       </div>

@@ -19,7 +19,11 @@ import { Skeleton } from '@/components/ui/skeleton';
  * Light mode: white/cream background with orange accents
  * Dark mode: dark slate background with orange accents
  */
-export const JoinCommunitySection = () => {
+interface JoinCommunitySectionProps {
+  username?: null | string;
+}
+
+export const JoinCommunitySection = ({ username }: JoinCommunitySectionProps) => {
   return (
     <section
       className={`relative overflow-hidden bg-gradient-to-br from-muted via-background
@@ -166,21 +170,28 @@ export const JoinCommunitySection = () => {
             }
           >
             <div className={'flex flex-wrap justify-center gap-4'}>
-              <Button
-                asChild
-                className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
-                  font-semibold text-primary-foreground shadow-lg shadow-primary/25
-                  hover:from-orange-600 hover:to-amber-600`}
-                size={'lg'}
-              >
-                <Link href={$path({ route: '/dashboard/collection' })}>
-                  <span>My Collection</span>
-                  <ArrowRightIcon
-                    aria-hidden
-                    className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
-                  />
-                </Link>
-              </Button>
+              {username && (
+                <Button
+                  asChild
+                  className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                    font-semibold text-primary-foreground shadow-lg shadow-primary/25
+                    hover:from-orange-600 hover:to-amber-600`}
+                  size={'lg'}
+                >
+                  <Link
+                    href={$path({
+                      route: '/user/[username]/dashboard/collection',
+                      routeParams: { username },
+                    })}
+                  >
+                    <span>My Collection</span>
+                    <ArrowRightIcon
+                      aria-hidden
+                      className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+                    />
+                  </Link>
+                </Button>
+              )}
               <Button
                 asChild
                 className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground

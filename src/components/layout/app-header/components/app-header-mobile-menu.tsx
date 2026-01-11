@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@clerk/nextjs';
 import {
   ChartSplineIcon,
   EarthIcon,
@@ -60,14 +61,18 @@ const publicNavItems = [
   },
 ];
 
-const userNavItems = [
+const getUserNavItems = (username: string) => [
   {
-    href: $path({ route: '/dashboard/collection' }),
+    href: $path({ route: '/user/[username]/dashboard/collection', routeParams: { username } }),
     icon: LayoutDashboardIcon,
     label: 'Dashboard',
   },
   {
-    href: $path({ route: '/dashboard/collection', searchParams: { add: true } }),
+    href: $path({
+      route: '/user/[username]/dashboard/collection',
+      routeParams: { username },
+      searchParams: { add: true },
+    }),
     icon: PackagePlusIcon,
     label: 'Add Bobblehead',
   },
@@ -104,8 +109,10 @@ const adminNavItems = [
 export const AppHeaderMobileMenu = () => {
   const [isOpen, setIsOpen] = useToggle();
   const { isAdmin, isLoading, isModerator } = useAdminRole();
+  const { user } = useUser();
 
   const isShowAdminMenu = !isLoading && (isModerator || isAdmin);
+  const userNavItems = user?.username ? getUserNavItems(user.username) : [];
 
   return (
     <Sheet onOpenChange={setIsOpen.update} open={isOpen}>

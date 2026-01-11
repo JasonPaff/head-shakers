@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { Toolbar } from '@/app/(app)/dashboard/collection/components/main/toolbar';
+import { Toolbar } from '@/app/(app)/user/[username]/dashboard/collection/components/main/toolbar';
 
 import { render, screen } from '../../../setup/test-utils';
 

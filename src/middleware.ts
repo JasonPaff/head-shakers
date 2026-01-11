@@ -49,6 +49,9 @@ const isProtectedRoute = createRouteMatcher([
   // dashboard - always protected
   '/dashboard(.*)',
 
+  // user dashboard - always protected
+  '/user/:username/dashboard(.*)',
+
   // settings - always protected
   '/settings(.*)',
 
@@ -95,13 +98,15 @@ const middleware = clerkMiddleware(async (auth, req) => {
     }
   }
 
-  // public routes, no auth required
-  if (isPublicRoute(req)) {
-    return;
-  }
-
   // construct absolute URL for homepage
   const homeUrl = new URL($path({ route: '/' }), req.url).toString();
+
+  // protected routes - check these BEFORE public routes to ensure
+  // specific protected patterns take precedence over public catch-alls
+  if (isProtectedRoute(req)) {
+    await auth.protect({ unauthenticatedUrl: homeUrl });
+    return;
+  }
 
   // admin routes - require authentication (role checking done at component level)
   if (isAdminRoute(req)) {
@@ -109,9 +114,8 @@ const middleware = clerkMiddleware(async (auth, req) => {
     return;
   }
 
-  // protected routes
-  if (isProtectedRoute(req)) {
-    await auth.protect({ unauthenticatedUrl: homeUrl });
+  // public routes, no auth required
+  if (isPublicRoute(req)) {
     return;
   }
 

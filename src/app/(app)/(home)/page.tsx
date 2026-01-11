@@ -5,6 +5,7 @@ import { JoinCommunitySection } from '@/app/(app)/(home)/components/sections/joi
 import { TrendingBobbleheadsSection } from '@/app/(app)/(home)/components/sections/trending-bobbleheads-section';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/lib/seo/seo.constants';
+import { getCurrentUserWithRole } from '@/lib/utils/admin.utils';
 
 import { HeroSection } from './components/sections/hero-section';
 
@@ -16,7 +17,9 @@ export function generateMetadata(): Metadata {
   });
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const currentUser = await getCurrentUserWithRole();
+
   return (
     <div className={'min-h-screen'}>
       {/* JSON-LD structured data for homepage */}
@@ -31,10 +34,10 @@ export default function HomePage() {
         type={'application/ld+json'}
       />
 
-      <HeroSection />
+      <HeroSection username={currentUser?.username} />
       <FeaturedCollectionsSection />
       <TrendingBobbleheadsSection />
-      <JoinCommunitySection />
+      <JoinCommunitySection username={currentUser?.username} />
     </div>
   );
 }

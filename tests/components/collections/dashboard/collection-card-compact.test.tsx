@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CollectionCardCompact } from '@/app/(app)/dashboard/collection/components/sidebar/cards/collection-card-compact';
+import { CollectionCardCompact } from '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/cards/collection-card-compact';
 
 import {
   createMockCollectionDashboardRecord,

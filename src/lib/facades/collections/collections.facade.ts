@@ -28,6 +28,7 @@ import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -536,7 +537,16 @@ export class CollectionsFacade extends BaseFacade {
 
         if (newCollection) {
           invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
-          revalidatePath($path({ route: '/dashboard/collection' }));
+          // Revalidate user's dashboard with their username
+          const user = await UsersFacade.getUserByIdAsync(userId);
+          if (user?.username) {
+            revalidatePath(
+              $path({
+                route: '/user/[username]/dashboard/collection',
+                routeParams: { username: user.username },
+              }),
+            );
+          }
           CacheRevalidationService.collections.onCreate(newCollection.id, userId, newCollection.slug);
         }
 
@@ -565,7 +575,16 @@ export class CollectionsFacade extends BaseFacade {
 
       if (deletedCollection) {
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, deletedCollection.id);
-        revalidatePath($path({ route: '/dashboard/collection' }));
+        // Revalidate user's dashboard with their username
+        const user = await UsersFacade.getUserByIdAsync(userId);
+        if (user?.username) {
+          revalidatePath(
+            $path({
+              route: '/user/[username]/dashboard/collection',
+              routeParams: { username: user.username },
+            }),
+          );
+        }
         CacheRevalidationService.collections.onDelete(deletedCollection.id, userId);
       }
 
@@ -1202,7 +1221,16 @@ export class CollectionsFacade extends BaseFacade {
 
       if (updatedCollection) {
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, updatedCollection.id);
-        revalidatePath($path({ route: '/dashboard/collection' }));
+        // Revalidate user's dashboard with their username
+        const user = await UsersFacade.getUserByIdAsync(userId);
+        if (user?.username) {
+          revalidatePath(
+            $path({
+              route: '/user/[username]/dashboard/collection',
+              routeParams: { username: user.username },
+            }),
+          );
+        }
         CacheRevalidationService.collections.onUpdate(updatedCollection.id, userId);
       }
 

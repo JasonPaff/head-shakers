@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { CollectionLayout } from '@/app/(app)/dashboard/collection/components/layout/collection-layout';
+import { CollectionLayout } from '@/app/(app)/user/[username]/dashboard/collection/components/layout/collection-layout';
 
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';

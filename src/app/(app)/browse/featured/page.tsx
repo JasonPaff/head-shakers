@@ -15,12 +15,13 @@ import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
-import { getUserIdAsync } from '@/utils/auth-utils';
+import { getCurrentUserWithRole } from '@/lib/utils/admin.utils';
 
 export const dynamic = 'force-dynamic';
 
 export default async function FeaturedPage() {
-  const currentUserId = await getUserIdAsync();
+  const currentUser = await getCurrentUserWithRole();
+  const currentUserId = currentUser?.id ?? null;
 
   // Generate JSON-LD schema for the featured content listing page
   const collectionPageSchema = generateCollectionPageSchema({
@@ -80,14 +81,31 @@ export default async function FeaturedPage() {
                   </div>
                 }
               >
-                <Button asChild>
-                  <Link href={$path({ route: '/dashboard/collection' })}>Create Collection</Link>
-                </Button>
-                <Button asChild variant={'outline'}>
-                  <Link href={$path({ route: '/dashboard/collection', searchParams: { add: true } })}>
-                    Add Bobblehead
-                  </Link>
-                </Button>
+                {currentUser?.username && (
+                  <Fragment>
+                    <Button asChild>
+                      <Link
+                        href={$path({
+                          route: '/user/[username]/dashboard/collection',
+                          routeParams: { username: currentUser.username },
+                        })}
+                      >
+                        Create Collection
+                      </Link>
+                    </Button>
+                    <Button asChild variant={'outline'}>
+                      <Link
+                        href={$path({
+                          route: '/user/[username]/dashboard/collection',
+                          routeParams: { username: currentUser.username },
+                          searchParams: { add: true },
+                        })}
+                      >
+                        Add Bobblehead
+                      </Link>
+                    </Button>
+                  </Fragment>
+                )}
               </AuthContent>
             </div>
           </section>

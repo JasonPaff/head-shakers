@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { SidebarFooter } from '@/app/(app)/dashboard/collection/components/sidebar/sidebar-footer';
+import { SidebarFooter } from '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-footer';
 
 import { render, screen } from '../../../setup/test-utils';
 

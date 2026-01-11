@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { BobbleheadPagination } from '@/app/(app)/dashboard/collection/components/main/bobblehead-pagination';
+import { BobbleheadPagination } from '@/app/(app)/user/[username]/dashboard/collection/components/main/bobblehead-pagination';
 
 import { render, screen } from '../../../setup/test-utils';
 

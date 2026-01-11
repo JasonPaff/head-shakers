@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
 
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { redirect } from 'next/navigation';
 import { Fragment, Suspense } from 'react';
 
-import type { PageProps } from '@/app/(app)/dashboard/collection/route-type';
+import type { PageProps } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 
-import { CollectionLayout } from '@/app/(app)/dashboard/collection/components/layout/collection-layout';
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/dashboard/collection/route-type';
+import { CollectionLayout } from '@/app/(app)/user/[username]/dashboard/collection/components/layout/collection-layout';
+import { collectionDashboardSearchParamsCache } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
+import { getCurrentUserWithRole } from '@/lib/utils/admin.utils';
 import { sortCollections } from '@/lib/utils/collection.utils';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
@@ -40,8 +42,15 @@ export function generateMetadata(): Metadata {
 
 export const dynamic = 'force-dynamic';
 
-async function CollectionPage({ searchParams }: CollectionPageProps) {
+async function CollectionPage({ routeParams, searchParams }: CollectionPageProps) {
+  const { username } = await routeParams;
   const params = await collectionDashboardSearchParamsCache.parse(searchParams);
+
+  // Authorization: Ensure the current user matches the URL username
+  const currentUser = await getCurrentUserWithRole();
+  if (!currentUser || currentUser.username !== username) {
+    redirect($path({ route: '/' }));
+  }
 
   // Server-side auto-selection: If no collection is selected, redirect to the first one
   // This respects the user's saved sort preference for consistent behavior
@@ -55,7 +64,7 @@ async function CollectionPage({ searchParams }: CollectionPageProps) {
       const firstCollection = sortedCollections[0]!;
 
       // Redirect to the first collection, preserving any other search params
-      const url = new URL('/dashboard/collection', 'http://localhost');
+      const url = new URL(`/user/${username}/dashboard/collection`, 'http://localhost');
       url.searchParams.set('collectionSlug', firstCollection.slug);
 
       // Preserve other params if they differ from defaults

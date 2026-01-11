@@ -5,7 +5,7 @@ import type { CollectionSortOption } from '@/hooks/use-user-preferences';
 import {
   type CollectionCardStyle,
   SidebarSearch,
-} from '@/app/(app)/dashboard/collection/components/sidebar/sidebar-search';
+} from '@/app/(app)/user/[username]/dashboard/collection/components/sidebar/sidebar-search';
 
 import { render, screen } from '../../../setup/test-utils';
 

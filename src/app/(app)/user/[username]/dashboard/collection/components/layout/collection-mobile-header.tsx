@@ -3,7 +3,7 @@
 import { MenuIcon, PlusIcon } from 'lucide-react';
 import { useQueryStates } from 'nuqs';
 
-import { collectionDashboardParsers } from '@/app/(app)/dashboard/collection/route-type';
+import { collectionDashboardParsers } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/tailwind-utils';
 
