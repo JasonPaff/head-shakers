@@ -5,7 +5,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
 import { BobbleheadFeatureCard } from './bobblehead-feature-card';
@@ -30,12 +29,6 @@ export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }
   if (!bobblehead) {
     notFound();
   }
-
-  const likeData = await SocialFacade.getContentLikeData(
-    bobbleheadId,
-    'bobblehead',
-    currentUserId || undefined,
-  );
 
   const hasMultiplePhotos = bobblehead.photos.length > 1;
 
@@ -63,7 +56,6 @@ export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }
           <BobbleheadFeatureCard
             bobblehead={bobblehead}
             collectionSlug={collectionSlug}
-            likeData={likeData}
             ownerUsername={ownerUsername}
           />
         </ContentLayout>

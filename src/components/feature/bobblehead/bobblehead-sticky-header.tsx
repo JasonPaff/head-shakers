@@ -11,16 +11,14 @@ import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeCompactButton } from '@/components/ui/like-button';
+import { LikeCompactButtonFromContext } from '@/components/ui/like-button';
 
 interface BobbleheadStickyHeaderProps {
   bobblehead: BobbleheadWithRelations;
   collectionName: string;
   collectionSlug: string;
   commentCount: number;
-  isLiked: boolean;
   isOwner: boolean;
-  likeCount: number;
   thumbnailUrl?: null | string;
   title: string;
   username: string;
@@ -31,9 +29,7 @@ export const BobbleheadStickyHeader = ({
   collectionName,
   collectionSlug,
   commentCount,
-  isLiked,
   isOwner,
-  likeCount,
   thumbnailUrl,
   title,
   username,
@@ -108,12 +104,7 @@ export const BobbleheadStickyHeader = ({
             {/* Action Buttons */}
             <div className={'flex flex-shrink-0 items-center gap-1.5 md:gap-2'}>
               {/* Like Button */}
-              <LikeCompactButton
-                initialLikeCount={likeCount ?? 0}
-                isInitiallyLiked={isLiked}
-                targetId={bobblehead.id}
-                targetType={'bobblehead'}
-              />
+              <LikeCompactButtonFromContext />
 
               {/* Comments Button */}
               <Button

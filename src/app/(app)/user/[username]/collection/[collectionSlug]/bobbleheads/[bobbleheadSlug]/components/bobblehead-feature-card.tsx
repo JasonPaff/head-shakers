@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Card } from '@/components/ui/card';
@@ -30,7 +29,6 @@ type BobbleheadFeatureCardProps = {
   bobblehead: BobbleheadWithRelations;
   collectionSlug: string;
   isOwner?: boolean;
-  likeData: ContentLikeData;
   ownerUsername: string;
 };
 
@@ -38,7 +36,6 @@ export const BobbleheadFeatureCard = ({
   bobblehead,
   collectionSlug,
   isOwner = false,
-  likeData,
   ownerUsername,
 }: BobbleheadFeatureCardProps) => {
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useToggle();
@@ -133,7 +130,6 @@ export const BobbleheadFeatureCard = ({
               collectionSlug={collectionSlug}
               commentCount={bobblehead.commentCount}
               isOwner={isOwner}
-              likeData={likeData}
               ownerUsername={ownerUsername}
             />
 
@@ -165,7 +161,6 @@ export const BobbleheadFeatureCard = ({
           collectionSlug={collectionSlug}
           commentCount={bobblehead.commentCount}
           isOwner={isOwner}
-          likeData={likeData}
           ownerUsername={ownerUsername}
         />
 

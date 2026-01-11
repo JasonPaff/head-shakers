@@ -12,6 +12,7 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import { useLikeContext } from '@/components/ui/form/focus-management/like-context';
 import { useLike } from '@/hooks/use-like';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
@@ -196,6 +197,126 @@ export const LikeCompactButton = ({
   const buttonElement = (
     <button
       aria-label={`${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} like${likeCount === 1 ? '' : 's'}`}
+      aria-pressed={isLiked}
+      className={cn('inline-flex items-center gap-1 text-sm transition-colors', className)}
+      data-testid={likeButtonTestId}
+      disabled={disabled || isPending}
+      onClick={handleClick}
+      {...props}
+    >
+      <Conditional isCondition={shouldShowIcon}>
+        <HeartIcon
+          aria-hidden
+          className={cn(
+            'size-4 text-red-500 transition-colors dark:text-red-400',
+            isLiked && 'fill-current',
+            !isLiked && 'hover:text-red-600 dark:hover:text-red-300',
+          )}
+        />
+      </Conditional>
+      <NumberFlow value={likeCount} />
+    </button>
+  );
+
+  if (!isSignedIn) {
+    return <SignUpButton mode={'modal'}>{buttonElement}</SignUpButton>;
+  }
+
+  return buttonElement;
+};
+
+// Context-aware variants - these read from LikeProvider instead of creating their own state
+
+interface LikeIconButtonFromContextProps
+  extends ComponentTestIdProps, Omit<ComponentProps<typeof Button>, 'onClick'> {
+  shouldShowCount?: boolean;
+}
+
+export const LikeIconButtonFromContext = ({
+  className,
+  disabled,
+  shouldShowCount = true,
+  testId,
+  ...props
+}: LikeIconButtonFromContextProps) => {
+  const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLikeContext();
+
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'icon');
+
+  const handleClick = () => {
+    if (!isSignedIn) return;
+    toggleLike();
+  };
+
+  const authenticatedAriaLabel = `${isLiked ? 'Unlike' : 'Like'} this bobblehead. ${likeCount} like${likeCount === 1 ? '' : 's'}`;
+  const unauthenticatedAriaLabel = `${likeCount} like${likeCount === 1 ? '' : 's'}. Sign in to like this bobblehead`;
+
+  const buttonElement = (
+    <button
+      aria-label={isSignedIn ? authenticatedAriaLabel : unauthenticatedAriaLabel}
+      aria-pressed={isLiked}
+      className={cn(
+        'group relative rounded-full p-2 transition-all duration-300 ease-out',
+        'hover:scale-110 active:scale-95',
+        isLiked ?
+          'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
+        : `bg-muted text-gray-400 hover:bg-red-200 hover:text-destructive
+         dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75`,
+        className,
+      )}
+      data-testid={likeButtonTestId}
+      disabled={disabled || isPending}
+      onClick={handleClick}
+      {...props}
+    >
+      <HeartIcon
+        aria-hidden
+        className={cn(
+          'size-4 transition-all duration-300',
+          isLiked ? 'fill-current' : 'group-hover:scale-110',
+        )}
+      />
+    </button>
+  );
+
+  return (
+    <div className={'flex items-center gap-3'}>
+      {isSignedIn ? buttonElement : <SignUpButton mode={'modal'}>{buttonElement}</SignUpButton>}
+
+      <Conditional isCondition={shouldShowCount}>
+        <div className={'flex items-baseline gap-0.5 text-muted-foreground'}>
+          <NumberFlow value={likeCount} />
+          <div className={'text-xs'}>like{likeCount === 1 ? '' : 's'}</div>
+        </div>
+      </Conditional>
+    </div>
+  );
+};
+
+interface LikeCompactButtonFromContextProps
+  extends ComponentTestIdProps, Omit<ComponentProps<typeof Button>, 'onClick'> {
+  shouldShowIcon?: boolean;
+}
+
+export const LikeCompactButtonFromContext = ({
+  className,
+  disabled,
+  shouldShowIcon = true,
+  testId,
+  ...props
+}: LikeCompactButtonFromContextProps) => {
+  const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLikeContext();
+
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'compact');
+
+  const handleClick = () => {
+    if (!isSignedIn) return;
+    toggleLike();
+  };
+
+  const buttonElement = (
+    <button
+      aria-label={`${isLiked ? 'Unlike' : 'Like'} this bobblehead. ${likeCount} like${likeCount === 1 ? '' : 's'}`}
       aria-pressed={isLiked}
       className={cn('inline-flex items-center gap-1 text-sm transition-colors', className)}
       data-testid={likeButtonTestId}

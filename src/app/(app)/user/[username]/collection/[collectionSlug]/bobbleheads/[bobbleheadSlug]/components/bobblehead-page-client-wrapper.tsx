@@ -8,6 +8,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
 import { BobbleheadStickyHeader } from '@/components/feature/bobblehead/bobblehead-sticky-header';
 import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
+import { LikeProvider } from '@/components/ui/form/focus-management/like-context';
 
 interface BobbleheadPageClientWrapperProps {
   bobblehead: BobbleheadWithRelations;
@@ -33,35 +34,40 @@ export function BobbleheadPageClientWrapper({
   ownerUsername,
 }: BobbleheadPageClientWrapperProps) {
   return (
-    <BobbleheadViewTracker
-      bobbleheadId={bobbleheadId}
-      bobbleheadSlug={bobbleheadSlug}
-      collectionId={collectionId}
+    <LikeProvider
+      initialLikeCount={likeData?.likeCount ?? 0}
+      isInitiallyLiked={likeData?.isLiked ?? false}
+      targetId={bobbleheadId}
+      targetType={'bobblehead'}
     >
-      <StickyHeaderWrapper>
-        {(isSticky) => (
-          <div>
-            {/* Sticky Header - shown when scrolling */}
-            {isSticky && (
-              <BobbleheadStickyHeader
-                bobblehead={bobblehead}
-                collectionName={bobblehead.collectionName || ''}
-                collectionSlug={collectionSlug}
-                commentCount={bobblehead.commentCount ?? 0}
-                isLiked={likeData?.isLiked ?? false}
-                isOwner={isOwner}
-                likeCount={likeData?.likeCount ?? 0}
-                thumbnailUrl={bobblehead.photos?.[0]?.url}
-                title={bobblehead.name}
-                username={ownerUsername}
-              />
-            )}
+      <BobbleheadViewTracker
+        bobbleheadId={bobbleheadId}
+        bobbleheadSlug={bobbleheadSlug}
+        collectionId={collectionId}
+      >
+        <StickyHeaderWrapper>
+          {(isSticky) => (
+            <div>
+              {/* Sticky Header - shown when scrolling */}
+              {isSticky && (
+                <BobbleheadStickyHeader
+                  bobblehead={bobblehead}
+                  collectionName={bobblehead.collectionName || ''}
+                  collectionSlug={collectionSlug}
+                  commentCount={bobblehead.commentCount ?? 0}
+                  isOwner={isOwner}
+                  thumbnailUrl={bobblehead.photos?.[0]?.url}
+                  title={bobblehead.name}
+                  username={ownerUsername}
+                />
+              )}
 
-            {/* Page content passed from server */}
-            {children}
-          </div>
-        )}
-      </StickyHeaderWrapper>
-    </BobbleheadViewTracker>
+              {/* Page content passed from server */}
+              {children}
+            </div>
+          )}
+        </StickyHeaderWrapper>
+      </BobbleheadViewTracker>
+    </LikeProvider>
   );
 }

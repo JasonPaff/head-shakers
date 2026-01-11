@@ -2,7 +2,6 @@ import 'server-only';
 import { notFound } from 'next/navigation';
 
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
 import { BobbleheadFeatureCard } from '../bobblehead-feature-card';
@@ -13,10 +12,10 @@ interface BobbleheadFeatureCardAsyncProps {
 
 export const BobbleheadFeatureCardAsync = async ({ bobbleheadId }: BobbleheadFeatureCardAsyncProps) => {
   const currentUserId = await getUserIdAsync();
-  const [bobblehead, likeData] = await Promise.all([
-    BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
-    SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),
-  ]);
+  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
+    bobbleheadId,
+    currentUserId || undefined,
+  );
 
   if (!bobblehead) {
     notFound();
@@ -29,7 +28,6 @@ export const BobbleheadFeatureCardAsync = async ({ bobbleheadId }: BobbleheadFea
       bobblehead={bobblehead}
       collectionSlug={bobblehead.collectionSlug ?? ''}
       isOwner={isOwner}
-      likeData={likeData}
       ownerUsername={bobblehead.ownerUsername ?? ''}
     />
   );

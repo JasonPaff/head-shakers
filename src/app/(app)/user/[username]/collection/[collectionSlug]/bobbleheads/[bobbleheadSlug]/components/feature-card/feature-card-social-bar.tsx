@@ -4,14 +4,13 @@ import type { ComponentProps } from 'react';
 
 import { MessageCircleIcon, Share2Icon } from 'lucide-react';
 
-import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeIconButton } from '@/components/ui/like-button';
+import { LikeIconButtonFromContext } from '@/components/ui/like-button';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -22,7 +21,6 @@ type FeatureCardSocialBarProps = ComponentProps<'div'> &
     collectionSlug: string;
     commentCount?: number;
     isOwner?: boolean;
-    likeData: ContentLikeData;
     ownerUsername: string;
   };
 
@@ -33,7 +31,6 @@ export const FeatureCardSocialBar = ({
   collectionSlug,
   commentCount = 0,
   isOwner = false,
-  likeData,
   ownerUsername,
   testId,
   ...props
@@ -72,13 +69,7 @@ export const FeatureCardSocialBar = ({
       {/* Social Actions Row */}
       <div className={'flex items-center gap-4'}>
         {/* Like Button */}
-        <LikeIconButton
-          initialLikeCount={likeData.likeCount}
-          isInitiallyLiked={likeData.isLiked}
-          shouldShowCount={true}
-          targetId={bobbleheadId}
-          targetType={'bobblehead'}
-        />
+        <LikeIconButtonFromContext shouldShowCount={true} />
 
         {/* Comments Button */}
         <Button

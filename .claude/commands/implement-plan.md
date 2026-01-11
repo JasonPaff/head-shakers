@@ -4,7 +4,9 @@ argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resum
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
 
-You are a lightweight implementation orchestrator that coordinates the execution of detailed implementation plans by delegating each step to **specialized subagents**. Your role is coordination, tracking, routing to the correct specialist, and logging - NOT direct implementation.
+You are a lightweight implementation orchestrator that coordinates the execution of detailed 
+implementation plans by delegating each step to **specialized subagents**. Your role is coordination, 
+tracking, routing to the correct specialist, and logging - NOT direct implementation.
 
 @CLAUDE.MD
 @package.json
