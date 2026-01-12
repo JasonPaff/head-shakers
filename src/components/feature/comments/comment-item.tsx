@@ -3,31 +3,34 @@
 import type { ComponentProps } from 'react';
 
 import { EditIcon, MessageSquareReplyIcon, TrashIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
+import { generateTestId } from '@/lib/test-ids';
 import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 // Re-export for convenience
 export type { CommentWithDepth, CommentWithUser };
 
-interface CommentItemProps extends Omit<ComponentProps<'div'>, 'content'> {
-  comment: CommentWithDepth;
-  currentUserId?: string;
-  depth?: number;
-  isAdmin?: boolean;
-  isEditable?: boolean;
-  onDeleteClick?: (commentId: string) => void;
-  onEditClick?: (comment: CommentWithDepth) => void;
-  onReply?: (comment: CommentWithDepth) => void;
-}
+type CommentItemProps = ComponentTestIdProps &
+  Omit<ComponentProps<'div'>, 'content'> & {
+    comment: CommentWithDepth;
+    currentUserId?: string;
+    depth?: number;
+    isAdmin?: boolean;
+    isEditable?: boolean;
+    onDeleteClick?: (commentId: string) => void;
+    onEditClick?: (comment: CommentWithDepth) => void;
+    onReply?: (comment: CommentWithDepth) => void;
+  };
 
 /**
  * Safely converts a date-like value to a Date object
@@ -119,11 +122,40 @@ export const CommentItem = ({
   onDeleteClick,
   onEditClick,
   onReply,
+  testId,
   ...props
 }: CommentItemProps) => {
+  // 1. useState hooks
   const [isHovered, setIsHovered] = useState(false);
 
-  // Derived conditional rendering variables
+  // 6. Event handlers
+  const handleEditClick = useCallback(() => {
+    if (onEditClick) {
+      onEditClick(comment);
+    }
+  }, [onEditClick, comment]);
+
+  const handleDeleteClick = useCallback(() => {
+    if (onDeleteClick) {
+      onDeleteClick(comment.id);
+    }
+  }, [onDeleteClick, comment.id]);
+
+  const handleReplyClick = useCallback(() => {
+    if (onReply) {
+      onReply(comment);
+    }
+  }, [onReply, comment]);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
+  // 7. Derived conditional rendering variables
   const _isCommentOwner = currentUserId === comment.userId;
   const _isWithinEditWindow = isCommentEditable(comment.createdAt);
   const _canEdit = isEditable && _isCommentOwner && (_isWithinEditWindow || isAdmin);
@@ -139,32 +171,7 @@ export const CommentItem = ({
   const _username = comment.user?.username || 'deleted';
   const _avatarUrl = comment.user?.avatarUrl;
 
-  // Event handlers
-  const handleEditClick = () => {
-    if (onEditClick) {
-      onEditClick(comment);
-    }
-  };
-
-  const handleDeleteClick = () => {
-    if (onDeleteClick) {
-      onDeleteClick(comment.id);
-    }
-  };
-
-  const handleReplyClick = () => {
-    if (onReply) {
-      onReply(comment);
-    }
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
+  const componentTestId = testId ?? generateTestId('feature', 'comment-item');
 
   return (
     <div
@@ -175,6 +182,8 @@ export const CommentItem = ({
         getDepthBorderClass(depth),
         className,
       )}
+      data-slot={'comment-item'}
+      data-testid={componentTestId}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}

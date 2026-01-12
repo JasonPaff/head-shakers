@@ -3,28 +3,32 @@
 import type { ChangeEvent, ComponentProps, FormEvent } from 'react';
 
 import { LoaderIcon, ReplyIcon, XIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { Textarea } from '@/components/ui/textarea';
 import { SCHEMA_LIMITS } from '@/lib/constants';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface CommentFormProps extends Omit<ComponentProps<'form'>, 'onSubmit'> {
-  initialContent?: string;
-  isAtMaxDepth?: boolean;
-  isDisabled?: boolean;
-  isSubmitting?: boolean;
-  onCancel?: () => void;
-  onCancelReply?: () => void;
-  onSubmit: (content: string, parentCommentId?: string) => Promise<void> | void;
-  parentCommentAuthor?: string;
-  parentCommentContent?: string;
-  parentCommentId?: string;
-  placeholder?: string;
-  submitButtonText?: string;
-}
+type CommentFormProps = ComponentTestIdProps &
+  Omit<ComponentProps<'form'>, 'onSubmit'> & {
+    initialContent?: string;
+    isAtMaxDepth?: boolean;
+    isDisabled?: boolean;
+    isSubmitting?: boolean;
+    onCancel?: () => void;
+    onCancelReply?: () => void;
+    onSubmit: (content: string, parentCommentId?: string) => Promise<void> | void;
+    parentCommentAuthor?: string;
+    parentCommentContent?: string;
+    parentCommentId?: string;
+    placeholder?: string;
+    submitButtonText?: string;
+  };
 
 /**
  * Comment submission and editing form component
@@ -45,17 +49,56 @@ export const CommentForm = ({
   parentCommentId,
   placeholder = 'Write a comment...',
   submitButtonText = 'Post Comment',
+  testId,
   ...props
 }: CommentFormProps) => {
+  // 1. useState hooks
   const [content, setContent] = useState(initialContent);
+
+  // 2. Other hooks
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Autofocus textarea when entering reply mode
+  // 4. useEffect hooks
   useEffect(() => {
     if (parentCommentId && textareaRef.current) {
       textareaRef.current.focus();
     }
   }, [parentCommentId]);
+
+  // 6. Event handlers
+  const handleContentChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const isContentValid =
+        content.trim().length >= SCHEMA_LIMITS.COMMENT.CONTENT.MIN &&
+        content.length <= SCHEMA_LIMITS.COMMENT.CONTENT.MAX;
+
+      if (isContentValid && !isSubmitting && !isAtMaxDepth) {
+        await onSubmit(content.trim(), parentCommentId);
+        setContent('');
+      }
+    },
+    [content, isSubmitting, isAtMaxDepth, onSubmit, parentCommentId],
+  );
+
+  const handleCancelClick = useCallback(() => {
+    if (onCancel) {
+      setContent(initialContent);
+      onCancel();
+    }
+  }, [onCancel, initialContent]);
+
+  const handleCancelReplyClick = useCallback(() => {
+    if (onCancelReply) {
+      setContent('');
+      onCancelReply();
+    }
+  }, [onCancelReply]);
 
   // 7. Derived values for conditional rendering
   const _isReplyMode = !!parentCommentId;
@@ -73,35 +116,16 @@ export const CommentForm = ({
     _isReplyMode ? `Reply to ${parentCommentAuthor ?? 'comment'}...` : placeholder;
   const _effectiveSubmitText = _isReplyMode ? 'Post Reply' : submitButtonText;
 
-  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (_isContentValid && !isSubmitting && !isAtMaxDepth) {
-      await onSubmit(content.trim(), parentCommentId);
-      setContent('');
-    }
-  };
-
-  const handleCancelClick = () => {
-    if (onCancel) {
-      setContent(initialContent);
-      onCancel();
-    }
-  };
-
-  const handleCancelReplyClick = () => {
-    if (onCancelReply) {
-      setContent('');
-      onCancelReply();
-    }
-  };
+  const componentTestId = testId ?? generateTestId('feature', 'comment-form');
 
   return (
-    <form className={cn('space-y-3', className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn('space-y-3', className)}
+      data-slot={'comment-form'}
+      data-testid={componentTestId}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       {/* Reply Context Indicator */}
       <Conditional isCondition={_shouldShowReplyContext}>
         <div className={cn('flex flex-col gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2')}>

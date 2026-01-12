@@ -2,20 +2,23 @@
 
 import type { ComponentProps } from 'react';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { CommentWithUser } from '@/components/feature/comments/comment-item';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { CommentForm } from '@/components/feature/comments/comment-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { generateTestId } from '@/lib/test-ids';
 
-interface CommentEditDialogProps extends ComponentProps<typeof Dialog> {
-  comment: CommentWithUser | null;
-  isOpen: boolean;
-  isSubmitting?: boolean;
-  onClose: () => void;
-  onSubmit: (commentId: string, content: string) => Promise<void> | void;
-}
+type CommentEditDialogProps = ComponentProps<typeof Dialog> &
+  ComponentTestIdProps & {
+    comment: CommentWithUser | null;
+    isOpen: boolean;
+    isSubmitting?: boolean;
+    onClose: () => void;
+    onSubmit: (commentId: string, content: string) => Promise<void> | void;
+  };
 
 /**
  * Dialog component for editing existing comments
@@ -27,36 +30,52 @@ export const CommentEditDialog = ({
   isSubmitting = false,
   onClose,
   onSubmit,
+  testId,
   ...props
 }: CommentEditDialogProps) => {
+  // 1. useState hooks
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // 6. Event handlers
+  const handleSubmit = useCallback(
+    async (content: string) => {
+      if (!comment) return;
+
+      setIsProcessing(true);
+      try {
+        await onSubmit(comment.id, content);
+        onClose();
+      } catch (error) {
+        console.error('Failed to update comment:', error);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [comment, onSubmit, onClose],
+  );
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && !isSubmitting && !isProcessing) {
+        onClose();
+      }
+    },
+    [isSubmitting, isProcessing, onClose],
+  );
+
+  // 7. Derived values for conditional rendering
   const _isDialogOpen = isOpen && comment !== null;
   const _isLoading = isSubmitting || isProcessing;
 
-  const handleSubmit = async (content: string) => {
-    if (!comment) return;
-
-    setIsProcessing(true);
-    try {
-      await onSubmit(comment.id, content);
-      onClose();
-    } catch (error) {
-      console.error('Failed to update comment:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open && !_isLoading) {
-      onClose();
-    }
-  };
+  const componentTestId = testId ?? generateTestId('feature', 'comment-edit-dialog');
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={_isDialogOpen} {...props}>
-      <DialogContent className={'sm:max-w-[600px]'}>
+      <DialogContent
+        className={'sm:max-w-[600px]'}
+        data-slot={'comment-edit-dialog'}
+        data-testid={componentTestId}
+      >
         {/* Dialog Header */}
         <DialogHeader>
           <DialogTitle>Edit Comment</DialogTitle>

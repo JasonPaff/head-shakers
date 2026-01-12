@@ -160,16 +160,16 @@ Entry: src/components/feature/comments/async/comment-section-async.tsx (server)
 
 Found **8 components** in tree (max-depth: 5)
 
-| Depth | Component                    | Type   | Specialist                  |
-| ----- | ---------------------------- | ------ | --------------------------- |
-| 0     | comment-section-async.tsx    | server | server-component-specialist |
-| 1     | comment-section-client.tsx   | client | client-component-specialist |
-| 2     | comment-section.tsx          | client | client-component-specialist |
-| 3     | comment-form.tsx             | client | client-component-specialist |
-| 3     | comment-list.tsx             | client | client-component-specialist |
-| 3     | comment-edit-dialog.tsx      | client | client-component-specialist |
-| 3     | comment-delete-dialog.tsx    | client | client-component-specialist |
-| 4     | comment-item.tsx             | client | client-component-specialist |
+| Depth | Component                  | Type   | Specialist                  |
+| ----- | -------------------------- | ------ | --------------------------- |
+| 0     | comment-section-async.tsx  | server | server-component-specialist |
+| 1     | comment-section-client.tsx | client | client-component-specialist |
+| 2     | comment-section.tsx        | client | client-component-specialist |
+| 3     | comment-form.tsx           | client | client-component-specialist |
+| 3     | comment-list.tsx           | client | client-component-specialist |
+| 3     | comment-edit-dialog.tsx    | client | client-component-specialist |
+| 3     | comment-delete-dialog.tsx  | client | client-component-specialist |
+| 4     | comment-item.tsx           | client | client-component-specialist |
 
 ### By Type
 
@@ -248,7 +248,7 @@ Mark "Fix components (parallel by type)" as in_progress.
 
 #### Server Component Fixes
 
-```
+````
 subagent_type: "server-component-specialist"
 
 Fix the following server components to follow project patterns.
@@ -268,13 +268,14 @@ You are fixing server components in a feature tree. Focus on:
 ### File 1: `{file_path}`
 ```tsx
 {full file contents}
-```
+````
 
 ## Reference Files
 
 Study these well-implemented server components:
 
 ### `{reference_path}`
+
 ```tsx
 {reference file contents}
 ```
@@ -282,6 +283,7 @@ Study these well-implemented server components:
 ## Instructions
 
 For EACH file:
+
 1. Read the file carefully
 2. Identify issues with project conventions
 3. Apply fixes following server component patterns
@@ -304,30 +306,37 @@ For each file fixed:
 ### `{file_path}`
 
 #### Issues Found
+
 1. {issue description}
 
 #### Changes Made
+
 1. {change description}
 
 #### Lines Modified
+
 - Lines {n}-{m}: {description}
 ```
+
 ```
 
 #### Client Component Fixes
 
 ```
+
 subagent_type: "client-component-specialist"
 
 Fix the following client components to follow project patterns.
 
 ## Role
+
 You are fixing client components in a feature tree. Focus on:
+
 - Hook organization order
 - Event handler naming (handle prefix)
 - useServerAction usage (not useAction)
 - Boolean state naming (is prefix)
-- Derived variable naming (_ prefix)
+- Derived variable naming (\_ prefix)
 - Accessibility attributes
 - Proper TypeScript types
 
@@ -336,11 +345,13 @@ You are fixing client components in a feature tree. Focus on:
 {List each client component with full path and current contents}
 
 ### File 1: `{file_path}`
+
 ```tsx
 {full file contents}
 ```
 
 ### File 2: `{file_path}`
+
 ```tsx
 {full file contents}
 ```
@@ -352,6 +363,7 @@ You are fixing client components in a feature tree. Focus on:
 Study these well-implemented client components:
 
 ### `{reference_path}`
+
 ```tsx
 {reference file contents}
 ```
@@ -359,6 +371,7 @@ Study these well-implemented client components:
 ## Instructions
 
 For EACH file:
+
 1. Read the file carefully
 2. Identify issues with project conventions
 3. Apply fixes following client component patterns
@@ -370,7 +383,7 @@ For EACH file:
 - [ ] Hooks in correct order (useState, useRef, useEffect, custom hooks, useCallback)
 - [ ] Event handlers use handle prefix
 - [ ] Boolean states use is prefix
-- [ ] Derived variables use _ prefix
+- [ ] Derived variables use \_ prefix
 - [ ] Uses useServerAction (not useAction)
 - [ ] Proper accessibility attributes
 - [ ] No inline styles (use Tailwind)
@@ -384,15 +397,19 @@ For each file fixed:
 ### `{file_path}`
 
 #### Issues Found
+
 1. {issue description}
 
 #### Changes Made
+
 1. {change description}
 
 #### Lines Modified
+
 - Lines {n}-{m}: {description}
 ```
-```
+
+````
 
 Mark "Fix components (parallel by type)" as completed.
 
@@ -406,7 +423,7 @@ Mark "Validate all changes" as in_progress.
 npm run lint:fix
 npm run typecheck
 npm run format
-```
+````
 
 **Track Validation Results**:
 
@@ -449,16 +466,16 @@ Mark "Generate summary" as in_progress.
 
 ### Components Fixed
 
-| Component                 | Type   | Status  | Changes |
-| ------------------------- | ------ | ------- | ------- |
-| comment-section-async.tsx | server | Fixed   | 3       |
-| comment-section-client.tsx| client | Fixed   | 5       |
-| comment-section.tsx       | client | Fixed   | 2       |
-| comment-form.tsx          | client | No issues | 0     |
-| comment-list.tsx          | client | Fixed   | 1       |
-| comment-item.tsx          | client | Fixed   | 4       |
-| comment-edit-dialog.tsx   | client | Fixed   | 2       |
-| comment-delete-dialog.tsx | client | Fixed   | 1       |
+| Component                  | Type   | Status    | Changes |
+| -------------------------- | ------ | --------- | ------- |
+| comment-section-async.tsx  | server | Fixed     | 3       |
+| comment-section-client.tsx | client | Fixed     | 5       |
+| comment-section.tsx        | client | Fixed     | 2       |
+| comment-form.tsx           | client | No issues | 0       |
+| comment-list.tsx           | client | Fixed     | 1       |
+| comment-item.tsx           | client | Fixed     | 4       |
+| comment-edit-dialog.tsx    | client | Fixed     | 2       |
+| comment-delete-dialog.tsx  | client | Fixed     | 1       |
 
 ### Summary
 
@@ -491,15 +508,15 @@ Mark all todos as completed.
 
 ### Error Handling
 
-| Failure                    | Action                                       |
-| -------------------------- | -------------------------------------------- |
-| File not found             | Show error with path suggestions             |
-| Not a .tsx file            | Show error, suggest correct file             |
-| No components in tree      | Show warning, file might be leaf component   |
-| Circular import detected   | Skip duplicate, note in summary              |
-| Specialist agent failed    | Retry once, then report failure              |
-| Validation failed          | Note errors, suggest manual fixes            |
-| Max depth reached          | Note truncation in summary                   |
+| Failure                  | Action                                     |
+| ------------------------ | ------------------------------------------ |
+| File not found           | Show error with path suggestions           |
+| Not a .tsx file          | Show error, suggest correct file           |
+| No components in tree    | Show warning, file might be leaf component |
+| Circular import detected | Skip duplicate, note in summary            |
+| Specialist agent failed  | Retry once, then report failure            |
+| Validation failed        | Note errors, suggest manual fixes          |
+| Max depth reached        | Note truncation in summary                 |
 
 ### Performance Notes
 

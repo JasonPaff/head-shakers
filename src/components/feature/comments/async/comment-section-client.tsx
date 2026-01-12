@@ -17,6 +17,7 @@ import {
   getCommentsAction,
   updateCommentAction,
 } from '@/lib/actions/social/social.actions';
+import { generateTestId } from '@/lib/test-ids';
 
 type CommentSectionClientProps = ComponentTestIdProps &
   Omit<ComponentProps<'div'>, 'children'> & {
@@ -80,11 +81,13 @@ export const CommentSectionClient = ({
   testId,
   ...props
 }: CommentSectionClientProps) => {
+  // 1. useState hooks
   const [loadedComments, setLoadedComments] = useState(initialComments);
   const [hasMoreComments, setHasMoreComments] = useState(hasMore);
   const [currentOffset, setCurrentOffset] = useState(initialComments.length);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // 2. Other hooks
   const { isAdmin } = useAdminRole();
 
   const { executeAsync: executeGetComments } = useServerAction(getCommentsAction, {
@@ -119,12 +122,14 @@ export const CommentSectionClient = ({
     loadingMessage: 'Deleting comment...',
   });
 
+  // 4. useEffect hooks
   useEffect(() => {
     setLoadedComments(initialComments);
     setCurrentOffset(initialComments.length);
     setHasMoreComments(hasMore);
   }, [initialComments, hasMore]);
 
+  // 6. Event handlers
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !hasMoreComments) return;
 
@@ -189,7 +194,7 @@ export const CommentSectionClient = ({
     [executeDeleteComment],
   );
 
-  const componentTestId = testId ?? 'feature-comment-section-client';
+  const componentTestId = testId ?? generateTestId('feature', 'comment-section-client');
 
   return (
     <CommentSection

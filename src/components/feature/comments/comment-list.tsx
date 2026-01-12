@@ -6,11 +6,13 @@ import { ChevronDownIcon, MessageSquareIcon } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { CommentItem } from '@/components/feature/comments/comment-item';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 // Re-export CommentWithDepth for convenience
@@ -41,18 +43,19 @@ const normalizeComment = (
   };
 };
 
-interface CommentListProps extends ComponentProps<'div'> {
-  comments: Array<CommentWithDepth | CommentWithUser>;
-  currentUserId?: string;
-  hasMore?: boolean;
-  isAdmin?: boolean;
-  isEditable?: boolean;
-  isLoading?: boolean;
-  onDeleteClick?: (commentId: string) => void;
-  onEditClick?: (comment: CommentWithDepth) => void;
-  onLoadMore?: () => void;
-  onReply?: (comment: CommentWithDepth) => void;
-}
+type CommentListProps = ComponentProps<'div'> &
+  ComponentTestIdProps & {
+    comments: Array<CommentWithDepth | CommentWithUser>;
+    currentUserId?: string;
+    hasMore?: boolean;
+    isAdmin?: boolean;
+    isEditable?: boolean;
+    isLoading?: boolean;
+    onDeleteClick?: (commentId: string) => void;
+    onEditClick?: (comment: CommentWithDepth) => void;
+    onLoadMore?: () => void;
+    onReply?: (comment: CommentWithDepth) => void;
+  };
 
 /**
  * Props for the recursive comment thread renderer
@@ -81,9 +84,15 @@ const CommentThread = memo(
     onEditClick,
     onReply,
   }: CommentThreadProps) => {
+    // 1. useState hooks
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // Derived conditional rendering variables
+    // 6. Event handlers
+    const handleCollapseToggle = useCallback(() => {
+      setIsCollapsed((prev) => !prev);
+    }, []);
+
+    // 7. Derived conditional rendering variables
     const _hasReplies = !!comment.replies && comment.replies.length > 0;
     const _replyCount = comment.replies?.length ?? 0;
     const _isAtMaxDepth = comment.depth >= MAX_COMMENT_NESTING_DEPTH;
@@ -94,13 +103,8 @@ const CommentThread = memo(
     const _additionalReplyCount = comment.replyCount ?? 0;
     const _additionalReplyText = _additionalReplyCount === 1 ? 'reply' : 'replies';
 
-    // Event handlers
-    const handleCollapseToggle = useCallback(() => {
-      setIsCollapsed((prev) => !prev);
-    }, []);
-
     return (
-      <div>
+      <div data-slot={'comment-thread'}>
         {/* Comment Item */}
         <CommentItem
           comment={comment}
@@ -188,25 +192,33 @@ export const CommentList = ({
   onEditClick,
   onLoadMore,
   onReply,
+  testId,
   ...props
 }: CommentListProps) => {
-  // Normalize comments to ensure they all have depth information
+  // 3. useMemo hooks
   const _normalizedComments = useMemo(() => comments.map((c) => normalizeComment(c, 0)), [comments]);
 
-  // Derived conditional rendering variables
-  const _hasComments = _normalizedComments.length > 0;
-  const _shouldShowLoadMore = hasMore && !isLoading && !!onLoadMore;
-  const _shouldShowEmptyState = !_hasComments && !isLoading;
-
-  // Event handlers
+  // 6. Event handlers
   const handleLoadMoreClick = useCallback(() => {
     if (onLoadMore) {
       onLoadMore();
     }
   }, [onLoadMore]);
 
+  // 7. Derived conditional rendering variables
+  const _hasComments = _normalizedComments.length > 0;
+  const _shouldShowLoadMore = hasMore && !isLoading && !!onLoadMore;
+  const _shouldShowEmptyState = !_hasComments && !isLoading;
+
+  const componentTestId = testId ?? generateTestId('feature', 'comment-list');
+
   return (
-    <div className={cn('space-y-4', className)} {...props}>
+    <div
+      className={cn('space-y-4', className)}
+      data-slot={'comment-list'}
+      data-testid={componentTestId}
+      {...props}
+    >
       {/* Comment List */}
       <Conditional isCondition={_hasComments}>
         <div className={'space-y-3'}>

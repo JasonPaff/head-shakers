@@ -3,9 +3,10 @@
 import type { ComponentProps } from 'react';
 
 import { MessageSquareTextIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { CommentWithDepth } from '@/lib/queries/social/social.query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { CommentDeleteDialog } from '@/components/feature/comments/comment-delete-dialog';
 import { CommentEditDialog } from '@/components/feature/comments/comment-edit-dialog';
@@ -13,6 +14,7 @@ import { CommentForm } from '@/components/feature/comments/comment-form';
 import { CommentList } from '@/components/feature/comments/comment-list';
 import { Conditional } from '@/components/ui/conditional';
 import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 const countAllReplies = (comment: CommentWithDepth): number => {
@@ -43,20 +45,21 @@ const countTotalReplies = (comment: CommentWithDepth): number => {
   return comment.replies.reduce((sum, reply) => sum + 1 + countTotalReplies(reply), 0);
 };
 
-interface CommentSectionProps extends ComponentProps<'div'> {
-  comments: Array<CommentWithDepth>;
-  currentUserId?: string;
-  hasMore?: boolean;
-  initialCommentCount?: number;
-  isAdmin?: boolean;
-  isAuthenticated?: boolean;
-  isEditable?: boolean;
-  isLoading?: boolean;
-  onCommentCreate?: (content: string, parentCommentId?: string) => Promise<void> | void;
-  onCommentDelete?: (commentId: string) => Promise<void> | void;
-  onCommentUpdate?: (commentId: string, content: string) => Promise<void> | void;
-  onLoadMore?: () => void;
-}
+type CommentSectionProps = ComponentProps<'div'> &
+  ComponentTestIdProps & {
+    comments: Array<CommentWithDepth>;
+    currentUserId?: string;
+    hasMore?: boolean;
+    initialCommentCount?: number;
+    isAdmin?: boolean;
+    isAuthenticated?: boolean;
+    isEditable?: boolean;
+    isLoading?: boolean;
+    onCommentCreate?: (content: string, parentCommentId?: string) => Promise<void> | void;
+    onCommentDelete?: (commentId: string) => Promise<void> | void;
+    onCommentUpdate?: (commentId: string, content: string) => Promise<void> | void;
+    onLoadMore?: () => void;
+  };
 
 /**
  * Main comment section orchestrator component
@@ -76,6 +79,7 @@ export const CommentSection = ({
   onCommentDelete,
   onCommentUpdate,
   onLoadMore,
+  testId,
   ...props
 }: CommentSectionProps) => {
   // 1. useState hooks
@@ -85,6 +89,92 @@ export const CommentSection = ({
   const [selectedCommentId, setSelectedCommentId] = useState<null | string>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyParentComment, setReplyParentComment] = useState<CommentWithDepth | null>(null);
+
+  // 6. Event handlers
+  const handleCreateComment = useCallback(
+    async (content: string, parentCommentId?: string) => {
+      if (!onCommentCreate) return;
+
+      setIsSubmitting(true);
+      try {
+        await onCommentCreate(content, parentCommentId);
+        // Clear reply state after successful submission
+        if (parentCommentId) {
+          setReplyParentComment(null);
+        }
+      } catch (error) {
+        console.error('Failed to create comment:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [onCommentCreate],
+  );
+
+  const handleReplyClick = useCallback((comment: CommentWithDepth) => {
+    // Clicking reply on a different comment clears the previous reply state
+    setReplyParentComment(comment);
+  }, []);
+
+  const handleCancelReply = useCallback(() => {
+    setReplyParentComment(null);
+  }, []);
+
+  const handleEditClick = useCallback((comment: CommentWithDepth) => {
+    setSelectedComment(comment);
+    setIsEditDialogOpen(true);
+  }, []);
+
+  const handleEditClose = useCallback(() => {
+    setIsEditDialogOpen(false);
+    setSelectedComment(null);
+  }, []);
+
+  const handleEditSubmit = useCallback(
+    async (commentId: string, content: string) => {
+      if (!onCommentUpdate) return;
+
+      setIsSubmitting(true);
+      try {
+        await onCommentUpdate(commentId, content);
+        setIsEditDialogOpen(false);
+        setSelectedComment(null);
+      } catch (error) {
+        console.error('Failed to update comment:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [onCommentUpdate],
+  );
+
+  const handleDeleteClick = useCallback((commentId: string) => {
+    setSelectedCommentId(commentId);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleDeleteClose = useCallback(() => {
+    setIsDeleteDialogOpen(false);
+    setSelectedCommentId(null);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(
+    async (commentId: string) => {
+      if (!onCommentDelete) return;
+
+      setIsSubmitting(true);
+      try {
+        await onCommentDelete(commentId);
+        setIsDeleteDialogOpen(false);
+        setSelectedCommentId(null);
+      } catch (error) {
+        console.error('Failed to delete comment:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [onCommentDelete],
+  );
 
   // 7. Derived values for conditional rendering
   const _commentRepliesCount = comments.reduce((total, comment) => total + countAllReplies(comment), 0);
@@ -101,83 +191,16 @@ export const CommentSection = ({
   const _hasReplies = !!(_selectedDeleteComment?.replies && _selectedDeleteComment.replies.length > 0);
   const _totalReplyCount = _selectedDeleteComment ? countTotalReplies(_selectedDeleteComment) : 0;
 
-  // 6. Event handlers
-  const handleCreateComment = async (content: string, parentCommentId?: string) => {
-    if (!onCommentCreate) return;
-
-    setIsSubmitting(true);
-    try {
-      await onCommentCreate(content, parentCommentId);
-      // Clear reply state after successful submission
-      if (parentCommentId) {
-        setReplyParentComment(null);
-      }
-    } catch (error) {
-      console.error('Failed to create comment:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleReplyClick = (comment: CommentWithDepth) => {
-    // Clicking reply on a different comment clears the previous reply state
-    setReplyParentComment(comment);
-  };
-
-  const handleCancelReply = () => {
-    setReplyParentComment(null);
-  };
-
-  const handleEditClick = (comment: CommentWithDepth) => {
-    setSelectedComment(comment);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setIsEditDialogOpen(false);
-    setSelectedComment(null);
-  };
-
-  const handleEditSubmit = async (commentId: string, content: string) => {
-    if (!onCommentUpdate) return;
-
-    setIsSubmitting(true);
-    try {
-      await onCommentUpdate(commentId, content);
-      handleEditClose();
-    } catch (error) {
-      console.error('Failed to update comment:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDeleteClick = (commentId: string) => {
-    setSelectedCommentId(commentId);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteClose = () => {
-    setIsDeleteDialogOpen(false);
-    setSelectedCommentId(null);
-  };
-
-  const handleDeleteConfirm = async (commentId: string) => {
-    if (!onCommentDelete) return;
-
-    setIsSubmitting(true);
-    try {
-      await onCommentDelete(commentId);
-      handleDeleteClose();
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const componentTestId = testId ?? generateTestId('feature', 'comment-section');
 
   return (
-    <div className={cn('space-y-6', className)} id={'comments-section'} {...props}>
+    <div
+      className={cn('space-y-6', className)}
+      data-slot={'comment-section'}
+      data-testid={componentTestId}
+      id={'comments-section'}
+      {...props}
+    >
       {/* Section Header */}
       <div className={'flex items-center gap-2'}>
         <MessageSquareTextIcon aria-hidden className={'size-5 text-muted-foreground'} />

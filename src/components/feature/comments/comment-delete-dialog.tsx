@@ -3,6 +3,9 @@
 import type { ComponentProps } from 'react';
 
 import { LoaderIcon, TriangleAlertIcon } from 'lucide-react';
+import { useCallback } from 'react';
+
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import {
   AlertDialog,
@@ -16,17 +19,19 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface CommentDeleteDialogProps extends ComponentProps<typeof AlertDialog> {
-  commentId: null | string;
-  hasReplies?: boolean;
-  isOpen: boolean;
-  isSubmitting?: boolean;
-  onClose: () => void;
-  onConfirm: (commentId: string) => Promise<void> | void;
-  replyCount?: number;
-}
+type CommentDeleteDialogProps = ComponentProps<typeof AlertDialog> &
+  ComponentTestIdProps & {
+    commentId: null | string;
+    hasReplies?: boolean;
+    isOpen: boolean;
+    isSubmitting?: boolean;
+    onClose: () => void;
+    onConfirm: (commentId: string) => Promise<void> | void;
+    replyCount?: number;
+  };
 
 /**
  * Confirmation dialog for deleting comments
@@ -41,16 +46,14 @@ export const CommentDeleteDialog = ({
   onClose,
   onConfirm,
   replyCount = 0,
+  testId,
   ...props
 }: CommentDeleteDialogProps) => {
+  // 1. useState hooks (useToggle is a useState wrapper)
   const [isProcessing, setIsProcessing] = useToggle();
 
-  const _isDialogOpen = isOpen && commentId !== null;
-  const _isLoading = isSubmitting || isProcessing;
-  const _hasMultipleReplies = replyCount > 1;
-  const _hasManyReplies = replyCount >= 5;
-
-  const handleConfirm = async () => {
+  // 6. Event handlers
+  const handleConfirm = useCallback(async () => {
     if (!commentId) return;
 
     setIsProcessing.on();
@@ -62,17 +65,28 @@ export const CommentDeleteDialog = ({
     } finally {
       setIsProcessing.off();
     }
-  };
+  }, [commentId, onConfirm, onClose, setIsProcessing]);
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && !_isLoading) {
-      onClose();
-    }
-  };
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && !isSubmitting && !isProcessing) {
+        onClose();
+      }
+    },
+    [isSubmitting, isProcessing, onClose],
+  );
+
+  // 7. Derived values for conditional rendering
+  const _isDialogOpen = isOpen && commentId !== null;
+  const _isLoading = isSubmitting || isProcessing;
+  const _hasMultipleReplies = replyCount > 1;
+  const _hasManyReplies = replyCount >= 5;
+
+  const componentTestId = testId ?? generateTestId('feature', 'comment-delete-dialog');
 
   return (
     <AlertDialog onOpenChange={handleOpenChange} open={_isDialogOpen} {...props}>
-      <AlertDialogContent>
+      <AlertDialogContent data-slot={'comment-delete-dialog'} data-testid={componentTestId}>
         {/* Dialog Header */}
         <AlertDialogHeader>
           <div className={'flex items-center gap-3'}>
