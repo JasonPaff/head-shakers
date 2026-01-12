@@ -92,7 +92,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       {/* Image Section */}
       <div
         className={
-          'relative aspect-square overflow-hidden bg-gradient-to-br from-muted to-secondary dark:from-secondary dark:to-muted'
+          'relative aspect-square overflow-hidden bg-linear-to-br from-muted to-secondary dark:from-secondary dark:to-muted'
         }
         data-slot={'trending-bobblehead-image-container'}
       >
@@ -125,7 +125,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
         <div
           aria-hidden
           className={
-            'absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100'
+            'absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100'
           }
           data-slot={'trending-bobblehead-overlay'}
         />

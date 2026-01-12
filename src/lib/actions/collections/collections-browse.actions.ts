@@ -43,7 +43,7 @@ export const browseCollectionsAction = publicActionClient
     });
 
     try {
-      const result = await CollectionsFacade.browseCollections(browseInput, undefined, dbInstance);
+      const result = await CollectionsFacade.browseCollectionsAsync(browseInput, undefined, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -88,7 +88,7 @@ export const browseCategoriesAction = publicActionClient
     });
 
     try {
-      const result = await CollectionsFacade.browseCategories(browseInput, undefined, dbInstance);
+      const result = await CollectionsFacade.browseCategoriesAsync(browseInput, undefined, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -126,7 +126,7 @@ export const getCategoriesAction = publicActionClient
     const dbInstance = ctx.db;
 
     try {
-      const categories = await CollectionsFacade.getCategories(dbInstance);
+      const categories = await CollectionsFacade.getCategoriesAsync(dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,

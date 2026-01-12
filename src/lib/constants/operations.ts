@@ -50,6 +50,7 @@ export const OPERATIONS = {
     UPLOAD_PHOTO: 'upload_bobblehead_photo',
   },
   BOBBLEHEADS_DASHBOARD: {
+    COUNT_BY_COLLECTION: 'count_by_collection',
     GET_BOBBLEHEAD_FOR_EDIT: 'get_bobblehead_for_edit',
     GET_USER_COLLECTION_SELECTORS: 'get_user_collection_selectors',
   },
@@ -88,6 +89,13 @@ export const OPERATIONS = {
     TOGGLE_STATUS: 'toggle_featured_content_status',
     UPDATE: 'update_featured_content',
   },
+  LAUNCH_NOTIFICATIONS: {
+    ADD_TO_WAITLIST: 'add_to_launch_waitlist',
+    GET_ALL_WAITLIST: 'get_all_launch_waitlist',
+    GET_STATISTICS: 'get_launch_notification_statistics',
+    REMOVE_FROM_WAITLIST: 'remove_from_launch_waitlist',
+    SEND_NOTIFICATIONS: 'send_launch_notifications',
+  },
   MODERATION: {
     CHECK_EXISTING_REPORT: 'check_existing_report',
     CHECK_RATE_LIMIT: 'check_rate_limit',
@@ -106,8 +114,16 @@ export const OPERATIONS = {
   },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
+    BOBBLEHEADS_FOR_FEATURING: 'search_bobbleheads_for_featuring',
     COLLECTIONS: 'search_collections',
+    COLLECTIONS_FOR_FEATURING: 'search_collections_for_featuring',
+    GET_BOBBLEHEAD_FOR_FEATURING: 'get_bobblehead_for_featuring',
+    GET_COLLECTION_FOR_FEATURING: 'get_collection_for_featuring',
+    GET_USER_FOR_FEATURING: 'get_user_for_featuring',
+    PUBLIC_DROPDOWN: 'search_public_dropdown',
+    PUBLIC_PAGE: 'search_public_page',
     USERS: 'search_users',
+    USERS_FOR_FEATURING: 'search_users_for_featuring',
   },
   SOCIAL: {
     CREATE_LIKE: 'create_like',

@@ -258,6 +258,7 @@ export const CACHE_ENTITY_TYPE = {
   FEATURED: 'featured',
   NEWSLETTER: 'newsletter',
   PLATFORM: 'platform',
+  SEARCH: 'search',
   USER: 'user',
 } as const;
 

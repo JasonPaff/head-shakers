@@ -71,7 +71,7 @@ export const searchCollectionsForFeaturingAction = adminActionClient
     });
 
     try {
-      const result = await ContentSearchFacade.searchCollectionsForFeaturing(
+      const result = await ContentSearchFacade.searchCollectionsForFeaturingAsync(
         query,
         limit,
         ctx.userId,
@@ -126,7 +126,7 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
     });
 
     try {
-      const result = await ContentSearchFacade.searchBobbleheadsForFeaturing(
+      const result = await ContentSearchFacade.searchBobbleheadsForFeaturingAsync(
         query,
         limit,
         ctx.userId,
@@ -175,7 +175,7 @@ export const searchUsersForFeaturingAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { excludeTags, includeTags, limit, query, type: 'users' });
 
     try {
-      const result = await ContentSearchFacade.searchUsersForFeaturing(
+      const result = await ContentSearchFacade.searchUsersForFeaturingAsync(
         query || '',
         limit,
         ctx.userId,
@@ -220,7 +220,11 @@ export const getCollectionForFeaturingAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, { id: input.id });
 
     try {
-      const result = await ContentSearchFacade.getCollectionForFeaturing(input.id, ctx.userId, dbInstance);
+      const result = await ContentSearchFacade.getCollectionForFeaturingAsync(
+        input.id,
+        ctx.userId,
+        dbInstance,
+      );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -262,7 +266,11 @@ export const getBobbleheadForFeaturingAction = adminActionClient
       Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { id: input.id });
 
       try {
-        const result = await ContentSearchFacade.getBobbleheadForFeaturing(input.id, ctx.userId, dbInstance);
+        const result = await ContentSearchFacade.getBobbleheadForFeaturingAsync(
+          input.id,
+          ctx.userId,
+          dbInstance,
+        );
 
         Sentry.addBreadcrumb({
           category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -302,7 +310,7 @@ export const getUserForFeaturingAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { id: input.id });
 
     try {
-      const result = await ContentSearchFacade.getUserForFeaturing(input.id, ctx.userId, dbInstance);
+      const result = await ContentSearchFacade.getUserForFeaturingAsync(input.id, ctx.userId, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -376,7 +384,7 @@ export const searchPublicContentAction = publicActionClient
     try {
       // TODO: Consider implementing rate limiting for public search endpoints
       // to prevent abuse and ensure fair usage across all users
-      const result = await ContentSearchFacade.getPublicSearchPageResults(input, dbInstance);
+      const result = await ContentSearchFacade.getPublicSearchPageResultsAsync(input, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -440,7 +448,7 @@ export const getPublicSearchDropdownAction = publicActionClient
     try {
       // TODO: Consider implementing rate limiting for dropdown search to prevent
       // excessive requests during rapid typing (debouncing on client side should help)
-      const result = await ContentSearchFacade.getPublicSearchDropdownResults(input.query, dbInstance);
+      const result = await ContentSearchFacade.getPublicSearchDropdownResultsAsync(input.query, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,

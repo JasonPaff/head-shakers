@@ -70,6 +70,20 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
     );
   }
 
+  /**
+   * Get unique categories for bobbleheads in a collection.
+   * Returns an array of distinct category strings used by bobbleheads in the collection.
+   *
+   * Caching: Uses MEDIUM TTL (30 minutes) with collection-based invalidation.
+   * Cache invalidation triggers:
+   * - Bobblehead created/updated/deleted in collection
+   * - Bobblehead category changed
+   *
+   * @param collectionSlug - The collection slug identifier
+   * @param userId - The user ID for permission context
+   * @param dbInstance - Optional database instance for transaction support
+   * @returns Array of unique category strings, empty array if none found
+   */
   static async getCategoriesByCollectionSlugAsync(
     collectionSlug: string,
     userId: string,
@@ -79,7 +93,7 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
       {
         data: { collectionSlug, userId },
         facade,
-        method: 'getCategoriesForCollectionAsync',
+        method: 'getCategoriesByCollectionSlugAsync',
         operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_CATEGORIES_FOR_COLLECTION,
       },
       async () => {
@@ -93,6 +107,15 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
           },
           collectionSlug,
           userId,
+          {
+            context: {
+              entityId: collectionSlug,
+              entityType: CACHE_ENTITY_TYPE.BOBBLEHEAD,
+              facade,
+              operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_CATEGORIES_FOR_COLLECTION,
+              userId,
+            },
+          },
         );
       },
     );
@@ -129,10 +152,11 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
   }> {
     return await executeFacadeOperation(
       {
-        data: { collectionSlug, userId },
+        data: { collectionSlug },
         facade,
-        method: 'getBobbleheadListByCollectionSlugAsync',
+        method: 'getListByCollectionSlugAsync',
         operation: OPERATIONS.COLLECTIONS_DASHBOARD.GET_BOBBLEHEAD_LIST_BY_COLLECTION_SLUG,
+        userId,
       },
       async () => {
         const context = this.getUserContext(userId, dbInstance);
@@ -200,7 +224,7 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
                 entityId: collectionSlug,
                 entityType: CACHE_ENTITY_TYPE.BOBBLEHEAD,
                 facade,
-                operation: 'count-by-collection',
+                operation: OPERATIONS.BOBBLEHEADS_DASHBOARD.COUNT_BY_COLLECTION,
                 userId,
               },
             },

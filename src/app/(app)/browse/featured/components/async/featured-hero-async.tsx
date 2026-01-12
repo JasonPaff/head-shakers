@@ -55,8 +55,8 @@ export async function FeaturedHeroAsync({ currentUserId }: FeaturedHeroAsyncProp
 
   try {
     const [homepageBanner, collectionOfWeek] = await Promise.all([
-      FeaturedContentFacade.getHomepageBanner(),
-      FeaturedContentFacade.getCollectionOfWeek(),
+      FeaturedContentFacade.getHomepageBannerAsync(),
+      FeaturedContentFacade.getCollectionOfWeekAsync(),
     ]);
 
     const heroContent = [...homepageBanner, ...collectionOfWeek];

@@ -55,8 +55,8 @@ export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabb
 
   try {
     const [editorPicks, trending] = await Promise.all([
-      FeaturedContentFacade.getEditorPicks(),
-      FeaturedContentFacade.getTrendingContent(),
+      FeaturedContentFacade.getEditorPicksAsync(),
+      FeaturedContentFacade.getTrendingContentAsync(),
     ]);
 
     const tabbedContent = [...editorPicks, ...trending];

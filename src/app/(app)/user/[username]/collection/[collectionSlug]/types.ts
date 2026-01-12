@@ -106,11 +106,11 @@ export interface CollectionPageData {
 /**
  * Collection view data for the public collection page
  *
- * Data source: CollectionsFacade.getCollectionForPublicView()
+ * Data source: CollectionsFacade.getCollectionForPublicViewAsync()
  * Includes computed fields like lastUpdatedAt and totalBobbleheadCount
  * which are derived from collection relations.
  *
- * @see CollectionsFacade.getCollectionForPublicView
+ * @see CollectionsFacade.getCollectionForPublicViewAsync
  */
 export interface CollectionViewData {
   /** Unique identifier for the collection */

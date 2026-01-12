@@ -7,6 +7,7 @@
 ## Workflow Overview
 
 This orchestration removes the entire tags feature from bobbleheads, including:
+
 - Database schema and relations
 - Add/edit bobblehead forms
 - Display components
@@ -15,11 +16,11 @@ This orchestration removes the entire tags feature from bobbleheads, including:
 
 ## Step Logs
 
-| Step | Description | Status | Log File |
-|------|-------------|--------|----------|
-| 1 | Feature Request Refinement | Pending | [01-feature-refinement.md](./01-feature-refinement.md) |
-| 2 | File Discovery | Pending | [02-file-discovery.md](./02-file-discovery.md) |
-| 3 | Implementation Planning | Pending | [03-implementation-planning.md](./03-implementation-planning.md) |
+| Step | Description                | Status  | Log File                                                         |
+| ---- | -------------------------- | ------- | ---------------------------------------------------------------- |
+| 1    | Feature Request Refinement | Pending | [01-feature-refinement.md](./01-feature-refinement.md)           |
+| 2    | File Discovery             | Pending | [02-file-discovery.md](./02-file-discovery.md)                   |
+| 3    | Implementation Planning    | Pending | [03-implementation-planning.md](./03-implementation-planning.md) |
 
 ## Output Files
 

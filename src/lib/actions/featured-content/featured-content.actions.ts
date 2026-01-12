@@ -296,7 +296,7 @@ export const getFeaturedContentByIdAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
     try {
-      const featuredContent = await FeaturedContentFacade.getFeaturedContentByIdForAdmin(
+      const featuredContent = await FeaturedContentFacade.getFeaturedContentByIdForAdminAsync(
         featuredContentData.id,
         dbInstance,
       );
@@ -348,7 +348,7 @@ export const incrementFeaturedViewCountAction = publicActionClient
     });
 
     try {
-      await FeaturedContentFacade.incrementViewCount(contentId);
+      await FeaturedContentFacade.incrementViewCountAsync(contentId);
       return actionSuccess(null);
     } catch (error) {
       return handleActionError(error, {

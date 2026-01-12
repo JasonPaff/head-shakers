@@ -118,7 +118,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
   }
 
   // Get collection by slug and owner
-  const collection = await CollectionsFacade.getCollectionBySlug(collectionSlug, user.id);
+  const collection = await CollectionsFacade.getCollectionBySlugAsync(collectionSlug, user.id);
 
   if (!collection) {
     notFound();

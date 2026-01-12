@@ -18,40 +18,44 @@
 ## File Discovery Results
 
 ### CRITICAL Priority (6 files)
-| File | Category | Status |
-|------|----------|--------|
-| `src/lib/db/schema/collections.schema.ts` | Database Schema | Modify |
-| `src/lib/db/schema/bobbleheads.schema.ts` | Database Schema | Modify |
-| `src/lib/constants/slug.ts` | Constants | **DELETE** |
-| `src/lib/utils/slug.ts` | Utility | **DELETE** |
-| `src/lib/validations/collections.validation.ts` | Validation | Modify |
-| `src/lib/validations/bobbleheads.validation.ts` | Validation | Modify |
+
+| File                                            | Category        | Status     |
+| ----------------------------------------------- | --------------- | ---------- |
+| `src/lib/db/schema/collections.schema.ts`       | Database Schema | Modify     |
+| `src/lib/db/schema/bobbleheads.schema.ts`       | Database Schema | Modify     |
+| `src/lib/constants/slug.ts`                     | Constants       | **DELETE** |
+| `src/lib/utils/slug.ts`                         | Utility         | **DELETE** |
+| `src/lib/validations/collections.validation.ts` | Validation      | Modify     |
+| `src/lib/validations/bobbleheads.validation.ts` | Validation      | Modify     |
 
 ### HIGH Priority (15 files)
-| File | Category |
-|------|----------|
-| `src/lib/facades/collections/collections.facade.ts` | Facade |
-| `src/lib/facades/bobbleheads/bobbleheads.facade.ts` | Facade |
-| `src/lib/queries/collections/collections.query.ts` | Query |
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Query |
-| `src/lib/services/cache-revalidation.service.ts` | Service |
-| `src/lib/validations/bobblehead-navigation.validation.ts` | Validation |
-| `src/lib/types/bobblehead-navigation.types.ts` | Types |
-| `src/lib/facades/collections/collections-dashboard.facade.ts` | Facade |
-| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts` | Facade |
-| `src/lib/queries/collections/collections-dashboard.query.ts` | Query |
-| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts` | Query |
-| `src/lib/queries/content-search/content-search.query.ts` | Query |
-| `src/lib/queries/featured-content/featured-content-query.ts` | Query |
-| `src/lib/queries/featured-content/featured-content-transformer.ts` | Query |
-| `src/lib/actions/social/social.actions.ts` | Action |
+
+| File                                                               | Category   |
+| ------------------------------------------------------------------ | ---------- |
+| `src/lib/facades/collections/collections.facade.ts`                | Facade     |
+| `src/lib/facades/bobbleheads/bobbleheads.facade.ts`                | Facade     |
+| `src/lib/queries/collections/collections.query.ts`                 | Query      |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts`                 | Query      |
+| `src/lib/services/cache-revalidation.service.ts`                   | Service    |
+| `src/lib/validations/bobblehead-navigation.validation.ts`          | Validation |
+| `src/lib/types/bobblehead-navigation.types.ts`                     | Types      |
+| `src/lib/facades/collections/collections-dashboard.facade.ts`      | Facade     |
+| `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts`      | Facade     |
+| `src/lib/queries/collections/collections-dashboard.query.ts`       | Query      |
+| `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts`       | Query      |
+| `src/lib/queries/content-search/content-search.query.ts`           | Query      |
+| `src/lib/queries/featured-content/featured-content-query.ts`       | Query      |
+| `src/lib/queries/featured-content/featured-content-transformer.ts` | Query      |
+| `src/lib/actions/social/social.actions.ts`                         | Action     |
 
 ### MEDIUM Priority (50+ files)
+
 - Route folders: `[collectionSlug]` → `[collectionId]`, `[bobbleheadSlug]` → `[bobbleheadId]`
 - 30+ components using slug in props/links
 - SEO and utility files
 
 ### LOW Priority (40+ files)
+
 - Integration, component, and unit tests
 - Test factories and mocks
 
@@ -85,19 +89,23 @@ This refactoring removes the slug concept entirely from the Head Shakers applica
 **Confidence**: High
 
 **Files to Delete:**
+
 - `src/lib/constants/slug.ts` - Contains SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN, SLUG_RESERVED_WORDS
 - `src/lib/utils/slug.ts` - Contains generateSlug, ensureUniqueSlug, validateSlug functions
 
 **Changes:**
+
 - Delete both files entirely
 - Remove all imports referencing these files throughout the codebase
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both files deleted
 - [ ] No imports referencing `@/lib/constants/slug` or `@/lib/utils/slug` remain
 - [ ] All validation commands pass
@@ -111,20 +119,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/collections.schema.ts` - Remove slug column definition, slug index, user_slug_unique constraint, and SLUG_MAX_LENGTH import
 
 **Changes:**
+
 - Remove import of `SLUG_MAX_LENGTH` from `@/lib/constants/slug`
 - Remove `slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull()` column
 - Remove `index('collections_slug_idx').on(table.slug)` index
 - Remove `uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug)` constraint
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Collections schema no longer contains slug column
 - [ ] Collections schema no longer references SLUG_MAX_LENGTH
 - [ ] All validation commands pass
@@ -138,19 +150,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/bobbleheads.schema.ts` - Remove slug column definition, slug index, and SLUG_MAX_LENGTH import
 
 **Changes:**
+
 - Remove import of `SLUG_MAX_LENGTH` from `@/lib/constants/slug`
 - Remove `slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull().unique()` column
 - Remove `index('bobbleheads_slug_idx').on(table.slug)` index
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bobbleheads schema no longer contains slug column
 - [ ] Bobbleheads schema no longer references SLUG_MAX_LENGTH
 - [ ] All validation commands pass
@@ -164,17 +180,20 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Run `npm run db:generate` to create migration dropping slug columns
 - Review the generated migration SQL to ensure it only drops slug-related items
 - Run `npm run db:migrate` to apply the migration
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated successfully
 - [ ] Migration drops collections.slug column and related indexes
 - [ ] Migration drops bobbleheads.slug column and related indexes
@@ -189,20 +208,24 @@ npm run db:migrate
 **Confidence**: High
 
 **Files to Modify:**
-- `src/lib/validations/collections.validation.ts` - Remove slug from insert schema omit, remove getCollectionBySlugSchema, remove SLUG_* imports
+
+- `src/lib/validations/collections.validation.ts` - Remove slug from insert schema omit, remove getCollectionBySlugSchema, remove SLUG\_\* imports
 
 **Changes:**
+
 - Remove imports of `SLUG_MAX_LENGTH`, `SLUG_MIN_LENGTH`, `SLUG_PATTERN` from `@/lib/constants/slug`
 - Remove `slug: true` from insertCollectionSchema omit clause
 - Remove the entire `getCollectionBySlugSchema` export
 - Update `UpdateCollection` type to remove slug if extended
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug-related imports in collections validation
 - [ ] insertCollectionSchema no longer omits slug (field removed from schema)
 - [ ] getCollectionBySlugSchema removed entirely
@@ -217,19 +240,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
-- `src/lib/validations/bobbleheads.validation.ts` - Remove slug from insert schema omit, remove getBobbleheadBySlugSchema, remove SLUG_* imports
+
+- `src/lib/validations/bobbleheads.validation.ts` - Remove slug from insert schema omit, remove getBobbleheadBySlugSchema, remove SLUG\_\* imports
 
 **Changes:**
+
 - Remove imports of `SLUG_MAX_LENGTH`, `SLUG_MIN_LENGTH`, `SLUG_PATTERN` from `@/lib/constants/slug`
 - Remove `slug: true` from insertBobbleheadSchema omit clause
 - Remove the entire `getBobbleheadBySlugSchema` export
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug-related imports in bobbleheads validation
 - [ ] insertBobbleheadSchema no longer omits slug (field removed from schema)
 - [ ] getBobbleheadBySlugSchema removed entirely
@@ -244,21 +271,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/types/bobblehead-navigation.types.ts` - Remove slug from AdjacentBobblehead and NavigationContext types
 - `src/lib/validations/bobblehead-navigation.validation.ts` - Remove slug from adjacentBobbleheadSchema and navigationContextSchema
 
 **Changes:**
+
 - Remove `slug: string` from AdjacentBobblehead type
 - Remove `contextSlug: string` from NavigationContext type
 - Remove `slug` field from adjacentBobbleheadSchema
 - Remove `contextSlug` field from navigationContextSchema
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] AdjacentBobblehead type no longer contains slug
 - [ ] NavigationContext type no longer contains contextSlug
 - [ ] Corresponding validation schemas updated
@@ -273,9 +304,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Remove findBySlugAsync, findBySlugWithRelationsAsync, getCollectionSlugsByUserIdAsync, getCollectionMetadata slug field, and BobbleheadListRecord.slug
 
 **Changes:**
+
 - Remove `findBySlugAsync` method entirely
 - Remove `findBySlugWithRelationsAsync` method entirely
 - Remove `getCollectionSlugsByUserIdAsync` method entirely
@@ -287,11 +320,13 @@ npm run lint:fix && npm run typecheck
 - Remove `slug` from `CollectionDashboardListRecord` type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug-related query methods remain
 - [ ] No slug fields in return types
 - [ ] All validation commands pass
@@ -305,9 +340,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Remove findBySlugAsync, findBySlugWithRelationsAsync, getSlugsAsync, and slug from BobbleheadWithRelations
 
 **Changes:**
+
 - Remove `findBySlugAsync` method entirely
 - Remove `findBySlugWithRelationsAsync` method entirely
 - Remove `getSlugsAsync` method entirely
@@ -316,11 +353,13 @@ npm run lint:fix && npm run typecheck
 - Remove `slug` references in `getBobbleheadMetadata` method
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug-based query methods remain
 - [ ] BobbleheadWithRelations no longer includes collectionSlug
 - [ ] All validation commands pass
@@ -334,9 +373,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/collections/collections.facade.ts` - Remove slug imports, slug generation in createCollectionAsync and updateAsync, remove getCollectionBySlug and getCollectionBySlugWithRelations methods
 
 **Changes:**
+
 - Remove import of `ensureUniqueSlug`, `generateSlug` from `@/lib/utils/slug`
 - In `createCollectionAsync`: Remove slug generation logic, remove `slug` from insert data
 - In `updateAsync`: Remove slug regeneration logic when name changes
@@ -347,11 +388,13 @@ npm run lint:fix && npm run typecheck
 - Update cache revalidation calls to remove slug parameters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug generation logic in create/update methods
 - [ ] No slug-based lookup methods
 - [ ] All validation commands pass
@@ -365,9 +408,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Remove slug imports, generateUniqueSlugAsync method, slug-based methods, and slug parameters in cache invalidation
 
 **Changes:**
+
 - Remove import of `ensureUniqueSlug`, `generateSlug` from `@/lib/utils/slug`
 - Remove `generateUniqueSlugAsync` private method entirely
 - In `createAsync`: Remove slug generation, create without slug
@@ -381,11 +426,13 @@ npm run lint:fix && npm run typecheck
 - Update cache invalidation calls to remove slug parameters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug generation logic remains
 - [ ] No slug-based lookup methods
 - [ ] CreateBobbleheadResult no longer includes collectionSlug
@@ -400,9 +447,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Update method signatures to remove slug parameters, update path revalidation to use IDs
 
 **Changes:**
+
 - Update `bobbleheads.onCreate` to remove `bobbleheadSlug`, `collectionSlug` parameters
 - Update `bobbleheads.onDelete` to remove `bobbleheadSlug`, `collectionSlug` parameters
 - Update `bobbleheads.onPhotoChange` to remove slug parameters
@@ -417,11 +466,13 @@ npm run lint:fix && npm run typecheck
 - Update path revalidation calls to use ID-based routes or remove if no longer applicable
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug parameters in cache revalidation method signatures
 - [ ] Path revalidation updated to use ID-based patterns
 - [ ] All validation commands pass
@@ -435,21 +486,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Rename `src/app/(app)/user/[username]/collection/[collectionSlug]` to `[collectionId]`
 - Update `route-type.ts` in the renamed folder
 
 **Changes:**
+
 - Rename folder from `[collectionSlug]` to `[collectionId]`
 - Update `route-type.ts` to validate `collectionId` as UUID instead of slug pattern
-- Remove SLUG_* imports from route-type.ts
+- Remove SLUG\_\* imports from route-type.ts
 - Update routeParams schema to use `collectionId: z.uuid()`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route folder renamed to `[collectionId]`
 - [ ] route-type.ts uses UUID validation for collectionId
 - [ ] All validation commands pass
@@ -463,21 +518,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Rename `src/app/(app)/user/[username]/collection/[collectionId]/bobbleheads/[bobbleheadSlug]` to `[bobbleheadId]`
 - Update `route-type.ts` in the renamed folder
 
 **Changes:**
+
 - Rename folder from `[bobbleheadSlug]` to `[bobbleheadId]`
 - Update `route-type.ts` to validate `bobbleheadId` and `collectionId` as UUIDs
-- Remove SLUG_* imports from route-type.ts
+- Remove SLUG\_\* imports from route-type.ts
 - Update routeParams schema to use UUID validation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route folder renamed to `[bobbleheadId]`
 - [ ] route-type.ts uses UUID validation for both IDs
 - [ ] All validation commands pass
@@ -491,16 +550,19 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Run `npm run next-typesafe-url` to regenerate `_next-typesafe-url_.d.ts`
 - Verify generated types use `collectionId` and `bobbleheadId` instead of slugs
 
 **Validation Commands:**
+
 ```bash
 npm run next-typesafe-url
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `_next-typesafe-url_.d.ts` regenerated successfully
 - [ ] Routes now use `[collectionId]` and `[bobbleheadId]` parameters
 - [ ] All validation commands pass
@@ -514,22 +576,26 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/user/[username]/collection/[collectionId]/page.tsx` - Update route params usage
 - `src/app/(app)/user/[username]/collection/[collectionId]/types.ts` - Update types if exists
 - All components in `src/app/(app)/user/[username]/collection/[collectionId]/components/` - Update prop types and data fetching
 
 **Changes:**
+
 - Update page.tsx to extract `collectionId` from routeParams instead of `collectionSlug`
 - Update data fetching to use `getByIdAsync` instead of slug-based methods
 - Update all child components to receive and use IDs
 - Update link generation to use IDs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page extracts collectionId from route params
 - [ ] Data fetching uses ID-based methods
 - [ ] All validation commands pass
@@ -543,10 +609,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/user/[username]/collection/[collectionId]/bobbleheads/[bobbleheadId]/page.tsx` - Update route params usage
 - All components in `src/app/(app)/user/[username]/collection/[collectionId]/bobbleheads/[bobbleheadId]/components/` - Update prop types and data fetching
 
 **Changes:**
+
 - Update page.tsx to extract `bobbleheadId` and `collectionId` from routeParams
 - Update data fetching to use `getBobbleheadById` instead of slug-based methods
 - Update all child components to receive and use IDs
@@ -554,11 +622,13 @@ npm run lint:fix && npm run typecheck
 - Update link generation throughout
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page extracts bobbleheadId and collectionId from route params
 - [ ] Data fetching uses ID-based methods
 - [ ] Navigation uses IDs for prev/next links
@@ -573,22 +643,26 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections-dashboard.query.ts` - Remove slug from return types and queries
 - `src/lib/queries/bobbleheads/bobbleheads-dashboard.query.ts` - Remove slug from return types and queries
 - `src/lib/facades/collections/collections-dashboard.facade.ts` - Remove slug usage
 - `src/lib/facades/bobbleheads/bobbleheads-dashboard.facade.ts` - Remove slug usage
 
 **Changes:**
+
 - Remove `slug` from dashboard record types
 - Remove slug selections from dashboard queries
 - Update dashboard facades to not reference slugs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug fields in dashboard types
 - [ ] No slug in dashboard query results
 - [ ] All validation commands pass
@@ -602,21 +676,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-search/content-search.query.ts` - Remove slug from search results
 - `src/lib/queries/featured-content/featured-content-query.ts` - Remove slug from featured content
 - `src/lib/queries/featured-content/featured-content-transformer.ts` - Remove slug transformations
 
 **Changes:**
+
 - Update search result types to exclude slug
 - Update featured content result types to exclude slug
 - Update transformers to not include slug in output
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search results use IDs instead of slugs
 - [ ] Featured content uses IDs instead of slugs
 - [ ] All validation commands pass
@@ -630,19 +708,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/social/social.actions.ts` - Remove slug parameters from action methods
 
 **Changes:**
+
 - Update like/unlike actions to remove slug parameters
 - Update comment actions to remove slug parameters
 - Update follow actions if they use slug
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug parameters in social action signatures
 - [ ] All validation commands pass
 
@@ -655,23 +737,27 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - Components in `src/components/feature/` directories
 - Dashboard page components in `src/app/(app)/user/[username]/dashboard/`
 - Browse page components in `src/app/(app)/browse/`
 - Admin components in `src/components/admin/`
 
 **Changes:**
+
 - Update component prop types to use IDs instead of slugs
 - Update `$path` calls to use `collectionId` and `bobbleheadId` parameters
 - Update any display of slug fields to show name instead
 - Update link generation throughout
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All components use IDs in prop types
 - [ ] All `$path` calls use ID parameters
 - [ ] No slug display in UI
@@ -686,18 +772,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/middleware.ts` - Update route matching patterns if needed
 
 **Changes:**
+
 - Update any route matchers that reference slug patterns
 - Update any slug validation or transformation logic
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Middleware handles ID-based routes correctly
 - [ ] All validation commands pass
 
@@ -710,22 +800,26 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Test factory files in `tests/fixtures/`
 - MSW handlers in `tests/mocks/handlers/`
 - Mock data files in `tests/mocks/data/`
 
 **Changes:**
+
 - Remove slug field generation from collection factories
 - Remove slug field generation from bobblehead factories
 - Update mock data to exclude slug fields
 - Update MSW handlers to not return slug fields
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No slug in factory-generated data
 - [ ] Mock data excludes slugs
 - [ ] All validation commands pass
@@ -739,24 +833,28 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - Integration tests in `tests/integration/`
 - Component tests in `tests/components/`
 - Unit tests in `tests/unit/`
 - E2E tests if any reference slugs
 
 **Changes:**
+
 - Update test assertions to not expect slug fields
 - Update test data creation to not include slugs
 - Update route testing to use ID parameters
 - Remove tests for slug generation and validation utilities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] No test references slug fields
 - [ ] Tests for slug utilities removed
 - [ ] All tests pass
@@ -771,12 +869,14 @@ npm run test
 **Confidence**: High
 
 **Changes:**
+
 - Run grep search for any remaining "slug" references
 - Address any edge cases discovered
 - Run full test suite
 - Run build to verify production readiness
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test
@@ -784,6 +884,7 @@ npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] No remaining slug references in source code (except potentially third-party)
 - [ ] All linting passes
 - [ ] All type checking passes

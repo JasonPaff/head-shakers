@@ -124,7 +124,7 @@ npm run lint:fix && npm run typecheck
 
 **Changes:**
 
-- Remove tags-related derived boolean variables (_hasTags, _visibleTags, _remainingTagsCount, _hasMoreTags)
+- Remove tags-related derived boolean variables (\_hasTags, \_visibleTags, \_remainingTagsCount, \_hasMoreTags)
 - Remove isValidHexColor helper function
 - Remove Tags Section JSX block with Conditional wrapper
 - Remove tags property access from bobblehead.tags
@@ -159,7 +159,7 @@ npm run lint:fix && npm run typecheck
 - Remove tagIds from SearchFiltersProps interface
 - Remove tagIds from activeFilterCount calculation
 - Remove tagIds from handleClearFilters callback
-- Remove tagIds check from _hasActiveFilters derived variable
+- Remove tagIds check from \_hasActiveFilters derived variable
 - Remove tagIds badge display from Active Filters Summary
 - Remove tagIds from route searchParams schema
 

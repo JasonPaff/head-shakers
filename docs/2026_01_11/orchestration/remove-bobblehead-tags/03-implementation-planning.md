@@ -13,6 +13,7 @@
 ## Agent Prompt
 
 Generate an implementation plan in MARKDOWN format with sections:
+
 - Overview (Duration, Complexity, Risk Level)
 - Quick Summary
 - Prerequisites
@@ -25,6 +26,7 @@ Include `npm run lint:fix && npm run typecheck` validation for every step.
 ## Agent Response
 
 Full implementation plan with 24 steps covering:
+
 1. UI component deletion (Steps 1-5)
 2. Server actions and facades deletion (Steps 6-9)
 3. Validation schema cleanup (Steps 10-12)
@@ -47,11 +49,11 @@ Full implementation plan with 24 steps covering:
 
 ## Plan Metrics
 
-| Metric | Value |
-|--------|-------|
-| Total Steps | 24 |
-| Files to Delete | 14 |
-| Files to Modify | 22 |
+| Metric             | Value     |
+| ------------------ | --------- |
+| Total Steps        | 24        |
+| Files to Delete    | 14        |
+| Files to Modify    | 22        |
 | Estimated Duration | 6-8 hours |
-| Complexity | High |
-| Risk Level | Medium |
+| Complexity         | High      |
+| Risk Level         | Medium    |

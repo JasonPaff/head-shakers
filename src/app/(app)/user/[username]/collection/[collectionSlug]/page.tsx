@@ -61,7 +61,7 @@ export async function generateMetadata({
   }
 
   // Fetch collection SEO metadata
-  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, user.id);
+  const seoData = await CollectionsFacade.getCollectionSeoMetadataAsync(collectionSlug, user.id);
 
   if (!seoData) {
     return {
@@ -125,7 +125,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   }
 
   // Get collection by slug
-  const collection = await CollectionsFacade.getCollectionBySlug(collectionSlug, user.id);
+  const collection = await CollectionsFacade.getCollectionBySlugAsync(collectionSlug, user.id);
 
   if (!collection) {
     notFound();
@@ -134,7 +134,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const collectionId = collection.id;
 
   // Fetch SEO data for JSON-LD schemas
-  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, user.id);
+  const seoData = await CollectionsFacade.getCollectionSeoMetadataAsync(collectionSlug, user.id);
 
   // Generate canonical URL for JSON-LD schemas
   const collectionUrl = `${DEFAULT_SITE_METADATA.url}${$path({

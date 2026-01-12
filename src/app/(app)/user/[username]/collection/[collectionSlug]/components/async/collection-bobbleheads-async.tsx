@@ -32,7 +32,7 @@ export const CollectionBobbleheadsAsync = async ({
 }: CollectionBobbleheadsAsyncProps) => {
   const currentUserId = await getUserIdAsync();
 
-  const bobbleheads = await CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
+  const bobbleheads = await CollectionsFacade.getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId,
     currentUserId || undefined,
     {

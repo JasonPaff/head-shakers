@@ -21,7 +21,7 @@ interface HeroSectionProps {
 export const HeroSection = ({ username }: HeroSectionProps) => {
   return (
     <section
-      className={`relative overflow-hidden bg-gradient-to-b from-orange-50 via-white to-orange-50/50
+      className={`relative overflow-hidden bg-linear-to-b from-orange-50 via-white to-orange-50/50
         dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
       data-slot={'hero-section'}
       data-testid={generateTestId('feature', 'hero-section')}
@@ -30,24 +30,24 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0
-        bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]
+        bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))]
           from-orange-200/40 via-transparent to-transparent dark:from-orange-900/20`}
       />
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0
          bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)]
-          bg-[size:24px_24px]
+          bg-size-[24px_24px]
           dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]`}
       />
       <div
         aria-hidden
-        className={`pointer-events-none absolute top-20 left-1/4 size-96 rounded-full bg-gradient-to-r
+        className={`pointer-events-none absolute top-20 left-1/4 size-96 rounded-full bg-linear-to-r
           from-orange-300/40 to-amber-300/40 blur-3xl dark:from-orange-500/30 dark:to-amber-500/30`}
       />
       <div
         aria-hidden
-        className={`pointer-events-none absolute top-60 right-1/4 size-96 rounded-full bg-gradient-to-l
+        className={`pointer-events-none absolute top-60 right-1/4 size-96 rounded-full bg-linear-to-l
           from-amber-300/30 to-orange-300/30 blur-3xl dark:from-amber-500/20 dark:to-orange-500/20`}
       />
 
@@ -73,7 +73,7 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
             >
               Collect, Share, and{' '}
               <span
-                className={`bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text
+                className={`bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text
                   text-transparent dark:from-orange-400 dark:via-amber-400 dark:to-yellow-400`}
               >
                 Discover
@@ -94,7 +94,7 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
                 fallback={
                   <Button
                     asChild
-                    className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8
+                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-8
                       text-lg font-semibold text-primary-foreground shadow-lg shadow-primary/25
                       hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}
@@ -107,7 +107,7 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
                 {username && (
                   <Button
                     asChild
-                    className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-8 text-lg
                       font-semibold text-primary-foreground shadow-lg shadow-primary/25
                       hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}

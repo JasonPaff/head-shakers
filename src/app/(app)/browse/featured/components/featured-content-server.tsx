@@ -98,10 +98,10 @@ export async function FeaturedContentServer() {
 
     // fetch all featured content sections in parallel
     const [homepageBanner, editorPicks, collectionOfWeek, trending] = await Promise.all([
-      FeaturedContentFacade.getHomepageBanner(),
-      FeaturedContentFacade.getEditorPicks(),
-      FeaturedContentFacade.getCollectionOfWeek(),
-      FeaturedContentFacade.getTrendingContent(),
+      FeaturedContentFacade.getHomepageBannerAsync(),
+      FeaturedContentFacade.getEditorPicksAsync(),
+      FeaturedContentFacade.getCollectionOfWeekAsync(),
+      FeaturedContentFacade.getTrendingContentAsync(),
     ]);
 
     console.log('FeaturedContentServer: Data fetched successfully', {

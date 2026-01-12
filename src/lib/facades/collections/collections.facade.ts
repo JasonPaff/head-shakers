@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
-import { eq } from 'drizzle-orm';
 import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
 
@@ -12,7 +10,6 @@ import type {
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
-import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
 import type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';
@@ -24,24 +21,18 @@ import type {
 
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
-import {
-  createProtectedQueryContext,
-  createPublicQueryContext,
-  createUserQueryContext,
-} from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
-import { createFacadeError } from '@/lib/utils/error-builders';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
+import { captureFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 export interface CollectionMetrics {
@@ -58,426 +49,177 @@ export interface CollectionMetrics {
   };
 }
 
-export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
+export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicViewAsync>>;
 
-const facadeName = 'COLLECTIONS_FACADE';
+const facadeName = 'CollectionsFacade';
 
 export class CollectionsFacade extends BaseFacade {
   /**
-   * Browse collections by category with filtering, sorting, and pagination
+   * Browse collections by category with filtering, sorting, and pagination.
+   *
+   * Cache behavior: Uses CacheService.collections.public with MEDIUM TTL (30 min).
+   * Invalidated by: collection creates, updates, deletes.
+   *
+   * @param input - Browse categories input with filters, sorting, and pagination
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Paginated browse categories result with collections and pagination info
    */
-  static async browseCategories(
+  static async browseCategoriesAsync(
     input: BrowseCategoriesInput,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<BrowseCategoriesResult> {
-    const startTime = performance.now();
-
-    // Track filter usage patterns
-    const activeFilters: Array<string> = [];
-    if (input.filters?.query) activeFilters.push('search');
-    if (input.filters?.category) activeFilters.push('category');
-    if (input.filters?.ownerId) activeFilters.push('owner');
-    if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
-
-    Sentry.addBreadcrumb({
-      category: 'browse_categories_filters',
-      data: {
-        activeFilters,
-        category: input.filters?.category ? 'set' : 'unset',
-        dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
-        dateTo: input.filters?.dateTo ? 'set' : 'unset',
-        ownerId: input.filters?.ownerId ? 'set' : 'unset',
-        query:
-          input.filters?.query ?
-            `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"`
-          : 'empty',
-      },
-      level: 'info',
-      message: `Browse categories with filters: ${activeFilters.join(', ') || 'none'}`,
-    });
-
-    Sentry.addBreadcrumb({
-      category: 'browse_categories_pagination',
-      data: {
-        page: input.pagination?.page,
-        pageSize: input.pagination?.pageSize,
-      },
-      level: 'info',
-      message: `Browse categories pagination: page ${input.pagination?.page}, size ${input.pagination?.pageSize}`,
-    });
-
-    try {
-      const inputHash = createHashFromObject(input);
-      const result = await CacheService.collections.public(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          const queryStartTime = performance.now();
-          const result = await CollectionsQuery.getBrowseCategoriesAsync(input, context);
-          const queryDuration = performance.now() - queryStartTime;
-
-          // Track query performance
-          Sentry.captureMessage('Browse categories query executed', {
-            level: 'info',
-            tags: {
-              activeFilters: activeFilters.join(','),
-              cacheKey: 'browse_categories_public',
-              operation: 'getBrowseCategoriesAsync',
-            },
-          });
-
-          // Track slow queries
-          if (queryDuration > 1000) {
-            Sentry.captureMessage('Browse categories slow query', {
-              level: 'info',
-              tags: {
-                activeFilters: activeFilters.join(','),
-                operation: 'query',
-              },
-            });
-          }
-
-          // transform results to include Cloudinary URLs for first bobblehead photos
-          const transformedCollections = result.collections.map((record) => ({
-            ...record,
-            firstBobbleheadPhoto:
-              record.firstBobbleheadPhoto ?
-                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
-                  crop: 'fill',
-                  gravity: 'auto',
-                  height: 300,
-                  quality: 'auto',
-                  width: 300,
-                })
-              : null,
-          }));
-
-          return {
-            ...result,
-            collections: transformedCollections,
-          };
-        },
-        inputHash,
-        {
-          context: {
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'browseCategories',
-            userId: viewerUserId,
-          },
-        },
-      );
-
-      const totalDuration = performance.now() - startTime;
-
-      // Track custom metrics for filter and pagination patterns
-      if (activeFilters.length > 0) {
-        Sentry.captureMessage('Browse categories filtered search', {
-          level: 'info',
-          tags: {
-            filterCount: activeFilters.length.toString(),
-            filters: activeFilters.join(','),
-          },
-        });
-      }
-
-      // Track pagination depth (how far users are paginating)
-      if (input.pagination?.page && input.pagination.page > 1) {
-        Sentry.captureMessage('Browse categories deep pagination', {
-          level: 'info',
-          tags: {
-            page: input.pagination.page.toString(),
-          },
-        });
-      }
-
-      // Track overall performance - report slow responses
-      if (totalDuration > 1000) {
-        Sentry.captureMessage('Browse categories slow response', {
-          level: 'info',
-          tags: {
-            hasFilters: activeFilters.length > 0 ? 'yes' : 'no',
-            resultCount: result.collections.length.toString(),
-            totalCount: result.pagination.totalCount.toString(),
-            viewerAuthenticated: !!viewerUserId,
-          },
-        });
-      }
-
-      // Add success breadcrumb with results summary
-      Sentry.addBreadcrumb({
-        category: 'browse_categories_results',
+    return executeFacadeOperation(
+      {
         data: {
+          hasCategory: Boolean(input.filters?.category),
+          hasQuery: Boolean(input.filters?.query),
+          page: input.pagination?.page,
+        },
+        facade: facadeName,
+        method: 'browseCategoriesAsync',
+        operation: OPERATIONS.COLLECTIONS.BROWSE_CATEGORIES,
+        userId: viewerUserId,
+      },
+      async () => {
+        const inputHash = createHashFromObject(input);
+        return CacheService.collections.public(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            const result = await CollectionsQuery.getBrowseCategoriesAsync(input, context);
+
+            // Transform results to include Cloudinary URLs for first bobblehead photos
+            const transformedCollections = result.collections.map((record) => ({
+              ...record,
+              firstBobbleheadPhoto:
+                record.firstBobbleheadPhoto ?
+                  CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                    crop: 'fill',
+                    gravity: 'auto',
+                    height: 300,
+                    quality: 'auto',
+                    width: 300,
+                  })
+                : null,
+            }));
+
+            return {
+              ...result,
+              collections: transformedCollections,
+            };
+          },
+          inputHash,
+          {
+            context: {
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'browseCategoriesAsync',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
           resultCount: result.collections.length,
           totalCount: result.pagination.totalCount,
           totalPages: result.pagination.totalPages,
-        },
-        level: 'info',
-        message: `Browse categories completed: ${result.collections.length} results of ${result.pagination.totalCount} total`,
-      });
-
-      return result;
-    } catch (error) {
-      const totalDuration = performance.now() - startTime;
-
-      // Track error metrics
-      Sentry.captureMessage('Browse categories error', {
-        level: 'error',
-        tags: {
-          activeFilters: activeFilters.join(','),
-          errorType: error instanceof Error ? error.constructor.name : 'unknown',
-        },
-      });
-
-      const context: FacadeErrorContext = {
-        data: {
-          activeFilters,
-          filters: {
-            category: input.filters?.category ? `[${input.filters.category}]` : 'unset',
-            dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
-            owner: input.filters?.ownerId ? 'set' : 'unset',
-            query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
-          },
-          input,
-          pagination: input.pagination,
-          totalDuration,
-        },
-        facade: 'CollectionsFacade',
-        method: 'browseCategories',
-        operation: 'browseCategories',
-        userId: viewerUserId,
-      };
-
-      Sentry.addBreadcrumb({
-        category: 'error',
-        data: {
-          activeFilters,
-          durationMs: totalDuration,
-        },
-        level: 'error',
-        message: `Browse categories failed after ${totalDuration.toFixed(2)}ms`,
-      });
-
-      throw createFacadeError(context, error);
-    }
+        }),
+      },
+    );
   }
 
   /**
-   * Browse collections with filtering, sorting, and pagination
+   * Browse collections with filtering, sorting, and pagination.
+   *
+   * Cache behavior: Uses CacheService.collections.public with MEDIUM TTL (30 min).
+   * Invalidated by: collection creates, updates, deletes.
+   *
+   * @param input - Browse collections input with filters, sorting, and pagination
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Paginated browse collections result with collections and pagination info
    */
-  static async browseCollections(
+  static async browseCollectionsAsync(
     input: BrowseCollectionsInput,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<BrowseCollectionsResult> {
-    const startTime = performance.now();
-
-    // Track filter usage patterns
-    const activeFilters: Array<string> = [];
-    if (input.filters?.query) activeFilters.push('search');
-    if (input.filters?.categoryId) activeFilters.push('category');
-    if (input.filters?.ownerId) activeFilters.push('owner');
-    if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
-
-    Sentry.addBreadcrumb({
-      category: 'browse_filters',
-      data: {
-        activeFilters,
-        categoryId: input.filters?.categoryId ? 'set' : 'unset',
-        dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
-        dateTo: input.filters?.dateTo ? 'set' : 'unset',
-        ownerId: input.filters?.ownerId ? 'set' : 'unset',
-        query:
-          input.filters?.query ?
-            `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"`
-          : 'empty',
-      },
-      level: 'info',
-      message: `Browse with filters: ${activeFilters.join(', ') || 'none'}`,
-    });
-
-    Sentry.addBreadcrumb({
-      category: 'browse_pagination',
-      data: {
-        page: input.pagination?.page,
-        pageSize: input.pagination?.pageSize,
-      },
-      level: 'info',
-      message: `Browse pagination: page ${input.pagination?.page}, size ${input.pagination?.pageSize}`,
-    });
-
-    try {
-      const inputHash = createHashFromObject(input);
-      const result = await CacheService.collections.public(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          const queryStartTime = performance.now();
-          const result = await CollectionsQuery.getBrowseCollectionsAsync(input, context);
-          const queryDuration = performance.now() - queryStartTime;
-
-          // Track query performance
-          Sentry.captureMessage('Browse collections query executed', {
-            level: 'info',
-            tags: {
-              activeFilters: activeFilters.join(','),
-              cacheKey: 'browse_public',
-              operation: 'getBrowseCollectionsAsync',
-            },
-          });
-
-          // Track query performance
-          if (queryDuration > 1000) {
-            // Only report slow queries
-            Sentry.captureMessage('Browse collections slow query', {
-              level: 'info',
-              tags: {
-                activeFilters: activeFilters.join(','),
-                operation: 'query',
-              },
-            });
-          }
-
-          // transform results to include Cloudinary URLs for first bobblehead photos
-          const transformedCollections = result.collections.map((record) => ({
-            ...record,
-            firstBobbleheadPhoto:
-              record.firstBobbleheadPhoto ?
-                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
-                  crop: 'fill',
-                  gravity: 'auto',
-                  height: 300,
-                  quality: 'auto',
-                  width: 300,
-                })
-              : null,
-          }));
-
-          return {
-            ...result,
-            collections: transformedCollections,
-          };
-        },
-        inputHash,
-        {
-          context: {
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'browse',
-            userId: viewerUserId,
-          },
-        },
-      );
-
-      const totalDuration = performance.now() - startTime;
-
-      // Track custom metrics for filter and pagination patterns
-      if (activeFilters.length > 0) {
-        Sentry.captureMessage('Browse collections filtered search', {
-          level: 'info',
-          tags: {
-            filterCount: activeFilters.length.toString(),
-            filters: activeFilters.join(','),
-          },
-        });
-      }
-
-      // Track pagination depth (how far users are paginating)
-      if (input.pagination?.page && input.pagination.page > 1) {
-        Sentry.captureMessage('Browse collections deep pagination', {
-          level: 'info',
-          tags: {
-            page: input.pagination.page.toString(),
-          },
-        });
-      }
-
-      // Track overall performance - report slow responses
-      if (totalDuration > 1000) {
-        Sentry.captureMessage('Browse collections slow response', {
-          level: 'info',
-          tags: {
-            hasFilters: activeFilters.length > 0 ? 'yes' : 'no',
-            resultCount: result.collections.length.toString(),
-            totalCount: result.pagination.totalCount.toString(),
-            viewerAuthenticated: !!viewerUserId,
-          },
-        });
-      }
-
-      // Add success breadcrumb with results summary
-      Sentry.addBreadcrumb({
-        category: 'browse_results',
+    return executeFacadeOperation(
+      {
         data: {
+          hasCategoryId: Boolean(input.filters?.categoryId),
+          hasQuery: Boolean(input.filters?.query),
+          page: input.pagination?.page,
+        },
+        facade: facadeName,
+        method: 'browseCollectionsAsync',
+        operation: OPERATIONS.COLLECTIONS.BROWSE,
+        userId: viewerUserId,
+      },
+      async () => {
+        const inputHash = createHashFromObject(input);
+        return CacheService.collections.public(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            const result = await CollectionsQuery.getBrowseCollectionsAsync(input, context);
+
+            // Transform results to include Cloudinary URLs for first bobblehead photos
+            const transformedCollections = result.collections.map((record) => ({
+              ...record,
+              firstBobbleheadPhoto:
+                record.firstBobbleheadPhoto ?
+                  CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                    crop: 'fill',
+                    gravity: 'auto',
+                    height: 300,
+                    quality: 'auto',
+                    width: 300,
+                  })
+                : null,
+            }));
+
+            return {
+              ...result,
+              collections: transformedCollections,
+            };
+          },
+          inputHash,
+          {
+            context: {
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'browseCollectionsAsync',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
           resultCount: result.collections.length,
           totalCount: result.pagination.totalCount,
           totalPages: result.pagination.totalPages,
-        },
-        level: 'info',
-        message: `Browse completed: ${result.collections.length} results of ${result.pagination.totalCount} total`,
-      });
-
-      return result;
-    } catch (error) {
-      const totalDuration = performance.now() - startTime;
-
-      // Track error metrics
-      Sentry.captureMessage('Browse collections error', {
-        level: 'error',
-        tags: {
-          activeFilters: activeFilters.join(','),
-          errorType: error instanceof Error ? error.constructor.name : 'unknown',
-        },
-      });
-
-      const context: FacadeErrorContext = {
-        data: {
-          activeFilters,
-          filters: {
-            category: input.filters?.categoryId ? 'set' : 'unset',
-            dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
-            owner: input.filters?.ownerId ? 'set' : 'unset',
-            query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
-          },
-          input,
-          pagination: input.pagination,
-          totalDuration,
-        },
-        facade: 'CollectionsFacade',
-        method: 'browseCollections',
-        operation: 'browse',
-        userId: viewerUserId,
-      };
-
-      Sentry.addBreadcrumb({
-        category: 'error',
-        data: {
-          activeFilters,
-          durationMs: totalDuration,
-        },
-        level: 'error',
-        message: `Browse collections failed after ${totalDuration.toFixed(2)}ms`,
-      });
-
-      throw createFacadeError(context, error);
-    }
+        }),
+      },
+    );
   }
 
   /**
-   * Compute metrics with view data included
+   * Compute metrics with view data included.
+   *
+   * @param collection - Collection with relations to compute metrics for
+   * @param shouldIncludeViewData - Whether to include view data in metrics
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Collection metrics with optional view data
    */
-  static async computeMetricsWithViews(
+  static async computeMetricsWithViewsAsync(
     collection: CollectionWithRelations,
     shouldIncludeViewData = false,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<CollectionMetrics> {
     const baseMetrics = this.computeMetrics(collection);
 
@@ -502,12 +244,24 @@ export class CollectionsFacade extends BaseFacade {
         viewStats,
       };
     } catch (error) {
-      // return base metrics if view data fails to load
-      console.warn('Failed to load view data for collection metrics:', error);
+      // Log warning but don't fail - return base metrics
+      captureFacadeWarning(error, facadeName, 'computeMetricsWithViewsAsync', {
+        collectionId: collection.id,
+      });
       return baseMetrics;
     }
   }
 
+  /**
+   * Create a new collection.
+   *
+   * Cache behavior: Invalidates user collections cache after creation.
+   *
+   * @param collection - Collection data to create
+   * @param userId - User ID of the collection owner
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The created collection record, or null if creation failed
+   */
   static async createCollectionAsync(
     collection: InsertCollection,
     userId: string,
@@ -515,9 +269,9 @@ export class CollectionsFacade extends BaseFacade {
   ): Promise<CollectionRecord | null> {
     return executeFacadeOperation(
       {
-        data: { collection, userId },
+        data: { name: collection.name },
         facade: facadeName,
-        method: 'createAsync',
+        method: 'createCollectionAsync',
         operation: OPERATIONS.COLLECTIONS.CREATE,
         userId,
       },
@@ -552,28 +306,62 @@ export class CollectionsFacade extends BaseFacade {
 
         return newCollection;
       },
+      {
+        includeResultSummary: (result) => ({
+          id: result?.id,
+          slug: result?.slug,
+        }),
+      },
     );
   }
 
-  static async deleteAsync(collection: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const deletedCollection = await CollectionsQuery.deleteAsync(collection, userId, context);
+  /**
+   * Delete a collection.
+   *
+   * Cache behavior: Invalidates collection caches after deletion.
+   * Also cleans up cover photo from Cloudinary (non-blocking).
+   *
+   * @param collection - Collection data with ID to delete
+   * @param userId - User ID of the collection owner
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The deleted collection record, or null if not found
+   */
+  static async deleteAsync(
+    collection: DeleteCollection,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionRecord | null> {
+    return executeFacadeOperation(
+      {
+        data: { collectionId: collection.collectionId },
+        facade: facadeName,
+        method: 'deleteAsync',
+        operation: OPERATIONS.COLLECTIONS.DELETE,
+        userId,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+        const deletedCollection = await CollectionsQuery.deleteAsync(collection, userId, context);
 
-      // cleanup cover photo from Cloudinary if it exists
-      if (deletedCollection?.coverImageUrl) {
-        try {
-          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);
-          if (publicId) {
-            await CloudinaryService.deletePhotosFromCloudinary([publicId]);
-          }
-        } catch (cloudinaryError) {
-          // log the error but don't fail the deletion operation
-          console.error('Failed to delete collection cover photo from Cloudinary:', cloudinaryError);
+        if (!deletedCollection) {
+          return null;
         }
-      }
 
-      if (deletedCollection) {
+        // Non-blocking cleanup of cover photo from Cloudinary
+        if (deletedCollection.coverImageUrl) {
+          try {
+            const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);
+            if (publicId) {
+              await CloudinaryService.deletePhotosFromCloudinary([publicId]);
+            }
+          } catch (cloudinaryError) {
+            // Log the error but don't fail the deletion operation
+            captureFacadeWarning(cloudinaryError, facadeName, 'cloudinary-cleanup', {
+              collectionId: deletedCollection.id,
+            });
+          }
+        }
+
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, deletedCollection.id);
         // Revalidate user's dashboard with their username
         const user = await UsersFacade.getUserByIdAsync(userId);
@@ -586,26 +374,35 @@ export class CollectionsFacade extends BaseFacade {
           );
         }
         CacheRevalidationService.collections.onDelete(deletedCollection.id, userId);
-      }
 
-      return deletedCollection;
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { collectionId: collection.collectionId },
-        facade: facadeName,
-        method: 'deleteAsync',
-        operation: 'delete',
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
+        return deletedCollection;
+      },
+      {
+        includeResultSummary: (result) => ({
+          deleted: result !== null,
+          id: result?.id,
+        }),
+      },
+    );
   }
 
-  static async getAllCollectionBobbleheadsWithPhotos(
+  /**
+   * Get all bobbleheads in a collection with photos and like data.
+   *
+   * Cache behavior: Uses CacheService.bobbleheads.byCollection with MEDIUM TTL.
+   * Invalidated by: bobblehead changes, photo changes.
+   *
+   * @param collectionId - Collection ID to get bobbleheads from
+   * @param viewerUserId - Optional viewer user ID for like status
+   * @param options - Optional search and sort options
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Array of bobbleheads with photos and like data
+   */
+  static async getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     viewerUserId?: string,
     options?: { searchTerm?: string; sortBy?: string },
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<
     Array<
       BobbleheadListRecord & {
@@ -616,73 +413,87 @@ export class CollectionsFacade extends BaseFacade {
       }
     >
   > {
-    try {
-      const optionsHash = createHashFromObject({ all: true, options, photos: true, viewerUserId });
-      return CacheService.bobbleheads.byCollection(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotosAsync(
-            collectionId,
-            context,
-            options,
-          );
-
-          if (bobbleheads.length === 0) {
-            return bobbleheads;
-          }
-
-          const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
-            bobbleheadIds,
-            'bobblehead',
-            viewerUserId,
-            dbInstance,
-          );
-
-          return bobbleheads.map((bobblehead) => ({
-            ...bobblehead,
-            likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
-          }));
-        },
-        collectionId,
-        optionsHash,
-        {
-          context: {
-            entityId: collectionId,
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'getAllBobbleheadsWithPhotos',
-            userId: viewerUserId,
-          },
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { collectionId },
-        facade: 'CollectionsFacade',
-        method: 'getAllCollectionBobbleheadsWithPhotos',
-        operation: 'getAllBobbleheadsWithPhotos',
+        facade: facadeName,
+        method: 'getAllCollectionBobbleheadsWithPhotosAsync',
+        operation: OPERATIONS.BOBBLEHEADS.FIND_BY_COLLECTION,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const optionsHash = createHashFromObject({ all: true, options, photos: true, viewerUserId });
+        return CacheService.bobbleheads.byCollection(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotosAsync(
+              collectionId,
+              context,
+              options,
+            );
+
+            if (bobbleheads.length === 0) {
+              return bobbleheads;
+            }
+
+            const bobbleheadIds = bobbleheads.map((b) => b.id);
+            const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
+              bobbleheadIds,
+              'bobblehead',
+              viewerUserId,
+              dbInstance,
+            );
+
+            return bobbleheads.map((bobblehead) => ({
+              ...bobblehead,
+              likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
+            }));
+          },
+          collectionId,
+          optionsHash,
+          {
+            context: {
+              entityId: collectionId,
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getAllBobbleheadsWithPhotos',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
+  /**
+   * Get a collection by ID.
+   *
+   * Cache behavior: Uses CacheService.collections.byId with LONG TTL (1 hour).
+   * Invalidated by: collection updates, deletes.
+   *
+   * @param collectionId - Collection ID to retrieve
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The collection record, or null if not found
+   */
   static async getByIdAsync(
     collectionId: string,
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<CollectionRecord | null> {
-    return await executeFacadeOperation(
+    return executeFacadeOperation(
       {
-        data: { collectionId, viewerUserId },
+        data: { collectionId },
         facade: facadeName,
-        method: 'getById',
+        method: 'getByIdAsync',
         operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId: viewerUserId,
       },
       async () => {
         return CacheService.collections.byId(
@@ -702,83 +513,124 @@ export class CollectionsFacade extends BaseFacade {
           },
         );
       },
+      {
+        includeResultSummary: (result) => ({
+          found: result !== null,
+          id: result?.id,
+        }),
+      },
     );
   }
 
   /**
-   * Get all distinct categories with counts
+   * Get all distinct categories with counts.
+   *
+   * Cache behavior: Uses CacheService.collections.public with MEDIUM TTL.
+   * Invalidated by: collection category changes.
+   *
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Array of category records with counts
    */
-  static async getCategories(dbInstance?: DatabaseExecutor): Promise<Array<CategoryRecord>> {
-    try {
-      return await CacheService.collections.public(
-        async () => {
-          const context = createPublicQueryContext({ dbInstance });
-          return await CollectionsQuery.getDistinctCategoriesAsync(context);
-        },
-        'categories',
-        {
-          context: {
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'getCategories',
+  static async getCategoriesAsync(dbInstance: DatabaseExecutor = db): Promise<Array<CategoryRecord>> {
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getCategoriesAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_CATEGORIES,
+      },
+      async () => {
+        return CacheService.collections.public(
+          async () => {
+            const context = this.getPublicContext(dbInstance);
+            return await CollectionsQuery.getDistinctCategoriesAsync(context);
           },
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: {},
-        facade: 'CollectionsFacade',
-        method: 'getCategories',
-        operation: 'getCategories',
-      };
-      throw createFacadeError(context, error);
-    }
+          'categories',
+          {
+            context: {
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getCategoriesAsync',
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
-  static async getCollectionBobbleheads(
+  /**
+   * Get bobbleheads in a collection (basic list).
+   *
+   * Cache behavior: Uses CacheService.bobbleheads.byCollection with MEDIUM TTL.
+   * Invalidated by: bobblehead changes.
+   *
+   * @param collectionId - Collection ID to get bobbleheads from
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Array of bobblehead list records
+   */
+  static async getCollectionBobbleheadsAsync(
     collectionId: string,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<Array<BobbleheadListRecord>> {
-    try {
-      const optionsHash = createHashFromObject({ scope: 'basic', viewerUserId });
-      return CacheService.bobbleheads.byCollection(
-        () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-          return CollectionsQuery.getBobbleheadsInCollectionAsync(collectionId, context);
-        },
-        collectionId,
-        optionsHash,
-        {
-          context: {
-            entityId: collectionId,
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'getBobbleheads',
-            userId: viewerUserId,
-          },
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { collectionId },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionBobbleheads',
-        operation: 'getBobbleheads',
+        facade: facadeName,
+        method: 'getCollectionBobbleheadsAsync',
+        operation: OPERATIONS.BOBBLEHEADS.FIND_BY_COLLECTION,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const optionsHash = createHashFromObject({ scope: 'basic', viewerUserId });
+        return CacheService.bobbleheads.byCollection(
+          () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            return CollectionsQuery.getBobbleheadsInCollectionAsync(collectionId, context);
+          },
+          collectionId,
+          optionsHash,
+          {
+            context: {
+              entityId: collectionId,
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getBobbleheads',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
-  static async getCollectionBobbleheadsWithPhotos(
+  /**
+   * Get bobbleheads in a collection with photos and like data.
+   *
+   * Cache behavior: Uses CacheService.bobbleheads.byCollection with MEDIUM TTL.
+   * Invalidated by: bobblehead changes, photo changes.
+   *
+   * @param collectionId - Collection ID to get bobbleheads from
+   * @param viewerUserId - Optional viewer user ID for like status
+   * @param options - Optional search and sort options
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Array of bobbleheads with photos and like data
+   */
+  static async getCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     viewerUserId?: string,
     options?: { searchTerm?: string; sortBy?: string },
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<
     Array<
       BobbleheadListRecord & {
@@ -789,186 +641,254 @@ export class CollectionsFacade extends BaseFacade {
       }
     >
   > {
-    try {
-      const optionsHash = createHashFromObject({ options, photos: true, viewerUserId });
-      return CacheService.bobbleheads.byCollection(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
-            collectionId,
-            context,
-            options,
-          );
-
-          if (bobbleheads.length === 0) {
-            return bobbleheads;
-          }
-
-          const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
-            bobbleheadIds,
-            'bobblehead',
-            viewerUserId,
-            dbInstance,
-          );
-
-          return bobbleheads.map((bobblehead) => ({
-            ...bobblehead,
-            likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
-          }));
-        },
-        collectionId,
-        optionsHash,
-        {
-          context: {
-            entityId: collectionId,
-            entityType: 'collection',
-            facade: 'CollectionsFacade',
-            operation: 'getBobbleheadsWithPhotos',
-            userId: viewerUserId,
-          },
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { collectionId },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionBobbleheadsWithPhotos',
-        operation: 'getBobbleheadsWithPhotos',
+        facade: facadeName,
+        method: 'getCollectionBobbleheadsWithPhotosAsync',
+        operation: OPERATIONS.BOBBLEHEADS.FIND_BY_COLLECTION,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
+      },
+      async () => {
+        const optionsHash = createHashFromObject({ options, photos: true, viewerUserId });
+        return CacheService.bobbleheads.byCollection(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
 
-  static async getCollectionBySlug(
-    slug: string,
-    userId: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionRecord | null> {
-    try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-      return CollectionsQuery.findBySlugAsync(slug, userId, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { slug, userId },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionBySlug',
-        operation: 'getBySlug',
-        userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
+            const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
+              collectionId,
+              context,
+              options,
+            );
 
-  static async getCollectionBySlugWithRelations(
-    slug: string,
-    userId: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionWithRelations | null> {
-    try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-      return CollectionsQuery.findBySlugWithRelationsAsync(slug, userId, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { slug, userId },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionBySlugWithRelations',
-        operation: 'getBySlugWithRelations',
-        userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
+            if (bobbleheads.length === 0) {
+              return bobbleheads;
+            }
 
-  static async getCollectionForPublicView(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
-    const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
+            const bobbleheadIds = bobbleheads.map((b) => b.id);
+            const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
+              bobbleheadIds,
+              'bobblehead',
+              viewerUserId,
+              dbInstance,
+            );
 
-    if (!collection) {
-      return null;
-    }
-
-    const metrics = this.computeMetrics(collection);
-
-    return {
-      coverImageUrl: collection.coverImageUrl,
-      createdAt: collection.createdAt,
-      description: collection.description,
-      id: collection.id,
-      isPublic: collection.isPublic,
-      lastUpdatedAt: metrics.lastUpdated,
-      name: collection.name,
-      slug: collection.slug,
-      totalBobbleheadCount: metrics.totalBobbleheads,
-      userId: collection.userId,
-    };
-  }
-
-  static async getCollectionsByUser(
-    userId: string,
-    options: FindOptions = {},
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<Array<CollectionRecord>> {
-    try {
-      const optionsHash = createHashFromObject({ options, viewerUserId });
-      return CacheService.collections.byUser(
-        () => {
-          const context =
-            viewerUserId && viewerUserId === userId ?
-              createProtectedQueryContext(userId, { dbInstance })
-            : createUserQueryContext(viewerUserId || userId, { dbInstance });
-          return CollectionsQuery.findByUserAsync(userId, options, context);
-        },
-        userId,
-        optionsHash,
-        {
-          context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'findByUser', userId },
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { options, userId },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionsByUser',
-        operation: 'findByUser',
-        userId: viewerUserId || userId,
-      };
-      throw createFacadeError(context, error);
-    }
+            return bobbleheads.map((bobblehead) => ({
+              ...bobblehead,
+              likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
+            }));
+          },
+          collectionId,
+          optionsHash,
+          {
+            context: {
+              entityId: collectionId,
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getBobbleheadsWithPhotos',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * get collection metadata for SEO and social sharing
-   * returns minimal collection information optimized for metadata generation
+   * Get a collection by slug.
    *
-   * Cache invalidation triggers:
-   * - Collection updates (name, description, cover image)
-   * - Bobblehead count changes (items added/removed)
-   * - Owner profile updates
-   * - Visibility changes (public/private)
+   * @param slug - Collection slug
+   * @param userId - Owner user ID
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The collection record, or null if not found
+   */
+  static async getCollectionBySlugAsync(
+    slug: string,
+    userId: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionRecord | null> {
+    return executeFacadeOperation(
+      {
+        data: { slug, userId },
+        facade: facadeName,
+        method: 'getCollectionBySlugAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId: viewerUserId,
+      },
+      async () => {
+        const context = this.getViewerContext(viewerUserId, dbInstance);
+        return CollectionsQuery.findBySlugAsync(slug, userId, context);
+      },
+      {
+        includeResultSummary: (result) => ({
+          found: result !== null,
+          id: result?.id,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Get a collection by slug with relations.
+   *
+   * @param slug - Collection slug
+   * @param userId - Owner user ID
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The collection with relations, or null if not found
+   */
+  static async getCollectionBySlugWithRelationsAsync(
+    slug: string,
+    userId: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionWithRelations | null> {
+    return executeFacadeOperation(
+      {
+        data: { slug, userId },
+        facade: facadeName,
+        method: 'getCollectionBySlugWithRelationsAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId: viewerUserId,
+      },
+      async () => {
+        const context = this.getViewerContext(viewerUserId, dbInstance);
+        return CollectionsQuery.findBySlugWithRelationsAsync(slug, userId, context);
+      },
+      {
+        includeResultSummary: (result) => ({
+          bobbleheadCount: result?.bobbleheads.length ?? 0,
+          found: result !== null,
+          id: result?.id,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Get a collection formatted for public view.
+   *
+   * @param id - Collection ID
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Public collection data, or null if not found
+   */
+  static async getCollectionForPublicViewAsync(
+    id: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ) {
+    return executeFacadeOperation(
+      {
+        data: { id },
+        facade: facadeName,
+        method: 'getCollectionForPublicViewAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId: viewerUserId,
+      },
+      async () => {
+        const collection = await this.getCollectionWithRelationsAsync(id, viewerUserId, dbInstance);
+
+        if (!collection) {
+          return null;
+        }
+
+        const metrics = this.computeMetrics(collection);
+
+        return {
+          coverImageUrl: collection.coverImageUrl,
+          createdAt: collection.createdAt,
+          description: collection.description,
+          id: collection.id,
+          isPublic: collection.isPublic,
+          lastUpdatedAt: metrics.lastUpdated,
+          name: collection.name,
+          slug: collection.slug,
+          totalBobbleheadCount: metrics.totalBobbleheads,
+          userId: collection.userId,
+        };
+      },
+      {
+        includeResultSummary: (result) => ({
+          found: result !== null,
+          id: result?.id,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Get collections by user.
+   *
+   * Cache behavior: Uses CacheService.collections.byUser with MEDIUM TTL.
+   * Invalidated by: collection creates, updates, deletes for user.
+   *
+   * @param userId - Owner user ID
+   * @param options - Optional find options (limit, offset, sort)
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Array of collection records
+   */
+  static async getCollectionsByUserAsync(
+    userId: string,
+    options: FindOptions = {},
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<CollectionRecord>> {
+    return executeFacadeOperation(
+      {
+        data: { userId },
+        facade: facadeName,
+        method: 'getCollectionsByUserAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_USER,
+        userId: viewerUserId ?? userId,
+      },
+      async () => {
+        const optionsHash = createHashFromObject({ options, viewerUserId });
+        return CacheService.collections.byUser(
+          () => {
+            const context = this.getOwnerOrViewerContext(userId, viewerUserId, dbInstance);
+            return CollectionsQuery.findByUserAsync(userId, options, context);
+          },
+          userId,
+          optionsHash,
+          {
+            context: { entityType: 'collection', facade: facadeName, operation: 'findByUser', userId },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Get collection metadata for SEO and social sharing.
+   * Returns minimal collection information optimized for metadata generation.
+   *
+   * Cache behavior: Uses CacheService.collections.byId with custom TTL (30 min).
+   * Invalidated by: collection updates (name, description, cover image),
+   * bobblehead count changes, owner profile updates, visibility changes.
    *
    * @param slug - Collection's unique slug
    * @param userId - Owner's user ID
    * @param dbInstance - Optional database instance for transactions
    * @returns Collection metadata or null if not found
    */
-  static async getCollectionSeoMetadata(
+  static async getCollectionSeoMetadataAsync(
     slug: string,
     userId: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<null | {
     coverImage: null | string;
     description: null | string;
@@ -980,55 +900,89 @@ export class CollectionsFacade extends BaseFacade {
     };
     slug: string;
   }> {
-    return CacheService.collections.byId(
-      () => {
-        const context = createPublicQueryContext({ dbInstance });
-        return CollectionsQuery.getCollectionMetadata(slug, userId, context);
-      },
-      `${userId}:${slug}`,
+    return executeFacadeOperation(
       {
-        context: {
-          entityType: 'collection',
-          facade: 'CollectionsFacade',
-          operation: 'getSeoMetadata',
-          userId,
-        },
-        ttl: 1800, // 30 minutes - balance between freshness and performance
+        data: { slug, userId },
+        facade: facadeName,
+        method: 'getCollectionSeoMetadataAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId,
+      },
+      async () => {
+        return CacheService.collections.byId(
+          () => {
+            const context = this.getPublicContext(dbInstance);
+            return CollectionsQuery.getCollectionMetadata(slug, userId, context);
+          },
+          `${userId}:${slug}`,
+          {
+            context: {
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getSeoMetadata',
+              userId,
+            },
+            ttl: 1800, // 30 minutes - balance between freshness and performance
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          found: result !== null,
+          itemCount: result?.itemCount,
+        }),
       },
     );
   }
 
   /**
-   * Get the view count for a collection
+   * Get the view count for a collection.
+   *
+   * @param collectionId - Collection ID
+   * @param shouldIncludeAnonymous - Whether to include anonymous views
+   * @param viewerUserId - Optional viewer user ID
+   * @param dbInstance - Optional database executor for transactions
+   * @returns View count
    */
   static async getCollectionViewCountAsync(
     collectionId: string,
     shouldIncludeAnonymous = true,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<number> {
-    try {
-      return await ViewTrackingFacade.getViewCountAsync(
-        'collection',
-        collectionId,
-        shouldIncludeAnonymous,
-        viewerUserId,
-        dbInstance,
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { collectionId },
-        facade: 'CollectionsFacade',
+        facade: facadeName,
         method: 'getCollectionViewCountAsync',
-        operation: 'getViewCount',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return ViewTrackingFacade.getViewCountAsync(
+          'collection',
+          collectionId,
+          shouldIncludeAnonymous,
+          viewerUserId,
+          dbInstance,
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          viewCount: result,
+        }),
+      },
+    );
   }
 
   /**
-   * Get view statistics for a collection
+   * Get view statistics for a collection.
+   *
+   * @param collectionId - Collection ID
+   * @param options - View stats options
+   * @param viewerUserId - Optional viewer user ID
+   * @param dbInstance - Optional database executor for transactions
+   * @returns View statistics
    */
   static async getCollectionViewStatsAsync(
     collectionId: string,
@@ -1037,61 +991,94 @@ export class CollectionsFacade extends BaseFacade {
       timeframe?: 'day' | 'hour' | 'month' | 'week' | 'year';
     },
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ) {
-    try {
-      return await ViewTrackingFacade.getViewStatsAsync(
-        'collection',
-        collectionId,
-        options,
-        viewerUserId,
-        dbInstance,
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { collectionId, options },
-        facade: 'CollectionsFacade',
-        method: 'getCollectionViewStatsAsync',
-        operation: 'getViewStats',
-        userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  static async getCollectionWithRelations(
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionWithRelations | null> {
-    return CacheService.collections.withRelations(
-      () => {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
-        return CollectionsQuery.findByIdWithRelationsAsync(id, context);
-      },
-      id,
+    return executeFacadeOperation(
       {
-        context: {
-          entityId: id,
-          entityType: 'collection',
-          facade: 'CollectionsFacade',
-          operation: 'getWithRelations',
-          userId: viewerUserId,
-        },
+        data: { collectionId, timeframe: options?.timeframe },
+        facade: facadeName,
+        method: 'getCollectionViewStatsAsync',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
+        userId: viewerUserId,
+      },
+      async () => {
+        return ViewTrackingFacade.getViewStatsAsync(
+          'collection',
+          collectionId,
+          options,
+          viewerUserId,
+          dbInstance,
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          totalViews: result.totalViews,
+          uniqueViewers: result.uniqueViewers,
+        }),
       },
     );
   }
 
   /**
-   * Check if collection name is available for user (case-insensitive)
+   * Get a collection with relations.
+   *
+   * Cache behavior: Uses CacheService.collections.withRelations with LONG TTL.
+   * Invalidated by: collection updates, bobblehead changes.
+   *
+   * @param id - Collection ID
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The collection with relations, or null if not found
+   */
+  static async getCollectionWithRelationsAsync(
+    id: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionWithRelations | null> {
+    return executeFacadeOperation(
+      {
+        data: { id },
+        facade: facadeName,
+        method: 'getCollectionWithRelationsAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId: viewerUserId,
+      },
+      async () => {
+        return CacheService.collections.withRelations(
+          () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            return CollectionsQuery.findByIdWithRelationsAsync(id, context);
+          },
+          id,
+          {
+            context: {
+              entityId: id,
+              entityType: 'collection',
+              facade: facadeName,
+              operation: 'getWithRelations',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          bobbleheadCount: result?.bobbleheads.length ?? 0,
+          found: result !== null,
+          id: result?.id,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Check if collection name is available for user (case-insensitive).
+   *
    * @param name - Collection name to check
    * @param userId - User ID to check against
    * @param excludeCollectionId - Optional collection ID to exclude (for updates)
    * @param dbInstance - Optional database instance for transactions
-   * @returns true if name is available, false if already taken
+   * @returns True if name is available, false if already taken
    */
   static async getIsCollectionNameAvailableAsync(
     name: string,
@@ -1099,19 +1086,39 @@ export class CollectionsFacade extends BaseFacade {
     excludeCollectionId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<boolean> {
-    // TODO: add caching service
-    const context = this.getUserContext(userId, dbInstance);
-    const exists = await CollectionsQuery.getIsCollectionNameAvailableAsync(
-      name,
-      userId,
-      context,
-      excludeCollectionId,
+    return executeFacadeOperation(
+      {
+        data: { excludeCollectionId, name },
+        facade: facadeName,
+        method: 'getIsCollectionNameAvailableAsync',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+        userId,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+        const exists = await CollectionsQuery.getIsCollectionNameAvailableAsync(
+          name,
+          userId,
+          context,
+          excludeCollectionId,
+        );
+        return !exists;
+      },
+      {
+        includeResultSummary: (result) => ({
+          isAvailable: result,
+        }),
+      },
     );
-    return !exists;
   }
 
   /**
-   * Get trending collections based on view data
+   * Get trending collections based on view data.
+   *
+   * @param options - Trending options (limit, timeframe, includeAnonymous)
+   * @param viewerUserId - Optional viewer user ID
+   * @param dbInstance - Optional database executor for transactions
+   * @returns Trending content data
    */
   static async getTrendingCollectionsAsync(
     options?: {
@@ -1120,29 +1127,35 @@ export class CollectionsFacade extends BaseFacade {
       timeframe?: 'day' | 'hour' | 'month' | 'week';
     },
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ) {
-    try {
-      return await ViewTrackingFacade.getTrendingContentAsync(
-        'collection',
-        options,
-        viewerUserId,
-        dbInstance,
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { options },
-        facade: 'CollectionsFacade',
+    return executeFacadeOperation(
+      {
+        data: { limit: options?.limit, timeframe: options?.timeframe },
+        facade: facadeName,
         method: 'getTrendingCollectionsAsync',
-        operation: 'getTrendingContent',
+        operation: OPERATIONS.ANALYTICS.GET_TRENDING_CONTENT,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return ViewTrackingFacade.getTrendingContentAsync('collection', options, viewerUserId, dbInstance);
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * Record a view for a collection
+   * Record a view for a collection.
+   *
+   * @param collectionId - Collection ID
+   * @param viewerUserId - Optional viewer user ID
+   * @param metadata - View metadata (IP, user agent, referrer, duration)
+   * @param dbInstance - Optional database executor for transactions
+   * @returns View recording result
    */
   static async recordCollectionViewAsync(
     collectionId: string,
@@ -1153,105 +1166,132 @@ export class CollectionsFacade extends BaseFacade {
       userAgent?: string;
       viewDuration?: number;
     },
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ) {
-    try {
-      return await ViewTrackingFacade.recordViewAsync(
-        {
-          ipAddress: metadata?.ipAddress,
-          referrerUrl: metadata?.referrerUrl,
-          targetId: collectionId,
-          targetType: 'collection',
-          userAgent: metadata?.userAgent,
-          viewDuration: metadata?.viewDuration,
-          viewerId: viewerUserId,
-        },
-        viewerUserId,
-        {
-          deduplicationWindow: 300, // 5 minutes
-          shouldRespectPrivacySettings: true,
-        },
-        dbInstance,
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { collectionId },
-        facade: 'CollectionsFacade',
+        facade: facadeName,
         method: 'recordCollectionViewAsync',
-        operation: 'recordView',
+        operation: OPERATIONS.ANALYTICS.RECORD_VIEW,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const dbInst = context.dbInstance ?? db;
-
-      const updateData: UpdateCollection & { slug?: string } = { ...data };
-
-      // if name is being updated, regenerate slug
-      if (data.name) {
-        // Check name uniqueness (excluding current collection)
-        const isNameAvailable = await this.getIsCollectionNameAvailableAsync(
-          data.name,
-          userId,
-          data.collectionId,
-          dbInst,
+      },
+      async () => {
+        return ViewTrackingFacade.recordViewAsync(
+          {
+            ipAddress: metadata?.ipAddress,
+            referrerUrl: metadata?.referrerUrl,
+            targetId: collectionId,
+            targetType: 'collection',
+            userAgent: metadata?.userAgent,
+            viewDuration: metadata?.viewDuration,
+            viewerId: viewerUserId,
+          },
+          viewerUserId,
+          {
+            deduplicationWindow: 300, // 5 minutes
+            shouldRespectPrivacySettings: true,
+          },
+          dbInstance,
         );
-        if (!isNameAvailable) {
-          return null;
-        }
-
-        const baseSlug = generateSlug(data.name);
-
-        // query existing slugs for this user, excluding current collection
-        const existingSlugs = await dbInst
-          .select({ slug: collections.slug })
-          .from(collections)
-          .where(eq(collections.userId, userId))
-          .then((results) => results.map((r) => r.slug).filter((slug) => slug !== data.collectionId));
-
-        updateData.slug = ensureUniqueSlug(baseSlug, existingSlugs);
-      }
-
-      const updatedCollection = await CollectionsQuery.updateAsync(updateData, userId, context);
-
-      if (updatedCollection) {
-        invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, updatedCollection.id);
-        // Revalidate user's dashboard with their username
-        const user = await UsersFacade.getUserByIdAsync(userId);
-        if (user?.username) {
-          revalidatePath(
-            $path({
-              route: '/user/[username]/dashboard/collection',
-              routeParams: { username: user.username },
-            }),
-          );
-        }
-        CacheRevalidationService.collections.onUpdate(updatedCollection.id, userId);
-      }
-
-      return updatedCollection;
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { collectionId: data.collectionId },
-        facade: 'CollectionsFacade',
-        method: 'updateAsync',
-        operation: 'update',
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      {
+        includeResultSummary: (result) => ({
+          isRecorded: result !== null,
+          viewId: result?.id,
+        }),
+      },
+    );
   }
 
+  /**
+   * Update a collection.
+   *
+   * Cache behavior: Invalidates collection caches after update.
+   *
+   * @param data - Update data with collection ID
+   * @param userId - User ID of the collection owner
+   * @param dbInstance - Optional database executor for transactions
+   * @returns The updated collection record, or null if not found or name conflict
+   */
+  static async updateAsync(
+    data: UpdateCollection,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionRecord | null> {
+    return executeFacadeOperation(
+      {
+        data: { collectionId: data.collectionId },
+        facade: facadeName,
+        method: 'updateAsync',
+        operation: OPERATIONS.COLLECTIONS.UPDATE,
+        userId,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+
+        const updateData: UpdateCollection & { slug?: string } = { ...data };
+
+        // If name is being updated, regenerate slug
+        if (data.name) {
+          // Check name uniqueness (excluding current collection)
+          const isNameAvailable = await this.getIsCollectionNameAvailableAsync(
+            data.name,
+            userId,
+            data.collectionId,
+            dbInstance,
+          );
+          if (!isNameAvailable) {
+            return null;
+          }
+
+          const baseSlug = generateSlug(data.name);
+
+          // Get existing slugs via query layer
+          const existingSlugs = await CollectionsQuery.getCollectionSlugsByUserIdAsync(userId, context);
+          // Filter out current collection's slug for uniqueness check
+          const filteredSlugs = existingSlugs.filter((slug) => slug !== data.collectionId);
+
+          updateData.slug = ensureUniqueSlug(baseSlug, filteredSlugs);
+        }
+
+        const updatedCollection = await CollectionsQuery.updateAsync(updateData, userId, context);
+
+        if (updatedCollection) {
+          invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, updatedCollection.id);
+          // Revalidate user's dashboard with their username
+          const user = await UsersFacade.getUserByIdAsync(userId);
+          if (user?.username) {
+            revalidatePath(
+              $path({
+                route: '/user/[username]/dashboard/collection',
+                routeParams: { username: user.username },
+              }),
+            );
+          }
+          CacheRevalidationService.collections.onUpdate(updatedCollection.id, userId);
+        }
+
+        return updatedCollection;
+      },
+      {
+        includeResultSummary: (result) => ({
+          id: result?.id,
+          updated: result !== null,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Compute metrics from collection with relations.
+   * @private
+   */
   private static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
-    // count featured bobbleheads
+    // Count featured bobbleheads
     const featuredBobbleheads = collection.bobbleheads.filter((b) => b.isFeatured).length;
 
-    // find the most recent update
+    // Find the most recent update
     const lastUpdated = collection.updatedAt;
 
     return {

@@ -1,6 +1,7 @@
 # Step 1: Feature Refinement
 
 ## Metadata
+
 - **Step**: 1 - Feature Request Refinement
 - **Start Time**: 2026-01-11T00:00:00.000Z
 - **End Time**: 2026-01-11T00:00:30.000Z
@@ -16,6 +17,7 @@ Remove the concept of slugs from the application, they were necessary when the r
 ## Context Provided
 
 Project context: This is a Next.js 16 application with React 19 using App Router. The project uses:
+
 - Drizzle ORM for database operations with PostgreSQL/Neon
 - Drizzle-Zod for schema validation
 - next-typesafe-url ($path) for type-safe routing
@@ -23,6 +25,7 @@ Project context: This is a Next.js 16 application with React 19 using App Router
 - Zod for validation schemas
 
 The codebase structure includes:
+
 - src/app/(app)/ - App routes (dashboard, collections, bobbleheads, etc.)
 - src/lib/db/ - Database schema, migrations
 - src/lib/actions/ - Server actions for mutations
@@ -49,11 +52,11 @@ Remove the slug concept entirely from the application since the routing structur
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Word Count | 79 words |
-| Refined Word Count | ~380 words |
-| Expansion Ratio | ~4.8x |
+| Metric              | Value      |
+| ------------------- | ---------- |
+| Original Word Count | 79 words   |
+| Refined Word Count  | ~380 words |
+| Expansion Ratio     | ~4.8x      |
 
 ## Scope Analysis
 

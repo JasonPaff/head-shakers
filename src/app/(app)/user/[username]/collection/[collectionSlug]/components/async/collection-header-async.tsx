@@ -19,7 +19,7 @@ export const CollectionHeaderAsync = async ({ collectionId, userId }: Collection
   const currentUserId = await getUserIdAsync();
 
   const [collection, likeData, viewCount, user] = await Promise.all([
-    CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),
+    CollectionsFacade.getCollectionForPublicViewAsync(collectionId, currentUserId || undefined),
     SocialFacade.getContentLikeDataAsync(collectionId, 'collection', currentUserId || undefined),
     CollectionsFacade.getCollectionViewCountAsync(collectionId),
     UsersFacade.getUserByIdAsync(userId),

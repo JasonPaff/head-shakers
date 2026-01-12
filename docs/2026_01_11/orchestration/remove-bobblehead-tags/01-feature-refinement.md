@@ -39,11 +39,11 @@ The tags feature for bobbleheads needs to be completely removed from the applica
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Word Count | 46 |
-| Refined Word Count | ~330 |
-| Expansion Ratio | 7.2x |
+| Metric              | Value |
+| ------------------- | ----- |
+| Original Word Count | 46    |
+| Refined Word Count  | ~330  |
+| Expansion Ratio     | 7.2x  |
 
 ## Scope Analysis
 

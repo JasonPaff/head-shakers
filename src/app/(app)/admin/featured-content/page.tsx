@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminFeaturedContentPage() {
   await requireModerator();
-  const featuredContent = await FeaturedContentFacade.getAllFeaturedContentForAdmin();
+  const featuredContent = await FeaturedContentFacade.getAllFeaturedContentForAdminAsync();
 
   return (
     <div className={'container mx-auto py-8'}>
