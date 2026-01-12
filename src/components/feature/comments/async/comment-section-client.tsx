@@ -2,7 +2,6 @@
 
 import type { ComponentProps } from 'react';
 
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
@@ -77,7 +76,6 @@ export const CommentSectionClient = ({
   targetType,
   ...props
 }: CommentSectionClientProps) => {
-  const router = useRouter();
   const { isAdmin } = useAdminRole();
 
   // State for pagination
@@ -146,41 +144,28 @@ export const CommentSectionClient = ({
           setLoadedComments((prev) => [{ ...createdComment, depth: 0, replies: [] }, ...prev]);
         }
       }
-
-      // Still refresh for eventual consistency with server
-      router.refresh();
     },
-    [targetId, targetType, router],
+    [targetId, targetType],
   );
 
-  const handleCommentUpdate = useCallback(
-    async (commentId: string, content: string) => {
-      const result = await updateCommentAction({
-        commentId,
-        content,
-      });
+  const handleCommentUpdate = useCallback(async (commentId: string, content: string) => {
+    const result = await updateCommentAction({
+      commentId,
+      content,
+    });
 
-      if (result?.serverError) {
-        throw new Error(result.serverError);
-      }
-      // Refresh the page to fetch updated comments from server
-      router.refresh();
-    },
-    [router],
-  );
+    if (result?.serverError) {
+      throw new Error(result.serverError);
+    }
+  }, []);
 
-  const handleCommentDelete = useCallback(
-    async (commentId: string) => {
-      const result = await deleteCommentAction({ commentId });
+  const handleCommentDelete = useCallback(async (commentId: string) => {
+    const result = await deleteCommentAction({ commentId });
 
-      if (result?.serverError) {
-        throw new Error(result.serverError);
-      }
-      // Refresh the page to fetch updated comments from server
-      router.refresh();
-    },
-    [router],
-  );
+    if (result?.serverError) {
+      throw new Error(result.serverError);
+    }
+  }, []);
 
   return (
     <CommentSection
