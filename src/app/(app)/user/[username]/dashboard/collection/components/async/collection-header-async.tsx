@@ -1,20 +1,20 @@
 import 'server-only';
 
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { CollectionHeaderDisplay } from '../display/collection-header-display';
 
+type CollectionHeaderAsyncProps = {
+  collectionSlug: string;
+};
+
 /**
  * Server component that fetches collection header data
  * and passes it to the client display component.
  */
-export async function CollectionHeaderAsync() {
+export async function CollectionHeaderAsync({ collectionSlug }: CollectionHeaderAsyncProps) {
   const userId = await getRequiredUserIdAsync();
-
-  const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
-  if (!collectionSlug) return null;
 
   const collection = await CollectionsDashboardFacade.getHeaderByCollectionSlugAsync(userId, collectionSlug);
 

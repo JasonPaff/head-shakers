@@ -28,7 +28,20 @@ export type UserStats = {
   userId: string;
 };
 
+/**
+ * Query class for user-related database operations
+ * Provides methods for user lookup, admin filtering, and statistics
+ */
 export class UsersQuery extends BaseQuery {
+  /**
+   * Check if a username is already taken
+   * Optionally excludes a specific user ID from the check (useful for profile updates)
+   *
+   * @param username - The username to check
+   * @param context - Query context with database instance
+   * @param excludeUserId - Optional user ID to exclude from the check
+   * @returns True if the username exists (and is not the excluded user), false otherwise
+   */
   static async checkUsernameExistsAsync(
     username: string,
     context: QueryContext,
@@ -57,6 +70,13 @@ export class UsersQuery extends BaseQuery {
     return !(excludeUserId && foundUser.id === excludeUserId);
   }
 
+  /**
+   * Count users for admin listing with filters applied
+   *
+   * @param filters - Admin filtering options (role, status, search)
+   * @param context - Query context with database instance
+   * @returns Total count of users matching the filters
+   */
   static async countUsersForAdminAsync(filters: AdminUsersFilter, context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
@@ -69,9 +89,10 @@ export class UsersQuery extends BaseQuery {
 
   /**
    * Get user email by user ID
-   * Returns null if user does not exist or does not have an email address
-   * @param userId
-   * @param context
+   *
+   * @param userId - The user ID to look up
+   * @param context - Query context with database instance
+   * @returns The user's email address, or null if user does not exist or has no email
    */
   static async getEmailByUserIdAsync(userId: string, context: QueryContext): Promise<null | string> {
     const dbInstance = this.getDbInstance(context);
@@ -85,6 +106,13 @@ export class UsersQuery extends BaseQuery {
     return result[0]?.email || null;
   }
 
+  /**
+   * Find a user by their Clerk authentication ID
+   *
+   * @param clerkId - The Clerk user ID
+   * @param context - Query context with database instance
+   * @returns The user record, or null if not found
+   */
   static async getUserByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
@@ -93,6 +121,13 @@ export class UsersQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  /**
+   * Find a user by their internal user ID
+   *
+   * @param userId - The internal user ID
+   * @param context - Query context with database instance
+   * @returns The user record, or null if not found
+   */
   static async getUserByUserIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
@@ -101,6 +136,14 @@ export class UsersQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  /**
+   * Find a user by their internal user ID for admin operations
+   * This method bypasses permission filters for admin access
+   *
+   * @param userId - The internal user ID
+   * @param context - Query context with database instance
+   * @returns The user record, or null if not found
+   */
   static async getUserByUserIdForAdminAsync(
     userId: string,
     context: QueryContext,
@@ -112,6 +155,13 @@ export class UsersQuery extends BaseQuery {
     return user[0] || null;
   }
 
+  /**
+   * Find a user by their username
+   *
+   * @param username - The username to search for
+   * @param context - Query context with database instance
+   * @returns The user record, or null if not found
+   */
   static async getUserByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
@@ -120,13 +170,11 @@ export class UsersQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  // ============================================================================
-  // Admin Query Methods
-  // ============================================================================
-
   /**
    * Get total users count (excluding deleted)
-   * @param context
+   *
+   * @param context - Query context with database instance
+   * @returns Total count of non-deleted users
    */
   static async getUserCountAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
@@ -139,7 +187,11 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
-   * find user ID by clerk ID
+   * Find user ID by Clerk authentication ID
+   *
+   * @param clerkId - The Clerk user ID
+   * @param context - Query context with database instance
+   * @returns The internal user ID, or null if not found
    */
   static async getUserIdByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | string> {
     const dbInstance = this.getDbInstance(context);
@@ -154,10 +206,14 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
-   * get user metadata for SEO and social sharing
-   * returns minimal fields needed for metadata generation
+   * Get user metadata for SEO and social sharing
+   * Returns minimal fields needed for metadata generation
+   *
+   * @param username - The username to look up
+   * @param context - Query context with database instance
+   * @returns User metadata object, or null if user not found
    */
-  static async getUserMetadata(
+  static async getUserMetadataAsync(
     username: string,
     context: QueryContext,
   ): Promise<null | {
@@ -238,6 +294,10 @@ export class UsersQuery extends BaseQuery {
   /**
    * Get user statistics for admin dashboard
    * Returns counts for collections and bobbleheads
+   *
+   * @param userId - The user ID to get statistics for
+   * @param context - Query context with database instance
+   * @returns User statistics object, or null if user not found
    */
   static async getUserStatsAsync(userId: string, context: QueryContext): Promise<null | UserStats> {
     const dbInstance = this.getDbInstance(context);
@@ -288,10 +348,6 @@ export class UsersQuery extends BaseQuery {
       userId,
     };
   }
-
-  // ============================================================================
-  // Private Helper Methods
-  // ============================================================================
 
   /**
    * Build WHERE conditions for admin user filtering

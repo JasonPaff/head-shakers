@@ -5,8 +5,7 @@
  * and renders the display component. Uses real database via Testcontainers.
  *
  * Tests cover:
- * - Fetching collection header data with collectionSlug
- * - Null handling when collectionSlug is not provided
+ * - Fetching collection header data with collectionSlug prop
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,7 +14,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 
 import { CollectionHeaderAsync } from '@/app/(app)/user/[username]/dashboard/collection/components/async/collection-header-async';
-import { collectionDashboardSearchParamsCache } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { createTestCollection } from '../../fixtures/collection.factory';
@@ -64,13 +62,6 @@ vi.mock('@/lib/utils/redis-client', () => ({
   },
 }));
 
-// Mock route-type search params cache
-vi.mock('@/app/(app)/user/[username]/dashboard/collection/route-type', () => ({
-  collectionDashboardSearchParamsCache: {
-    get: vi.fn(),
-  },
-}));
-
 // Mock auth utils
 vi.mock('@/utils/auth-utils', () => ({
   getRequiredUserIdAsync: vi.fn(),
@@ -108,10 +99,7 @@ describe('CollectionHeaderAsync', () => {
       userId: testUserId,
     });
 
-    // Mock search params to return the collection slug
-    vi.mocked(collectionDashboardSearchParamsCache.get).mockReturnValue(collection!.slug);
-
-    const result = await CollectionHeaderAsync();
+    const result = await CollectionHeaderAsync({ collectionSlug: collection!.slug });
 
     // Verify the result is JSX
     expect(result).toBeDefined();
@@ -119,24 +107,5 @@ describe('CollectionHeaderAsync', () => {
 
     // Verify that getRequiredUserIdAsync was called
     expect(getRequiredUserIdAsync).toHaveBeenCalledTimes(1);
-
-    // Verify that search params cache was queried
-    expect(collectionDashboardSearchParamsCache.get).toHaveBeenCalledWith('collectionSlug');
-  });
-
-  it('should return null when collectionSlug is not provided', async () => {
-    // Mock search params to return null (no collection slug)
-    vi.mocked(collectionDashboardSearchParamsCache.get).mockReturnValue(null);
-
-    const result = await CollectionHeaderAsync();
-
-    // Should return null when no slug
-    expect(result).toBeNull();
-
-    // Verify that getRequiredUserIdAsync was still called
-    expect(getRequiredUserIdAsync).toHaveBeenCalledTimes(1);
-
-    // Verify that search params cache was queried
-    expect(collectionDashboardSearchParamsCache.get).toHaveBeenCalledWith('collectionSlug');
   });
 });

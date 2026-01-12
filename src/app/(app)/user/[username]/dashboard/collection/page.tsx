@@ -22,6 +22,7 @@ import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
 import { EditBobbleheadFormAsync } from './components/async/edit-bobblehead-form-async';
 import { SidebarAsync } from './components/async/sidebar-async';
+import { NoCollectionSelected } from './components/empty-states/no-collection-selected';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';
@@ -29,7 +30,19 @@ import { Route } from './route-type';
 
 type CollectionPageProps = PageProps;
 
+type FilterParams = {
+  category: string;
+  condition: string;
+  featured: 'all' | 'featured' | 'not-featured';
+  page: number;
+  pageSize: number;
+  search: string;
+  sortBy: string;
+};
+
 interface MainContentProps {
+  collectionSlug: string;
+  filterParams: FilterParams;
   mode: 'add' | 'edit' | null;
 }
 
@@ -77,7 +90,35 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
 
       redirect(`${url.pathname}${url.search}`);
     }
+
+    // User has no collections - render empty state
+    return (
+      <CollectionLayout
+        main={<NoCollectionSelected />}
+        sidebar={
+          <ErrorBoundary name={'collection-sidebar'}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <SidebarAsync />
+            </Suspense>
+          </ErrorBoundary>
+        }
+      />
+    );
   }
+
+  // At this point, collectionSlug is guaranteed to exist
+  const collectionSlug = params.collectionSlug;
+
+  // Extract filter params for bobblehead grid
+  const filterParams: FilterParams = {
+    category: params.category,
+    condition: params.condition,
+    featured: params.featured,
+    page: params.page,
+    pageSize: params.pageSize,
+    search: params.search,
+    sortBy: params.sortBy,
+  };
 
   return (
     <CollectionLayout
@@ -86,12 +127,14 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
           {/* Collection Header - always shown */}
           <ErrorBoundary name={'collection-header'}>
             <Suspense fallback={<CollectionHeaderSkeleton />}>
-              <CollectionHeaderAsync />
+              <CollectionHeaderAsync collectionSlug={collectionSlug} />
             </Suspense>
           </ErrorBoundary>
 
           {/* Conditional: Add Form, Edit Form, or Bobblehead Grid */}
           <MainContent
+            collectionSlug={collectionSlug}
+            filterParams={filterParams}
             mode={
               params.add === true ? 'add'
               : params.edit ?
@@ -114,7 +157,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
 
 // Render the appropriate main content based on mode
 // Add mode takes precedence over edit mode if both are set
-const MainContent = ({ mode }: MainContentProps) => {
+const MainContent = ({ collectionSlug, filterParams, mode }: MainContentProps) => {
   if (mode === 'add') {
     return (
       <ErrorBoundary name={'add-bobblehead-form'}>
@@ -138,7 +181,7 @@ const MainContent = ({ mode }: MainContentProps) => {
   return (
     <ErrorBoundary name={'collection-bobbleheads'}>
       <Suspense fallback={<BobbleheadContentSkeleton />}>
-        <BobbleheadGridAsync />
+        <BobbleheadGridAsync collectionSlug={collectionSlug} filterParams={filterParams} />
       </Suspense>
     </ErrorBoundary>
   );

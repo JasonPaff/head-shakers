@@ -260,7 +260,7 @@ export class UsersFacade extends BaseFacade {
     return CacheService.users.profile(
       () => {
         const context = createPublicQueryContext({ dbInstance });
-        return UsersQuery.getUserMetadata(username, context);
+        return UsersQuery.getUserMetadataAsync(username, context);
       },
       username,
       {
