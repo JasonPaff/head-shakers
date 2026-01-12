@@ -609,28 +609,6 @@ trackActionWarning('CREATE_BOBBLEHEAD', 'photo.move', 'Some photos failed to mov
 });
 ```
 
-#### `trackCacheInvalidation()`
-
-Track cache invalidation and automatically log failures as warnings (non-throwing):
-
-```typescript
-trackCacheInvalidation(CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'), {
-  entityType: 'like',
-  entityId: targetId,
-  operation: 'onLikeChange',
-  userId,
-});
-
-// Can chain for conditional handling
-const result = trackCacheInvalidation(
-  CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId),
-  { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId },
-);
-if (!result.isSuccess) {
-  // Handle manually if needed
-}
-```
-
 #### `trackFacadeEntry()` / `trackFacadeSuccess()` / `trackFacadeWarning()` / `trackFacadeError()`
 
 Track facade lifecycle:

@@ -397,32 +397,33 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<CommentData | null> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
-
-      // fetch the comment with user data using efficient method
-      const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(commentId, context);
-
-      if (!commentWithUser) {
-        return null;
-      }
-
-      // Now that we have the comment data, we can generate proper cache tags
-      // Cache with tags based on the target entity (not the comment ID)
+      // Cache the entire query operation, not just the result transformation
       return CacheService.cached(
-        () =>
-          Promise.resolve({
+        async () => {
+          const context = createUserQueryContext(userId, { dbInstance });
+
+          // fetch the comment with user data using efficient method
+          const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(commentId, context);
+
+          if (!commentWithUser) {
+            return null;
+          }
+
+          return {
             comment: commentWithUser,
             isOwner: commentWithUser.userId === userId,
-          }),
+          };
+        },
         CACHE_KEYS.SOCIAL.COMMENTS('comment', commentId),
         {
           context: {
-            entityId: commentWithUser.targetId,
+            entityId: commentId,
             entityType: 'social',
             facade: facadeName,
             operation: 'getCommentById',
           },
           tags: CacheTagGenerators.social.comment(commentId, userId),
+          ttl: CACHE_CONFIG.TTL.SHORT,
         },
       );
     } catch (error) {
@@ -570,26 +571,49 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<ContentLikeData> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      // Create cache key with viewer context for proper cache segmentation
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES(targetType, targetId)}:data:${viewerUserId || 'public'}`;
 
-      // get like count and user status in parallel
-      const [likeCount, userStatus] = await Promise.all([
-        SocialFacade.getLikeCount(targetId, targetType, dbInstance),
-        viewerUserId ?
-          SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
-        : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
-      ]);
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
 
-      return {
-        isLiked: userStatus.isLiked,
-        likeCount,
-        likeId: userStatus.likeId,
-        targetId,
-        targetType,
-      };
+          // get like count and user status in parallel
+          const [likeCount, userStatus] = await Promise.all([
+            SocialQuery.getLikeCountAsync(targetId, targetType, context),
+            viewerUserId ?
+              SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
+            : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
+          ]);
+
+          return {
+            isLiked: userStatus.isLiked,
+            likeCount,
+            likeId: userStatus.likeId,
+            targetId,
+            targetType,
+          };
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getContentLikeData',
+            userId: viewerUserId,
+          },
+          tags: CacheTagGenerators.social.like(
+            targetType as 'bobblehead' | 'collection' | 'comment',
+            targetId,
+            viewerUserId || 'system',
+          ),
+          ttl: CACHE_CONFIG.TTL.SHORT,
+        },
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
@@ -642,12 +666,53 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      if (contentIds.length === 0) return new Map();
 
-      return SocialQuery.getLikesForMultipleContentItemsAsync(contentIds, contentType, context);
+      // Create cache key with hashed content IDs for proper cache segmentation
+      const contentIdsHash = createHashFromObject(contentIds);
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES(contentType, 'batch')}:${contentIdsHash}:${viewerUserId || 'public'}`;
+
+      // Generate cache tags for each content item
+      const cacheTags = contentIds.flatMap((contentId) =>
+        CacheTagGenerators.social.like(
+          contentType as 'bobblehead' | 'collection' | 'comment',
+          contentId,
+          viewerUserId || 'system',
+        ),
+      );
+
+      // CacheService returns serializable data, so we cache an array and convert to Map
+      const cachedResult = await CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          const resultMap = await SocialQuery.getLikesForMultipleContentItemsAsync(
+            contentIds,
+            contentType,
+            context,
+          );
+
+          // Convert Map to array of entries for caching (Maps are not JSON-serializable)
+          return Array.from(resultMap.entries());
+        },
+        cacheKey,
+        {
+          context: {
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getLikesForMultipleContentItems',
+            userId: viewerUserId,
+          },
+          tags: cacheTags,
+          ttl: CACHE_CONFIG.TTL.SHORT,
+        },
+      );
+
+      // Convert cached array back to Map
+      return new Map(cachedResult);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { contentIds, contentType },
@@ -668,21 +733,46 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<LikeActivity>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      // Create cache key with pagination parameters for proper cache segmentation
+      const limit = options.limit || 10;
+      const offset = options.offset || 0;
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES(targetType, targetId)}:activity:${limit}:${offset}:${viewerUserId || 'public'}`;
 
-      const likes = await SocialQuery.getRecentLikesAsync(targetId, targetType, options, context);
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
 
-      return likes.map((like) => ({
-        createdAt: like.createdAt,
-        id: like.id,
-        targetId: like.targetId,
-        targetType: like.targetType,
-        user: like.user,
-        userId: like.userId,
-      }));
+          const likes = await SocialQuery.getRecentLikesAsync(targetId, targetType, options, context);
+
+          return likes.map((like) => ({
+            createdAt: like.createdAt,
+            id: like.id,
+            targetId: like.targetId,
+            targetType: like.targetType,
+            user: like.user,
+            userId: like.userId,
+          }));
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getRecentLikeActivity',
+            userId: viewerUserId,
+          },
+          tags: CacheTagGenerators.social.like(
+            targetType as 'bobblehead' | 'collection' | 'comment',
+            targetId,
+            viewerUserId || 'system',
+          ),
+          ttl: CACHE_CONFIG.TTL.SHORT,
+        },
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, targetId, targetType },
@@ -702,12 +792,33 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<TrendingContent>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      // Create cache key with pagination parameters for proper cache segmentation
+      const limit = options.limit || 10;
+      const offset = options.offset || 0;
+      const optionsHash = createHashFromObject({ limit, offset });
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES(targetType, 'trending')}:${optionsHash}`;
 
-      return SocialQuery.getTrendingContentAsync(targetType, options, context);
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          return SocialQuery.getTrendingContentAsync(targetType, options, context);
+        },
+        cacheKey,
+        {
+          context: {
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getTrendingContent',
+            userId: viewerUserId,
+          },
+          tags: CacheTagGenerators.analytics.trending(),
+          ttl: CACHE_CONFIG.TTL.REALTIME,
+        },
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, targetType },
@@ -729,8 +840,31 @@ export class SocialFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<UserLikeStatus> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
+      // Create cache key with user context for proper cache segmentation
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES(targetType, targetId)}:status:${userId}`;
+
+      return CacheService.cached(
+        async () => {
+          const context = createUserQueryContext(userId, { dbInstance });
+          return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getUserLikeStatus',
+            userId,
+          },
+          tags: CacheTagGenerators.social.like(
+            targetType as 'bobblehead' | 'collection' | 'comment',
+            targetId,
+            userId,
+          ),
+          ttl: CACHE_CONFIG.TTL.SHORT,
+        },
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },

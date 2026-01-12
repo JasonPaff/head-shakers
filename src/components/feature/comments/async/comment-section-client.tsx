@@ -80,13 +80,11 @@ export const CommentSectionClient = ({
   testId,
   ...props
 }: CommentSectionClientProps) => {
-  // 1. useState hooks
   const [loadedComments, setLoadedComments] = useState(initialComments);
   const [hasMoreComments, setHasMoreComments] = useState(hasMore);
   const [currentOffset, setCurrentOffset] = useState(initialComments.length);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // 2. Other hooks
   const { isAdmin } = useAdminRole();
 
   const { executeAsync: executeGetComments } = useServerAction(getCommentsAction, {
@@ -121,14 +119,12 @@ export const CommentSectionClient = ({
     loadingMessage: 'Deleting comment...',
   });
 
-  // 4. useEffect hooks - Sync state when initial props change
   useEffect(() => {
     setLoadedComments(initialComments);
     setCurrentOffset(initialComments.length);
     setHasMoreComments(hasMore);
   }, [initialComments, hasMore]);
 
-  // 6. Event handlers
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !hasMoreComments) return;
 
@@ -193,7 +189,6 @@ export const CommentSectionClient = ({
     [executeDeleteComment],
   );
 
-  // 7. Derived variables
   const componentTestId = testId ?? 'feature-comment-section-client';
 
   return (

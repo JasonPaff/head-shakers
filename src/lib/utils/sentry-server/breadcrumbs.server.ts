@@ -1,7 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 
-import type { RevalidationResult } from '@/lib/services/cache-revalidation.service';
-
 import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS, SENTRY_TAGS } from '@/lib/constants';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { includeFullResult } from '@/lib/utils/facade-helpers';
@@ -10,7 +8,6 @@ import type {
   ActionBreadcrumbData,
   ActionErrorContext,
   ActionOperationContext,
-  CacheInvalidationConfig,
   FacadeBreadcrumbData,
   FacadeOperationContext,
   ServerBreadcrumbLevel,
@@ -176,48 +173,6 @@ export function trackActionWarning(
     },
     'warning',
   );
-}
-
-/**
- * Track cache invalidation result and log failures to Sentry.
- * Returns the original result for chaining.
- *
- * @example
- * // Track and continue (failures are logged but don't throw)
- * trackCacheInvalidation(
- *   CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'),
- *   { entityType: 'like', entityId: targetId, operation: 'onLikeChange', userId }
- * );
- *
- * @example
- * // With result checking
- * const result = trackCacheInvalidation(
- *   CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId),
- *   { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId }
- * );
- * if (!result.isSuccess) {
- *   // Handle manually if needed
- * }
- */
-export function trackCacheInvalidation(
-  result: RevalidationResult,
-  config: CacheInvalidationConfig,
-): RevalidationResult {
-  if (!result.isSuccess) {
-    Sentry.captureException(new Error(`Cache invalidation failed for ${config.operation}`), {
-      extra: {
-        entityId: config.entityId,
-        entityType: config.entityType,
-        error: result.error,
-        operation: config.operation,
-        tagsAttempted: result.tagsInvalidated,
-        userId: config.userId,
-      },
-      level: 'warning',
-    });
-  }
-
-  return result;
 }
 
 /**
