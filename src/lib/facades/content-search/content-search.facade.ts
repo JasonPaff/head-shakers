@@ -252,7 +252,7 @@ export class ContentSearchFacade extends BaseFacade {
 
             // Get top 3 results per entity type (total max 6, but we'll limit to 5)
             const limitPerType = 3;
-            const consolidated = await ContentSearchQuery.searchPublicConsolidated(
+            const consolidated = await ContentSearchQuery.searchPublicConsolidatedAsync(
               query,
               limitPerType,
               context,
@@ -750,7 +750,7 @@ export class ContentSearchFacade extends BaseFacade {
       : undefined;
 
     // Get total counts for all entity types
-    const counts = await ContentSearchQuery.getSearchResultCounts(
+    const counts = await ContentSearchQuery.getSearchResultCountsAsync(
       query,
       context,
       filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
@@ -763,7 +763,7 @@ export class ContentSearchFacade extends BaseFacade {
     // Execute searches for requested entity types with pagination
     const [collections, bobbleheads] = await Promise.all([
       entityTypes.includes('collection') ?
-        ContentSearchQuery.searchPublicCollections(
+        ContentSearchQuery.searchPublicCollectionsAsync(
           query,
           pageSize,
           context,
@@ -773,7 +773,7 @@ export class ContentSearchFacade extends BaseFacade {
         )
       : Promise.resolve([]),
       entityTypes.includes('bobblehead') ?
-        ContentSearchQuery.searchPublicBobbleheads(
+        ContentSearchQuery.searchPublicBobbleheadsAsync(
           query,
           pageSize,
           context,

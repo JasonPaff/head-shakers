@@ -22,6 +22,10 @@ import { withDatabaseRetry } from '@/lib/utils/retry';
 export abstract class BaseQuery extends BaseContextHelpers {
   protected static combineFilters = combineFilters;
 
+  /**
+   * Apply pagination constraints to query options
+   * Enforces maximum limit from DEFAULTS.PAGINATION.MAX_LIMIT
+   */
   protected static applyPagination(options: FindOptions): { limit?: number; offset?: number } {
     const { limit, offset } = options;
 
@@ -31,6 +35,10 @@ export abstract class BaseQuery extends BaseContextHelpers {
     };
   }
 
+  /**
+   * Build combined permission and soft delete filters for a table
+   * Returns undefined if no filters are applicable
+   */
   protected static buildBaseFilters(
     isPublicColumn: AnyColumn | undefined,
     userIdColumn: AnyColumn,
@@ -39,12 +47,12 @@ export abstract class BaseQuery extends BaseContextHelpers {
   ): SQL | undefined {
     const filters: Array<SQL | undefined> = [];
 
-    // add the permission filter if isPublic column exists
+    // Add the permission filter if isPublic column exists
     if (isPublicColumn) {
       filters.push(buildPermissionFilter(isPublicColumn, userIdColumn, context));
     }
 
-    // add soft delete filter if deletedAt column exists
+    // Add soft delete filter if deletedAt column exists
     if (deletedAtColumn) {
       filters.push(buildSoftDeleteFilter(deletedAtColumn, context));
     }
@@ -53,10 +61,13 @@ export abstract class BaseQuery extends BaseContextHelpers {
   }
 
   /**
-   * execute a database operation with retry logic and circuit breaker protection
-   * automatically handles transient database errors and connection issues
+   * Execute a database operation with retry logic and circuit breaker protection
+   * Automatically handles transient database errors and connection issues
    */
-  protected static async executeWithRetry<T>(operation: () => Promise<T>, operationName: string): Promise<T> {
+  protected static async executeWithRetryAsync<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+  ): Promise<T> {
     const circuitBreaker = circuitBreakers.database(operationName);
 
     const result = await circuitBreaker.execute(async () => {
@@ -72,10 +83,10 @@ export abstract class BaseQuery extends BaseContextHelpers {
   }
 
   /**
-   * execute a database operation with retry logic and return full retry metadata
-   * useful when you need detailed information about retry attempts
+   * Execute a database operation with retry logic and return full retry metadata
+   * Useful when you need detailed information about retry attempts
    */
-  protected static async executeWithRetryDetails<T>(
+  protected static async executeWithRetryDetailsAsync<T>(
     operation: () => Promise<T>,
     operationName: string,
   ): Promise<RetryResult<T>> {
@@ -92,7 +103,7 @@ export abstract class BaseQuery extends BaseContextHelpers {
   }
 
   /**
-   * get the database instance to use (transaction or main db)
+   * Get the database instance to use (transaction or main db)
    */
   protected static getDbInstance(context: QueryContext): DatabaseExecutor {
     return context.dbInstance ?? db;

@@ -1,9 +1,8 @@
-import { and, count, eq, gte, ilike, inArray, isNull, lte, not, or, sql, type SQL } from 'drizzle-orm';
+import { count, eq, gte, ilike, inArray, isNull, lte, not, or, sql, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
 
-import { DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -96,39 +95,26 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<BobbleheadSearchResult | null> {
     const dbInstance = this.getDbInstance(context);
 
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     const result = await dbInstance
-      .select({
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        collectionName: collections.name,
-        collectionSlug: collections.slug,
-        description: bobbleheads.description,
-        id: bobbleheads.id,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        primaryPhotoUrl: bobbleheadPhotos.url,
-        series: bobbleheads.series,
-        slug: bobbleheads.slug,
-        year: bobbleheads.year,
-      })
+      .select(this._selectBobbleheadSearchResult())
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
-      .where(
-        and(
-          eq(bobbleheads.id, id),
-          eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-          isNull(bobbleheads.deletedAt),
-          isNull(users.deletedAt),
+        this.combineFilters(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
         ),
       )
+      .where(this.combineFilters(eq(bobbleheads.id, id), bobbleheadFilter, isNull(users.deletedAt)))
       .limit(1);
 
     return result[0] || null;
@@ -143,32 +129,18 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<CollectionSearchResult | null> {
     const dbInstance = this.getDbInstance(context);
 
+    const collectionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      collections.deletedAt,
+      context,
+    );
+
     const result = await dbInstance
-      .select({
-        coverImageUrl: collections.coverImageUrl,
-        description: collections.description,
-        id: collections.id,
-        isPublic: collections.isPublic,
-        name: collections.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        slug: collections.slug,
-        totalItems: sql<number>`(
-          SELECT COUNT(*)::integer
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
-          AND ${bobbleheads.deletedAt} IS NULL
-        )`.as('total_items'),
-      })
+      .select(this._selectCollectionSearchResult())
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
-      .where(
-        and(
-          eq(collections.id, id),
-          eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-          isNull(users.deletedAt),
-        ),
-      )
+      .where(this.combineFilters(eq(collections.id, id), collectionFilter, isNull(users.deletedAt)))
       .limit(1);
 
     return result[0] || null;
@@ -189,7 +161,7 @@ export class ContentSearchQuery extends BaseQuery {
         username: users.username,
       })
       .from(users)
-      .where(and(eq(users.id, id), isNull(users.deletedAt)))
+      .where(this.combineFilters(eq(users.id, id), isNull(users.deletedAt)))
       .limit(1);
 
     return result[0] || null;
@@ -298,6 +270,13 @@ export class ContentSearchQuery extends BaseQuery {
 
     const dbInstance = this.getDbInstance(context);
 
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     const results = await dbInstance
       .select({
         collectionId: bobbleheads.collectionId,
@@ -312,13 +291,7 @@ export class ContentSearchQuery extends BaseQuery {
       .from(bobbleheads)
       .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
       .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
-      .where(
-        and(
-          inArray(bobbleheads.collectionId, collectionIds),
-          eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-          isNull(bobbleheads.deletedAt),
-        ),
-      )
+      .where(this.combineFilters(inArray(bobbleheads.collectionId, collectionIds), bobbleheadFilter))
       .orderBy(tags.name);
 
     // group by collection ID and deduplicate tags
@@ -353,7 +326,7 @@ export class ContentSearchQuery extends BaseQuery {
    * @param tagIds - Optional array of tag IDs to filter by
    * @param filterOptions - Optional additional filters (dateFrom, dateTo, category)
    */
-  static async getSearchResultCounts(
+  static async getSearchResultCountsAsync(
     query: string,
     context: QueryContext,
     tagIds?: Array<string>,
@@ -361,21 +334,25 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<PublicSearchCounts> {
     const dbInstance = this.getDbInstance(context);
 
-    // Build collection count query
-    const collectionConditions: Array<SQL> = [
-      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      isNull(users.deletedAt),
-    ];
+    const collectionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      collections.deletedAt,
+      context,
+    );
 
-    if (query && query.trim()) {
-      const textSearch = or(
-        ilike(collections.name, `%${query}%`),
-        ilike(collections.description, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-      );
-      if (textSearch) collectionConditions.push(textSearch);
-    }
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
+    // Build collection count query conditions
+    const collectionConditions: Array<SQL | undefined> = [collectionFilter, isNull(users.deletedAt)];
+
+    const collectionTextSearch = this._buildCollectionTextSearchCondition(query);
+    if (collectionTextSearch) collectionConditions.push(collectionTextSearch);
 
     // Apply date range filters to collections
     if (filterOptions?.dateFrom) {
@@ -394,39 +371,17 @@ export class ContentSearchQuery extends BaseQuery {
               .select({ collectionId: bobbleheads.collectionId })
               .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  eq(bobbleheadTags.tagId, tagId),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
+              .where(this.combineFilters(eq(bobbleheadTags.tagId, tagId), bobbleheadFilter)),
           ),
         );
       }
     }
 
-    // Build bobblehead count query
-    const bobbleheadConditions: Array<SQL> = [
-      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      isNull(bobbleheads.deletedAt),
-      isNull(users.deletedAt),
-    ];
+    // Build bobblehead count query conditions
+    const bobbleheadConditions: Array<SQL | undefined> = [bobbleheadFilter, isNull(users.deletedAt)];
 
-    if (query && query.trim()) {
-      const textSearch = or(
-        ilike(bobbleheads.name, `%${query}%`),
-        ilike(bobbleheads.description, `%${query}%`),
-        ilike(bobbleheads.characterName, `%${query}%`),
-        ilike(bobbleheads.manufacturer, `%${query}%`),
-        ilike(bobbleheads.series, `%${query}%`),
-        ilike(bobbleheads.category, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(collections.name, `%${query}%`),
-      );
-      if (textSearch) bobbleheadConditions.push(textSearch);
-    }
+    const bobbleheadTextSearch = this._buildBobbleheadTextSearchCondition(query);
+    if (bobbleheadTextSearch) bobbleheadConditions.push(bobbleheadTextSearch);
 
     // Apply date range and category filters to bobbleheads
     if (filterOptions?.dateFrom) {
@@ -459,14 +414,14 @@ export class ContentSearchQuery extends BaseQuery {
         .select({ count: count() })
         .from(collections)
         .innerJoin(users, eq(collections.userId, users.id))
-        .where(and(...collectionConditions)),
+        .where(this.combineFilters(...collectionConditions)),
 
       dbInstance
         .select({ count: count() })
         .from(bobbleheads)
         .innerJoin(users, eq(bobbleheads.userId, users.id))
         .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
-        .where(and(...bobbleheadConditions)),
+        .where(this.combineFilters(...bobbleheadConditions)),
     ]);
 
     const collectionsCount = Number(collectionsCountResult[0]?.count) || 0;
@@ -491,54 +446,33 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<Array<BobbleheadSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     // Build where conditions
-    const conditions: Array<SQL> = [
-      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      isNull(bobbleheads.deletedAt),
-      isNull(users.deletedAt),
-    ];
+    const conditions: Array<SQL | undefined> = [bobbleheadFilter, isNull(users.deletedAt)];
 
     // Add text search conditions if query is provided
-    if (query && query.trim()) {
-      const textSearchCondition = or(
-        ilike(bobbleheads.name, `%${query}%`),
-        ilike(bobbleheads.description, `%${query}%`),
-        ilike(bobbleheads.characterName, `%${query}%`),
-        ilike(bobbleheads.manufacturer, `%${query}%`),
-        ilike(bobbleheads.series, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(collections.name, `%${query}%`),
-      );
-      if (textSearchCondition) {
-        conditions.push(textSearchCondition);
-      }
+    const textSearchCondition = this._buildBobbleheadTextSearchCondition(query);
+    if (textSearchCondition) {
+      conditions.push(textSearchCondition);
     }
 
     const queryBuilder = dbInstance
-      .select({
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        collectionName: collections.name,
-        collectionSlug: collections.slug,
-        description: bobbleheads.description,
-        id: bobbleheads.id,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        primaryPhotoUrl: bobbleheadPhotos.url,
-        series: bobbleheads.series,
-        slug: bobbleheads.slug,
-        year: bobbleheads.year,
-      })
+      .select(this._selectBobbleheadSearchResult())
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+        this.combineFilters(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+        ),
       );
 
     // Add tag filtering if includeTags or excludeTags are provided
@@ -572,7 +506,7 @@ export class ContentSearchQuery extends BaseQuery {
       );
     }
 
-    return queryBuilder.where(and(...conditions)).limit(limit);
+    return queryBuilder.where(this.combineFilters(...conditions)).limit(limit);
   }
 
   /**
@@ -587,42 +521,31 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<Array<CollectionSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
+    const collectionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      collections.deletedAt,
+      context,
+    );
+
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     // Build where conditions
-    const conditions: Array<SQL> = [
-      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      isNull(users.deletedAt),
-    ];
+    const conditions: Array<SQL | undefined> = [collectionFilter, isNull(users.deletedAt)];
 
     // Add text search conditions if query is provided
-    if (query && query.trim()) {
-      const textSearchCondition = or(
-        ilike(collections.name, `%${query}%`),
-        ilike(collections.description, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-      );
-      if (textSearchCondition) {
-        conditions.push(textSearchCondition);
-      }
+    const textSearchCondition = this._buildCollectionTextSearchCondition(query);
+    if (textSearchCondition) {
+      conditions.push(textSearchCondition);
     }
 
     const queryBuilder = dbInstance
-      .select({
-        coverImageUrl: collections.coverImageUrl,
-        description: collections.description,
-        id: collections.id,
-        isPublic: collections.isPublic,
-        name: collections.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        slug: collections.slug,
-        totalItems: sql<number>`(
-          SELECT COUNT(*)::integer
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
-          AND ${bobbleheads.deletedAt} IS NULL
-        )`.as('total_items'),
-      })
+      .select(this._selectCollectionSearchResult())
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id));
 
@@ -637,13 +560,7 @@ export class ContentSearchQuery extends BaseQuery {
               .select({ collectionId: bobbleheads.collectionId })
               .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  eq(bobbleheadTags.tagId, tagId),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
+              .where(this.combineFilters(eq(bobbleheadTags.tagId, tagId), bobbleheadFilter)),
           ),
         );
       }
@@ -659,19 +576,13 @@ export class ContentSearchQuery extends BaseQuery {
               .select({ collectionId: bobbleheads.collectionId })
               .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  inArray(bobbleheadTags.tagId, excludeTags),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
+              .where(this.combineFilters(inArray(bobbleheadTags.tagId, excludeTags), bobbleheadFilter)),
           ),
         ),
       );
     }
 
-    return queryBuilder.where(and(...conditions)).limit(limit);
+    return queryBuilder.where(this.combineFilters(...conditions)).limit(limit);
   }
 
   /**
@@ -687,7 +598,7 @@ export class ContentSearchQuery extends BaseQuery {
    * @param offset - Optional offset for pagination
    * @param filterOptions - Optional additional filters (dateFrom, dateTo, category)
    */
-  static async searchPublicBobbleheads(
+  static async searchPublicBobbleheadsAsync(
     query: string,
     limit: number,
     context: QueryContext,
@@ -697,30 +608,21 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<Array<BobbleheadSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     // Build where conditions - only public, non-deleted bobbleheads
-    const conditions: Array<SQL> = [
-      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      isNull(bobbleheads.deletedAt),
-      isNull(users.deletedAt),
-    ];
+    const conditions: Array<SQL | undefined> = [bobbleheadFilter, isNull(users.deletedAt)];
 
     // Add text search conditions if query is provided
     // Leverages GIN indexes: bobbleheads_name_search_idx, bobbleheads_description_search_idx
-    if (query && query.trim()) {
-      const textSearchCondition = or(
-        ilike(bobbleheads.name, `%${query}%`),
-        ilike(bobbleheads.description, `%${query}%`),
-        ilike(bobbleheads.characterName, `%${query}%`),
-        ilike(bobbleheads.manufacturer, `%${query}%`),
-        ilike(bobbleheads.series, `%${query}%`),
-        ilike(bobbleheads.category, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(collections.name, `%${query}%`),
-      );
-      if (textSearchCondition) {
-        conditions.push(textSearchCondition);
-      }
+    const textSearchCondition = this._buildBobbleheadTextSearchCondition(query);
+    if (textSearchCondition) {
+      conditions.push(textSearchCondition);
     }
 
     // Apply date range and category filters
@@ -735,29 +637,16 @@ export class ContentSearchQuery extends BaseQuery {
     }
 
     const queryBuilder = dbInstance
-      .select({
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        collectionName: collections.name,
-        collectionSlug: collections.slug,
-        description: bobbleheads.description,
-        id: bobbleheads.id,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        primaryPhotoUrl: bobbleheadPhotos.url,
-        series: bobbleheads.series,
-        slug: bobbleheads.slug,
-        year: bobbleheads.year,
-      })
+      .select(this._selectBobbleheadSearchResult())
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+        this.combineFilters(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+        ),
       );
 
     // Tag filtering: find bobbleheads with ALL specified tags
@@ -775,7 +664,7 @@ export class ContentSearchQuery extends BaseQuery {
       }
     }
 
-    const baseQuery = queryBuilder.where(and(...conditions)).limit(limit);
+    const baseQuery = queryBuilder.where(this.combineFilters(...conditions)).limit(limit);
 
     if (offset !== undefined && offset > 0) {
       return baseQuery.offset(offset);
@@ -796,7 +685,7 @@ export class ContentSearchQuery extends BaseQuery {
    * @param offset - Optional offset for pagination
    * @param filterOptions - Optional additional filters (dateFrom, dateTo)
    */
-  static async searchPublicCollections(
+  static async searchPublicCollectionsAsync(
     query: string,
     limit: number,
     context: QueryContext,
@@ -806,24 +695,28 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<Array<CollectionSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
+    const collectionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      collections.deletedAt,
+      context,
+    );
+
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.deletedAt,
+      context,
+    );
+
     // Build where conditions - only public collections from non-deleted users
-    const conditions: Array<SQL> = [
-      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      isNull(users.deletedAt),
-    ];
+    const conditions: Array<SQL | undefined> = [collectionFilter, isNull(users.deletedAt)];
 
     // Add text search conditions if query is provided
     // Leverages GIN indexes: collections_name_search_idx, collections_description_search_idx
-    if (query && query.trim()) {
-      const textSearchCondition = or(
-        ilike(collections.name, `%${query}%`),
-        ilike(collections.description, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-      );
-      if (textSearchCondition) {
-        conditions.push(textSearchCondition);
-      }
+    const textSearchCondition = this._buildCollectionTextSearchCondition(query);
+    if (textSearchCondition) {
+      conditions.push(textSearchCondition);
     }
 
     // Apply date range filters
@@ -835,22 +728,7 @@ export class ContentSearchQuery extends BaseQuery {
     }
 
     const queryBuilder = dbInstance
-      .select({
-        coverImageUrl: collections.coverImageUrl,
-        description: collections.description,
-        id: collections.id,
-        isPublic: collections.isPublic,
-        name: collections.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        slug: collections.slug,
-        totalItems: sql<number>`(
-          SELECT COUNT(*)::integer
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
-          AND ${bobbleheads.deletedAt} IS NULL
-        )`.as('total_items'),
-      })
+      .select(this._selectCollectionSearchResult())
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id));
 
@@ -864,19 +742,13 @@ export class ContentSearchQuery extends BaseQuery {
               .select({ collectionId: bobbleheads.collectionId })
               .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  eq(bobbleheadTags.tagId, tagId),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
+              .where(this.combineFilters(eq(bobbleheadTags.tagId, tagId), bobbleheadFilter)),
           ),
         );
       }
     }
 
-    const baseQuery = queryBuilder.where(and(...conditions)).limit(limit);
+    const baseQuery = queryBuilder.where(this.combineFilters(...conditions)).limit(limit);
 
     if (offset !== undefined && offset > 0) {
       return baseQuery.offset(offset);
@@ -894,15 +766,15 @@ export class ContentSearchQuery extends BaseQuery {
    * @param limitPerType - Maximum number of results per entity type
    * @param context - Query context with database instance
    */
-  static async searchPublicConsolidated(
+  static async searchPublicConsolidatedAsync(
     query: string,
     limitPerType: number,
     context: QueryContext,
   ): Promise<ConsolidatedSearchResults> {
     // Execute both searches in parallel for optimal performance
     const [collections, bobbleheads] = await Promise.all([
-      this.searchPublicCollections(query, limitPerType, context),
-      this.searchPublicBobbleheads(query, limitPerType, context),
+      this.searchPublicCollectionsAsync(query, limitPerType, context),
+      this.searchPublicBobbleheadsAsync(query, limitPerType, context),
     ]);
 
     return {
@@ -921,6 +793,12 @@ export class ContentSearchQuery extends BaseQuery {
   ): Promise<Array<UserSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
+    const textSearchCondition = or(
+      ilike(users.username, `%${query}%`),
+      ilike(users.bio, `%${query}%`),
+      ilike(users.location, `%${query}%`),
+    );
+
     return dbInstance
       .select({
         avatarUrl: users.avatarUrl,
@@ -930,16 +808,93 @@ export class ContentSearchQuery extends BaseQuery {
         username: users.username,
       })
       .from(users)
-      .where(
-        and(
-          isNull(users.deletedAt),
-          or(
-            ilike(users.username, `%${query}%`),
-            ilike(users.bio, `%${query}%`),
-            ilike(users.location, `%${query}%`),
-          ),
-        ),
-      )
+      .where(this.combineFilters(isNull(users.deletedAt), textSearchCondition))
       .limit(limit);
+  }
+
+  /**
+   * Build text search condition for bobblehead queries
+   * Searches across name, description, characterName, manufacturer, series, category, username, and collection name
+   * Fixes duplicate username condition that was in the original code
+   */
+  private static _buildBobbleheadTextSearchCondition(query: string | undefined): SQL | undefined {
+    if (!query || !query.trim()) {
+      return undefined;
+    }
+
+    return or(
+      ilike(bobbleheads.name, `%${query}%`),
+      ilike(bobbleheads.description, `%${query}%`),
+      ilike(bobbleheads.characterName, `%${query}%`),
+      ilike(bobbleheads.manufacturer, `%${query}%`),
+      ilike(bobbleheads.series, `%${query}%`),
+      ilike(bobbleheads.category, `%${query}%`),
+      ilike(users.username, `%${query}%`),
+      ilike(collections.name, `%${query}%`),
+    );
+  }
+
+  /**
+   * Build text search condition for collection queries
+   * Searches across name, description, and username
+   * Fixes duplicate username condition that was in the original code
+   */
+  private static _buildCollectionTextSearchCondition(query: string | undefined): SQL | undefined {
+    if (!query || !query.trim()) {
+      return undefined;
+    }
+
+    return or(
+      ilike(collections.name, `%${query}%`),
+      ilike(collections.description, `%${query}%`),
+      ilike(users.username, `%${query}%`),
+    );
+  }
+
+  /**
+   * Select fields for bobblehead search results
+   * Extracts common select definition to reduce code duplication
+   */
+  private static _selectBobbleheadSearchResult() {
+    return {
+      category: bobbleheads.category,
+      characterName: bobbleheads.characterName,
+      collectionName: collections.name,
+      collectionSlug: collections.slug,
+      description: bobbleheads.description,
+      id: bobbleheads.id,
+      isPublic: bobbleheads.isPublic,
+      manufacturer: bobbleheads.manufacturer,
+      name: bobbleheads.name,
+      ownerName: users.username,
+      ownerUsername: users.username,
+      primaryPhotoUrl: bobbleheadPhotos.url,
+      series: bobbleheads.series,
+      slug: bobbleheads.slug,
+      year: bobbleheads.year,
+    };
+  }
+
+  /**
+   * Select fields for collection search results
+   * Extracts common select definition to reduce code duplication
+   */
+  private static _selectCollectionSearchResult() {
+    return {
+      coverImageUrl: collections.coverImageUrl,
+      description: collections.description,
+      id: collections.id,
+      isPublic: collections.isPublic,
+      name: collections.name,
+      ownerName: users.username,
+      ownerUsername: users.username,
+      slug: collections.slug,
+      totalItems: sql<number>`(
+        SELECT COUNT(*)::integer
+        FROM ${bobbleheads}
+        WHERE ${bobbleheads.collectionId} = ${collections.id}
+        AND ${bobbleheads.deletedAt} IS NULL
+      )`.as('total_items'),
+    };
   }
 }

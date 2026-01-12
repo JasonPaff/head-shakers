@@ -1,4 +1,5 @@
 import 'server-only';
+import { notFound } from 'next/navigation';
 
 import { CollectionsDashboardFacade } from '@/lib/facades/collections/collections-dashboard.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
@@ -17,6 +18,10 @@ export async function CollectionHeaderAsync({ collectionSlug }: CollectionHeader
   const userId = await getRequiredUserIdAsync();
 
   const collection = await CollectionsDashboardFacade.getHeaderByCollectionSlugAsync(userId, collectionSlug);
+
+  if (!collection) {
+    notFound();
+  }
 
   return <CollectionHeaderDisplay collection={collection} />;
 }

@@ -1,4 +1,4 @@
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';

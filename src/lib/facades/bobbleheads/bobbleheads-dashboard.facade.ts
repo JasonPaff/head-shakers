@@ -2,7 +2,7 @@ import type {
   BobbleheadDashboardListRecord,
   BobbleheadDashboardQueryOptions,
 } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
-import type { BobbleheadRecord } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadRecord } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import type { CollectionSelectorRecord } from '@/lib/queries/collections/collections-dashboard.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
@@ -10,7 +10,7 @@ import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsDashboardQuery } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
-import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import { CollectionsDashboardQuery } from '@/lib/queries/collections/collections-dashboard.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';

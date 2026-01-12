@@ -120,16 +120,24 @@ export type CollectionWithRelations = CollectionRecord & {
 
 export class CollectionsQuery extends BaseQuery {
   /**
-   * count total collections across all users
+   * Count total collections across all users
+   * Excludes soft-deleted collections from the count
    */
   static async countTotalCollectionsAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.select({ count: count() }).from(collections);
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(collections)
+      .where(buildSoftDeleteFilter(collections.deletedAt, context));
 
     return result[0]?.count || 0;
   }
 
+  /**
+   * Create a new collection for a user
+   * Returns the created collection record or null if creation failed
+   */
   static async createCollectionAsync(
     data: InsertCollection & { slug: string },
     userId: string,
@@ -145,17 +153,30 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async deleteAsync(data: DeleteCollection, userId: string, context: QueryContext) {
+  /**
+   * Soft delete a collection by setting deletedAt timestamp
+   * Only deletes collections owned by the specified user
+   */
+  static async deleteAsync(
+    data: DeleteCollection,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
-      .delete(collections)
+      .update(collections)
+      .set({ deletedAt: new Date() })
       .where(and(eq(collections.id, data.collectionId), eq(collections.userId, userId)))
       .returning();
 
     return result?.[0] || null;
   }
 
+  /**
+   * Find a collection by ID with related bobblehead data
+   * Applies permission filters and excludes soft-deleted bobbleheads
+   */
   static async findByIdWithRelationsAsync(
     id: string,
     context: QueryContext,
@@ -188,6 +209,10 @@ export class CollectionsQuery extends BaseQuery {
     return collection || null;
   }
 
+  /**
+   * Find a collection by slug and user ID
+   * Applies permission filters for access control
+   */
   static async findBySlugAsync(
     slug: string,
     userId: string,
@@ -210,6 +235,10 @@ export class CollectionsQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  /**
+   * Find a collection by slug and user ID with related bobblehead data
+   * Applies permission filters and excludes soft-deleted bobbleheads
+   */
   static async findBySlugWithRelationsAsync(
     slug: string,
     userId: string,
@@ -247,6 +276,10 @@ export class CollectionsQuery extends BaseQuery {
     return collection || null;
   }
 
+  /**
+   * Find all collections belonging to a specific user
+   * Supports pagination and applies permission filters
+   */
   static async findByUserAsync(
     userId: string,
     options: FindOptions = {},
@@ -277,6 +310,10 @@ export class CollectionsQuery extends BaseQuery {
     return query;
   }
 
+  /**
+   * Get all bobbleheads in a collection with their primary photos
+   * Supports search filtering and custom sort order
+   */
   static async getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
@@ -328,6 +365,10 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
+  /**
+   * Get bobbleheads in a collection without photo data
+   * Applies permission filters for both collection and bobbleheads
+   */
   static async getBobbleheadsInCollectionAsync(
     collectionId: string,
     context: QueryContext,
@@ -359,6 +400,10 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(bobbleheads.createdAt);
   }
 
+  /**
+   * Get collections filtered by category with pagination
+   * Returns collections containing bobbleheads in the specified category
+   */
   static async getBrowseCategoriesAsync(
     input: BrowseCategoriesInput,
     context: QueryContext,
@@ -637,6 +682,10 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
+  /**
+   * Get collections for browsing with filtering, sorting, and pagination
+   * Returns collections with owner info, item counts, and engagement metrics
+   */
   static async getBrowseCollectionsAsync(
     input: BrowseCollectionsInput,
     context: QueryContext,
@@ -796,6 +845,10 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
+  /**
+   * Get a collection by its ID
+   * Applies permission filters and excludes soft-deleted collections
+   */
   static async getByIdAsync(collectionId: string, context: QueryContext): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
@@ -813,6 +866,10 @@ export class CollectionsQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  /**
+   * Get bobbleheads in a collection with their primary photos
+   * Supports search filtering and custom sort order
+   */
   static async getCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
@@ -865,6 +922,10 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
+  /**
+   * Get the total count of non-deleted collections
+   * Uses soft delete filter to exclude deleted collections
+   */
   static async getCollectionCountAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
@@ -876,10 +937,10 @@ export class CollectionsQuery extends BaseQuery {
   }
 
   /**
-   * get collection metadata for SEO and social sharing
-   * returns minimal fields needed for metadata generation with owner info
+   * Get collection metadata for SEO and social sharing
+   * Returns minimal fields needed for metadata generation with owner info
    */
-  static async getCollectionMetadata(
+  static async getCollectionMetadataAsync(
     slug: string,
     userId: string,
     context: QueryContext,
@@ -941,6 +1002,10 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
+  /**
+   * Get all collection slugs for a specific user
+   * Excludes soft-deleted collections from the results
+   */
   static async getCollectionSlugsByUserIdAsync(
     userId: string,
     context: QueryContext,
@@ -950,10 +1015,14 @@ export class CollectionsQuery extends BaseQuery {
     return await dbInstance
       .select({ slug: collections.slug })
       .from(collections)
-      .where(eq(collections.userId, userId))
+      .where(this.combineFilters(eq(collections.userId, userId), isNull(collections.deletedAt)))
       .then((results) => results.map((r) => r.slug));
   }
 
+  /**
+   * Get distinct categories with collection and bobblehead counts
+   * Filters to public collections and non-deleted bobbleheads
+   */
   static async getDistinctCategoriesAsync(context: QueryContext): Promise<Array<CategoryRecord>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -984,7 +1053,8 @@ export class CollectionsQuery extends BaseQuery {
   }
 
   /**
-   * Check if collection name exists for user (case-insensitive)
+   * Check if a collection name already exists for a user (case-insensitive)
+   * Returns true if the name is taken, false if available
    */
   static async getIsCollectionNameAvailableAsync(
     name: string,
@@ -1013,7 +1083,15 @@ export class CollectionsQuery extends BaseQuery {
     return result.length > 0;
   }
 
-  static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {
+  /**
+   * Update an existing collection
+   * Only updates collections owned by the specified user
+   */
+  static async updateAsync(
+    data: UpdateCollection,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance

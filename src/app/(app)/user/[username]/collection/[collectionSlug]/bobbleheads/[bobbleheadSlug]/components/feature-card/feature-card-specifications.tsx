@@ -1,7 +1,7 @@
 import { Palette, Ruler, Scale } from 'lucide-react';
 import { useMemo } from 'react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';

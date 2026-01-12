@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';

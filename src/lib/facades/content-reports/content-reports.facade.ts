@@ -181,13 +181,19 @@ export class ContentReportsFacade extends BaseFacade {
         }
 
         // create the report
-        return ContentReportsQuery.createContentReportAsync(
+        const report = await ContentReportsQuery.createContentReportAsync(
           {
             ...reportData,
             reporterId: userId,
           },
           context,
         );
+
+        if (!report) {
+          throw new Error('Failed to create content report');
+        }
+
+        return report;
       },
       {
         includeResultSummary: (result) => ({
@@ -370,13 +376,19 @@ export class ContentReportsFacade extends BaseFacade {
       async () => {
         const context = this.getProtectedContext(userId, dbInstance);
 
-        return ContentReportsQuery.updateReportStatusAsync(
+        const report = await ContentReportsQuery.updateReportStatusAsync(
           updateData.reportId,
           updateData.status,
           userId,
           updateData.moderatorNotes,
           context,
         );
+
+        if (!report) {
+          throw new Error('Failed to update content report');
+        }
+
+        return report;
       },
       {
         includeResultSummary: (result) => ({

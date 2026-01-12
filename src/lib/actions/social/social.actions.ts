@@ -8,7 +8,7 @@ import type { ActionResponse } from '@/lib/utils/action-response';
 import { ACTION_NAMES, ERROR_MESSAGES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
-import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { actionFailure, actionSuccess } from '@/lib/utils/action-response';

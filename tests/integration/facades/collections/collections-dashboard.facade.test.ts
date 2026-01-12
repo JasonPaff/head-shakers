@@ -156,18 +156,18 @@ describe('CollectionsDashboardFacade Integration Tests', () => {
       );
 
       // Assert - Verify all fields are present
-      expect(result).toBeDefined();
-      expect(result.id).toBe(collection!.id);
-      expect(result.name).toBe('Test Collection');
-      expect(result.slug).toBe('test-collection');
-      expect(result.description).toBe('My amazing collection');
-      expect(result.coverImageUrl).toBe('https://example.com/cover.jpg');
-      expect(result.isPublic).toBe(true);
-      expect(result.bobbleheadCount).toBe('2');
-      expect(result.totalValue).toBe('125.50');
-      expect(result.likeCount).toBe('1');
-      expect(result.commentCount).toBe('1');
-      expect(result.viewCount).toBe('1');
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe(collection!.id);
+      expect(result!.name).toBe('Test Collection');
+      expect(result!.slug).toBe('test-collection');
+      expect(result!.description).toBe('My amazing collection');
+      expect(result!.coverImageUrl).toBe('https://example.com/cover.jpg');
+      expect(result!.isPublic).toBe(true);
+      expect(result!.bobbleheadCount).toBe('2');
+      expect(result!.totalValue).toBe('125.50');
+      expect(result!.likeCount).toBe('1');
+      expect(result!.commentCount).toBe('1');
+      expect(result!.viewCount).toBe('1');
 
       // Verify cache was called with correct key
       const cacheKey = `dashboardHeader-${user!.id}-test-collection`;
@@ -201,8 +201,8 @@ describe('CollectionsDashboardFacade Integration Tests', () => {
         'private-collection',
       );
 
-      // Assert - Should return undefined (permission denied)
-      expect(result).toBeUndefined();
+      // Assert - Should return null (permission denied)
+      expect(result).toBeNull();
 
       // Verify cache was still called (but query returned nothing)
       const cacheKey = `dashboardHeader-${user2!.id}-private-collection`;
@@ -232,11 +232,11 @@ describe('CollectionsDashboardFacade Integration Tests', () => {
       );
 
       // Assert - Owner can see private collection
-      expect(result).toBeDefined();
-      expect(result.id).toBe(collection!.id);
-      expect(result.name).toBe('My Private Collection');
-      expect(result.isPublic).toBe(false);
-      expect(result.bobbleheadCount).toBe('1');
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe(collection!.id);
+      expect(result!.name).toBe('My Private Collection');
+      expect(result!.isPublic).toBe(false);
+      expect(result!.bobbleheadCount).toBe('1');
     });
 
     it('should return zero counts for collection with no activity', async () => {
@@ -255,13 +255,13 @@ describe('CollectionsDashboardFacade Integration Tests', () => {
       );
 
       // Assert
-      expect(result).toBeDefined();
-      expect(result.bobbleheadCount).toBe('0');
-      expect(result.totalValue).toBe('0');
-      expect(result.featuredCount).toBe('0');
-      expect(result.likeCount).toBe('0');
-      expect(result.commentCount).toBe('0');
-      expect(result.viewCount).toBe('0');
+      expect(result).not.toBeNull();
+      expect(result!.bobbleheadCount).toBe('0');
+      expect(result!.totalValue).toBe('0');
+      expect(result!.featuredCount).toBe('0');
+      expect(result!.likeCount).toBe('0');
+      expect(result!.commentCount).toBe('0');
+      expect(result!.viewCount).toBe('0');
     });
   });
 

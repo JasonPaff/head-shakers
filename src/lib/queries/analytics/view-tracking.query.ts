@@ -1,11 +1,11 @@
-import { count, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
+import { count, desc, eq, gte, inArray, isNotNull, lte, sql } from 'drizzle-orm';
 
 import type { ENUMS } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { InsertContentView, SelectContentView } from '@/lib/validations/analytics.validation';
 
 import { contentViews } from '@/lib/db/schema';
-import { ViewBaseQuery } from '@/lib/queries/analytics/view-base-query';
+import { ViewBaseQuery } from '@/lib/queries/analytics/view-base.query';
 
 export type RecentViewsRecord = {
   id: string;
@@ -27,6 +27,11 @@ export type ViewStats = {
   uniqueViewers: number;
 };
 
+/**
+ * View tracking query class for database operations related to content views.
+ * Provides methods for recording, retrieving, and analyzing view data
+ * with deduplication and privacy compliance features.
+ */
 export class ViewTrackingQuery extends ViewBaseQuery {
   /**
    * Record multiple views in a batch operation
@@ -37,9 +42,8 @@ export class ViewTrackingQuery extends ViewBaseQuery {
   ): Promise<Array<ViewRecord>> {
     if (views.length === 0) return [];
 
-    const dbInstance = this.getDbInstance(context);
-
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const viewsWithTimestamp = views.map((view) => ({
         ...view,
         viewedAt: new Date(),
@@ -63,10 +67,10 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     },
     context: QueryContext,
   ): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
     const { targetId, targetType, userId, viewIds } = filters;
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const whereConditions = [];
 
       if (targetType) {
@@ -107,19 +111,19 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     } = {},
     context: QueryContext,
   ): Promise<Array<RecentViewsRecord>> {
-    const dbInstance = this.getDbInstance(context);
     const { isIncludingAnonymous = true, startDate, ...findOptions } = options;
     const pagination = this.applyPagination(findOptions);
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const filters = [eq(contentViews.targetType, targetType), eq(contentViews.targetId, targetId)];
 
-      // add an anonymous filter if specified
+      // Add an anonymous filter if specified
       if (!isIncludingAnonymous) {
-        filters.push(sql`${contentViews.viewerId} IS NOT NULL`);
+        filters.push(isNotNull(contentViews.viewerId));
       }
 
-      // add the start date filter
+      // Add the start date filter
       if (startDate) {
         filters.push(gte(contentViews.viewedAt, startDate));
       }
@@ -164,19 +168,19 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     } = {},
     context: QueryContext,
   ): Promise<Array<ViewRecord>> {
-    const dbInstance = this.getDbInstance(context);
     const { endDate, startDate, targetType, ...findOptions } = options;
     const pagination = this.applyPagination(findOptions);
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const filters = [eq(contentViews.viewerId, userId)];
 
-      // add the target type filter if specified
+      // Add the target type filter if specified
       if (targetType) {
         filters.push(eq(contentViews.targetType, targetType));
       }
 
-      // add date range filters
+      // Add date range filters
       if (startDate) {
         filters.push(gte(contentViews.viewedAt, startDate));
       }
@@ -215,18 +219,18 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     } = {},
     context: QueryContext,
   ): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
     const { endDate, isIncludingAnonymous = true, startDate } = options;
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const filters = [eq(contentViews.targetType, targetType), eq(contentViews.targetId, targetId)];
 
-      // add the anonymous filter if specified
+      // Add the anonymous filter if specified
       if (!isIncludingAnonymous) {
-        filters.push(sql`${contentViews.viewerId} IS NOT NULL`);
+        filters.push(isNotNull(contentViews.viewerId));
       }
 
-      // add date range filters
+      // Add date range filters
       if (startDate) {
         filters.push(gte(contentViews.viewedAt, startDate));
       }
@@ -255,13 +259,13 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     } = {},
     context: QueryContext,
   ): Promise<ViewStats> {
-    const dbInstance = this.getDbInstance(context);
     const { endDate, startDate } = options;
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const filters = [eq(contentViews.targetType, targetType), eq(contentViews.targetId, targetId)];
 
-      // add date range filters
+      // Add date range filters
       if (startDate) {
         filters.push(gte(contentViews.viewedAt, startDate));
       }
@@ -306,38 +310,34 @@ export class ViewTrackingQuery extends ViewBaseQuery {
       ipAddress?: string;
       userId?: string;
     },
+    timeWindow:
+      | undefined
+      | {
+          endDate: Date;
+          startDate: Date;
+        },
     context: QueryContext,
-    timeWindow?: {
-      endDate: Date;
-      startDate: Date;
-    },
   ): Promise<boolean> {
-    const dbInstance = this.getDbInstance(context);
-    const { ipAddress, userId } = identifier;
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
 
-    return this.executeWithRetry(async () => {
-      const filters = [eq(contentViews.targetType, targetType), eq(contentViews.targetId, targetId)];
+      // Use the base query helper for building deduplication filters
+      const deduplicationFilter = this.buildViewDeduplicationFilter(
+        targetType,
+        targetId,
+        identifier,
+        timeWindow,
+      );
 
-      // add user or IP identification
-      if (userId) {
-        filters.push(eq(contentViews.viewerId, userId));
-      } else if (ipAddress) {
-        filters.push(eq(contentViews.ipAddress, ipAddress));
-        filters.push(isNull(contentViews.viewerId));
-      } else {
-        return false; // No identification provided
-      }
-
-      // add the time window if specified
-      if (timeWindow) {
-        filters.push(gte(contentViews.viewedAt, timeWindow.startDate));
-        filters.push(lte(contentViews.viewedAt, timeWindow.endDate));
+      // No identification provided
+      if (!deduplicationFilter) {
+        return false;
       }
 
       const result = await dbInstance
         .select({ id: contentViews.id })
         .from(contentViews)
-        .where(this.combineFilters(...filters))
+        .where(deduplicationFilter)
         .limit(1);
 
       return result.length > 0;
@@ -348,9 +348,8 @@ export class ViewTrackingQuery extends ViewBaseQuery {
    * Record a single view with deduplication
    */
   static async recordViewAsync(data: InsertContentView, context: QueryContext): Promise<null | ViewRecord> {
-    const dbInstance = this.getDbInstance(context);
-
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const result = await dbInstance
         .insert(contentViews)
         .values({
@@ -371,9 +370,8 @@ export class ViewTrackingQuery extends ViewBaseQuery {
     duration: number,
     context: QueryContext,
   ): Promise<null | ViewRecord> {
-    const dbInstance = this.getDbInstance(context);
-
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
+      const dbInstance = this.getDbInstance(context);
       const result = await dbInstance
         .update(contentViews)
         .set({ viewDuration: duration })

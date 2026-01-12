@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react';
 
 import { FileTextIcon } from 'lucide-react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Conditional } from '@/components/ui/conditional';

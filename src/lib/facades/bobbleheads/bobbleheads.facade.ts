@@ -4,7 +4,7 @@ import type {
   AdjacentBobblehead,
   BobbleheadRecord,
   BobbleheadWithRelations,
-} from '@/lib/queries/bobbleheads/bobbleheads-query';
+} from '@/lib/queries/bobbleheads/bobbleheads.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { BobbleheadNavigationDataSchema } from '@/lib/validations/bobblehead-navigation.validation';
 import type {
@@ -26,7 +26,7 @@ import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
-import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
@@ -1122,7 +1122,7 @@ export class BobbleheadsFacade extends BaseFacade {
         return CacheService.bobbleheads.byId(
           () => {
             const context = this.getPublicContext(dbInstance);
-            return BobbleheadsQuery.getBobbleheadMetadata(slug, context);
+            return BobbleheadsQuery.getBobbleheadMetadataAsync(slug, context);
           },
           slug,
           {

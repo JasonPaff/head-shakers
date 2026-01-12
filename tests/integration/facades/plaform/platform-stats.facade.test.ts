@@ -147,7 +147,7 @@ describe('PlatformStatsFacade Integration Tests', () => {
     it('should handle database errors gracefully', async () => {
       // Arrange - Mock one of the query methods to throw an error
       // This simulates a database failure during query execution
-      const { BobbleheadsQuery } = await import('@/lib/queries/bobbleheads/bobbleheads-query');
+      const { BobbleheadsQuery } = await import('@/lib/queries/bobbleheads/bobbleheads.query');
       const originalGetCount = BobbleheadsQuery.getBobbleheadCountAsync.bind(BobbleheadsQuery);
 
       BobbleheadsQuery.getBobbleheadCountAsync = vi.fn(() => {

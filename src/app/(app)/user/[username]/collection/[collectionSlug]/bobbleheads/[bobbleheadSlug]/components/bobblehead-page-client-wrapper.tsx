@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
 import { BobbleheadStickyHeader } from '@/components/feature/bobblehead/bobblehead-sticky-header';

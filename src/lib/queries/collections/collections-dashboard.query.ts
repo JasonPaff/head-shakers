@@ -1,6 +1,6 @@
 import { count, eq, sql, sum } from 'drizzle-orm';
 
-import type { QueryContext } from '@/lib/queries/base/query-context';
+import type { UserQueryContext } from '@/lib/queries/base/query-context';
 import type {
   CollectionDashboardListRecord,
   CollectionRecord,
@@ -28,10 +28,18 @@ export type CollectionDashboardHeaderRecord = Pick<
 export type CollectionSelectorRecord = Pick<CollectionRecord, 'id' | 'name' | 'slug'>;
 
 export class CollectionsDashboardQuery extends BaseQuery {
+  /**
+   * Get dashboard header data for a collection by slug.
+   * Includes aggregate stats for bobbleheads, comments, likes, and views.
+   *
+   * @param collectionSlug - The slug of the collection
+   * @param context - User query context with authenticated userId
+   * @returns Collection header record with stats or null if not found
+   */
   static async getHeaderByCollectionSlugAsync(
     collectionSlug: string,
-    context: QueryContext,
-  ): Promise<CollectionDashboardHeaderRecord> {
+    context: UserQueryContext,
+  ): Promise<CollectionDashboardHeaderRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const bobbleheadStats = this._buildBobbleheadStatsSubquery(dbInstance);
@@ -62,15 +70,23 @@ export class CollectionsDashboardQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(collections.slug, collectionSlug),
-          eq(collections.userId, context.userId!),
           this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
         ),
       );
 
-    return result[0]!;
+    return result[0] || null;
   }
 
-  static async getListByUserIdAsync(context: QueryContext): Promise<Array<CollectionDashboardListRecord>> {
+  /**
+   * Get list of collections for dashboard display.
+   * Includes aggregate stats for bobbleheads, comments, likes, and views.
+   *
+   * @param context - User query context with authenticated userId
+   * @returns Array of collection records with stats, ordered by name (case-insensitive)
+   */
+  static async getListByUserIdAsync(
+    context: UserQueryContext,
+  ): Promise<Array<CollectionDashboardListRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const bobbleheadStats = this._buildBobbleheadStatsSubquery(dbInstance);
@@ -98,12 +114,8 @@ export class CollectionsDashboardQuery extends BaseQuery {
       .leftJoin(commentStats, eq(commentStats.targetId, collections.id))
       .leftJoin(likeStats, eq(likeStats.targetId, collections.id))
       .leftJoin(viewStats, eq(viewStats.targetId, collections.id))
-      .where(
-        this.combineFilters(
-          eq(collections.userId, context.userId!),
-          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
-        ),
-      );
+      .where(this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context))
+      .orderBy(sql`lower(${collections.name}) asc`);
 
     return result || [];
   }
@@ -115,7 +127,9 @@ export class CollectionsDashboardQuery extends BaseQuery {
    * @param context - Query context with userId for permission filtering
    * @returns Array of collection selectors ordered by name (case-insensitive)
    */
-  static async getSelectorsByUserIdAsync(context: QueryContext): Promise<Array<CollectionSelectorRecord>> {
+  static async getSelectorsByUserIdAsync(
+    context: UserQueryContext,
+  ): Promise<Array<CollectionSelectorRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -125,12 +139,7 @@ export class CollectionsDashboardQuery extends BaseQuery {
         slug: collections.slug,
       })
       .from(collections)
-      .where(
-        this.combineFilters(
-          eq(collections.userId, context.userId!),
-          this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context),
-        ),
-      )
+      .where(this.buildBaseFilters(undefined, collections.userId, collections.deletedAt, context))
       .orderBy(sql`lower(${collections.name}) asc`);
 
     return result || [];

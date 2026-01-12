@@ -38,13 +38,13 @@ export type ReportsStatsResult = {
 
 export class ContentReportsQuery extends BaseQuery {
   /**
-   * Bulk update report statuses for admin operations
+   * Bulk update report statuses for admin operations.
    * @param reportIds - Array of report IDs to update (max 100)
    * @param status - New status to set for all reports
    * @param moderatorId - ID of the moderator performing the action
    * @param context - Query context for database access
    * @param moderatorNotes - Optional notes from the moderator
-   * @returns Promise<SelectContentReport[]> - Updated reports
+   * @returns Array of updated reports, or empty array if no IDs provided
    */
   static async bulkUpdateReportsStatusAsync(
     reportIds: Array<string>,
@@ -61,7 +61,7 @@ export class ContentReportsQuery extends BaseQuery {
       throw new Error('Cannot update more than 100 reports at once');
     }
 
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
 
       const updateData: {
@@ -97,7 +97,12 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Check if a user has already reported a specific target
+   * Check if a user has already reported a specific target.
+   * @param userId - The ID of the user who reported
+   * @param targetId - The ID of the reported target
+   * @param targetType - The type of the reported target
+   * @param context - Query context for database access
+   * @returns The existing report if found, or null
    */
   static async checkExistingReportAsync(
     userId: string,
@@ -108,7 +113,7 @@ export class ContentReportsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     const existingReport = await dbInstance.query.contentReports.findFirst({
-      where: and(
+      where: this.combineFilters(
         eq(contentReports.reporterId, userId),
         eq(contentReports.targetId, targetId),
         eq(contentReports.targetType, targetType),
@@ -119,7 +124,11 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Count total reports for a target
+   * Count total reports for a target.
+   * @param targetId - The ID of the target
+   * @param targetType - The type of the target
+   * @param context - Query context for database access
+   * @returns The count of reports for the target
    */
   static async countReportsForTargetAsync(
     targetId: string,
@@ -130,18 +139,23 @@ export class ContentReportsQuery extends BaseQuery {
     const [result] = await dbInstance
       .select({ count: count() })
       .from(contentReports)
-      .where(and(eq(contentReports.targetId, targetId), eq(contentReports.targetType, targetType)));
+      .where(
+        this.combineFilters(eq(contentReports.targetId, targetId), eq(contentReports.targetType, targetType)),
+      );
     return result?.count ?? 0;
   }
 
   /**
-   * Create a new content report
+   * Create a new content report.
+   * @param report - The report data to insert
+   * @param context - Query context for database access
+   * @returns The created report, or null if creation failed
    */
   static async createContentReportAsync(
     report: InsertContentReport,
     context: QueryContext,
-  ): Promise<SelectContentReport> {
-    return this.executeWithRetry(async () => {
+  ): Promise<null | SelectContentReport> {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
 
       const [newReport] = await dbInstance
@@ -152,74 +166,29 @@ export class ContentReportsQuery extends BaseQuery {
         })
         .returning();
 
-      if (!newReport) {
-        throw new Error('Failed to create content report');
-      }
-
-      return newReport;
+      return newReport ?? null;
     }, 'createContentReport');
   }
 
   /**
-   * Get all reports for admin with comprehensive filtering and pagination
+   * Get all reports for admin with comprehensive filtering and pagination.
    * @param options - Filter and pagination options
    * @param context - Query context for database access
-   * @returns Promise<SelectContentReport[]> - Filtered and paginated reports
+   * @returns Filtered and paginated reports
    */
   static async getAllReportsForAdminAsync(
     options: AdminReportsFilterOptions = {},
     context: QueryContext,
   ): Promise<Array<SelectContentReport>> {
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
       const pagination = this.applyPagination(options);
-
-      const filters: Array<SQL | undefined> = [];
-
-      if (options.status) {
-        if (Array.isArray(options.status)) {
-          filters.push(inArray(contentReports.status, options.status));
-        } else {
-          filters.push(eq(contentReports.status, options.status));
-        }
-      }
-
-      if (options.targetType) {
-        if (Array.isArray(options.targetType)) {
-          filters.push(inArray(contentReports.targetType, options.targetType));
-        } else {
-          filters.push(eq(contentReports.targetType, options.targetType));
-        }
-      }
-
-      if (options.reason) {
-        if (Array.isArray(options.reason)) {
-          filters.push(inArray(contentReports.reason, options.reason));
-        } else {
-          filters.push(eq(contentReports.reason, options.reason));
-        }
-      }
-
-      if (options.reporterId) {
-        filters.push(eq(contentReports.reporterId, options.reporterId));
-      }
-
-      if (options.moderatorId) {
-        filters.push(eq(contentReports.moderatorId, options.moderatorId));
-      }
-
-      if (options.dateFrom) {
-        filters.push(gte(contentReports.createdAt, options.dateFrom));
-      }
-
-      if (options.dateTo) {
-        filters.push(lte(contentReports.createdAt, options.dateTo));
-      }
+      const whereClause = this._buildAdminFilters(options);
 
       let query = dbInstance
         .select()
         .from(contentReports)
-        .where(filters.length > 0 ? and(...filters) : undefined)
+        .where(whereClause)
         .orderBy(desc(contentReports.createdAt))
         .$dynamic();
 
@@ -236,61 +205,20 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Get all reports for admin with slug data for generating type-safe links
-   * Uses LEFT JOINs to fetch slug information from related tables
+   * Get all reports for admin with slug data for generating type-safe links.
+   * Uses LEFT JOINs to fetch slug information from related tables.
    * @param options - Filter and pagination options
    * @param context - Query context for database access
-   * @returns Promise<SelectContentReportWithSlugs[]> - Reports with slug data
+   * @returns Reports with slug data
    */
   static async getAllReportsWithSlugsForAdminAsync(
     options: AdminReportsFilterOptions = {},
     context: QueryContext,
   ): Promise<Array<SelectContentReportWithSlugs>> {
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
       const pagination = this.applyPagination(options);
-
-      const filters: Array<SQL | undefined> = [];
-
-      if (options.status) {
-        if (Array.isArray(options.status)) {
-          filters.push(inArray(contentReports.status, options.status));
-        } else {
-          filters.push(eq(contentReports.status, options.status));
-        }
-      }
-
-      if (options.targetType) {
-        if (Array.isArray(options.targetType)) {
-          filters.push(inArray(contentReports.targetType, options.targetType));
-        } else {
-          filters.push(eq(contentReports.targetType, options.targetType));
-        }
-      }
-
-      if (options.reason) {
-        if (Array.isArray(options.reason)) {
-          filters.push(inArray(contentReports.reason, options.reason));
-        } else {
-          filters.push(eq(contentReports.reason, options.reason));
-        }
-      }
-
-      if (options.reporterId) {
-        filters.push(eq(contentReports.reporterId, options.reporterId));
-      }
-
-      if (options.moderatorId) {
-        filters.push(eq(contentReports.moderatorId, options.moderatorId));
-      }
-
-      if (options.dateFrom) {
-        filters.push(gte(contentReports.createdAt, options.dateFrom));
-      }
-
-      if (options.dateTo) {
-        filters.push(lte(contentReports.createdAt, options.dateTo));
-      }
+      const whereClause = this._buildAdminFilters(options);
 
       // Select all content report fields plus computed slug fields
       let query = dbInstance
@@ -360,7 +288,7 @@ export class ContentReportsQuery extends BaseQuery {
           comments,
           and(eq(contentReports.targetId, comments.id), eq(contentReports.targetType, 'comment')),
         )
-        .where(filters.length > 0 ? and(...filters) : undefined)
+        .where(whereClause)
         .orderBy(desc(contentReports.createdAt))
         .$dynamic();
 
@@ -377,7 +305,11 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Get recent reports by a specific user (for rate limiting checks)
+   * Get recent reports by a specific user (for rate limiting checks).
+   * @param userId - The ID of the user
+   * @param hoursAgo - Number of hours to look back (default: 24)
+   * @param context - Query context for database access
+   * @returns Array of recent reports by the user
    */
   static async getRecentReportsByUserAsync(
     userId: string,
@@ -389,23 +321,26 @@ export class ContentReportsQuery extends BaseQuery {
 
     return dbInstance.query.contentReports.findMany({
       orderBy: [desc(contentReports.createdAt)],
-      where: and(eq(contentReports.reporterId, userId), gte(contentReports.createdAt, timeThreshold)),
+      where: this.combineFilters(
+        eq(contentReports.reporterId, userId),
+        gte(contentReports.createdAt, timeThreshold),
+      ),
     });
   }
 
   /**
-   * Get reports filtered by status for admin dashboard
+   * Get reports filtered by status for admin dashboard.
    * @param status - Report status to filter by
    * @param options - Pagination options
    * @param context - Query context for database access
-   * @returns Promise<SelectContentReport[]> - Reports with specified status
+   * @returns Reports with specified status
    */
   static async getReportsByStatusAsync(
     status: ContentReportStatus,
     options: FindOptions = {},
     context: QueryContext,
   ): Promise<Array<SelectContentReport>> {
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
       const pagination = this.applyPagination(options);
 
@@ -429,7 +364,12 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Get all reports for a specific target
+   * Get all reports for a specific target.
+   * @param targetId - The ID of the target
+   * @param targetType - The type of the target
+   * @param options - Pagination options
+   * @param context - Query context for database access
+   * @returns Array of reports for the target
    */
   static async getReportsByTargetAsync(
     targetId: string,
@@ -443,7 +383,9 @@ export class ContentReportsQuery extends BaseQuery {
     let query = dbInstance
       .select()
       .from(contentReports)
-      .where(and(eq(contentReports.targetId, targetId), eq(contentReports.targetType, targetType)))
+      .where(
+        this.combineFilters(eq(contentReports.targetId, targetId), eq(contentReports.targetType, targetType)),
+      )
       .orderBy(desc(contentReports.createdAt))
       .$dynamic();
 
@@ -458,15 +400,13 @@ export class ContentReportsQuery extends BaseQuery {
     return query;
   }
 
-  // Admin-specific methods
-
   /**
-   * Get report statistics for admin dashboard
+   * Get report statistics for admin dashboard.
    * @param context - Query context for database access
-   * @returns Promise<ReportsStatsResult> - Report statistics by status
+   * @returns Report statistics by status
    */
   static async getReportsStatsAsync(context: QueryContext): Promise<ReportsStatsResult> {
-    return this.executeWithRetry(async () => {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
 
       const [stats] = await dbInstance
@@ -488,17 +428,22 @@ export class ContentReportsQuery extends BaseQuery {
         .from(contentReports);
 
       return {
-        dismissed: parseInt(String(stats?.dismissed ?? 0), 10),
-        pending: parseInt(String(stats?.pending ?? 0), 10),
-        resolved: parseInt(String(stats?.resolved ?? 0), 10),
-        reviewed: parseInt(String(stats?.reviewed ?? 0), 10),
-        total: parseInt(String(stats?.total ?? 0), 10),
+        dismissed: Number(stats?.dismissed ?? 0),
+        pending: Number(stats?.pending ?? 0),
+        resolved: Number(stats?.resolved ?? 0),
+        reviewed: Number(stats?.reviewed ?? 0),
+        total: Number(stats?.total ?? 0),
       };
     }, 'getReportsStats');
   }
 
   /**
-   * Get report status for a specific target and user
+   * Get report status for a specific target and user.
+   * @param userId - The ID of the user
+   * @param targetId - The ID of the target
+   * @param targetType - The type of the target
+   * @param context - Query context for database access
+   * @returns Object with hasReported flag and the report if exists
    */
   static async getReportStatusAsync(
     userId: string,
@@ -515,7 +460,13 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
-   * Update the report status (for admin use later)
+   * Update the report status (for admin use).
+   * @param reportId - The ID of the report to update
+   * @param status - The new status
+   * @param moderatorId - The ID of the moderator making the update
+   * @param moderatorNotes - Optional notes from the moderator
+   * @param context - Query context for database access
+   * @returns The updated report, or null if update failed
    */
   static async updateReportStatusAsync(
     reportId: string,
@@ -523,8 +474,8 @@ export class ContentReportsQuery extends BaseQuery {
     moderatorId: string | undefined,
     moderatorNotes: string | undefined,
     context: QueryContext,
-  ): Promise<SelectContentReport> {
-    return this.executeWithRetry(async () => {
+  ): Promise<null | SelectContentReport> {
+    return this.executeWithRetryAsync(async () => {
       const dbInstance = this.getDbInstance(context);
       const [updatedReport] = await dbInstance
         .update(contentReports)
@@ -538,16 +489,16 @@ export class ContentReportsQuery extends BaseQuery {
         .where(eq(contentReports.id, reportId))
         .returning();
 
-      if (!updatedReport) {
-        throw new Error('Failed to update content report');
-      }
-
-      return updatedReport;
+      return updatedReport ?? null;
     }, 'updateReportStatus');
   }
 
   /**
-   * Validate target exists and fetches the owner info
+   * Validate target exists and fetch the owner info.
+   * @param targetId - The ID of the target to validate
+   * @param targetType - The type of the target
+   * @param context - Query context for database access
+   * @returns Object with existence flag and owner ID if exists
    */
   static async validateTargetAsync(
     targetId: string,
@@ -605,5 +556,56 @@ export class ContentReportsQuery extends BaseQuery {
       default:
         return { isExists: false, ownerId: null };
     }
+  }
+
+  /**
+   * Build admin filter conditions from options.
+   * @param options - Filter options for admin reports
+   * @returns Combined SQL filter or undefined if no filters
+   */
+  private static _buildAdminFilters(options: AdminReportsFilterOptions): SQL | undefined {
+    const filters: Array<SQL | undefined> = [];
+
+    if (options.status) {
+      if (Array.isArray(options.status)) {
+        filters.push(inArray(contentReports.status, options.status));
+      } else {
+        filters.push(eq(contentReports.status, options.status));
+      }
+    }
+
+    if (options.targetType) {
+      if (Array.isArray(options.targetType)) {
+        filters.push(inArray(contentReports.targetType, options.targetType));
+      } else {
+        filters.push(eq(contentReports.targetType, options.targetType));
+      }
+    }
+
+    if (options.reason) {
+      if (Array.isArray(options.reason)) {
+        filters.push(inArray(contentReports.reason, options.reason));
+      } else {
+        filters.push(eq(contentReports.reason, options.reason));
+      }
+    }
+
+    if (options.reporterId) {
+      filters.push(eq(contentReports.reporterId, options.reporterId));
+    }
+
+    if (options.moderatorId) {
+      filters.push(eq(contentReports.moderatorId, options.moderatorId));
+    }
+
+    if (options.dateFrom) {
+      filters.push(gte(contentReports.createdAt, options.dateFrom));
+    }
+
+    if (options.dateTo) {
+      filters.push(lte(contentReports.createdAt, options.dateTo));
+    }
+
+    return filters.length > 0 ? this.combineFilters(...filters) : undefined;
   }
 }

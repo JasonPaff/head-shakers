@@ -16,7 +16,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
     userId: string,
     collectionSlug: string,
     dbInstance: DatabaseExecutor = db,
-  ): Promise<CollectionDashboardHeaderRecord> {
+  ): Promise<CollectionDashboardHeaderRecord | null> {
     return await executeFacadeOperation(
       {
         data: { collectionSlug, userId },

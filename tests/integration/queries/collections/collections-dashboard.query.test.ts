@@ -168,19 +168,19 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       });
 
       // Assert
-      expect(result).toBeDefined();
-      expect(result.id).toBe(collection!.id);
-      expect(result.name).toBe('Test Collection');
-      expect(result.slug).toBe('test-collection');
-      expect(result.description).toBe('My amazing collection');
-      expect(result.coverImageUrl).toBe('https://example.com/cover.jpg');
-      expect(result.isPublic).toBe(true);
-      expect(result.bobbleheadCount).toBe('3'); // PostgreSQL count() returns string
-      expect(result.totalValue).toBe('150.50'); // PostgreSQL sum() returns numeric as string
-      expect(result.featuredCount).toBe('0'); // None marked as featured
-      expect(result.likeCount).toBe('2');
-      expect(result.commentCount).toBe('3');
-      expect(result.viewCount).toBe('5');
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe(collection!.id);
+      expect(result!.name).toBe('Test Collection');
+      expect(result!.slug).toBe('test-collection');
+      expect(result!.description).toBe('My amazing collection');
+      expect(result!.coverImageUrl).toBe('https://example.com/cover.jpg');
+      expect(result!.isPublic).toBe(true);
+      expect(result!.bobbleheadCount).toBe('3'); // PostgreSQL count() returns string
+      expect(result!.totalValue).toBe('150.50'); // PostgreSQL sum() returns numeric as string
+      expect(result!.featuredCount).toBe('0'); // None marked as featured
+      expect(result!.likeCount).toBe('2');
+      expect(result!.commentCount).toBe('3');
+      expect(result!.viewCount).toBe('5');
     });
 
     it('should return zero counts for collection with no activity', async () => {
@@ -199,14 +199,14 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       });
 
       // Assert
-      expect(result).toBeDefined();
-      expect(result.id).toBe(collection!.id);
-      expect(result.bobbleheadCount).toBe('0');
-      expect(result.totalValue).toBe('0');
-      expect(result.featuredCount).toBe('0');
-      expect(result.likeCount).toBe('0');
-      expect(result.commentCount).toBe('0');
-      expect(result.viewCount).toBe('0');
+      expect(result).not.toBeNull();
+      expect(result!.id).toBe(collection!.id);
+      expect(result!.bobbleheadCount).toBe('0');
+      expect(result!.totalValue).toBe('0');
+      expect(result!.featuredCount).toBe('0');
+      expect(result!.likeCount).toBe('0');
+      expect(result!.commentCount).toBe('0');
+      expect(result!.viewCount).toBe('0');
     });
 
     it('should return null for non-existent collection', async () => {
@@ -220,7 +220,7 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       });
 
       // Assert
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
 
     it('should respect user permission filtering', async () => {
@@ -609,9 +609,9 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       });
 
       // Assert
-      expect(result).toBeDefined();
-      expect(result.bobbleheadCount).toBe('5'); // Total
-      expect(result.featuredCount).toBe('2'); // Only featured ones
+      expect(result).not.toBeNull();
+      expect(result!.bobbleheadCount).toBe('5'); // Total
+      expect(result!.featuredCount).toBe('2'); // Only featured ones
     });
 
     it('should handle null purchase prices in total value calculation', async () => {

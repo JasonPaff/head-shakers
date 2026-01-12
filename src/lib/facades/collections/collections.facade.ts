@@ -912,7 +912,7 @@ export class CollectionsFacade extends BaseFacade {
         return CacheService.collections.byId(
           () => {
             const context = this.getPublicContext(dbInstance);
-            return CollectionsQuery.getCollectionMetadata(slug, userId, context);
+            return CollectionsQuery.getCollectionMetadataAsync(slug, userId, context);
           },
           `${userId}:${slug}`,
           {

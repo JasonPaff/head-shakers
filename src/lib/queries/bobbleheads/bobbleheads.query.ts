@@ -1,3 +1,5 @@
+import type { AnyColumn } from 'drizzle-orm';
+
 import { and, asc, count, desc, eq, gt, gte, inArray, isNull, like, lt, ne, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext, UserQueryContext } from '@/lib/queries/base/query-context';
@@ -542,10 +544,7 @@ export class BobbleheadsQuery extends BaseQuery {
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
+      .leftJoin(bobbleheadPhotos, this._primaryPhotoJoinCondition(bobbleheads.id))
       .where(
         this.combineFilters(
           ne(bobbleheads.id, bobbleheadId),
@@ -565,10 +564,7 @@ export class BobbleheadsQuery extends BaseQuery {
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
+      .leftJoin(bobbleheadPhotos, this._primaryPhotoJoinCondition(bobbleheads.id))
       .where(
         this.combineFilters(
           ne(bobbleheads.id, bobbleheadId),
@@ -593,8 +589,8 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get total bobblehead count excluding deleted records
-   * @param context
+   * Get total bobblehead count excluding deleted records
+   * Returns 0 if no bobbleheads exist
    */
   static async getBobbleheadCountAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
@@ -607,10 +603,11 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get bobblehead metadata for SEO and social sharing
-   * returns minimal fields needed for metadata generation with owner info
+   * Get bobblehead metadata for SEO and social sharing
+   * Returns minimal fields needed for metadata generation with owner info,
+   * or null if the bobblehead is not found or not accessible
    */
-  static async getBobbleheadMetadata(
+  static async getBobbleheadMetadataAsync(
     slug: string,
     context: QueryContext,
   ): Promise<null | {
@@ -638,10 +635,7 @@ export class BobbleheadsQuery extends BaseQuery {
       })
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
+      .leftJoin(bobbleheadPhotos, this._primaryPhotoJoinCondition(bobbleheads.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
@@ -737,8 +731,9 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * Get the first (newest) bobblehead in a collection for loop-around navigation.
-   * Used when at the last bobblehead and navigating to "next".
+   * Get the first (newest) bobblehead in a collection for loop-around navigation
+   * Used when at the last bobblehead and navigating to "next"
+   * Returns null if collection is empty or not accessible
    */
   static async getFirstBobbleheadInCollectionAsync(
     collectionId: string,
@@ -752,10 +747,7 @@ export class BobbleheadsQuery extends BaseQuery {
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
+      .leftJoin(bobbleheadPhotos, this._primaryPhotoJoinCondition(bobbleheads.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),
@@ -769,8 +761,9 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * Get the last (oldest) bobblehead in a collection for loop-around navigation.
-   * Used when at the first bobblehead and navigating to "previous".
+   * Get the last (oldest) bobblehead in a collection for loop-around navigation
+   * Used when at the first bobblehead and navigating to "previous"
+   * Returns null if collection is empty or not accessible
    */
   static async getLastBobbleheadInCollectionAsync(
     collectionId: string,
@@ -784,10 +777,7 @@ export class BobbleheadsQuery extends BaseQuery {
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
+      .leftJoin(bobbleheadPhotos, this._primaryPhotoJoinCondition(bobbleheads.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),
@@ -829,7 +819,8 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get photos for a bobblehead
+   * Get photos for a bobblehead ordered by sortOrder and uploadedAt
+   * Note: Caller must verify bobblehead access before calling this method
    */
   static async getPhotosAsync(
     bobbleheadId: string,
@@ -844,11 +835,17 @@ export class BobbleheadsQuery extends BaseQuery {
       .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
   }
 
+  /**
+   * Get all bobblehead slugs for the current user
+   * Returns an array of slug strings, or empty array if none exist
+   * Excludes soft-deleted bobbleheads
+   */
   static async getSlugsAsync(context: UserQueryContext): Promise<Array<string>> {
     const dbInstance = this.getDbInstance(context);
     return await dbInstance
       .select({ slug: bobbleheads.slug })
       .from(bobbleheads)
+      .where(and(eq(bobbleheads.userId, context.userId), isNull(bobbleheads.deletedAt)))
       .then((results) => results.map((r) => r.slug));
   }
 
@@ -1015,5 +1012,13 @@ export class BobbleheadsQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  /**
+   * Build the join condition for primary bobblehead photos
+   * Used for LEFT JOIN with bobbleheadPhotos table to get only primary photos
+   */
+  private static _primaryPhotoJoinCondition(bobbleheadIdColumn: AnyColumn) {
+    return and(eq(bobbleheadIdColumn, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true));
   }
 }

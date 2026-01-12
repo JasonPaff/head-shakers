@@ -2,7 +2,7 @@ import 'server-only';
 import { CalendarIcon } from 'lucide-react';
 import { Fragment, Suspense } from 'react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -2,28 +2,19 @@ import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 
-import { newsletterSignups } from '@/lib/db/schema/newsletter-signups.schema';
+import { newsletterSignups } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { normalizeEmail } from '@/lib/utils/email-utils';
 
-/**
- * Type for newsletter signup record from the database
- */
 export type NewsletterSignupRecord = typeof newsletterSignups.$inferSelect;
 
 /**
- * Newsletter query class for database operations
+ * Newsletter domain query service.
+ * Handles all database operations for newsletter subscriptions with consistent patterns.
  */
 export class NewsletterQuery extends BaseQuery {
   /**
-   * Create a new newsletter subscription
-   * Uses onConflictDoNothing to handle duplicate emails gracefully
-   *
-   * Note: userId can be undefined for anonymous signups. The null to undefined conversion
-   * ensures compatibility with the database schema which uses varchar (allowing undefined but not null).
-   *
-   * Email normalization: Email addresses are normalized by converting to lowercase and trimming
-   * whitespace to ensure case-insensitive matching and prevent duplicates from spacing differences.
+   * Create a new newsletter subscription with optional user linking.
    */
   static async createSignupAsync(
     email: string,
@@ -31,6 +22,7 @@ export class NewsletterQuery extends BaseQuery {
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
+
     const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
@@ -42,10 +34,11 @@ export class NewsletterQuery extends BaseQuery {
       .onConflictDoNothing()
       .returning();
 
-    return result?.[0] || null;
+    return result[0] || null;
   }
+
   /**
-   * Check if email exists (regardless of subscription status)
+   * Check if email exists regardless of subscription status.
    */
   static async emailExistsAsync(email: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
@@ -62,14 +55,14 @@ export class NewsletterQuery extends BaseQuery {
   }
 
   /**
-   * Find a newsletter signup by email address
-   * Returns the signup record if found, null otherwise
+   * Find a newsletter signup by email address.
    */
   static async findByEmailAsync(
     email: string,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
+
     const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
@@ -78,11 +71,11 @@ export class NewsletterQuery extends BaseQuery {
       .where(eq(newsletterSignups.email, normalizedEmail))
       .limit(1);
 
-    return result?.[0] || null;
+    return result[0] || null;
   }
 
   /**
-   * Get the active subscriber by email (not unsubscribed)
+   * Get the active subscriber by email (not unsubscribed).
    */
   static async getActiveSubscriberByEmailAsync(
     email: string,
@@ -95,32 +88,26 @@ export class NewsletterQuery extends BaseQuery {
     const result = await dbInstance
       .select()
       .from(newsletterSignups)
-      .where(eq(newsletterSignups.email, normalizedEmail))
+      .where(and(eq(newsletterSignups.email, normalizedEmail), isNull(newsletterSignups.unsubscribedAt)))
       .limit(1);
 
-    const signup = result?.[0];
-    if (!signup || signup.unsubscribedAt !== null) {
-      return null;
-    }
-
-    return signup;
+    return result[0] || null;
   }
 
   /**
-   * Check if an email is actively subscribed (not unsubscribed)
-   *
-   * @returns true if the email is subscribed and not unsubscribed, false otherwise.
-   * @example 'const isSubscribed = await NewsletterQuery.getIsActiveSubscriberAsync(email);'
+   * Check if an email is actively subscribed (not unsubscribed).
    */
   static async getIsActiveSubscriberByEmailAsync(email: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
+
+    const normalizedEmail = normalizeEmail(email);
 
     const [newsletterSignup] = await dbInstance
       .select({ exists: sql<boolean>`1` })
       .from(newsletterSignups)
       .where(
         and(
-          eq(newsletterSignups.email, email),
+          eq(newsletterSignups.email, normalizedEmail),
           isNotNull(newsletterSignups.subscribedAt),
           isNull(newsletterSignups.unsubscribedAt),
         ),
@@ -131,13 +118,7 @@ export class NewsletterQuery extends BaseQuery {
   }
 
   /**
-   * Resubscribe an existing email (clear unsubscribedAt)
-   * Returns null if the email doesn't exist in the system
-   *
-   * Note on subscribedAt behavior: We intentionally update subscribedAt to the current timestamp
-   * when a user resubscribes. This decision prioritizes the most recent subscription intent over
-   * preserving historical data. If original subscription date tracking is needed in the future,
-   * consider adding a separate firstSubscribedAt field to the schema.
+   * Resubscribe an existing email by clearing unsubscribedAt and updating subscribedAt.
    */
   static async resubscribeAsync(
     email: string,
@@ -147,7 +128,6 @@ export class NewsletterQuery extends BaseQuery {
     if (!existing) return null;
 
     const dbInstance = this.getDbInstance(context);
-    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .update(newsletterSignups)
@@ -155,15 +135,14 @@ export class NewsletterQuery extends BaseQuery {
         subscribedAt: new Date(),
         unsubscribedAt: null,
       })
-      .where(eq(newsletterSignups.email, normalizedEmail))
+      .where(eq(newsletterSignups.email, existing.email))
       .returning();
 
-    return result?.[0] || null;
+    return result[0] || null;
   }
 
   /**
-   * Soft delete (unsubscribe) a newsletter signup by email
-   * Sets unsubscribedAt timestamp instead of hard delete
+   * Unsubscribe by setting unsubscribedAt timestamp (soft delete).
    */
   static async unsubscribeAsync(
     email: string,
@@ -181,13 +160,11 @@ export class NewsletterQuery extends BaseQuery {
       .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
 
-    return result?.[0] || null;
+    return result[0] || null;
   }
 
   /**
-   * Update user ID for an existing signup (for linking anonymous signup to user)
-   * Idempotent: Only updates if userId is currently null (prevents overwriting existing userId)
-   * Returns null if email doesn't exist or userId is already set
+   * Link an anonymous signup to a user account.
    */
   static async updateUserIdAsync(
     email: string,
@@ -198,16 +175,15 @@ export class NewsletterQuery extends BaseQuery {
     if (!existing || existing.userId !== null) return null;
 
     const dbInstance = this.getDbInstance(context);
-    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .update(newsletterSignups)
       .set({
         userId,
       })
-      .where(eq(newsletterSignups.email, normalizedEmail))
+      .where(eq(newsletterSignups.email, existing.email))
       .returning();
 
-    return result?.[0] || null;
+    return result[0] || null;
   }
 }

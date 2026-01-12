@@ -6,7 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { useCallback, useState } from 'react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

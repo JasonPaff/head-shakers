@@ -1,12 +1,16 @@
-import type { AnyColumn } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 
-import { asc, count, desc, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
 
 import type { UserQueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
+import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { bobbleheadPhotos, bobbleheads, collections, comments, contentViews, likes } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+
+/** Default page size for dashboard bobblehead list */
+const DEFAULT_PAGE_SIZE = 24;
 
 export type BobbleheadDashboardListRecord = BobbleheadListRecord & {
   collectionId: string;
@@ -29,7 +33,12 @@ export type BobbleheadDashboardQueryOptions = {
 
 export class BobbleheadsDashboardQuery extends BaseQuery {
   /**
-   * Get all distinct categories for a collection
+   * Get all distinct categories for a collection.
+   * Returns only categories from bobbleheads that the current user has permission to view.
+   *
+   * @param collectionSlug - The slug of the collection to get categories for
+   * @param context - User query context with authenticated userId
+   * @returns Array of distinct category names, sorted alphabetically
    */
   static async getCategoriesByCollectionSlugAsync(
     collectionSlug: string,
@@ -54,7 +63,13 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
   }
 
   /**
-   * Get total count of bobbleheads matching filters (without pagination)
+   * Get total count of bobbleheads matching filters (without pagination).
+   * Used for calculating pagination metadata.
+   *
+   * @param collectionSlug - The slug of the collection to count bobbleheads for
+   * @param context - User query context with authenticated userId
+   * @param options - Optional filter options (category, condition, featured status, search term)
+   * @returns Total count of matching bobbleheads
    */
   static async getCountAsync(
     collectionSlug: string,
@@ -81,6 +96,15 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
     return countResult[0]?.count || 0;
   }
 
+  /**
+   * Get paginated list of bobbleheads for dashboard display.
+   * Includes aggregate stats for comments, likes, and views.
+   *
+   * @param collectionSlug - The slug of the collection to get bobbleheads for
+   * @param context - User query context with authenticated userId
+   * @param options - Optional pagination and filter options
+   * @returns Array of bobblehead records with stats, ordered by specified sort
+   */
   static async getListAsync(
     collectionSlug: string,
     context: UserQueryContext,
@@ -90,8 +114,13 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
 
     // extract pagination parameters with defaults
     const page = options?.page ?? 1;
-    const pageSize = options?.pageSize ?? 24;
+    const pageSize = options?.pageSize ?? DEFAULT_PAGE_SIZE;
     const offset = (page - 1) * pageSize;
+
+    // Build subqueries for aggregate stats
+    const commentStats = this._buildCommentStatsSubquery(dbInstance);
+    const likeStats = this._buildLikeStatsSubquery(dbInstance);
+    const viewStats = this._buildViewStatsSubquery(dbInstance);
 
     return dbInstance
       .select({
@@ -101,7 +130,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         characterName: bobbleheads.characterName,
         collectionId: bobbleheads.collectionId,
         collectionSlug: collections.slug,
-        commentCount: this._buildCountSubquery(comments, bobbleheads.id, 'bobblehead'),
+        commentCount: sql<number>`COALESCE("comment_stats"."comment_count", 0)`,
         condition: bobbleheads.currentCondition,
         customFields: bobbleheads.customFields,
         description: bobbleheads.description,
@@ -110,7 +139,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         id: bobbleheads.id,
         isFeatured: bobbleheads.isFeatured,
         isPublic: bobbleheads.isPublic,
-        likeCount: this._buildCountSubquery(likes, bobbleheads.id, 'bobblehead'),
+        likeCount: sql<number>`COALESCE("like_stats"."like_count", 0)`,
         manufacturer: bobbleheads.manufacturer,
         material: bobbleheads.material,
         name: bobbleheads.name,
@@ -119,7 +148,7 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
         series: bobbleheads.series,
         slug: bobbleheads.slug,
         status: bobbleheads.status,
-        viewCount: this._buildCountSubquery(contentViews, bobbleheads.id, 'bobblehead'),
+        viewCount: sql<number>`COALESCE("view_stats"."view_count", 0)`,
         weight: bobbleheads.weight,
         year: bobbleheads.year,
       })
@@ -127,11 +156,11 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
-        this.combineFilters(
-          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
-          eq(bobbleheadPhotos.isPrimary, true),
-        ),
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
+      .leftJoin(commentStats, eq(commentStats.targetId, bobbleheads.id))
+      .leftJoin(likeStats, eq(likeStats.targetId, bobbleheads.id))
+      .leftJoin(viewStats, eq(viewStats.targetId, bobbleheads.id))
       .where(
         this.combineFilters(
           eq(collections.slug, collectionSlug),
@@ -147,42 +176,60 @@ export class BobbleheadsDashboardQuery extends BaseQuery {
       .offset(offset);
   }
 
-  /**
-   * build a subquery for counting the number of items matching a targetId and targetType
-   * e.g., for counting comments on a post, use: buildCountSubquery(comments, post.id, 'post')
-   * @param table
-   * @param targetIdColumn
-   * @param targetType
-   * @protected
-   */
-  private static _buildCountSubquery(
-    table: typeof comments | typeof contentViews | typeof likes,
-    targetIdColumn: AnyColumn,
-    targetType: string,
-  ) {
-    return sql<number>`(
-      SELECT COUNT(*) FROM ${table}
-      WHERE ${table.targetId} = ${targetIdColumn}
-      AND ${table.targetType} = ${targetType}
-    )`;
+  private static _buildCommentStatsSubquery(dbInstance: DatabaseExecutor) {
+    return dbInstance
+      .select({
+        commentCount: count(comments.id).as('comment_count'),
+        targetId: comments.targetId,
+      })
+      .from(comments)
+      .where(eq(comments.targetType, 'bobblehead'))
+      .groupBy(comments.targetId)
+      .as('comment_stats');
   }
 
-  private static _getCategoryCondition(category?: string) {
+  private static _buildLikeStatsSubquery(dbInstance: DatabaseExecutor) {
+    return dbInstance
+      .select({
+        likeCount: count(likes.id).as('like_count'),
+        targetId: likes.targetId,
+      })
+      .from(likes)
+      .where(eq(likes.targetType, 'bobblehead'))
+      .groupBy(likes.targetId)
+      .as('like_stats');
+  }
+
+  private static _buildViewStatsSubquery(dbInstance: DatabaseExecutor) {
+    return dbInstance
+      .select({
+        targetId: contentViews.targetId,
+        viewCount: count(contentViews.id).as('view_count'),
+      })
+      .from(contentViews)
+      .where(eq(contentViews.targetType, 'bobblehead'))
+      .groupBy(contentViews.targetId)
+      .as('view_stats');
+  }
+
+  private static _getCategoryCondition(category?: string): SQL | undefined {
     if (!category || category === 'all') return undefined;
     return eq(bobbleheads.category, category);
   }
 
-  private static _getConditionFilter(condition?: string) {
+  private static _getConditionFilter(condition?: string): SQL | undefined {
     if (!condition || condition === 'all') return undefined;
     return eq(bobbleheads.currentCondition, condition);
   }
 
-  private static _getFeaturedCondition(featured?: BobbleheadDashboardQueryOptions['featured']) {
+  private static _getFeaturedCondition(
+    featured?: BobbleheadDashboardQueryOptions['featured'],
+  ): SQL | undefined {
     if (!featured || featured === 'all') return undefined;
     return eq(bobbleheads.isFeatured, featured === 'featured');
   }
 
-  private static _getSearchCondition(searchTerm?: string) {
+  private static _getSearchCondition(searchTerm?: string): SQL | undefined {
     if (!searchTerm) return undefined;
     return or(
       ilike(bobbleheads.name, `%${searchTerm}%`),

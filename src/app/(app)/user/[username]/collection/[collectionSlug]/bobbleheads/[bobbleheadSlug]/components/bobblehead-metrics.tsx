@@ -2,7 +2,7 @@ import 'server-only';
 import { DollarSignIcon, HeartIcon, PackageIcon, ShieldCheckIcon } from 'lucide-react';
 import { Suspense } from 'react';
 
-import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads.query';
 
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent } from '@/components/ui/card';
