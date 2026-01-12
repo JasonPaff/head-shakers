@@ -42,7 +42,7 @@ import {
 } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
-const facadeName = 'BobbleheadsFacade';
+const facadeName = 'BOBBLEHEADS_FACADE';
 
 export interface CreateBobbleheadResult {
   bobblehead: BobbleheadRecord;
@@ -264,6 +264,16 @@ export class BobbleheadsFacade extends BaseFacade {
     );
   }
 
+  /**
+   * Create a new bobblehead.
+   *
+   * Cache invalidation: Calls invalidateOnCreate after successful creation.
+   *
+   * @param data - Bobblehead data to create
+   * @param userId - User ID creating the bobblehead
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Created bobblehead record or null if creation failed
+   */
   static async createAsync(
     data: InsertBobblehead,
     userId: string,
@@ -405,7 +415,7 @@ export class BobbleheadsFacade extends BaseFacade {
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { bobbleheadId: data.bobbleheadId },
         facade: facadeName,
@@ -497,7 +507,7 @@ export class BobbleheadsFacade extends BaseFacade {
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { bobbleheadId: data.bobbleheadId, photoId: data.photoId },
         facade: facadeName,
@@ -564,7 +574,7 @@ export class BobbleheadsFacade extends BaseFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { id },
         facade: facadeName,
@@ -603,6 +613,8 @@ export class BobbleheadsFacade extends BaseFacade {
    * Get a bobblehead by slug with optional viewer context.
    * Returns null if not found or if viewer lacks permission.
    *
+   * Caching: Uses domain-specific cache with bobblehead-based invalidation.
+   *
    * @param slug - The unique slug of the bobblehead
    * @param viewerUserId - Optional viewer for permission context (sees own + public)
    * @param dbInstance - Optional database instance for transaction support
@@ -613,7 +625,7 @@ export class BobbleheadsFacade extends BaseFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { slug },
         facade: facadeName,
@@ -622,8 +634,22 @@ export class BobbleheadsFacade extends BaseFacade {
         userId: viewerUserId,
       },
       async () => {
-        const context = this.getViewerContext(viewerUserId, dbInstance);
-        return BobbleheadsQuery.findBySlugAsync(slug, context);
+        return CacheService.bobbleheads.byId(
+          () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            return BobbleheadsQuery.findBySlugAsync(slug, context);
+          },
+          slug,
+          {
+            context: {
+              entityId: slug,
+              entityType: 'bobblehead',
+              facade: facadeName,
+              operation: 'getBobbleheadBySlugAsync',
+              userId: viewerUserId,
+            },
+          },
+        );
       },
       {
         includeResultSummary: (result) => ({
@@ -638,6 +664,8 @@ export class BobbleheadsFacade extends BaseFacade {
    * Get a bobblehead by slug with full relations (photos, tags, collection, etc.).
    * Returns null if not found or if viewer lacks permission.
    *
+   * Caching: Uses domain-specific cache with bobblehead-based invalidation.
+   *
    * @param slug - The unique slug of the bobblehead
    * @param viewerUserId - Optional viewer for permission context (sees own + public)
    * @param dbInstance - Optional database instance for transaction support
@@ -648,7 +676,7 @@ export class BobbleheadsFacade extends BaseFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadWithRelations | null> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { slug },
         facade: facadeName,
@@ -657,8 +685,22 @@ export class BobbleheadsFacade extends BaseFacade {
         userId: viewerUserId,
       },
       async () => {
-        const context = this.getViewerContext(viewerUserId, dbInstance);
-        return BobbleheadsQuery.findBySlugWithRelationsAsync(slug, context);
+        return CacheService.bobbleheads.withRelations(
+          () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            return BobbleheadsQuery.findBySlugWithRelationsAsync(slug, context);
+          },
+          slug,
+          {
+            context: {
+              entityId: slug,
+              entityType: 'bobblehead',
+              facade: facadeName,
+              operation: 'getBobbleheadBySlugWithRelationsAsync',
+              userId: viewerUserId,
+            },
+          },
+        );
       },
       {
         includeResultSummary: (result) => ({
@@ -1023,6 +1065,7 @@ export class BobbleheadsFacade extends BaseFacade {
           optionsHash,
           {
             context: {
+              entityId: userId,
               entityType: 'bobblehead',
               facade: facadeName,
               operation: 'getBobbleheadsByUserAsync',
@@ -1088,7 +1131,7 @@ export class BobbleheadsFacade extends BaseFacade {
               facade: facadeName,
               operation: 'getBobbleheadSeoMetadataAsync',
             },
-            ttl: 1800, // 30 minutes - balance between freshness and performance
+            ttl: CACHE_CONFIG.TTL.MEDIUM, // 30 minutes - balance between freshness and performance
           },
         );
       },
@@ -1603,6 +1646,10 @@ export class BobbleheadsFacade extends BaseFacade {
     );
   }
 
+  // ============================================================================
+  // PRIVATE HELPER METHODS
+  // ============================================================================
+
   /**
    * Generate a unique slug for a bobblehead name.
    * Ensures uniqueness across all existing slugs in the system.
@@ -1615,10 +1662,6 @@ export class BobbleheadsFacade extends BaseFacade {
     const existingSlugs = await BobbleheadsQuery.getSlugsAsync(context);
     return ensureUniqueSlug(generateSlug(name), existingSlugs);
   }
-
-  // ============================================================================
-  // HELPER METHODS - Cache Invalidation
-  // ============================================================================
 
   /**
    * Insert photo records into the database.
@@ -1666,10 +1709,6 @@ export class BobbleheadsFacade extends BaseFacade {
     CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId, slug);
   }
 
-  // ============================================================================
-  // HELPER METHODS - Slug Generation
-  // ============================================================================
-
   /**
    * Invalidate caches after bobblehead update.
    * Triggers both metadata cache and tag-based cache invalidation.
@@ -1683,10 +1722,6 @@ export class BobbleheadsFacade extends BaseFacade {
       bobblehead.slug,
     );
   }
-
-  // ============================================================================
-  // HELPER METHODS - Photo Processing
-  // ============================================================================
 
   /**
    * Map a CloudinaryPhoto to an InsertBobbleheadPhoto record.
