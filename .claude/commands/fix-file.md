@@ -103,35 +103,136 @@ If no `--reference` flag:
 - Generate summary
 ```
 
-### Phase 2: Initial Analysis
+### Phase 2: Initial Analysis (Using Specialist Agent)
 
 Mark "Analyze file and identify issues" as in_progress.
 
-**Read the target file** and any reference files to understand:
-- Current implementation patterns
-- Gaps compared to reference files
-- Violations of project conventions
+**IMPORTANT**: Use a specialist agent for initial analysis. The specialist agents load skills containing project patterns and conventions, making them significantly better at identifying issues than analyzing directly.
 
-**Build Issue Summary**:
+**Dispatch the specialist analysis agent**:
 
-```markdown
+```
+subagent_type: "{selected-specialist}"
+
+Analyze this file and identify all issues that need to be fixed to follow project patterns.
+
+## Role
+You are a code ANALYST, NOT an implementer. Your job is to:
+1. Thoroughly analyze the target file
+2. Compare it against reference files to identify pattern gaps
+3. Identify all violations of project conventions
+4. Provide a detailed issue report
+
+DO NOT make any changes. Only analyze and report.
+
+## Target File
+`{file_path}`
+
+## File Contents
+{Read and include the full file contents}
+
+## Reference Files for Comparison
+Study these well-implemented files to understand the correct patterns:
+
+### `{reference_path_1}`
+{Full contents of reference file 1}
+
+### `{reference_path_2}` (if applicable)
+{Full contents of reference file 2}
+
+## Analysis Checklist
+
+{Include domain-specific checklist based on specialist type}
+
+### For Actions (server-action-specialist):
+- Auth client usage (authActionClient, publicActionClient, adminActionClient)
+- withActionErrorHandling() wrapper usage
+- ctx.sanitizedInput vs parsedInput
+- Business logic delegation to facades
+- Cache invalidation with CacheRevalidationService
+- Return shape consistency { success, message, data }
+- Metadata with actionName
+- Direct database calls (should be none)
+- Sentry context and breadcrumbs
+
+### For Facades (facade-specialist):
+- Async suffix on all methods
+- CacheService usage for reads
+- CacheRevalidationService for invalidation
+- Sentry breadcrumbs for operations
+- Transaction wrapping for multi-step mutations
+- JSDoc documentation presence
+- Method length (under 60 lines)
+- Anti-patterns (stubs, silent failures)
+
+### For Components (client-component-specialist or server-component-specialist):
+- Hook organization order
+- Event handler naming (handle prefix)
+- useServerAction usage (not useAction)
+- Boolean state naming (is prefix)
+- Derived variable naming (_ prefix)
+- Accessibility attributes
+- Tailwind usage (no inline styles)
+
+### For Queries (database-specialist):
+- BaseQuery class extension
+- QueryContext usage
+- Permission filter application
+- Async suffix on methods
+- getDbInstance(context) usage
+
+### For Validation (validation-specialist):
+- drizzle-zod usage for base schemas
+- Custom zod utilities
+- Auto-generated field omission
+- Type exports with z.infer
+
+## Report Format
+
+Provide your analysis in this exact format:
+
+\`\`\`markdown
 ## Current State Analysis
 
-### File: {file_path}
+### File: `{file_path}`
 - Type: {action|facade|component|query|validation|schema}
 - Specialist: {specialist-type}
 - Lines: {count}
 
 ### Reference Files
-- `{reference_path}` - {why it's a good reference}
+- `{reference_path_1}` - {why it's a good reference}
+- `{reference_path_2}` - {why it's a good reference} (if applicable)
 
-### Preliminary Issues Identified
-1. {Issue description} (line ~{n})
-2. {Issue description} (line ~{n})
-...
+### Issues Identified
+
+#### High Priority
+1. **{Issue Title}** (line ~{n})
+   - Problem: {detailed description}
+   - Expected: {what the code should look like based on patterns}
+   - Reference: {which reference file shows the correct pattern}
+
+#### Medium Priority
+1. **{Issue Title}** (line ~{n})
+   - Problem: {description}
+   - Expected: {correct pattern}
+
+#### Low Priority
+1. **{Issue Title}** (line ~{n})
+   - Problem: {description}
+   - Expected: {correct pattern}
+
+### Pattern Gaps Summary
+- {Brief summary of major gaps compared to reference files}
+
+### Estimated Changes
+- Structural changes: {description}
+- Lines affected: ~{estimate}
+\`\`\`
 ```
 
-**If --dry-run**: Display the analysis and stop here. Do not proceed to Phase 3.
+**Save the analysis report** for use in Phase 3.
+
+**If --dry-run**: Display the analysis report from the specialist agent and stop here. Do not proceed to Phase 3.
 
 Mark "Analyze file and identify issues" as completed.
 
@@ -139,15 +240,18 @@ Mark "Analyze file and identify issues" as completed.
 
 Mark "Apply fixes using specialist agent" as in_progress.
 
-**Dispatch the specialist fix agent**:
+**Dispatch the specialist fix agent** with the analysis from Phase 2:
 
 ```
 subagent_type: "{selected-specialist}"
 
-Fix this file to follow project patterns and conventions:
+Fix this file to follow project patterns and conventions based on the analysis below.
 
 ## Target File
 `{file_path}`
+
+## Analysis from Phase 2
+{Include the full analysis report from the specialist agent in Phase 2}
 
 ## File Contents
 {Full file contents}
