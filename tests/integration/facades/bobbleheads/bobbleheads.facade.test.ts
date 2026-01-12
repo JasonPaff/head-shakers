@@ -280,7 +280,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
         userId: user!.id,
       });
 
-      const result = await BobbleheadsFacade.getBobbleheadById(bobblehead!.id, user!.id);
+      const result = await BobbleheadsFacade.getBobbleheadByIdAsync(bobblehead!.id, user!.id);
 
       expect(result).toBeDefined();
       expect(result!.id).toBe(bobblehead!.id);
@@ -290,7 +290,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
     it('should return null for non-existent bobblehead', async () => {
       const user = await createTestUser();
 
-      const result = await BobbleheadsFacade.getBobbleheadById(
+      const result = await BobbleheadsFacade.getBobbleheadByIdAsync(
         '00000000-0000-0000-0000-000000000000',
         user!.id,
       );
@@ -305,7 +305,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
       const collection = await createTestCollection({ userId: user!.id });
       await createTestBobbleheads(user!.id, collection!.id, 5);
 
-      const result = await BobbleheadsFacade.getBobbleheadsByCollection(collection!.id, {}, user!.id);
+      const result = await BobbleheadsFacade.getBobbleheadsByCollectionAsync(collection!.id, {}, user!.id);
 
       expect(result).toHaveLength(5);
     });
@@ -314,7 +314,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
       const user = await createTestUser();
       const collection = await createTestCollection({ userId: user!.id });
 
-      const result = await BobbleheadsFacade.getBobbleheadsByCollection(collection!.id, {}, user!.id);
+      const result = await BobbleheadsFacade.getBobbleheadsByCollectionAsync(collection!.id, {}, user!.id);
 
       expect(result).toEqual([]);
     });
@@ -328,7 +328,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
       await createTestBobbleheads(user!.id, collection1!.id, 3);
       await createTestBobbleheads(user!.id, collection2!.id, 2);
 
-      const result = await BobbleheadsFacade.getBobbleheadsByUser(user!.id, {}, user!.id);
+      const result = await BobbleheadsFacade.getBobbleheadsByUserAsync(user!.id, {}, user!.id);
 
       expect(result).toHaveLength(5);
     });
@@ -338,8 +338,16 @@ describe('BobbleheadsFacade Integration Tests', () => {
       const collection = await createTestCollection({ userId: user!.id });
       await createTestBobbleheads(user!.id, collection!.id, 10);
 
-      const page1 = await BobbleheadsFacade.getBobbleheadsByUser(user!.id, { limit: 5, offset: 0 }, user!.id);
-      const page2 = await BobbleheadsFacade.getBobbleheadsByUser(user!.id, { limit: 5, offset: 5 }, user!.id);
+      const page1 = await BobbleheadsFacade.getBobbleheadsByUserAsync(
+        user!.id,
+        { limit: 5, offset: 0 },
+        user!.id,
+      );
+      const page2 = await BobbleheadsFacade.getBobbleheadsByUserAsync(
+        user!.id,
+        { limit: 5, offset: 5 },
+        user!.id,
+      );
 
       expect(page1).toHaveLength(5);
       expect(page2).toHaveLength(5);

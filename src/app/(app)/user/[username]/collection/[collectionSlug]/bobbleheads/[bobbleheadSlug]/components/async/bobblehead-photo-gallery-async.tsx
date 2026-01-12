@@ -12,7 +12,7 @@ interface BobbleheadPhotoGalleryAsyncProps {
 
 export const BobbleheadPhotoGalleryAsync = async ({ bobbleheadId }: BobbleheadPhotoGalleryAsyncProps) => {
   const currentUserId = await getUserIdAsync();
-  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
+  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelationsAsync(
     bobbleheadId,
     currentUserId || undefined,
   );

@@ -53,7 +53,7 @@ export async function generateMetadata({
   }
 
   // Fetch bobblehead SEO metadata
-  const bobblehead = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
+  const bobblehead = await BobbleheadsFacade.getBobbleheadSeoMetadataAsync(bobbleheadSlug);
 
   // Handle bobblehead not found
   if (!bobblehead) {
@@ -127,7 +127,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
   const collectionId = collection.id;
 
   // Get the bobblehead
-  const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
+  const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlugAsync(
     bobbleheadSlug,
     currentUserId ?? undefined,
   );
@@ -145,7 +145,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
 
   // Fetch bobblehead with relations and like data for sticky header
   const [bobblehead, likeData] = await Promise.all([
-    BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
+    BobbleheadsFacade.getBobbleheadWithRelationsAsync(bobbleheadId, currentUserId || undefined),
     SocialFacade.getContentLikeDataAsync(bobbleheadId, 'bobblehead', currentUserId || undefined),
   ]);
 
@@ -157,7 +157,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
   const isOwner = await getIsOwnerAsync(bobblehead.userId);
 
   // Fetch SEO metadata for JSON-LD schemas
-  const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
+  const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadataAsync(bobbleheadSlug);
 
   // Generate Product schema for bobblehead
   const productSchema =

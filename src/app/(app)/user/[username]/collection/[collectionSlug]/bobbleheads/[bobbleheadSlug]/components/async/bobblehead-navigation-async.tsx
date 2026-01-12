@@ -22,7 +22,7 @@ export const BobbleheadNavigationAsync = async ({
 }: BobbleheadNavigationAsyncProps) => {
   const currentUserId = await getUserIdAsync();
 
-  const navigationData = await BobbleheadsFacade.getBobbleheadNavigationData(
+  const navigationData = await BobbleheadsFacade.getBobbleheadNavigationDataAsync(
     bobbleheadId,
     collectionId,
     currentUserId || undefined,

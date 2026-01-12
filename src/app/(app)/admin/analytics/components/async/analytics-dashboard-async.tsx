@@ -16,26 +16,26 @@ export const AnalyticsDashboardAsync = async ({
   targetType,
   timeRange = 'week',
 }: AnalyticsDashboardAsyncProps) => {
-  const dashboardData = await AnalyticsFacade.getDashboardData({
+  const dashboardData = await AnalyticsFacade.getDashboardDataAsync({
     isIncludingAnonymous: isIncludeAnonymous,
     targetType,
     timeframe: timeRange,
   });
 
   // fetch trending content for all types using the facade
-  const trendingBobbleheads = await AnalyticsFacade.getTrendingContent('bobblehead', {
+  const trendingBobbleheads = await AnalyticsFacade.getTrendingContentAsync('bobblehead', {
     isIncludingAnonymous: isIncludeAnonymous,
     limit: 5,
     timeframe: timeRange,
   });
 
-  const trendingCollections = await AnalyticsFacade.getTrendingContent('collection', {
+  const trendingCollections = await AnalyticsFacade.getTrendingContentAsync('collection', {
     isIncludingAnonymous: isIncludeAnonymous,
     limit: 5,
     timeframe: timeRange,
   });
 
-  const trendingProfiles = await AnalyticsFacade.getTrendingContent('profile', {
+  const trendingProfiles = await AnalyticsFacade.getTrendingContentAsync('profile', {
     isIncludingAnonymous: isIncludeAnonymous,
     limit: 3,
     timeframe: timeRange,
@@ -82,7 +82,7 @@ export const AnalyticsDashboardAsync = async ({
   ];
 
   // get detailed view trends for charts using the facade
-  const chartDataRaw = await AnalyticsFacade.getViewTrends({
+  const chartDataRaw = await AnalyticsFacade.getViewTrendsAsync({
     groupBy: timeRange === 'day' ? 'hour' : 'day',
     isIncludingAnonymous: isIncludeAnonymous,
     targetType,

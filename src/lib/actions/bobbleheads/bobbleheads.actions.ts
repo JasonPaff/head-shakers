@@ -267,7 +267,11 @@ export const getBobbleheadPhotosAction = publicActionClient
     const userId = (await getUserIdAsync()) ?? undefined;
 
     try {
-      const photos = await BobbleheadsFacade.getBobbleheadPhotos(bobbleheadId, userId ?? undefined, ctx.db);
+      const photos = await BobbleheadsFacade.getBobbleheadPhotosAsync(
+        bobbleheadId,
+        userId ?? undefined,
+        ctx.db,
+      );
 
       return actionSuccess(photos);
     } catch (error) {
@@ -294,9 +298,13 @@ export const deleteBobbleheadPhotoAction = authActionClient
 
     try {
       // get all photos for the bobblehead before deletion to determine if we need to promote a new primary
-      const allPhotos = await BobbleheadsFacade.getBobbleheadPhotos(photoData.bobbleheadId, userId, ctx.db);
+      const allPhotos = await BobbleheadsFacade.getBobbleheadPhotosAsync(
+        photoData.bobbleheadId,
+        userId,
+        ctx.db,
+      );
 
-      const photoToDelete = allPhotos.find((p) => p.id === photoData.photoId);
+      const photoToDelete = allPhotos.find((p: { id: string }) => p.id === photoData.photoId);
 
       if (!photoToDelete) {
         throw new ActionError(
@@ -326,14 +334,14 @@ export const deleteBobbleheadPhotoAction = authActionClient
       }
 
       // get remaining photos after deletion
-      const remainingPhotos = allPhotos.filter((p) => p.id !== photoData.photoId);
+      const remainingPhotos = allPhotos.filter((p: { id: string }) => p.id !== photoData.photoId);
 
       // if we deleted the primary photo and there are remaining photos, promote the first one
       if (wasPrimaryPhoto && remainingPhotos.length > 0) {
         // reindex all remaining photos with proper sortOrder and set first as primary
         const photoOrder = remainingPhotos
-          .sort((a, b) => a.sortOrder - b.sortOrder)
-          .map((photo, index) => ({
+          .sort((a: { sortOrder: number }, b: { sortOrder: number }) => a.sortOrder - b.sortOrder)
+          .map((photo: { id: string }, index: number) => ({
             id: photo.id,
             isPrimary: index === 0,
             sortOrder: index,
@@ -360,8 +368,8 @@ export const deleteBobbleheadPhotoAction = authActionClient
       } else if (remainingPhotos.length > 0) {
         // reindex sortOrder for remaining photos even if we didn't delete the primary
         const photoOrder = remainingPhotos
-          .sort((a, b) => a.sortOrder - b.sortOrder)
-          .map((photo, index) => ({
+          .sort((a: { sortOrder: number }, b: { sortOrder: number }) => a.sortOrder - b.sortOrder)
+          .map((photo: { id: string }, index: number) => ({
             id: photo.id,
             sortOrder: index,
           }));

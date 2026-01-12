@@ -21,7 +21,7 @@ interface BobbleheadProps {
 export const Bobblehead = async ({ bobbleheadId, collectionSlug, ownerUsername }: BobbleheadProps) => {
   const currentUserId = await getUserIdAsync();
 
-  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
+  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelationsAsync(
     bobbleheadId,
     currentUserId || undefined,
   );

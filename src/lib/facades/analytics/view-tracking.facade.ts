@@ -5,18 +5,19 @@ import type {
   TrendingContentRecord,
 } from '@/lib/queries/analytics/view-analytics.query';
 import type { RecentViewsRecord, ViewRecord, ViewStats } from '@/lib/queries/analytics/view-tracking.query';
-import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertContentView } from '@/lib/validations/analytics.validation';
 
-import { REDIS_KEYS, REDIS_TTL } from '@/lib/constants';
+import { OPERATIONS, REDIS_KEYS } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { ViewAnalyticsQuery } from '@/lib/queries/analytics/view-analytics.query';
 import { ViewTrackingQuery } from '@/lib/queries/analytics/view-tracking.query';
-import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
-import { createFacadeError } from '@/lib/utils/error-builders';
+import { executeFacadeOperation, includeFullResult } from '@/lib/utils/facade-helpers';
 import { RedisOperations } from '@/lib/utils/redis-client';
+import { captureFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'ViewTrackingFacade';
 
@@ -54,12 +55,24 @@ export interface ViewStatsOptions {
 }
 
 /**
- * Business logic facade for view tracking functionality
- * Provides clean API and business rule enforcement for view operations
+ * Business logic facade for view tracking functionality.
+ * Provides clean API and business rule enforcement for view operations.
+ *
+ * Extends BaseFacade for consistent context creation and error handling patterns.
  */
-export class ViewTrackingFacade {
+export class ViewTrackingFacade extends BaseFacade {
   /**
-   * Record multiple views in a batch operation
+   * Record multiple views in a batch operation.
+   * Handles deduplication, privacy settings, and cache invalidation for each view.
+   *
+   * Caching: Uses Redis-based deduplication with configurable TTL (default 10 min).
+   * Invalidates view count cache for each recorded view via CacheRevalidationService.
+   *
+   * @param views - Array of view data to record
+   * @param viewerUserId - Optional authenticated user ID
+   * @param options - Configuration for deduplication and privacy
+   * @param dbInstance - Optional database executor for transactions
+   * @returns BatchViewResult with counts of recorded, duplicate, and skipped views
    */
   static async batchRecordViewsAsync(
     views: Array<InsertContentView>,
@@ -67,120 +80,93 @@ export class ViewTrackingFacade {
     options: ViewRecordOptions = {},
     dbInstance: DatabaseExecutor = db,
   ): Promise<BatchViewResult> {
-    try {
-      if (views.length === 0) {
-        return {
-          batchId: crypto.randomUUID(),
-          duplicateViews: 0,
-          errors: [],
-          recordedViews: 0,
-          skippedViews: 0,
-        };
-      }
-
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      const batchId = crypto.randomUUID();
-      const errors: Array<string> = [];
-      let duplicateViews = 0;
-      let skippedViews = 0;
-      const validViews: Array<InsertContentView> = [];
-
-      // process each view for deduplication and privacy
-      for (const viewData of views) {
-        try {
-          // check deduplication
-          const deduplicationResult = await this.checkViewDeduplication(
-            viewData.targetType,
-            viewData.targetId,
-            viewerUserId,
-            viewData.ipAddress || undefined,
-            options.deduplicationWindow || 600,
-          );
-
-          if (deduplicationResult.isDuplicate) {
-            duplicateViews++;
-            continue;
-          }
-
-          // check privacy settings
-          if (options.shouldRespectPrivacySettings && viewerUserId) {
-            const canTrack = this.checkUserPrivacySettings(viewerUserId, dbInstance);
-            if (!canTrack) {
-              skippedViews++;
-              continue;
-            }
-          }
-
-          // skip anonymous tracking if requested
-          if (options.shouldSkipAnonymousTracking && !viewerUserId) {
-            skippedViews++;
-            continue;
-          }
-
-          validViews.push(viewData);
-        } catch (error) {
-          errors.push(`View validation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
-      }
-
-      // record valid views
-      let recordedViews = 0;
-      if (validViews.length > 0) {
-        try {
-          await ViewTrackingQuery.batchRecordViewsAsync(validViews, context);
-          recordedViews = validViews.length;
-
-          // set deduplication caches and invalidate view count caches
-          await Promise.allSettled([
-            ...validViews.map((view) =>
-              viewerUserId ?
-                this.setDeduplicationCache(
-                  view.targetType,
-                  view.targetId,
-                  viewerUserId,
-                  options.deduplicationWindow || 600,
-                )
-              : view.ipAddress ?
-                this.setAnonymousDeduplicationCache(
-                  view.targetType,
-                  view.targetId,
-                  view.ipAddress,
-                  options.deduplicationWindow || 600,
-                )
-              : Promise.resolve(),
-            ),
-            ...validViews.map((view) => this.invalidateViewCountCache(view.targetType, view.targetId)),
-          ]);
-        } catch (error) {
-          errors.push(`Batch record error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
-      }
-
-      return {
-        batchId,
-        duplicateViews,
-        errors,
-        recordedViews,
-        skippedViews,
-      };
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { viewCount: views.length },
         facade: facadeName,
         method: 'batchRecordViewsAsync',
-        operation: 'batchRecordViews',
+        operation: OPERATIONS.ANALYTICS.BATCH_RECORD_VIEWS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        if (views.length === 0) {
+          return {
+            batchId: crypto.randomUUID(),
+            duplicateViews: 0,
+            errors: [],
+            recordedViews: 0,
+            skippedViews: 0,
+          };
+        }
+
+        const context = this.getViewerContext(viewerUserId, dbInstance);
+
+        const batchId = crypto.randomUUID();
+        const errors: Array<string> = [];
+        let duplicateViews = 0;
+        let skippedViews = 0;
+        const validViews: Array<InsertContentView> = [];
+
+        // Process each view for deduplication and privacy
+        for (const viewData of views) {
+          const result = await this.validateSingleViewAsync(viewData, viewerUserId, options, dbInstance);
+
+          if (result.isDuplicate) {
+            duplicateViews++;
+          } else if (result.isSkipped) {
+            skippedViews++;
+          } else if (result.error) {
+            errors.push(result.error);
+          } else {
+            validViews.push(viewData);
+          }
+        }
+
+        // Record valid views
+        let recordedViews = 0;
+        if (validViews.length > 0) {
+          try {
+            await ViewTrackingQuery.batchRecordViewsAsync(validViews, context);
+            recordedViews = validViews.length;
+
+            // Set deduplication caches and invalidate view count caches
+            await this.handleBatchPostRecordAsync(validViews, viewerUserId, options);
+          } catch (error) {
+            errors.push(`Batch record error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+
+        return {
+          batchId,
+          duplicateViews,
+          errors,
+          recordedViews,
+          skippedViews,
+        };
+      },
+      {
+        includeResultSummary: (result) => ({
+          duplicateViews: result.duplicateViews,
+          errorCount: result.errors.length,
+          recordedViews: result.recordedViews,
+          skippedViews: result.skippedViews,
+        }),
+      },
+    );
   }
 
   /**
-   * Get content performance metrics
+   * Get content performance metrics for multiple targets.
+   * Returns performance data including view counts and engagement metrics.
+   *
+   * Caching: Uses CacheService.analytics.performance with MEDIUM TTL (30 min).
+   * Invalidated by: View recording, analytics aggregation.
+   *
+   * @param targetIds - Array of target entity IDs
+   * @param targetType - Type of content being analyzed
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns Array of ContentPerformanceRecord for requested targets
    */
   static async getContentPerformanceAsync(
     targetIds: Array<string>,
@@ -188,34 +174,60 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<ContentPerformanceRecord>> {
-    try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      return await ViewAnalyticsQuery.getContentPerformanceAsync(
-        targetIds,
-        targetType,
-        {
-          isIncludingAnonymous: true, // Default to including anonymous views
-        },
-        context,
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { targetIds, targetType },
         facade: facadeName,
         method: 'getContentPerformanceAsync',
-        operation: 'getContentPerformance',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return CacheService.analytics.performance(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            return ViewAnalyticsQuery.getContentPerformanceAsync(
+              targetIds,
+              targetType,
+              {
+                isIncludingAnonymous: true,
+              },
+              context,
+            );
+          },
+          targetType,
+          targetIds,
+          {
+            context: {
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getContentPerformance',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * Get engagement metrics for multiple targets
+   * Get engagement metrics for multiple targets.
+   * Returns engagement data filtered to requested target IDs.
+   *
+   * Caching: Uses CacheService.analytics.engagement with MEDIUM TTL (30 min).
+   * Invalidated by: View recording, analytics aggregation.
+   *
+   * @param targetIds - Array of target entity IDs to get metrics for
+   * @param targetType - Type of content being analyzed
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns Array of EngagementMetric filtered to requested targets
    */
   static async getEngagementMetricsAsync(
     targetIds: Array<string>,
@@ -223,38 +235,66 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<EngagementMetric>> {
-    try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      // get engagement metrics for all targets
-      const results = await ViewAnalyticsQuery.getUserEngagementAsync(
-        targetType,
-        {
-          minViews: 1, // minimum views to include in engagement metrics
-          timeframe: 'week', // default timeframe
-        },
-        context,
-      );
-
-      // filter results to only include the requested target IDs
-      return results.filter((result) => targetIds.includes(result.targetId));
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { targetIds, targetType },
         facade: facadeName,
         method: 'getEngagementMetricsAsync',
-        operation: 'getEngagementMetrics',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return CacheService.analytics.engagement(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            // Get engagement metrics for all targets
+            const results = await ViewAnalyticsQuery.getUserEngagementAsync(
+              targetType,
+              {
+                minViews: 1,
+                timeframe: 'week',
+              },
+              context,
+            );
+
+            // Filter results to only include the requested target IDs
+            return results.filter((result) => targetIds.includes(result.targetId));
+          },
+          targetType,
+          targetIds,
+          undefined,
+          {
+            context: {
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getEngagementMetrics',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * Get recent views for a target
+   * Get recent views for a specific target.
+   * Returns list of recent view records with viewer information.
+   *
+   * Caching: Uses CacheService.analytics.recentViews with SHORT TTL (5 min).
+   * Invalidated by: View recording for this target.
+   *
+   * @param targetType - Type of content being viewed
+   * @param targetId - ID of the target entity
+   * @param limit - Maximum number of recent views to return (default 10)
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns Array of RecentViewsRecord, empty array if none found
    */
   static async getRecentViewsAsync(
     targetType: ContentViewTargetType,
@@ -263,44 +303,55 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<RecentViewsRecord>> {
-    try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.RECENT_VIEWS(targetType, targetId);
-
-      return CacheService.cached(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          return ViewTrackingQuery.getRecentViewsAsync(targetType, targetId, { limit }, context);
-        },
-        cacheKey,
-        {
-          context: {
-            entityId: targetId,
-            entityType: targetType,
-            facade: facadeName,
-            operation: 'getRecentViews',
-            userId: viewerUserId,
-          },
-          ttl: REDIS_TTL.VIEW_TRACKING.STATS,
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { limit, targetId, targetType },
         facade: facadeName,
         method: 'getRecentViewsAsync',
-        operation: 'getRecentViews',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return CacheService.analytics.recentViews(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            return ViewTrackingQuery.getRecentViewsAsync(targetType, targetId, { limit }, context);
+          },
+          targetType,
+          targetId,
+          limit,
+          {
+            context: {
+              entityId: targetId,
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getRecentViews',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * Get trending content with caching
+   * Get trending content for a specific type and timeframe.
+   * Returns content ranked by view activity within the timeframe.
+   *
+   * Caching: Uses CacheService.analytics.trending with SHORT TTL (5 min).
+   * Invalidated by: Trending update events.
+   *
+   * @param targetType - Type of content to get trending data for
+   * @param options - Configuration for timeframe, limit, and anonymous inclusion
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns Array of TrendingContentRecord sorted by popularity
    */
   static async getTrendingContentAsync(
     targetType: ContentViewTargetType,
@@ -308,51 +359,64 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<TrendingContentRecord>> {
-    try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.TRENDING_CACHE(targetType, options.timeframe || 'day');
-
-      return CacheService.cached(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          return ViewAnalyticsQuery.getTrendingContentAsync(
-            targetType,
-            {
-              isIncludingAnonymous: options.shouldIncludeAnonymous ?? true,
-              limit: options.limit || 10,
-              timeframe: options.timeframe || 'day',
-            },
-            context,
-          );
-        },
-        cacheKey,
-        {
-          context: {
-            entityType: targetType,
-            facade: facadeName,
-            operation: 'getTrendingContent',
-            userId: viewerUserId,
-          },
-          ttl: REDIS_TTL.VIEW_TRACKING.TRENDING,
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { options, targetType },
         facade: facadeName,
         method: 'getTrendingContentAsync',
-        operation: 'getTrendingContent',
+        operation: OPERATIONS.ANALYTICS.GET_TRENDING_CONTENT,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const timeframe = options.timeframe || 'day';
+
+        return CacheService.analytics.trending(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            return ViewAnalyticsQuery.getTrendingContentAsync(
+              targetType,
+              {
+                isIncludingAnonymous: options.shouldIncludeAnonymous ?? true,
+                limit: options.limit || 10,
+                timeframe,
+              },
+              context,
+            );
+          },
+          targetType,
+          timeframe,
+          {
+            context: {
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getTrendingContent',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          count: result.length,
+        }),
+      },
+    );
   }
 
   /**
-   * Get view count for a specific target with caching
+   * Get view count for a specific target.
+   * Returns total view count with optional anonymous view inclusion.
+   *
+   * Caching: Uses CacheService.analytics.viewCounts with MEDIUM TTL (30 min).
+   * Invalidated by: View recording for this target.
+   *
+   * @param targetType - Type of content being counted
+   * @param targetId - ID of the target entity
+   * @param shouldIncludeAnonymous - Whether to include anonymous views (reserved for future use)
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns Total view count as number
    */
   static async getViewCountAsync(
     targetType: ContentViewTargetType,
@@ -361,53 +425,55 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<number> {
-    try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(targetType, targetId);
-
-      return CacheService.cached(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          const stats = await ViewTrackingQuery.getViewStatsAsync(
-            targetType,
-            targetId,
-            {}, // empty options for all-time stats
-            context,
-          );
-
-          // shouldIncludeAnonymous parameter is reserved for future use
-          void shouldIncludeAnonymous;
-          return stats.totalViews;
-        },
-        cacheKey,
-        {
-          context: {
-            entityId: targetId,
-            entityType: targetType,
-            facade: facadeName,
-            operation: 'getViewCount',
-            userId: viewerUserId,
-          },
-          ttl: REDIS_TTL.VIEW_TRACKING.COUNTS,
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { targetId, targetType },
         facade: facadeName,
         method: 'getViewCountAsync',
-        operation: 'getViewCount',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        return CacheService.analytics.viewCounts(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            const stats = await ViewTrackingQuery.getViewStatsAsync(targetType, targetId, {}, context);
+
+            // shouldIncludeAnonymous parameter is reserved for future use
+            void shouldIncludeAnonymous;
+            return stats.totalViews;
+          },
+          targetType,
+          targetId,
+          {
+            context: {
+              entityId: targetId,
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getViewCount',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      { includeResultSummary: includeFullResult },
+    );
   }
 
   /**
-   * Get view statistics for a specific target with caching
+   * Get view statistics for a specific target.
+   * Returns comprehensive view stats including totals and time-based breakdowns.
+   *
+   * Caching: Uses CacheService.analytics.viewStats with MEDIUM TTL (30 min).
+   * Invalidated by: View recording for this target.
+   *
+   * @param targetType - Type of content being analyzed
+   * @param targetId - ID of the target entity
+   * @param options - Configuration for timeframe and anonymous inclusion
+   * @param viewerUserId - Optional viewer for context
+   * @param dbInstance - Optional database executor
+   * @returns ViewStats object with total views and breakdowns
    */
   static async getViewStatsAsync(
     targetType: ContentViewTargetType,
@@ -416,49 +482,58 @@ export class ViewTrackingFacade {
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<ViewStats> {
-    try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.VIEW_STATS(targetType, targetId, options.timeframe || 'day');
-
-      return CacheService.cached(
-        async () => {
-          const context =
-            viewerUserId ?
-              createUserQueryContext(viewerUserId, { dbInstance })
-            : createPublicQueryContext({ dbInstance });
-
-          return ViewTrackingQuery.getViewStatsAsync(
-            targetType,
-            targetId,
-            {}, // use empty options for now
-            context,
-          );
-        },
-        cacheKey,
-        {
-          context: {
-            entityId: targetId,
-            entityType: targetType,
-            facade: facadeName,
-            operation: 'getViewStats',
-            userId: viewerUserId,
-          },
-          ttl: REDIS_TTL.VIEW_TRACKING.STATS,
-        },
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { targetId, targetType },
         facade: facadeName,
         method: 'getViewStatsAsync',
-        operation: 'getViewStats',
+        operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const timeframe = options.timeframe || 'day';
+
+        return CacheService.analytics.viewStats(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+
+            return ViewTrackingQuery.getViewStatsAsync(targetType, targetId, {}, context);
+          },
+          targetType,
+          targetId,
+          timeframe,
+          {
+            context: {
+              entityId: targetId,
+              entityType: targetType,
+              facade: facadeName,
+              operation: 'getViewStats',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+      {
+        includeResultSummary: (result) => ({
+          totalViews: result.totalViews,
+          uniqueViewers: result.uniqueViewers,
+        }),
+      },
+    );
   }
 
   /**
-   * Record a single view with deduplication and privacy enforcement
+   * Record a single view with deduplication and privacy enforcement.
+   * Checks for duplicate views within the deduplication window and respects privacy settings.
+   *
+   * Caching: Uses Redis-based deduplication with configurable TTL (default 5 min).
+   * Invalidates view count cache via CacheRevalidationService.analytics.onViewRecord.
+   *
+   * @param viewData - View data to record
+   * @param viewerUserId - Optional authenticated user ID
+   * @param options - Configuration for deduplication and privacy
+   * @param dbInstance - Optional database executor
+   * @returns ViewRecord if recorded, null if deduplicated or skipped
    */
   static async recordViewAsync(
     viewData: InsertContentView,
@@ -466,85 +541,63 @@ export class ViewTrackingFacade {
     options: ViewRecordOptions = {},
     dbInstance: DatabaseExecutor = db,
   ): Promise<null | ViewRecord> {
-    try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      // check for deduplication
-      const deduplicationResult = await this.checkViewDeduplication(
-        viewData.targetType,
-        viewData.targetId,
-        viewerUserId,
-        viewData.ipAddress || undefined,
-        options.deduplicationWindow || 600, // 10-minute default
-      );
-
-      if (deduplicationResult.isDuplicate) {
-        return null;
-      }
-
-      // check privacy settings if requested
-      if (options.shouldRespectPrivacySettings && viewerUserId) {
-        const canTrack = this.checkUserPrivacySettings(viewerUserId, dbInstance);
-        if (!canTrack) {
-          return null;
-        }
-      }
-
-      // skip anonymous tracking if requested
-      if (options.shouldSkipAnonymousTracking && !viewerUserId) {
-        return null;
-      }
-
-      // record the view
-      const result = await ViewTrackingQuery.recordViewAsync(viewData, context);
-
-      // set deduplication cache
-      if (viewerUserId) {
-        await this.setDeduplicationCache(
-          viewData.targetType,
-          viewData.targetId,
-          viewerUserId,
-          options.deduplicationWindow || 300,
-        );
-      } else if (viewData.ipAddress) {
-        await this.setAnonymousDeduplicationCache(
-          viewData.targetType,
-          viewData.targetId,
-          viewData.ipAddress,
-          options.deduplicationWindow || 300,
-        );
-      }
-
-      // invalidate view count caches
-      await this.invalidateViewCountCache(viewData.targetType, viewData.targetId);
-
-      return result;
-    } catch (error) {
-      const context: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { targetId: viewData.targetId, targetType: viewData.targetType },
         facade: facadeName,
         method: 'recordViewAsync',
-        operation: 'recordView',
+        operation: OPERATIONS.ANALYTICS.RECORD_VIEW,
         userId: viewerUserId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const context = this.getViewerContext(viewerUserId, dbInstance);
+
+        // Validate view (deduplication and privacy)
+        const validation = await this.validateSingleViewAsync(viewData, viewerUserId, options, dbInstance);
+        if (validation.isDuplicate || validation.isSkipped) {
+          return null;
+        }
+
+        // Record the view
+        const result = await ViewTrackingQuery.recordViewAsync(viewData, context);
+
+        // Set deduplication cache
+        await this.setDeduplicationCacheAsync(
+          viewData.targetType,
+          viewData.targetId,
+          viewerUserId,
+          viewData.ipAddress || undefined,
+          options.deduplicationWindow || 300,
+        );
+
+        // Invalidate view count caches using CacheRevalidationService
+        CacheRevalidationService.analytics.onViewRecord(
+          viewData.targetType as 'bobblehead' | 'collection' | 'user',
+          viewData.targetId,
+          viewerUserId,
+        );
+
+        return result;
+      },
+      {
+        includeResultSummary: (result) => ({
+          recorded: result !== null,
+          targetId: viewData.targetId,
+          targetType: viewData.targetType,
+        }),
+      },
+    );
   }
 
-  /**
-   * Private helper methods
-   */
+  // ============================================================================
+  // Private Helper Methods
+  // ============================================================================
 
   /**
-   * Check user privacy settings for view tracking
+   * Check user privacy settings for view tracking.
+   * Currently assumes tracking is allowed - placeholder for future implementation.
    */
   private static checkUserPrivacySettings(userId: string, dbInstance: DatabaseExecutor): boolean {
-    // for now, assume tracking is allowed unless specifically opted out
-    // this should be implemented based on the user settings schema
-    // TODO: Implement actual privacy settings check from database
     // Reserved parameters for future implementation
     void userId;
     void dbInstance;
@@ -552,9 +605,10 @@ export class ViewTrackingFacade {
   }
 
   /**
-   * Check if a view is a duplicate within the deduplication window
+   * Check if a view is a duplicate within the deduplication window.
+   * Uses Redis to track recent views by user or IP address.
    */
-  private static async checkViewDeduplication(
+  private static async checkViewDeduplicationAsync(
     targetType: ContentViewTargetType,
     targetId: string,
     viewerUserId?: string,
@@ -572,7 +626,6 @@ export class ViewTrackingFacade {
         return { isDuplicate: false, isSuccessful: true };
       }
 
-      // check if the cache key exists
       const exists = await RedisOperations.exists(cacheKey);
 
       if (exists) {
@@ -585,7 +638,13 @@ export class ViewTrackingFacade {
 
       return { isDuplicate: false, isSuccessful: true };
     } catch (error) {
-      // on cache error, allow the view to be recorded
+      // On cache error, allow the view to be recorded
+      captureFacadeWarning(error, facadeName, 'checkViewDeduplication', {
+        ipAddress: ipAddress ? '[redacted]' : undefined,
+        targetId,
+        targetType,
+        viewerUserId,
+      });
       return {
         isDuplicate: false,
         isSuccessful: false,
@@ -594,67 +653,116 @@ export class ViewTrackingFacade {
     }
   }
 
-  private static async deleteCacheValue(key: string): Promise<void> {
-    try {
-      await RedisOperations.del(key);
-    } catch (error) {
-      console.warn(`Failed to delete cache key ${key}:`, error);
-    }
-  }
-
   /**
-   * Invalidate view count cache
+   * Handle post-record operations for batch views.
+   * Sets deduplication caches and invalidates view count caches.
    */
-  private static async invalidateViewCountCache(
-    targetType: ContentViewTargetType,
-    targetId: string,
+  private static async handleBatchPostRecordAsync(
+    views: Array<InsertContentView>,
+    viewerUserId?: string,
+    options: ViewRecordOptions = {},
   ): Promise<void> {
-    try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(targetType, targetId);
-      await this.deleteCacheValue(cacheKey);
+    const deduplicationWindow = options.deduplicationWindow || 600;
 
-      // also invalidate view stats cache
-      const statsKey = REDIS_KEYS.VIEW_TRACKING.VIEW_STATS(targetType, targetId, 'day');
-      await this.deleteCacheValue(statsKey);
-    } catch (error) {
-      // non-blocking cache operation
-      console.warn('Failed to invalidate view count cache:', error);
+    // Set deduplication caches (async operations)
+    await Promise.allSettled(
+      views.map((view) =>
+        this.setDeduplicationCacheAsync(
+          view.targetType,
+          view.targetId,
+          viewerUserId,
+          view.ipAddress || undefined,
+          deduplicationWindow,
+        ),
+      ),
+    );
+
+    // Invalidate view count caches using CacheRevalidationService (synchronous)
+    for (const view of views) {
+      CacheRevalidationService.analytics.onViewRecord(
+        view.targetType as 'bobblehead' | 'collection' | 'user',
+        view.targetId,
+        viewerUserId,
+      );
     }
   }
 
   /**
-   * Set deduplication cache for anonymous users
+   * Set deduplication cache for a view (authenticated or anonymous).
    */
-  private static async setAnonymousDeduplicationCache(
+  private static async setDeduplicationCacheAsync(
     targetType: ContentViewTargetType,
     targetId: string,
-    ipAddress: string,
+    viewerUserId?: string,
+    ipAddress?: string,
     ttl = 300,
   ): Promise<void> {
     try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, ipAddress);
+      let cacheKey: string;
+
+      if (viewerUserId) {
+        cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, viewerUserId);
+      } else if (ipAddress) {
+        cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, ipAddress);
+      } else {
+        return;
+      }
+
       await RedisOperations.set(cacheKey, Date.now().toString(), ttl);
     } catch (error) {
-      // non-blocking cache operation
-      console.warn('Failed to set anonymous deduplication cache:', error);
+      // Non-blocking cache operation
+      captureFacadeWarning(error, facadeName, 'setDeduplicationCache', {
+        targetId,
+        targetType,
+        viewerUserId,
+      });
     }
   }
 
   /**
-   * Set deduplication cache for authenticated users
+   * Validate a single view for deduplication and privacy.
+   * Returns validation result with status flags.
    */
-  private static async setDeduplicationCache(
-    targetType: ContentViewTargetType,
-    targetId: string,
-    viewerUserId: string,
-    ttl = 300,
-  ): Promise<void> {
+  private static async validateSingleViewAsync(
+    viewData: InsertContentView,
+    viewerUserId?: string,
+    options: ViewRecordOptions = {},
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<{ error?: string; isDuplicate: boolean; isSkipped: boolean }> {
     try {
-      const cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, viewerUserId);
-      await RedisOperations.set(cacheKey, Date.now().toString(), ttl);
+      // Check deduplication
+      const deduplicationResult = await this.checkViewDeduplicationAsync(
+        viewData.targetType,
+        viewData.targetId,
+        viewerUserId,
+        viewData.ipAddress || undefined,
+        options.deduplicationWindow || 600,
+      );
+
+      if (deduplicationResult.isDuplicate) {
+        return { isDuplicate: true, isSkipped: false };
+      }
+
+      // Check privacy settings
+      if (options.shouldRespectPrivacySettings && viewerUserId) {
+        const canTrack = this.checkUserPrivacySettings(viewerUserId, dbInstance);
+        if (!canTrack) {
+          return { isDuplicate: false, isSkipped: true };
+        }
+      }
+
+      // Skip anonymous tracking if requested
+      if (options.shouldSkipAnonymousTracking && !viewerUserId) {
+        return { isDuplicate: false, isSkipped: true };
+      }
+
+      return { isDuplicate: false, isSkipped: false };
     } catch (error) {
-      // non-blocking cache operation
-      console.warn('Failed to set deduplication cache:', error);
+      return {
+        error: `View validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        isDuplicate: false,
+        isSkipped: false,
+      };
     }
   }
 }

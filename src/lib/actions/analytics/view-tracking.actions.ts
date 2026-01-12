@@ -77,7 +77,7 @@ export const recordViewAction = publicActionClient
       });
 
       try {
-        const result = await AnalyticsFacade.recordView(processedViewData, ctx.db, {
+        const result = await AnalyticsFacade.recordViewAsync(processedViewData, {
           deduplicationWindow: 600,
           shouldRespectPrivacySettings: true,
         });
@@ -157,7 +157,6 @@ export const batchRecordViewsAction = authActionClient
       }>
     > => {
       const batchData = batchRecordViewsSchema.parse(ctx.sanitizedInput || parsedInput);
-      const dbInstance = ctx.db;
 
       Sentry.setContext(SENTRY_CONTEXTS.BATCH_VIEW_DATA, {
         batchId: batchData.batchId,
@@ -166,7 +165,7 @@ export const batchRecordViewsAction = authActionClient
       });
 
       try {
-        const result = await AnalyticsFacade.batchRecordViews(batchData.views, dbInstance, {
+        const result = await AnalyticsFacade.batchRecordViewsAsync(batchData.views, {
           batchId: batchData.batchId,
           deduplicationWindow: 600,
           shouldRespectPrivacySettings: true,
@@ -239,15 +238,10 @@ export const getViewStatsAction = publicActionClient
       const statsData = viewStatsSchema.parse(ctx.sanitizedInput);
 
       try {
-        const result = await AnalyticsFacade.getViewStats(
-          statsData.targetId,
-          statsData.targetType,
-          {
-            shouldIncludeAnonymous: statsData.includeAnonymous,
-            timeframe: statsData.timeframe,
-          },
-          ctx.db,
-        );
+        const result = await AnalyticsFacade.getViewStatsAsync(statsData.targetId, statsData.targetType, {
+          shouldIncludeAnonymous: statsData.includeAnonymous,
+          timeframe: statsData.timeframe,
+        });
 
         return actionSuccess(result);
       } catch (error) {
@@ -289,15 +283,11 @@ export const getTrendingContentAction = publicActionClient
       const trendingData = trendingContentSchema.parse(ctx.sanitizedInput || parsedInput);
 
       try {
-        const result = await AnalyticsFacade.getTrendingContent(
-          trendingData.targetType,
-          {
-            isIncludingAnonymous: trendingData.includeAnonymous,
-            limit: trendingData.limit,
-            timeframe: trendingData.timeframe,
-          },
-          ctx.db,
-        );
+        const result = await AnalyticsFacade.getTrendingContentAsync(trendingData.targetType, {
+          isIncludingAnonymous: trendingData.includeAnonymous,
+          limit: trendingData.limit,
+          timeframe: trendingData.timeframe,
+        });
 
         return actionSuccess(result);
       } catch (error) {
@@ -343,7 +333,7 @@ export const aggregateViewsAction = authActionClient
       });
 
       try {
-        const result = await AnalyticsFacade.aggregateViews(
+        const result = await AnalyticsFacade.aggregateViewsAsync(
           aggregateData.targetIds,
           aggregateData.targetType,
           {
