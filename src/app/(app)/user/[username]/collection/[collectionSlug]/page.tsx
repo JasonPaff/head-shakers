@@ -50,7 +50,7 @@ export async function generateMetadata({
   const { collectionSlug, username } = await params;
 
   // Resolve username to user
-  const user = await UsersFacade.getUserByUsername(username);
+  const user = await UsersFacade.getUserByUsernameAsync(username);
 
   if (!user) {
     return {
@@ -118,7 +118,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const resolvedSearchParams = await searchParams;
 
   // Resolve username to user
-  const user = await UsersFacade.getUserByUsername(username);
+  const user = await UsersFacade.getUserByUsernameAsync(username);
 
   if (!user) {
     notFound();

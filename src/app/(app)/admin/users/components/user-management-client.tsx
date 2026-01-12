@@ -6,7 +6,7 @@ import { LoaderIcon, LockIcon, RefreshCwIcon, SearchIcon, ShieldAlertIcon, Users
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { AdminUserListRecord } from '@/lib/queries/users/users-query';
+import type { AdminUserListRecord } from '@/lib/queries/users/users.query';
 import type { AdminUserStatus } from '@/lib/validations/admin-users.validation';
 
 import { UserDetailsDialog } from '@/app/(app)/admin/users/components/user-details-dialog';

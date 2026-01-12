@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import type { UserRecord, UserStats } from '@/lib/queries/users/users-query';
+import type { UserRecord, UserStats } from '@/lib/queries/users/users.query';
 
 import { Alert } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

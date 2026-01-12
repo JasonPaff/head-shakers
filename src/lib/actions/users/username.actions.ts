@@ -3,7 +3,7 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
-import type { UserRecord } from '@/lib/queries/users/users-query';
+import type { UserRecord } from '@/lib/queries/users/users.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
 
 import {
@@ -42,7 +42,7 @@ export const checkUsernameAvailabilityAction = publicActionClient
     });
 
     try {
-      const isAvailable = await UsersFacade.isUsernameAvailable(username, undefined, dbInstance);
+      const isAvailable = await UsersFacade.isUsernameAvailableAsync(username, undefined, dbInstance);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
@@ -80,7 +80,7 @@ export const updateUsernameAction = authActionClient
 
     try {
       // Check if user can change username (cooldown period)
-      const canChange = await UsersFacade.canChangeUsername(ctx.userId, dbInstance);
+      const canChange = await UsersFacade.canChangeUsernameAsync(ctx.userId, dbInstance);
 
       if (!canChange) {
         throw new ActionError(
@@ -94,7 +94,7 @@ export const updateUsernameAction = authActionClient
       }
 
       // Check if username is available (excluding current user)
-      const isAvailable = await UsersFacade.isUsernameAvailable(username, ctx.userId, dbInstance);
+      const isAvailable = await UsersFacade.isUsernameAvailableAsync(username, ctx.userId, dbInstance);
 
       if (!isAvailable) {
         throw new ActionError(
@@ -108,7 +108,7 @@ export const updateUsernameAction = authActionClient
       }
 
       // Update username
-      const updatedUser = await UsersFacade.updateUsername(ctx.userId, username, dbInstance);
+      const updatedUser = await UsersFacade.updateUsernameAsync(ctx.userId, username, dbInstance);
 
       if (!updatedUser) {
         throw new ActionError(

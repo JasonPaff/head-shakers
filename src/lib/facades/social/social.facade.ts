@@ -13,7 +13,7 @@ import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { SocialQuery } from '@/lib/queries/social/social.query';
-import { UsersQuery } from '@/lib/queries/users/users-query';
+import { UsersQuery } from '@/lib/queries/users/users.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createHashFromObject } from '@/lib/utils/cache.utils';

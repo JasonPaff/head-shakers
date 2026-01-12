@@ -16,7 +16,7 @@ import {
 import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useMemo, useState } from 'react';
 
-import type { AdminUserListRecord } from '@/lib/queries/users/users-query';
+import type { AdminUserListRecord } from '@/lib/queries/users/users.query';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

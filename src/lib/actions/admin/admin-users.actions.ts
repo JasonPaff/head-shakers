@@ -3,7 +3,7 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
-import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
+import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
 
 import {

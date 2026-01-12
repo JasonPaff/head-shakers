@@ -137,12 +137,23 @@ export const OPERATIONS = {
     VALIDATE: 'validate_tags',
   },
   USERS: {
+    CAN_CHANGE_USERNAME: 'can_change_username',
+    CHECK_USERNAME_AVAILABLE: 'check_username_available',
     DELETE_ACCOUNT: 'delete_user_account',
+    GET_BY_ID: 'get_user_by_id',
+    GET_BY_USERNAME: 'get_user_by_username',
+    GET_DETAILS_FOR_ADMIN: 'get_user_details_for_admin',
     GET_EMAIL_BY_USER_ID: 'get_email_by_user_id',
+    GET_SEO_METADATA: 'get_user_seo_metadata',
     GET_USER_BY_CLERK_ID: 'get_user_by_clerk_id',
     GET_USER_ID_BY_CLERK_ID: 'get_user_id_by_clerk_id',
+    GET_USERS_FOR_ADMIN: 'get_users_for_admin',
+    LOCK_USER: 'lock_user',
+    UNLOCK_USER: 'unlock_user',
     UPDATE_PROFILE: 'update_user_profile',
+    UPDATE_ROLE: 'update_user_role',
     UPDATE_SETTINGS: 'update_user_settings',
+    UPDATE_USERNAME: 'update_username',
   },
 } as const;
 

@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
-import { UsersQuery } from '@/lib/queries/users/users-query';
+import { UsersQuery } from '@/lib/queries/users/users.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 

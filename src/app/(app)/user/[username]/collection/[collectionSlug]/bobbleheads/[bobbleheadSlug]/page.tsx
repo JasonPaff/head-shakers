@@ -42,7 +42,7 @@ export async function generateMetadata({
   const { bobbleheadSlug, collectionSlug, username } = await params;
 
   // Resolve username to user
-  const user = await UsersFacade.getUserByUsername(username);
+  const user = await UsersFacade.getUserByUsernameAsync(username);
 
   if (!user) {
     return {
@@ -111,7 +111,7 @@ async function BobbleheadPage({ routeParams }: BobbleheadPageProps) {
   const currentUserId = await getUserIdAsync();
 
   // Resolve username to user
-  const user = await UsersFacade.getUserByUsername(username);
+  const user = await UsersFacade.getUserByUsernameAsync(username);
 
   if (!user) {
     notFound();

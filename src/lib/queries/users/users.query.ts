@@ -1,5 +1,6 @@
 import { and, asc, count, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
+import type { UserRole } from '@/lib/constants/enums';
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { AdminUsersFilter } from '@/lib/validations/admin-users.validation';
 
@@ -347,6 +348,88 @@ export class UsersQuery extends BaseQuery {
       publicCollectionsCount: publicCollectionsResult[0]?.count || 0,
       userId,
     };
+  }
+
+  /**
+   * Update a user's lock status (lockedUntil)
+   *
+   * @param userId - The user ID to update
+   * @param lockedUntil - The date until which the user is locked (null to unlock)
+   * @param context - Query context with database instance
+   * @returns Updated user record, or null if user not found
+   */
+  static async updateUserLockAsync(
+    userId: string,
+    lockedUntil: Date | null,
+    context: QueryContext,
+  ): Promise<null | UserRecord> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(users)
+      .set({
+        lockedUntil,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  /**
+   * Update a user's username and set the usernameChangedAt timestamp
+   *
+   * @param userId - The user ID to update
+   * @param username - The new username
+   * @param context - Query context with database instance
+   * @returns Updated user record, or null if user not found
+   */
+  static async updateUsernameAsync(
+    userId: string,
+    username: string,
+    context: QueryContext,
+  ): Promise<null | UserRecord> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(users)
+      .set({
+        updatedAt: new Date(),
+        username,
+        usernameChangedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  /**
+   * Update a user's role
+   *
+   * @param userId - The user ID to update
+   * @param role - The new role to assign
+   * @param context - Query context with database instance
+   * @returns Updated user record, or null if user not found
+   */
+  static async updateUserRoleAsync(
+    userId: string,
+    role: UserRole,
+    context: QueryContext,
+  ): Promise<null | UserRecord> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(users)
+      .set({
+        role,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return result[0] || null;
   }
 
   /**

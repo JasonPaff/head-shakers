@@ -5,7 +5,7 @@ import type { ComponentPropsWithRef } from 'react';
 import { Loader2Icon, ShieldIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import type { AdminUserListRecord } from '@/lib/queries/users/users-query';
+import type { AdminUserListRecord } from '@/lib/queries/users/users.query';
 import type { AssignableRole } from '@/lib/validations/admin-users.validation';
 
 import { Alert } from '@/components/ui/alert';

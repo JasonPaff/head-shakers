@@ -22,6 +22,7 @@ import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
 import { EditBobbleheadFormAsync } from './components/async/edit-bobblehead-form-async';
 import { SidebarAsync } from './components/async/sidebar-async';
+import { CollectionUrlSync } from './components/collection-url-sync';
 import { NoCollectionSelected } from './components/empty-states/no-collection-selected';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
@@ -65,49 +66,39 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
     redirect($path({ route: '/' }));
   }
 
-  // Server-side auto-selection: If no collection is selected, redirect to the first one
-  // This respects the user's saved sort preference for consistent behavior
+  // Server-side auto-selection: If no collection is selected, render with the first one
+  // and sync the URL client-side to avoid blank flash during redirect
+  let shouldSyncUrl = false;
+  let collectionSlug: string;
+
   if (!params.collectionSlug) {
     const [userId, preferences] = await Promise.all([getRequiredUserIdAsync(), getUserPreferences()]);
     const collections = await CollectionsDashboardFacade.getListByUserIdAsync(userId);
 
-    if (collections.length > 0) {
-      const sortOption = preferences.collectionSidebarSort ?? 'name-asc';
-      const sortedCollections = sortCollections(collections, sortOption);
-      const firstCollection = sortedCollections[0]!;
-
-      // Redirect to the first collection, preserving any other search params
-      const url = new URL(`/user/${username}/dashboard/collection`, 'http://localhost');
-      url.searchParams.set('collectionSlug', firstCollection.slug);
-
-      // Preserve other params if they differ from defaults
-      if (params.add) url.searchParams.set('add', 'true');
-      if (params.edit) url.searchParams.set('edit', params.edit);
-      if (params.search) url.searchParams.set('search', params.search);
-      if (params.condition !== 'all') url.searchParams.set('condition', params.condition);
-      if (params.featured !== 'all') url.searchParams.set('featured', params.featured);
-      if (params.sortBy !== 'newest') url.searchParams.set('sortBy', params.sortBy);
-
-      redirect(`${url.pathname}${url.search}`);
+    if (collections.length === 0) {
+      // User has no collections - render empty state
+      return (
+        <CollectionLayout
+          main={<NoCollectionSelected />}
+          sidebar={
+            <ErrorBoundary name={'collection-sidebar'}>
+              <Suspense fallback={<SidebarSkeleton />}>
+                <SidebarAsync />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+      );
     }
 
-    // User has no collections - render empty state
-    return (
-      <CollectionLayout
-        main={<NoCollectionSelected />}
-        sidebar={
-          <ErrorBoundary name={'collection-sidebar'}>
-            <Suspense fallback={<SidebarSkeleton />}>
-              <SidebarAsync />
-            </Suspense>
-          </ErrorBoundary>
-        }
-      />
-    );
+    // Auto-select first collection based on user's sort preference
+    const sortOption = preferences.collectionSidebarSort ?? 'name-asc';
+    const sortedCollections = sortCollections(collections, sortOption);
+    collectionSlug = sortedCollections[0]!.slug;
+    shouldSyncUrl = true;
+  } else {
+    collectionSlug = params.collectionSlug;
   }
-
-  // At this point, collectionSlug is guaranteed to exist
-  const collectionSlug = params.collectionSlug;
 
   // Extract filter params for bobblehead grid
   const filterParams: FilterParams = {
@@ -124,6 +115,9 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
     <CollectionLayout
       main={
         <Fragment>
+          {/* Sync URL when collection was auto-selected */}
+          {shouldSyncUrl && <CollectionUrlSync collectionSlug={collectionSlug} />}
+
           {/* Collection Header - always shown */}
           <ErrorBoundary name={'collection-header'}>
             <Suspense fallback={<CollectionHeaderSkeleton />}>
