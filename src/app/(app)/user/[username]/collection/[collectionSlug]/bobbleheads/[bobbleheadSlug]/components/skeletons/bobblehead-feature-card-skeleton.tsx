@@ -44,6 +44,14 @@ const SocialBarSkeleton = () => (
 
 const CollapsibleSectionsSkeleton = () => (
   <div className={'space-y-4'} data-slot={'skeleton-sections'}>
+    {/* Description Section */}
+    <div className={'rounded-lg border p-4'}>
+      <div className={'flex items-center justify-between'}>
+        <Skeleton className={'h-5 w-28'} />
+        <Skeleton className={'h-5 w-5'} />
+      </div>
+    </div>
+
     {/* Specifications Section */}
     <div className={'rounded-lg border p-4'}>
       <div className={'flex items-center justify-between'}>
@@ -56,6 +64,22 @@ const CollapsibleSectionsSkeleton = () => (
     <div className={'rounded-lg border p-4'}>
       <div className={'flex items-center justify-between'}>
         <Skeleton className={'h-5 w-40'} />
+        <Skeleton className={'h-5 w-5'} />
+      </div>
+    </div>
+
+    {/* Status Section */}
+    <div className={'rounded-lg border p-4'}>
+      <div className={'flex items-center justify-between'}>
+        <Skeleton className={'h-5 w-20'} />
+        <Skeleton className={'h-5 w-5'} />
+      </div>
+    </div>
+
+    {/* Custom Fields Section */}
+    <div className={'rounded-lg border p-4'}>
+      <div className={'flex items-center justify-between'}>
+        <Skeleton className={'h-5 w-36'} />
         <Skeleton className={'h-5 w-5'} />
       </div>
     </div>

@@ -1,10 +1,10 @@
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 
-import { BobbleheadDetailCardsSkeleton } from './components/skeletons/bobblehead-detail-cards-skeleton';
 import { BobbleheadFeatureCardSkeleton } from './components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from './components/skeletons/bobblehead-header-skeleton';
+import { BobbleheadNavigationSkeleton } from './components/skeletons/bobblehead-navigation-skeleton';
 import { BobbleheadPhotoGallerySkeleton } from './components/skeletons/bobblehead-photo-gallery-skeleton';
-import { BobbleheadSecondaryCardsSkeleton } from './components/skeletons/bobblehead-secondary-cards-skeleton';
 
 export default function BobbleheadLoading() {
   return (
@@ -13,6 +13,13 @@ export default function BobbleheadLoading() {
       <div className={'border-b border-border'}>
         <ContentLayout>
           <BobbleheadHeaderSkeleton />
+        </ContentLayout>
+      </div>
+
+      {/* Navigation Section */}
+      <div className={'mt-4'}>
+        <ContentLayout>
+          <BobbleheadNavigationSkeleton />
         </ContentLayout>
       </div>
 
@@ -28,15 +35,12 @@ export default function BobbleheadLoading() {
         <BobbleheadPhotoGallerySkeleton />
       </ContentLayout>
 
-      {/* Primary Detail Cards Section */}
-      <ContentLayout>
-        <BobbleheadDetailCardsSkeleton />
-      </ContentLayout>
-
-      {/* Secondary Detail Cards Section */}
-      <ContentLayout>
-        <BobbleheadSecondaryCardsSkeleton />
-      </ContentLayout>
+      {/* Comments Section */}
+      <div className={'mt-8'}>
+        <ContentLayout>
+          <CommentSectionSkeleton />
+        </ContentLayout>
+      </div>
     </div>
   );
 }
