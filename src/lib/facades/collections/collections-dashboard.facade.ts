@@ -57,7 +57,7 @@ export class CollectionsDashboardFacade extends BaseFacade {
       },
       async () => {
         return CacheService.collections.dashboard(async () => {
-          const context = this.getUserContext(userId, dbInstance);
+          const context = this.getProtectedContext(userId, dbInstance);
           return await CollectionsDashboardQuery.getListByUserIdAsync(context);
         }, userId);
       },

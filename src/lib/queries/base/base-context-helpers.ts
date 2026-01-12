@@ -38,7 +38,7 @@ export abstract class BaseContextHelpers {
   /**
    * Create a QueryContext for protected/owner-only operations
    */
-  protected static getProtectedContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
+  protected static getProtectedContext(userId: string, dbInstance?: DatabaseExecutor): UserQueryContext {
     return createProtectedQueryContext(userId, { dbInstance });
   }
 

@@ -201,9 +201,8 @@ describe('NewsletterQuery', () => {
     });
 
     it('should return null when subscriber is unsubscribed', async () => {
-      // Arrange
-      const unsubscribedRecord = { ...mockRecord, unsubscribedAt: new Date('2024-02-01') };
-      const mockLimit = vi.fn().mockResolvedValue([unsubscribedRecord]);
+      // Arrange - mock returns empty array (simulating DB filtering via isNull(unsubscribedAt) clause)
+      const mockLimit = vi.fn().mockResolvedValue([]);
       const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
       const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
       const mockSelect = vi.fn().mockReturnValue({ from: mockFrom });

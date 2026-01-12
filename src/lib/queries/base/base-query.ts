@@ -8,6 +8,7 @@ import { DEFAULTS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseContextHelpers } from '@/lib/queries/base/base-context-helpers';
 import {
+  buildOwnershipFilter,
   buildPermissionFilter,
   buildSoftDeleteFilter,
   combineFilters,
@@ -50,6 +51,9 @@ export abstract class BaseQuery extends BaseContextHelpers {
     // Add the permission filter if isPublic column exists
     if (isPublicColumn) {
       filters.push(buildPermissionFilter(isPublicColumn, userIdColumn, context));
+    } else if (context.requiredUserId) {
+      // When no isPublic column but requiredUserId is set, filter by ownership
+      filters.push(buildOwnershipFilter(userIdColumn, context));
     }
 
     // Add soft delete filter if deletedAt column exists

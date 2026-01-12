@@ -278,7 +278,7 @@ export class BobbleheadsDashboardFacade extends BaseFacade {
       async () => {
         return CacheService.collections.selectorsByUser(
           async () => {
-            const context = this.getUserContext(userId, dbInstance);
+            const context = this.getProtectedContext(userId, dbInstance);
             return await CollectionsDashboardQuery.getSelectorsByUserIdAsync(context);
           },
           userId,

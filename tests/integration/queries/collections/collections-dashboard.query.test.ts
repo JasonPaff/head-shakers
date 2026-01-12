@@ -229,6 +229,7 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       const user2 = await createTestUser({ username: 'notowner' });
 
       const collection = await createTestCollection({
+        isPublic: false,
         name: 'Private Collection',
         slug: 'private-collection',
         userId: user1!.id,
@@ -247,7 +248,7 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
       });
 
       // Assert - Should not return the collection (different user)
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
@@ -551,9 +552,10 @@ describe('CollectionsDashboardQuery Integration Tests', () => {
         userId: user2!.id,
       });
 
-      // Act - Query as user1
+      // Act - Query as user1 with requiredUserId to enforce ownership filtering
       const result = await CollectionsDashboardQuery.getSelectorsByUserIdAsync({
         ...queryContext,
+        requiredUserId: user1!.id,
         userId: user1!.id,
       });
 
