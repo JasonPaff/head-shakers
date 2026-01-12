@@ -9,8 +9,6 @@ import { AppHeaderMobileMenu } from '@/components/layout/app-header/components/a
 import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-header-nav-menu';
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
-import { AuthContent } from '@/components/ui/auth';
-import { Skeleton } from '@/components/ui/skeleton';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { generateTestId } from '@/lib/test-ids';
 import { getUserIdAsync } from '@/utils/auth-utils';
@@ -80,18 +78,18 @@ export const AppHeader = async () => {
           </div>
 
           {/* Auth Nav Menus (Collections) - Hidden on mobile and tablet, shown on desktop */}
-          <AuthContent loadingSkeleton={<Skeleton className={'h-8.75 w-7'} />}>
+          {userId && (
             <div className={'hidden lg:block'}>
               <AppHeaderAuthNavMenu username={username} />
             </div>
-          </AuthContent>
+          )}
 
           {/* Auth Nav Menus - Show on tablet only when search is below */}
-          <AuthContent loadingSkeleton={<Skeleton className={'h-8.75 w-7'} />}>
+          {userId && (
             <div className={'hidden items-center gap-2 md:flex lg:hidden'}>
               <AppHeaderAuthNavMenu username={username} />
             </div>
-          </AuthContent>
+          )}
 
           {/* User Menu - Always visible */}
           <div
