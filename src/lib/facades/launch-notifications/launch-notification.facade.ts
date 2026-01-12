@@ -7,7 +7,7 @@ import type {
 import { OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
-import { LaunchNotificationQuery } from '@/lib/queries/launch-notifications/launch-notification-query';
+import { LaunchNotificationsQuery } from '@/lib/queries/launch-notifications/launch-notifications.query';
 import { ResendService } from '@/lib/services/resend.service';
 import { maskEmail } from '@/lib/utils/email-utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
@@ -67,7 +67,7 @@ export class LaunchNotificationFacade extends BaseFacade {
         const context = this.getPublicContext(dbInstance);
 
         // Add to waitlist (silent success for duplicates)
-        await LaunchNotificationQuery.addToWaitlistAsync({ email: data.email }, context);
+        await LaunchNotificationsQuery.addToWaitlistAsync({ email: data.email }, context);
 
         // Send confirmation email asynchronously - non-blocking
         // Note: we send confirmation regardless of whether it's a new email or duplicate
@@ -96,7 +96,7 @@ export class LaunchNotificationFacade extends BaseFacade {
       },
       async () => {
         const context = this.getPublicContext(dbInstance);
-        return LaunchNotificationQuery.getAllWaitlistAsync(context);
+        return LaunchNotificationsQuery.getAllWaitlistAsync(context);
       },
       {
         includeResultSummary: (result) => ({
@@ -126,9 +126,9 @@ export class LaunchNotificationFacade extends BaseFacade {
         const context = this.getPublicContext(dbInstance);
 
         const [totalCount, notifiedCount, unnotifiedCount] = await Promise.all([
-          LaunchNotificationQuery.getTotalCountAsync(context),
-          LaunchNotificationQuery.getNotifiedCountAsync(context),
-          LaunchNotificationQuery.getUnnotifiedCountAsync(context),
+          LaunchNotificationsQuery.getTotalCountAsync(context),
+          LaunchNotificationsQuery.getNotifiedCountAsync(context),
+          LaunchNotificationsQuery.getUnnotifiedCountAsync(context),
         ]);
 
         return {
@@ -164,7 +164,7 @@ export class LaunchNotificationFacade extends BaseFacade {
       },
       async () => {
         const context = this.getPublicContext(dbInstance);
-        await LaunchNotificationQuery.deleteAsync(email, context);
+        await LaunchNotificationsQuery.deleteAsync(email, context);
       },
     );
   }
@@ -196,7 +196,7 @@ export class LaunchNotificationFacade extends BaseFacade {
         const context = this.getPublicContext(dbInstance);
 
         // Get unnotified emails
-        const emails = await LaunchNotificationQuery.getUnnotifiedEmailsAsync(context);
+        const emails = await LaunchNotificationsQuery.getUnnotifiedEmailsAsync(context);
 
         facadeBreadcrumb('Fetched unnotified emails for launch notifications', {
           emailCount: emails.length,
@@ -218,7 +218,7 @@ export class LaunchNotificationFacade extends BaseFacade {
         // Mark successfully sent emails as notified
         const successfulEmails = emails.filter((e) => !failedEmails.includes(e));
         if (successfulEmails.length > 0) {
-          await LaunchNotificationQuery.markAsNotifiedAsync(successfulEmails, context);
+          await LaunchNotificationsQuery.markAsNotifiedAsync(successfulEmails, context);
           facadeBreadcrumb('Marked emails as notified', {
             markedCount: successfulEmails.length,
           });

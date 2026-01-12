@@ -9,7 +9,7 @@ import type {
 import { launchNotifications } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
-export class LaunchNotificationQuery extends BaseQuery {
+export class LaunchNotificationsQuery extends BaseQuery {
   /**
    * add email to launch notification waitlist
    */
