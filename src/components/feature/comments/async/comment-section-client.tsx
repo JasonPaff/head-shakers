@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
@@ -66,6 +66,48 @@ const addReplyToComment = (
 };
 
 /**
+ * Helper function to update a comment's content in the nested comment tree
+ */
+const updateCommentInTree = (
+  comments: Array<CommentWithDepth>,
+  commentId: string,
+  newContent: string,
+): Array<CommentWithDepth> => {
+  return comments.map((comment) => {
+    if (comment.id === commentId) {
+      return { ...comment, content: newContent };
+    }
+    if (comment.replies && comment.replies.length > 0) {
+      return {
+        ...comment,
+        replies: updateCommentInTree(comment.replies, commentId, newContent),
+      };
+    }
+    return comment;
+  });
+};
+
+/**
+ * Helper function to delete a comment from the nested comment tree
+ */
+const deleteCommentFromTree = (
+  comments: Array<CommentWithDepth>,
+  commentId: string,
+): Array<CommentWithDepth> => {
+  return comments
+    .filter((comment) => comment.id !== commentId)
+    .map((comment) => {
+      if (comment.replies && comment.replies.length > 0) {
+        return {
+          ...comment,
+          replies: deleteCommentFromTree(comment.replies, commentId),
+        };
+      }
+      return comment;
+    });
+};
+
+/**
  * Client wrapper for CommentSection that wires up server actions
  * Handles mutations, pagination, and manages optimistic updates
  */
@@ -122,13 +164,6 @@ export const CommentSectionClient = ({
     loadingMessage: 'Deleting comment...',
   });
 
-  // 4. useEffect hooks
-  useEffect(() => {
-    setLoadedComments(initialComments);
-    setCurrentOffset(initialComments.length);
-    setHasMoreComments(hasMore);
-  }, [initialComments, hasMore]);
-
   // 6. Event handlers
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !hasMoreComments) return;
@@ -179,17 +214,23 @@ export const CommentSectionClient = ({
 
   const handleCommentUpdate = useCallback(
     async (commentId: string, content: string) => {
-      await executeUpdateComment({
+      const updatedComment = await executeUpdateComment({
         commentId,
         content,
       });
+      if (updatedComment) {
+        setLoadedComments((prev) => updateCommentInTree(prev, commentId, content));
+      }
     },
     [executeUpdateComment],
   );
 
   const handleCommentDelete = useCallback(
     async (commentId: string) => {
-      await executeDeleteComment({ commentId });
+      const result = await executeDeleteComment({ commentId });
+      if (result) {
+        setLoadedComments((prev) => deleteCommentFromTree(prev, commentId));
+      }
     },
     [executeDeleteComment],
   );
