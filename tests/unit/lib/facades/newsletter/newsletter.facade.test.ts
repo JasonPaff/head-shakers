@@ -6,7 +6,7 @@ import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter
 import { OPERATIONS } from '@/lib/constants';
 
 // Mock all dependencies at the top of the test file
-vi.mock('@/lib/queries/newsletter/newsletter.queries', () => ({
+vi.mock('@/lib/queries/newsletter/newsletter.query', () => ({
   NewsletterQuery: {
     createSignupAsync: vi.fn(),
     findByEmailAsync: vi.fn(),
