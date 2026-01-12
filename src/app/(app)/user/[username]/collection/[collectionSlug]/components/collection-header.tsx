@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
+import { SignUpButton } from '@clerk/nextjs';
 import * as Sentry from '@sentry/nextjs';
 import {
   CalendarIcon,
@@ -52,7 +53,7 @@ export const CollectionHeader = ({
   ...props
 }: CollectionHeaderProps) => {
   // 1. Other hooks (useLike wraps useState internally)
-  const { isLiked, isPending, likeCount, toggleLike } = useLike({
+  const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLike({
     initialLikeCount,
     isInitiallyLiked,
     targetId: collection.collectionId,
@@ -76,6 +77,7 @@ export const CollectionHeader = ({
 
   // 6. Event handlers (prefixed with 'handle')
   const handleLikeClick = useCallback(() => {
+    if (!isSignedIn) return;
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
       data: {
@@ -88,7 +90,7 @@ export const CollectionHeader = ({
       message: `User ${isLiked ? 'unliking' : 'liking'} collection`,
     });
     toggleLike();
-  }, [collection.collectionId, isLiked, toggleLike]);
+  }, [collection.collectionId, isLiked, isSignedIn, toggleLike]);
 
   const handleCopyLink = useCallback(() => {
     Sentry.addBreadcrumb({
@@ -221,22 +223,36 @@ export const CollectionHeader = ({
           data-testid={`${headerTestId}-actions`}
         >
           {/* Like Button */}
-          <Button
-            aria-label={isLiked ? 'Unlike this collection' : 'Like this collection'}
-            aria-pressed={isLiked}
-            className={cn(
-              'gap-2',
-              isLiked && 'bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700',
-            )}
-            disabled={_isLikeDisabled}
-            onClick={handleLikeClick}
-            testId={`${headerTestId}-like-button`}
-            variant={isLiked ? 'default' : 'outline'}
-          >
-            <HeartIcon aria-hidden className={cn('size-4', isLiked && 'fill-current')} />
-            {isLiked ? 'Liked' : 'Like'}
-            <span className={'ml-1 tabular-nums'}>({likeCount})</span>
-          </Button>
+          {isSignedIn ?
+            <Button
+              aria-label={isLiked ? 'Unlike this collection' : 'Like this collection'}
+              aria-pressed={isLiked}
+              className={cn(
+                'gap-2',
+                isLiked && 'bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700',
+              )}
+              disabled={_isLikeDisabled}
+              onClick={handleLikeClick}
+              testId={`${headerTestId}-like-button`}
+              variant={isLiked ? 'default' : 'outline'}
+            >
+              <HeartIcon aria-hidden className={cn('size-4', isLiked && 'fill-current')} />
+              {isLiked ? 'Liked' : 'Like'}
+              <span className={'ml-1 tabular-nums'}>({likeCount})</span>
+            </Button>
+          : <SignUpButton mode={'modal'}>
+              <Button
+                aria-label={'Sign in to like this collection'}
+                className={'gap-2'}
+                testId={`${headerTestId}-like-button`}
+                variant={'outline'}
+              >
+                <HeartIcon aria-hidden className={'size-4'} />
+                Like
+                <span className={'ml-1 tabular-nums'}>({likeCount})</span>
+              </Button>
+            </SignUpButton>
+          }
 
           {/* Share Menu */}
           <DropdownMenu>
