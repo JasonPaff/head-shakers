@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm';
+import { asc, desc, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
@@ -114,6 +114,12 @@ export interface TrendingBobblehead {
 }
 
 export class FeaturedContentQuery extends BaseQuery {
+  /** Maximum number of featured collections to display */
+  private static readonly MAX_FEATURED_COLLECTIONS = 6;
+
+  /** Maximum number of trending bobbleheads to display */
+  private static readonly MAX_TRENDING_BOBBLEHEADS = 12;
+
   /**
    * create a new featured content entry
    */
@@ -182,8 +188,14 @@ export class FeaturedContentQuery extends BaseQuery {
       })
       .from(featuredContent)
       .leftJoin(users, eq(featuredContent.curatorId, users.id))
-      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
-      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(
+        bobbleheads,
+        this.combineFilters(eq(featuredContent.contentId, bobbleheads.id), isNull(bobbleheads.deletedAt)),
+      )
+      .leftJoin(
+        collections,
+        this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+      )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt), desc(featuredContent.title));
 
     return results.map((row) => ({
@@ -254,8 +266,14 @@ export class FeaturedContentQuery extends BaseQuery {
       })
       .from(featuredContent)
       .leftJoin(users, eq(featuredContent.curatorId, users.id))
-      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
-      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(
+        bobbleheads,
+        this.combineFilters(eq(featuredContent.contentId, bobbleheads.id), isNull(bobbleheads.deletedAt)),
+      )
+      .leftJoin(
+        collections,
+        this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+      )
       .where(eq(featuredContent.id, id))
       .limit(1);
 
@@ -330,17 +348,26 @@ export class FeaturedContentQuery extends BaseQuery {
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)
-      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(
+        bobbleheads,
+        this.combineFilters(eq(featuredContent.contentId, bobbleheads.id), isNull(bobbleheads.deletedAt)),
+      )
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+        this.combineFilters(
+          eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id),
+          eq(bobbleheadPhotos.isPrimary, true),
+        ),
       )
       .leftJoin(bobbleheadOwnerUsers, eq(bobbleheads.userId, bobbleheadOwnerUsers.id))
-      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(
+        collections,
+        this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+      )
       .leftJoin(collectionOwnerUsers, eq(collections.userId, collectionOwnerUsers.id))
       .leftJoin(users, eq(featuredContent.contentId, users.id))
       .where(
-        and(
+        this.combineFilters(
           eq(featuredContent.isActive, DEFAULTS.FEATURED_CONTENT.IS_ACTIVE),
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
@@ -373,12 +400,21 @@ export class FeaturedContentQuery extends BaseQuery {
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)
-      .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(
+        bobbleheads,
+        this.combineFilters(eq(featuredContent.contentId, bobbleheads.id), isNull(bobbleheads.deletedAt)),
+      )
+      .innerJoin(
+        collections,
+        this.combineFilters(eq(bobbleheads.collectionId, collections.id), isNull(collections.deletedAt)),
+      )
       .innerJoin(users, eq(collections.userId, users.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+        this.combineFilters(
+          eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id),
+          eq(bobbleheadPhotos.isPrimary, true),
+        ),
       )
       .where(
         this.combineFilters(
@@ -446,12 +482,15 @@ export class FeaturedContentQuery extends BaseQuery {
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)
-      .innerJoin(collections, eq(featuredContent.contentId, collections.id))
+      .innerJoin(
+        collections,
+        this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+      )
       .innerJoin(users, eq(collections.userId, users.id))
       .leftJoin(
         likes,
         userId ?
-          and(
+          this.combineFilters(
             eq(likes.targetId, collections.id),
             eq(likes.targetType, 'collection'),
             eq(likes.userId, userId),
@@ -459,7 +498,7 @@ export class FeaturedContentQuery extends BaseQuery {
         : sql`false`,
       )
       .where(
-        and(
+        this.combineFilters(
           eq(featuredContent.contentType, 'collection'),
           eq(featuredContent.isActive, true),
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
@@ -467,7 +506,7 @@ export class FeaturedContentQuery extends BaseQuery {
         ),
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
-      .limit(6);
+      .limit(this.MAX_FEATURED_COLLECTIONS);
   }
 
   /**
@@ -505,11 +544,11 @@ export class FeaturedContentQuery extends BaseQuery {
       .from(featuredContent)
       .leftJoin(
         collections,
-        and(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+        this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
       )
       .leftJoin(users, eq(collections.userId, users.id))
       .where(
-        and(
+        this.combineFilters(
           eq(featuredContent.isActive, true),
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
@@ -523,11 +562,12 @@ export class FeaturedContentQuery extends BaseQuery {
    * get trending bobbleheads data for homepage display
    *
    * returns active featured bobbleheads with feature_type 'trending' or 'editor_pick',
-   * ordered by priority (ascending) and limited to 12 items. uses innerJoin to ensure bobblehead exists.
+   * ordered by priority (ascending) and limited to MAX_TRENDING_BOBBLEHEADS items.
+   * uses innerJoin to ensure bobblehead exists.
    * returns only the fields needed for the TrendingBobbleheadsDisplay component.
    *
    * @param context - query context with database instance
-   * @returns array of trending bobblehead data (limit 12, ordered by priority asc)
+   * @returns array of trending bobblehead data ordered by priority asc
    */
   static async getTrendingBobbleheadsAsync(context: QueryContext): Promise<Array<TrendingBobblehead>> {
     const dbInstance = this.getDbInstance(context);
@@ -550,15 +590,24 @@ export class FeaturedContentQuery extends BaseQuery {
         year: bobbleheads.year,
       })
       .from(featuredContent)
-      .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(
+        bobbleheads,
+        this.combineFilters(eq(featuredContent.contentId, bobbleheads.id), isNull(bobbleheads.deletedAt)),
+      )
+      .innerJoin(
+        collections,
+        this.combineFilters(eq(bobbleheads.collectionId, collections.id), isNull(collections.deletedAt)),
+      )
       .innerJoin(users, eq(bobbleheads.userId, users.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+        this.combineFilters(
+          eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id),
+          eq(bobbleheadPhotos.isPrimary, true),
+        ),
       )
       .where(
-        and(
+        this.combineFilters(
           eq(featuredContent.contentType, 'bobblehead'),
           eq(featuredContent.isActive, true),
           inArray(featuredContent.featureType, ['trending', 'editor_pick']),
@@ -567,7 +616,7 @@ export class FeaturedContentQuery extends BaseQuery {
         ),
       )
       .orderBy(asc(featuredContent.priority), desc(featuredContent.createdAt))
-      .limit(12);
+      .limit(this.MAX_TRENDING_BOBBLEHEADS);
   }
 
   /**

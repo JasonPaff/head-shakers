@@ -1,6 +1,8 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS, SENTRY_TAGS } from '@/lib/constants';
+import type { SENTRY_CONTEXTS } from '@/lib/constants';
+
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS, SENTRY_TAGS } from '@/lib/constants';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { includeFullResult } from '@/lib/utils/facade-helpers';
 
@@ -8,12 +10,17 @@ import type {
   ActionBreadcrumbData,
   ActionErrorContext,
   ActionOperationContext,
+  CacheInvalidationConfig,
   FacadeBreadcrumbData,
   FacadeOperationContext,
   ServerBreadcrumbLevel,
   WithActionBreadcrumbsOptions,
   WithFacadeBreadcrumbsOptions,
 } from './types';
+
+// =============================================================================
+// Basic Breadcrumb Functions (Layer 0)
+// =============================================================================
 
 /**
  * Add an action breadcrumb with BUSINESS_LOGIC category.
@@ -100,17 +107,23 @@ export function facadeBreadcrumb(
  * Set Sentry context with type-safe context key.
  * Reduces boilerplate for Sentry.setContext(SENTRY_CONTEXTS.XXX, data).
  *
+ * @param contextType - The context type value from SENTRY_CONTEXTS
+ * @param data - The data to set in the context
  * @example
- * setActionContext('BOBBLEHEAD_DATA', bobbleheadData);
- * setActionContext('COLLECTION_DATA', { name, slug, userId });
- * setActionContext('INPUT_INFO', { filters, pagination, sort });
+ * setActionContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
+ * setActionContext(SENTRY_CONTEXTS.COLLECTION_DATA, { name, slug, userId });
+ * setActionContext(SENTRY_CONTEXTS.INPUT_INFO, { filters, pagination, sort });
  */
 export function setActionContext(
   contextType: (typeof SENTRY_CONTEXTS)[keyof typeof SENTRY_CONTEXTS],
   data: Record<string, unknown>,
 ): void {
-  Sentry.setContext(Object.values(SENTRY_CONTEXTS).find((v) => v === contextType) ?? 'unknown', data);
+  Sentry.setContext(contextType, data);
 }
+
+// =============================================================================
+// Tracking Functions (Layer 1)
+// =============================================================================
 
 /**
  * Track server action operation start.
@@ -144,10 +157,6 @@ export function trackActionSuccess(actionName: string, operation: string, data?:
   });
 }
 
-// =============================================================================
-// Action Breadcrumb Helpers (Layer 1)
-// =============================================================================
-
 /**
  * Track server action warning for partial failures or non-critical issues.
  * Creates a warning-level breadcrumb with action and operation context.
@@ -173,6 +182,48 @@ export function trackActionWarning(
     },
     'warning',
   );
+}
+
+/**
+ * Track cache invalidation result with automatic warning on failure.
+ * Use for logging cache invalidation outcomes without failing the main operation.
+ *
+ * @param config - Configuration for the cache invalidation tracking
+ * @param result - The result from CacheRevalidationService
+ * @example
+ * const result = CacheRevalidationService.bobbleheads.onUpdate(bobbleheadId, userId);
+ * trackCacheInvalidation(
+ *   { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'update', userId },
+ *   result,
+ * );
+ */
+export function trackCacheInvalidation(
+  config: CacheInvalidationConfig,
+  result: { error?: string; isSuccess: boolean; tagsInvalidated?: Array<string> },
+): void {
+  const { entityId, entityType, operation, userId } = config;
+
+  if (result.isSuccess) {
+    actionBreadcrumb(`Cache invalidated for ${entityType}`, {
+      entityId,
+      entityType,
+      operation,
+      tagsInvalidated: result.tagsInvalidated,
+      ...(userId && { userId }),
+    });
+  } else {
+    Sentry.captureException(new Error(`Cache invalidation failed for ${entityType}`), {
+      extra: {
+        entityId,
+        entityType,
+        error: result.error,
+        operation,
+        tagsAttempted: result.tagsInvalidated,
+        ...(userId && { userId }),
+      },
+      level: 'warning',
+    });
+  }
 }
 
 /**
@@ -261,7 +312,7 @@ export function trackFacadeWarning(
 }
 
 // =============================================================================
-// Action Wrapper Functions (Layer 2)
+// Wrapper Functions (Layer 2)
 // =============================================================================
 
 /**
@@ -440,10 +491,6 @@ export async function withActionErrorHandling<T>(
     });
   }
 }
-
-// =============================================================================
-// Cache Invalidation Helper (Layer 3)
-// =============================================================================
 
 /**
  * Wrap a facade operation with automatic entry/success/error breadcrumbs.
