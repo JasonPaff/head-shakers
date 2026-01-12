@@ -6,9 +6,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { CommentSection } from '@/components/feature/comments/comment-section';
 import { useAdminRole } from '@/hooks/use-admin-role';
+import { useServerAction } from '@/hooks/use-server-action';
 import {
   createCommentAction,
   deleteCommentAction,
@@ -16,16 +18,17 @@ import {
   updateCommentAction,
 } from '@/lib/actions/social/social.actions';
 
-interface CommentSectionClientProps extends Omit<ComponentProps<'div'>, 'children'> {
-  currentUserId?: string;
-  hasMore?: boolean;
-  initialCommentCount: number;
-  initialComments: Array<CommentWithDepth>;
-  initialLimit?: number;
-  isAuthenticated: boolean;
-  targetId: string;
-  targetType: CommentTargetType;
-}
+type CommentSectionClientProps = ComponentTestIdProps &
+  Omit<ComponentProps<'div'>, 'children'> & {
+    currentUserId?: string;
+    hasMore?: boolean;
+    initialCommentCount: number;
+    initialComments: Array<CommentWithDepth>;
+    initialLimit?: number;
+    isAuthenticated: boolean;
+    targetId: string;
+    targetType: CommentTargetType;
+  };
 
 const DEFAULT_COMMENTS_LIMIT = 10;
 
@@ -74,29 +77,64 @@ export const CommentSectionClient = ({
   isAuthenticated,
   targetId,
   targetType,
+  testId,
   ...props
 }: CommentSectionClientProps) => {
-  const { isAdmin } = useAdminRole();
-
-  // State for pagination
+  // 1. useState hooks
   const [loadedComments, setLoadedComments] = useState(initialComments);
   const [hasMoreComments, setHasMoreComments] = useState(hasMore);
   const [currentOffset, setCurrentOffset] = useState(initialComments.length);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Sync state when initial props change (e.g., after router.refresh() from mutations)
+  // 2. Other hooks
+  const { isAdmin } = useAdminRole();
+
+  const { executeAsync: executeGetComments } = useServerAction(getCommentsAction, {
+    breadcrumbContext: {
+      action: 'load-more-comments',
+      component: 'comment-section-client',
+    },
+    isDisableToast: true,
+  });
+
+  const { executeAsync: executeCreateComment } = useServerAction(createCommentAction, {
+    breadcrumbContext: {
+      action: 'create-comment',
+      component: 'comment-section-client',
+    },
+    loadingMessage: 'Posting comment...',
+  });
+
+  const { executeAsync: executeUpdateComment } = useServerAction(updateCommentAction, {
+    breadcrumbContext: {
+      action: 'update-comment',
+      component: 'comment-section-client',
+    },
+    loadingMessage: 'Updating comment...',
+  });
+
+  const { executeAsync: executeDeleteComment } = useServerAction(deleteCommentAction, {
+    breadcrumbContext: {
+      action: 'delete-comment',
+      component: 'comment-section-client',
+    },
+    loadingMessage: 'Deleting comment...',
+  });
+
+  // 4. useEffect hooks - Sync state when initial props change
   useEffect(() => {
     setLoadedComments(initialComments);
     setCurrentOffset(initialComments.length);
     setHasMoreComments(hasMore);
   }, [initialComments, hasMore]);
 
+  // 6. Event handlers
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !hasMoreComments) return;
 
     setIsLoadingMore(true);
     try {
-      const result = await getCommentsAction({
+      const responseData = await executeGetComments({
         pagination: {
           limit: initialLimit,
           offset: currentOffset,
@@ -105,34 +143,24 @@ export const CommentSectionClient = ({
         targetType,
       });
 
-      const responseData = result?.data?.data;
       if (responseData) {
         setLoadedComments((prev) => [...prev, ...responseData.comments]);
         setCurrentOffset((prev) => prev + responseData.comments.length);
         setHasMoreComments(responseData.hasMore);
       }
-    } catch (error) {
-      console.error('Failed to load more comments:', error);
     } finally {
       setIsLoadingMore(false);
     }
-  }, [targetId, targetType, currentOffset, initialLimit, isLoadingMore, hasMoreComments]);
+  }, [targetId, targetType, currentOffset, initialLimit, isLoadingMore, hasMoreComments, executeGetComments]);
 
   const handleCommentCreate = useCallback(
     async (content: string, parentCommentId?: string) => {
-      const result = await createCommentAction({
+      const createdComment = await executeCreateComment({
         content,
         parentCommentId,
         targetId,
         targetType,
       });
-
-      if (result?.serverError) {
-        throw new Error(result.serverError);
-      }
-
-      // Get the created comment from the action result for optimistic update
-      const createdComment = result?.data?.data;
 
       if (createdComment) {
         // Optimistically add the new comment to local state
@@ -145,32 +173,35 @@ export const CommentSectionClient = ({
         }
       }
     },
-    [targetId, targetType],
+    [targetId, targetType, executeCreateComment],
   );
 
-  const handleCommentUpdate = useCallback(async (commentId: string, content: string) => {
-    const result = await updateCommentAction({
-      commentId,
-      content,
-    });
+  const handleCommentUpdate = useCallback(
+    async (commentId: string, content: string) => {
+      await executeUpdateComment({
+        commentId,
+        content,
+      });
+    },
+    [executeUpdateComment],
+  );
 
-    if (result?.serverError) {
-      throw new Error(result.serverError);
-    }
-  }, []);
+  const handleCommentDelete = useCallback(
+    async (commentId: string) => {
+      await executeDeleteComment({ commentId });
+    },
+    [executeDeleteComment],
+  );
 
-  const handleCommentDelete = useCallback(async (commentId: string) => {
-    const result = await deleteCommentAction({ commentId });
-
-    if (result?.serverError) {
-      throw new Error(result.serverError);
-    }
-  }, []);
+  // 7. Derived variables
+  const componentTestId = testId ?? 'feature-comment-section-client';
 
   return (
     <CommentSection
       comments={loadedComments}
       currentUserId={currentUserId}
+      data-slot={'comment-section-client'}
+      data-testid={componentTestId}
       hasMore={hasMoreComments}
       initialCommentCount={initialCommentCount}
       isAdmin={isAdmin}
