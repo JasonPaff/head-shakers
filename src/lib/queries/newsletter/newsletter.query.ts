@@ -7,11 +7,6 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
 import { normalizeEmail } from '@/lib/utils/email-utils';
 
 /**
- * Type for inserting a new newsletter signup
- */
-export type InsertNewsletterSignup = typeof newsletterSignups.$inferInsert;
-
-/**
  * Type for newsletter signup record from the database
  */
 export type NewsletterSignupRecord = typeof newsletterSignups.$inferSelect;

@@ -1,10 +1,10 @@
-import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
+import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
-import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
+import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { ResendService } from '@/lib/services/resend.service';

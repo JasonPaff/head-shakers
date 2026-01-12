@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
+import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.query';
 
 import { OPERATIONS } from '@/lib/constants';
 
@@ -54,7 +54,7 @@ vi.mock('@/lib/utils/email-utils', () => ({
 }));
 
 import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
-import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
+import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { ResendService } from '@/lib/services/resend.service';

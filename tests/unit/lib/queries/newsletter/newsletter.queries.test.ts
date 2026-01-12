@@ -2,10 +2,10 @@ import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
-import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
+import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.query';
 
 import { newsletterSignups } from '@/lib/db/schema/newsletter-signups.schema';
-import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
+import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.query';
 import { normalizeEmail } from '@/lib/utils/email-utils';
 
 // Mock the email-utils module
