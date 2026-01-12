@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
-import { updateUsernameAction } from '@/lib/actions/users/username.actions';
+import { updateUsernameAction } from '@/lib/actions/users/users.actions';
 
 interface UsernameSetupDialogProps {
   currentUsername: string;

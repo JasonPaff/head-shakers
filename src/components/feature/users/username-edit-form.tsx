@@ -9,7 +9,7 @@ import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
-import { checkUsernameAvailabilityAction, updateUsernameAction } from '@/lib/actions/users/username.actions';
+import { checkUsernameAvailabilityAction, updateUsernameAction } from '@/lib/actions/users/users.actions';
 import { CONFIG } from '@/lib/constants/config';
 import { updateUsernameSchema } from '@/lib/validations/users.validation';
 import { cn } from '@/utils/tailwind-utils';
