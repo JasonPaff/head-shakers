@@ -636,7 +636,7 @@ export class CollectionsFacade extends BaseFacade {
           }
 
           const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
             bobbleheadIds,
             'bobblehead',
             viewerUserId,
@@ -809,7 +809,7 @@ export class CollectionsFacade extends BaseFacade {
           }
 
           const bobbleheadIds = bobbleheads.map((b) => b.id);
-          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+          const likesMap = await SocialFacade.getLikesForMultipleContentItemsAsync(
             bobbleheadIds,
             'bobblehead',
             viewerUserId,

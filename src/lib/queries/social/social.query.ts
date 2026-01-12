@@ -1,6 +1,6 @@
 import { and, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
-import type { LikeTargetType } from '@/lib/constants';
+import type { ENUMS, LikeTargetType } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
   InsertComment,
@@ -11,8 +11,8 @@ import type {
   SelectLike,
 } from '@/lib/validations/social.validation';
 
-import { ENUMS, MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
-import { bobbleheads, comments, likes, userBlocks } from '@/lib/db/schema';
+import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
+import { bobbleheads, comments, likes, userBlocks, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
@@ -48,7 +48,15 @@ export type UserLikeStatus = {
   targetType: LikeTargetType;
 };
 
+/**
+ * Social query class for database operations related to comments and likes.
+ * Provides methods for creating, reading, updating, and deleting social interactions
+ * on various content types (bobbleheads, collections, etc.)
+ */
 export class SocialQuery extends BaseQuery {
+  /**
+   * Create a new comment on a target entity
+   */
   static async createCommentAsync(
     data: InsertComment,
     userId: string,
@@ -64,6 +72,10 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Create a new like on a target entity
+   * Checks for existing like to prevent duplicates
+   */
   static async createLikeAsync(
     data: InsertLike,
     userId: string,
@@ -93,6 +105,10 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Decrement comment count on a target entity
+   * Uses GREATEST to prevent negative counts
+   */
   static async decrementCommentCountAsync(
     targetId: string,
     targetType: CommentTargetType,
@@ -100,18 +116,22 @@ export class SocialQuery extends BaseQuery {
   ): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
-    switch (targetType) {
-      case ENUMS.COMMENT.TARGET_TYPE[0]:
-        await dbInstance
-          .update(bobbleheads)
-          .set({ commentCount: sql`GREATEST(0, ${bobbleheads.commentCount} - 1)` })
-          .where(eq(bobbleheads.id, targetId));
-        break;
-      default:
-        throw new Error(`Unknown target type: ${targetType as string}`);
+    // Currently only supports 'bobblehead' target type
+    if (targetType === 'bobblehead') {
+      await dbInstance
+        .update(bobbleheads)
+        .set({ commentCount: sql`GREATEST(0, ${bobbleheads.commentCount} - 1)` })
+        .where(eq(bobbleheads.id, targetId));
+      return;
     }
+
+    throw new Error(`Unknown target type: ${targetType as string}`);
   }
 
+  /**
+   * Decrement like count on a target entity
+   * Uses GREATEST to prevent negative counts
+   */
   static async decrementLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -119,18 +139,21 @@ export class SocialQuery extends BaseQuery {
   ): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
-    switch (targetType) {
-      case ENUMS.LIKE.TARGET_TYPE[0]:
-        await dbInstance
-          .update(bobbleheads)
-          .set({ likeCount: sql`GREATEST(0, ${bobbleheads.likeCount} - 1)` })
-          .where(eq(bobbleheads.id, targetId));
-        break;
-      default:
-        throw new Error(`Unknown target type: ${targetType as string}`);
+    // Currently only supports 'bobblehead' target type
+    if (targetType === 'bobblehead') {
+      await dbInstance
+        .update(bobbleheads)
+        .set({ likeCount: sql`GREATEST(0, ${bobbleheads.likeCount} - 1)` })
+        .where(eq(bobbleheads.id, targetId));
+      return;
     }
+
+    throw new Error(`Unknown target type: ${targetType as string}`);
   }
 
+  /**
+   * Soft delete a comment by setting deletedAt timestamp
+   */
   static async deleteCommentAsync(commentId: string, context: QueryContext): Promise<CommentRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
@@ -145,6 +168,9 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Hard delete a like from the database
+   */
   static async deleteLikeAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -161,6 +187,9 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Get a comment by ID without user data
+   */
   static async getCommentByIdAsync(commentId: string, context: QueryContext): Promise<CommentRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
@@ -173,6 +202,10 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
+  /**
+   * Get a comment by ID with user data
+   * Uses left join to include user info even if user is deleted
+   */
   static async getCommentByIdWithUserAsync(
     commentId: string,
     context: QueryContext,
@@ -180,30 +213,18 @@ export class SocialQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
-      .select({
-        content: comments.content,
-        createdAt: comments.createdAt,
-        editedAt: comments.editedAt,
-        id: comments.id,
-        likeCount: comments.likeCount,
-        parentCommentId: comments.parentCommentId,
-        targetId: comments.targetId,
-        targetType: comments.targetType,
-        user: {
-          avatarUrl: sql<null | string>`users.avatar_url`,
-          id: sql<string>`users.id`,
-          username: sql<null | string>`users.username`,
-        },
-        userId: comments.userId,
-      })
+      .select(this._selectCommentWithUser())
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
+      .leftJoin(users, and(eq(comments.userId, users.id), isNull(users.deletedAt)))
       .where(and(eq(comments.id, commentId), isNull(comments.deletedAt)))
       .limit(1);
 
     return result?.[0] || null;
   }
 
+  /**
+   * Get the count of top-level comments for a target
+   */
   static async getCommentCountAsync(
     targetId: string,
     targetType: CommentTargetType,
@@ -239,24 +260,9 @@ export class SocialQuery extends BaseQuery {
     const pagination = this.applyPagination(options);
 
     const query = dbInstance
-      .select({
-        content: comments.content,
-        createdAt: comments.createdAt,
-        editedAt: comments.editedAt,
-        id: comments.id,
-        likeCount: comments.likeCount,
-        parentCommentId: comments.parentCommentId,
-        targetId: comments.targetId,
-        targetType: comments.targetType,
-        user: {
-          avatarUrl: sql<null | string>`users.avatar_url`,
-          id: sql<string>`users.id`,
-          username: sql<null | string>`users.username`,
-        },
-        userId: comments.userId,
-      })
+      .select(this._selectCommentWithUser())
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
+      .leftJoin(users, and(eq(comments.userId, users.id), isNull(users.deletedAt)))
       .where(and(eq(comments.parentCommentId, parentCommentId), isNull(comments.deletedAt)))
       .orderBy(desc(comments.createdAt));
 
@@ -286,6 +292,9 @@ export class SocialQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
+  /**
+   * Get all comments for a target entity with user data
+   */
   static async getCommentsAsync(
     targetId: string,
     targetType: CommentTargetType,
@@ -296,24 +305,9 @@ export class SocialQuery extends BaseQuery {
     const pagination = this.applyPagination(options);
 
     const query = dbInstance
-      .select({
-        content: comments.content,
-        createdAt: comments.createdAt,
-        editedAt: comments.editedAt,
-        id: comments.id,
-        likeCount: comments.likeCount,
-        parentCommentId: comments.parentCommentId,
-        targetId: comments.targetId,
-        targetType: comments.targetType,
-        user: {
-          avatarUrl: sql<null | string>`users.avatar_url`,
-          id: sql<string>`users.id`,
-          username: sql<null | string>`users.username`,
-        },
-        userId: comments.userId,
-      })
+      .select(this._selectCommentWithUser())
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
+      .leftJoin(users, and(eq(comments.userId, users.id), isNull(users.deletedAt)))
       .where(
         and(eq(comments.targetId, targetId), eq(comments.targetType, targetType), isNull(comments.deletedAt)),
       )
@@ -351,24 +345,9 @@ export class SocialQuery extends BaseQuery {
 
     // fetch only root comments (no parent)
     const query = dbInstance
-      .select({
-        content: comments.content,
-        createdAt: comments.createdAt,
-        editedAt: comments.editedAt,
-        id: comments.id,
-        likeCount: comments.likeCount,
-        parentCommentId: comments.parentCommentId,
-        targetId: comments.targetId,
-        targetType: comments.targetType,
-        user: {
-          avatarUrl: sql<null | string>`users.avatar_url`,
-          id: sql<string>`users.id`,
-          username: sql<null | string>`users.username`,
-        },
-        userId: comments.userId,
-      })
+      .select(this._selectCommentWithUser())
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
+      .leftJoin(users, and(eq(comments.userId, users.id), isNull(users.deletedAt)))
       .where(
         and(
           eq(comments.targetId, targetId),
@@ -466,6 +445,9 @@ export class SocialQuery extends BaseQuery {
     return commentWithDepth;
   }
 
+  /**
+   * Get the like count for a specific target
+   */
   static async getLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -481,6 +463,10 @@ export class SocialQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
+  /**
+   * Get like counts for multiple targets in a single query
+   * Returns counts for all requested targets (0 if not found)
+   */
   static async getLikeCountsAsync(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     context: QueryContext,
@@ -524,6 +510,10 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
+  /**
+   * Get like data for multiple content items in a single query
+   * Returns a map with like count and user's like status for each content item
+   */
   static async getLikesForMultipleContentItemsAsync(
     contentIds: Array<string>,
     contentType: LikeTargetType,
@@ -580,8 +570,9 @@ export class SocialQuery extends BaseQuery {
     return result;
   }
 
-  // ==================== Comment Methods ====================
-
+  /**
+   * Get recent likes for a target with user data
+   */
   static async getRecentLikesAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -592,19 +583,9 @@ export class SocialQuery extends BaseQuery {
     const pagination = this.applyPagination(options);
 
     const query = dbInstance
-      .select({
-        createdAt: likes.createdAt,
-        id: likes.id,
-        targetId: likes.targetId,
-        targetType: likes.targetType,
-        user: {
-          id: sql<string>`users.id`,
-          username: sql<null | string>`users.username`,
-        },
-        userId: likes.userId,
-      })
+      .select(this._selectLikeWithUser())
       .from(likes)
-      .leftJoin(sql`users`, and(eq(likes.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
+      .leftJoin(users, and(eq(likes.userId, users.id), isNull(users.deletedAt)))
       .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType)))
       .orderBy(desc(likes.createdAt));
 
@@ -619,6 +600,10 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
+  /**
+   * Get trending content based on recent like activity
+   * Returns content with high like activity in the last 7 days
+   */
   static async getTrendingContentAsync(
     targetType: LikeTargetType,
     options: FindOptions = {},
@@ -654,6 +639,9 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
+  /**
+   * Get a user's like status for a specific target
+   */
   static async getUserLikeStatusAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -678,6 +666,9 @@ export class SocialQuery extends BaseQuery {
     };
   }
 
+  /**
+   * Get a user's like status for multiple targets in a single query
+   */
   static async getUserLikeStatusesAsync(
     targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' }>,
     userId: string,
@@ -736,6 +727,9 @@ export class SocialQuery extends BaseQuery {
     return result.length > 0;
   }
 
+  /**
+   * Increment comment count on a target entity
+   */
   static async incrementCommentCountAsync(
     targetId: string,
     targetType: CommentTargetType,
@@ -743,18 +737,21 @@ export class SocialQuery extends BaseQuery {
   ): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
-    switch (targetType) {
-      case ENUMS.COMMENT.TARGET_TYPE[0]:
-        await dbInstance
-          .update(bobbleheads)
-          .set({ commentCount: sql`${bobbleheads.commentCount} + 1` })
-          .where(eq(bobbleheads.id, targetId));
-        break;
-      default:
-        throw new Error(`Unknown target type: ${targetType as string}`);
+    // Currently only supports 'bobblehead' target type
+    if (targetType === 'bobblehead') {
+      await dbInstance
+        .update(bobbleheads)
+        .set({ commentCount: sql`${bobbleheads.commentCount} + 1` })
+        .where(eq(bobbleheads.id, targetId));
+      return;
     }
+
+    throw new Error(`Unknown target type: ${targetType as string}`);
   }
 
+  /**
+   * Increment like count on a target entity
+   */
   static async incrementLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -762,16 +759,16 @@ export class SocialQuery extends BaseQuery {
   ): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
-    switch (targetType) {
-      case ENUMS.LIKE.TARGET_TYPE[0]:
-        await dbInstance
-          .update(bobbleheads)
-          .set({ likeCount: sql`${bobbleheads.likeCount} + 1` })
-          .where(eq(bobbleheads.id, targetId));
-        break;
-      default:
-        throw new Error(`Unknown target type: ${targetType as string}`);
+    // Currently only supports 'bobblehead' target type
+    if (targetType === 'bobblehead') {
+      await dbInstance
+        .update(bobbleheads)
+        .set({ likeCount: sql`${bobbleheads.likeCount} + 1` })
+        .where(eq(bobbleheads.id, targetId));
+      return;
     }
+
+    throw new Error(`Unknown target type: ${targetType as string}`);
   }
 
   /**
@@ -794,6 +791,9 @@ export class SocialQuery extends BaseQuery {
     return result.length > 0;
   }
 
+  /**
+   * Update a comment's content and set editedAt timestamp
+   */
   static async updateCommentAsync(
     commentId: string,
     content: string,
@@ -811,5 +811,46 @@ export class SocialQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  /**
+   * Private helper to build the select pattern for comments with user data.
+   * Uses SQL expressions for user fields to maintain null handling when user is deleted.
+   */
+  private static _selectCommentWithUser() {
+    return {
+      content: comments.content,
+      createdAt: comments.createdAt,
+      editedAt: comments.editedAt,
+      id: comments.id,
+      likeCount: comments.likeCount,
+      parentCommentId: comments.parentCommentId,
+      targetId: comments.targetId,
+      targetType: comments.targetType,
+      user: {
+        avatarUrl: sql<null | string>`${users.avatarUrl}`,
+        id: sql<string>`${users.id}`,
+        username: sql<null | string>`${users.username}`,
+      },
+      userId: comments.userId,
+    };
+  }
+
+  /**
+   * Private helper to build the select pattern for likes with user data.
+   * Uses SQL expressions for user fields to maintain null handling when user is deleted.
+   */
+  private static _selectLikeWithUser() {
+    return {
+      createdAt: likes.createdAt,
+      id: likes.id,
+      targetId: likes.targetId,
+      targetType: likes.targetType,
+      user: {
+        id: sql<string>`${users.id}`,
+        username: sql<null | string>`${users.username}`,
+      },
+      userId: likes.userId,
+    };
   }
 }

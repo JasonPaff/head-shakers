@@ -4,7 +4,7 @@ argument-hint: 'path/to/file.ts [--reference=path/to/reference.ts] [--dry-run]'
 description: Fix a file to follow project patterns using specialist agents with automatic review and iteration
 ---
 
-You are a file fix orchestrator for Head Shakers. You coordinate specialist agents to fix files to 
+You are a file fix orchestrator for Head Shakers. You coordinate specialist agents to fix files to
 follow project patterns, then review the changes and iterate if issues are found.
 
 @CLAUDE.MD
@@ -37,18 +37,18 @@ follow project patterns, then review the changes and iterate if issues are found
 
 Map the file path to the appropriate specialist agent:
 
-| File Pattern | Specialist Agent | Skills Loaded |
-|--------------|------------------|---------------|
-| `*.actions.ts` in `src/lib/actions/` | `server-action-specialist` | server-actions, sentry-server |
-| `*.facade.ts` in `src/lib/facades/` | `facade-specialist` | facade-layer, sentry-server, caching |
-| `*.queries.ts` in `src/lib/queries/` | `database-specialist` | drizzle-orm, database-schema |
-| `*.validation.ts` in `src/lib/validations/` | `validation-specialist` | validation-schemas |
-| `*-client.tsx` or `use client` directive | `client-component-specialist` | client-components, ui-components |
-| Server components in `src/components/` | `server-component-specialist` | server-components, ui-components |
-| Server components in `src/app/` (pages) | `server-component-specialist` | server-components |
-| `*.schema.ts` in `src/lib/db/` | `database-specialist` | database-schema, drizzle-orm |
-| `*.test.ts` or `*.spec.ts` | Use test type specialist based on path | testing skills |
-| Cache files in `src/lib/cache/` | `facade-specialist` | caching |
+| File Pattern                                | Specialist Agent                       | Skills Loaded                        |
+| ------------------------------------------- | -------------------------------------- | ------------------------------------ |
+| `*.actions.ts` in `src/lib/actions/`        | `server-action-specialist`             | server-actions, sentry-server        |
+| `*.facade.ts` in `src/lib/facades/`         | `facade-specialist`                    | facade-layer, sentry-server, caching |
+| `*.queries.ts` in `src/lib/queries/`        | `database-specialist`                  | drizzle-orm, database-schema         |
+| `*.validation.ts` in `src/lib/validations/` | `validation-specialist`                | validation-schemas                   |
+| `*-client.tsx` or `use client` directive    | `client-component-specialist`          | client-components, ui-components     |
+| Server components in `src/components/`      | `server-component-specialist`          | server-components, ui-components     |
+| Server components in `src/app/` (pages)     | `server-component-specialist`          | server-components                    |
+| `*.schema.ts` in `src/lib/db/`              | `database-specialist`                  | database-schema, drizzle-orm         |
+| `*.test.ts` or `*.spec.ts`                  | Use test type specialist based on path | testing skills                       |
+| Cache files in `src/lib/cache/`             | `facade-specialist`                    | caching                              |
 
 ## Orchestration Workflow
 
@@ -80,6 +80,7 @@ Examples:
 **4. Determine Specialist Type**:
 
 Using the Specialist Selection Matrix above:
+
 - Analyze file path
 - Read file to check for `'use client'` directive if needed
 - Select the appropriate specialist agent type
@@ -87,6 +88,7 @@ Using the Specialist Selection Matrix above:
 **5. Find Reference Files** (if not provided):
 
 If no `--reference` flag:
+
 - Find 1-2 well-implemented reference files in the same domain
 - For actions: Look for `newsletter.actions.ts`, `collections.actions.ts`
 - For facades: Look for `collections.facade.ts`, `newsletter.facade.ts`
@@ -368,16 +370,19 @@ npm run format
 ## Validation Results
 
 ### ESLint
+
 - Status: PASS/FAIL
 - Errors remaining: {n}
 - {Error details if any}
 
 ### TypeScript
+
 - Status: PASS/FAIL
 - Errors in modified file: {n}
 - {Error details if any}
 
 ### Prettier
+
 - Status: PASS/FAIL
 ```
 
@@ -539,32 +544,41 @@ Mark "Generate summary" as in_progress.
 ## File Fix Complete
 
 ### Target File
+
 `{file_path}`
 
 ### Specialist Used
+
 {specialist-type}
 
 ### Reference Files
+
 - `{reference_path_1}`
 - `{reference_path_2}` (if applicable)
 
 ### Changes Applied
+
 {Summary of main changes from Phase 3}
 
 ### Validation
+
 - ESLint: PASS/FAIL
 - TypeScript: PASS/FAIL
 - Prettier: PASS/FAIL
 
 ### Review Result
+
 - Assessment: APPROVED / NEEDS_MANUAL_ATTENTION
 - Checks Passed: {n}/{total}
 
 {If issues remain}
+
 ### Issues Requiring Manual Attention
+
 1. {issue description} (line {n})
 
 ### Next Steps
+
 1. [ ] Review the changes
 2. [ ] Run tests if applicable
 3. [ ] Commit changes
@@ -574,13 +588,13 @@ Mark all todos as completed.
 
 ### Error Handling
 
-| Failure | Action |
-|---------|--------|
-| File not found | Show error with path suggestions |
-| Unknown file type | Ask user to specify specialist or suggest closest match |
-| Specialist agent failed | Retry once, then report failure |
-| Validation failed repeatedly | Continue but note in summary |
-| Review found unfixable issues | Report for manual attention |
+| Failure                       | Action                                                  |
+| ----------------------------- | ------------------------------------------------------- |
+| File not found                | Show error with path suggestions                        |
+| Unknown file type             | Ask user to specify specialist or suggest closest match |
+| Specialist agent failed       | Retry once, then report failure                         |
+| Validation failed repeatedly  | Continue but note in summary                            |
+| Review found unfixable issues | Report for manual attention                             |
 
 ### Performance Notes
 

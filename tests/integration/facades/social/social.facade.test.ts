@@ -95,7 +95,7 @@ describe('SocialFacade Integration Tests', () => {
       const owner = await createTestUser({ username: 'owner' });
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
-      const result = await SocialFacade.toggleLike(collection!.id, 'collection', user!.id);
+      const result = await SocialFacade.toggleLikeAsync(collection!.id, 'collection', user!.id);
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(true);
@@ -109,10 +109,10 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // First like
-      await SocialFacade.toggleLike(collection!.id, 'collection', user!.id);
+      await SocialFacade.toggleLikeAsync(collection!.id, 'collection', user!.id);
 
       // Then unlike
-      const result = await SocialFacade.toggleLike(collection!.id, 'collection', user!.id);
+      const result = await SocialFacade.toggleLikeAsync(collection!.id, 'collection', user!.id);
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(false);
@@ -128,7 +128,7 @@ describe('SocialFacade Integration Tests', () => {
         userId: owner!.id,
       });
 
-      const result = await SocialFacade.toggleLike(bobblehead!.id, 'bobblehead', user!.id);
+      const result = await SocialFacade.toggleLikeAsync(bobblehead!.id, 'bobblehead', user!.id);
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(true);
@@ -145,10 +145,10 @@ describe('SocialFacade Integration Tests', () => {
 
       // All users like the collection
       for (const user of users) {
-        await SocialFacade.toggleLike(collection!.id, 'collection', user!.id);
+        await SocialFacade.toggleLikeAsync(collection!.id, 'collection', user!.id);
       }
 
-      const result = await SocialFacade.toggleLike(collection!.id, 'collection', users[0]!.id);
+      const result = await SocialFacade.toggleLikeAsync(collection!.id, 'collection', users[0]!.id);
 
       // First user unlikes, count should be 2
       expect(result.likeCount).toBe(2);
@@ -162,9 +162,9 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Like the collection
-      await SocialFacade.toggleLike(collection!.id, 'collection', user!.id);
+      await SocialFacade.toggleLikeAsync(collection!.id, 'collection', user!.id);
 
-      const result = await SocialFacade.getUserLikeStatus(collection!.id, 'collection', user!.id);
+      const result = await SocialFacade.getUserLikeStatusAsync(collection!.id, 'collection', user!.id);
 
       expect(result.isLiked).toBe(true);
     });
@@ -174,7 +174,7 @@ describe('SocialFacade Integration Tests', () => {
       const owner = await createTestUser({ username: 'owner' });
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
-      const result = await SocialFacade.getUserLikeStatus(collection!.id, 'collection', user!.id);
+      const result = await SocialFacade.getUserLikeStatusAsync(collection!.id, 'collection', user!.id);
 
       expect(result.isLiked).toBe(false);
     });
@@ -186,7 +186,7 @@ describe('SocialFacade Integration Tests', () => {
       const owner = await createTestUser({ username: 'owner' });
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
-      const result = await SocialFacade.createComment(
+      const result = await SocialFacade.createCommentAsync(
         {
           content: 'Great collection!',
           targetId: collection!.id,
@@ -210,7 +210,7 @@ describe('SocialFacade Integration Tests', () => {
         userId: owner!.id,
       });
 
-      const result = await SocialFacade.createComment(
+      const result = await SocialFacade.createCommentAsync(
         {
           content: 'Nice bobblehead!',
           targetId: bobblehead!.id,
@@ -232,7 +232,7 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create parent comment
-      const parentResult = await SocialFacade.createComment(
+      const parentResult = await SocialFacade.createCommentAsync(
         {
           content: 'Original comment',
           targetId: collection!.id,
@@ -242,7 +242,7 @@ describe('SocialFacade Integration Tests', () => {
       );
 
       // Create reply
-      const replyResult = await SocialFacade.createCommentReply(
+      const replyResult = await SocialFacade.createCommentReplyAsync(
         {
           content: 'This is a reply',
           parentCommentId: parentResult.comment!.id,
@@ -261,7 +261,7 @@ describe('SocialFacade Integration Tests', () => {
       const owner = await createTestUser({ username: 'owner' });
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
-      const result = await SocialFacade.createCommentReply(
+      const result = await SocialFacade.createCommentReplyAsync(
         {
           content: 'Reply to nothing',
           parentCommentId: '00000000-0000-0000-0000-000000000000',
@@ -283,7 +283,7 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create comment
-      const createResult = await SocialFacade.createComment(
+      const createResult = await SocialFacade.createCommentAsync(
         {
           content: 'Original content',
           targetId: collection!.id,
@@ -293,7 +293,7 @@ describe('SocialFacade Integration Tests', () => {
       );
 
       // Update comment
-      const updateResult = await SocialFacade.updateComment(
+      const updateResult = await SocialFacade.updateCommentAsync(
         createResult.comment!.id,
         'Updated content',
         user!.id,
@@ -310,7 +310,7 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create comment as user
-      const createResult = await SocialFacade.createComment(
+      const createResult = await SocialFacade.createCommentAsync(
         {
           content: 'My comment',
           targetId: collection!.id,
@@ -320,7 +320,7 @@ describe('SocialFacade Integration Tests', () => {
       );
 
       // Try to update as other user
-      const updateResult = await SocialFacade.updateComment(
+      const updateResult = await SocialFacade.updateCommentAsync(
         createResult.comment!.id,
         'Hacked content',
         otherUser!.id,
@@ -337,7 +337,7 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create comment
-      const createResult = await SocialFacade.createComment(
+      const createResult = await SocialFacade.createCommentAsync(
         {
           content: 'To be deleted',
           targetId: collection!.id,
@@ -347,7 +347,7 @@ describe('SocialFacade Integration Tests', () => {
       );
 
       // Delete comment
-      const deleteResult = await SocialFacade.deleteComment(createResult.comment!.id, user!.id);
+      const deleteResult = await SocialFacade.deleteCommentAsync(createResult.comment!.id, user!.id);
 
       expect(deleteResult).toBe(true);
     });
@@ -359,7 +359,7 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create comment as user
-      const createResult = await SocialFacade.createComment(
+      const createResult = await SocialFacade.createCommentAsync(
         {
           content: 'Protected comment',
           targetId: collection!.id,
@@ -369,7 +369,7 @@ describe('SocialFacade Integration Tests', () => {
       );
 
       // Try to delete as other user
-      const deleteResult = await SocialFacade.deleteComment(createResult.comment!.id, otherUser!.id);
+      const deleteResult = await SocialFacade.deleteCommentAsync(createResult.comment!.id, otherUser!.id);
 
       expect(deleteResult).toBe(false);
     });
@@ -385,16 +385,16 @@ describe('SocialFacade Integration Tests', () => {
       const collection = await createTestCollection({ isPublic: true, userId: owner!.id });
 
       // Create multiple comments
-      await SocialFacade.createComment(
+      await SocialFacade.createCommentAsync(
         { content: 'Comment 1', targetId: collection!.id, targetType: 'collection' },
         users[0]!.id,
       );
-      await SocialFacade.createComment(
+      await SocialFacade.createCommentAsync(
         { content: 'Comment 2', targetId: collection!.id, targetType: 'collection' },
         users[1]!.id,
       );
 
-      const result = await SocialFacade.getComments(
+      const result = await SocialFacade.getCommentsAsync(
         collection!.id,
         'collection',
         { limit: 10, offset: 0 },
@@ -411,20 +411,20 @@ describe('SocialFacade Integration Tests', () => {
 
       // Create 5 comments
       for (let i = 0; i < 5; i++) {
-        await SocialFacade.createComment(
+        await SocialFacade.createCommentAsync(
           { content: `Comment ${i}`, targetId: collection!.id, targetType: 'collection' },
           user!.id,
         );
       }
 
-      const page1 = await SocialFacade.getComments(
+      const page1 = await SocialFacade.getCommentsAsync(
         collection!.id,
         'collection',
         { limit: 2, offset: 0 },
         user!.id,
       );
 
-      const page2 = await SocialFacade.getComments(
+      const page2 = await SocialFacade.getCommentsAsync(
         collection!.id,
         'collection',
         { limit: 2, offset: 2 },

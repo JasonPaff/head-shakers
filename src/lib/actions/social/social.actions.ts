@@ -87,7 +87,7 @@ export const toggleLikeAction = authActionClient
           userId: ctx.userId,
         },
         async () => {
-          const result = await SocialFacade.toggleLike(
+          const result = await SocialFacade.toggleLikeAsync(
             likeData.targetId,
             likeData.targetType,
             ctx.userId,
@@ -165,7 +165,7 @@ export const createCommentAction = authActionClient
         // Use createCommentReply for nested comments, createComment for top-level
         const result =
           commentData.parentCommentId ?
-            await SocialFacade.createCommentReply(
+            await SocialFacade.createCommentReplyAsync(
               {
                 content: commentData.content,
                 parentCommentId: commentData.parentCommentId,
@@ -175,7 +175,7 @@ export const createCommentAction = authActionClient
               ctx.userId,
               ctx.db,
             )
-          : await SocialFacade.createComment(
+          : await SocialFacade.createCommentAsync(
               {
                 content: commentData.content,
                 targetId: commentData.targetId,
@@ -248,7 +248,7 @@ export const updateCommentAction = authActionClient
 
     // Fetch comment details BEFORE the mutation to get targetType/targetId for slug lookup
     // Use base db connection (not transaction) to ensure we can get the slug for cache invalidation
-    const existingComment = await SocialFacade.getCommentById(updateData.commentId, ctx.userId, ctx.db);
+    const existingComment = await SocialFacade.getCommentByIdAsync(updateData.commentId, ctx.userId, ctx.db);
     const entitySlug =
       existingComment?.comment ?
         await getEntitySlugByTypeAndId(
@@ -270,7 +270,7 @@ export const updateCommentAction = authActionClient
         userId: ctx.userId,
       },
       async () => {
-        const result = await SocialFacade.updateComment(
+        const result = await SocialFacade.updateCommentAsync(
           updateData.commentId,
           updateData.content,
           ctx.userId,
@@ -322,7 +322,7 @@ export const deleteCommentAction = authActionClient
 
     // Get comment details BEFORE deletion using base db connection (not transaction)
     // This ensures we have the data needed for cache invalidation
-    const commentResult = await SocialFacade.getCommentById(deleteData.commentId, ctx.userId, ctx.db);
+    const commentResult = await SocialFacade.getCommentByIdAsync(deleteData.commentId, ctx.userId, ctx.db);
     const entitySlug =
       commentResult?.comment ?
         await getEntitySlugByTypeAndId(
@@ -344,7 +344,7 @@ export const deleteCommentAction = authActionClient
         userId: ctx.userId,
       },
       async () => {
-        const result = await SocialFacade.deleteComment(deleteData.commentId, ctx.userId, ctx.db);
+        const result = await SocialFacade.deleteCommentAsync(deleteData.commentId, ctx.userId, ctx.db);
 
         if (!result) {
           actionBreadcrumb('Comment deletion failed', { commentId: deleteData.commentId }, 'warning');
@@ -398,7 +398,7 @@ export const getCommentsAction = publicActionClient
           operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         },
         async () => {
-          const result = await SocialFacade.getCommentsWithReplies(
+          const result = await SocialFacade.getCommentsWithRepliesAsync(
             input.targetId,
             input.targetType,
             {

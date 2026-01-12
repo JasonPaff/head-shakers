@@ -40,7 +40,7 @@ export const CommentSectionAsync = async ({
   const isAuthenticated = !!currentUserId;
 
   // Fetch initial comments with nested replies for threaded display
-  const { comments, hasMore, total } = await SocialFacade.getCommentsWithReplies(
+  const { comments, hasMore, total } = await SocialFacade.getCommentsWithRepliesAsync(
     targetId,
     targetType,
     {
