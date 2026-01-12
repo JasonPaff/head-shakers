@@ -223,22 +223,6 @@ export const createCollectionAction = authActionClient
   });
 ```
 
-#### `trackCacheInvalidation()` - For Cache Operations
-
-Tracks cache invalidation and automatically logs failures as warnings (non-throwing):
-
-```typescript
-import { trackCacheInvalidation } from '@/lib/utils/sentry-server/breadcrumbs.server';
-
-// After successful mutation
-trackCacheInvalidation(CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId), {
-  entityType: 'collection',
-  entityId: newCollection.id,
-  operation: 'onCreate',
-  userId: ctx.userId,
-});
-```
-
 #### `withActionBreadcrumbs()` - For Read-Only Actions
 
 Wraps action with breadcrumbs only (no error handling, errors propagate):
