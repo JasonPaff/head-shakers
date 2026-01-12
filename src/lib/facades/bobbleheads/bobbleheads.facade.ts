@@ -1530,8 +1530,7 @@ export class BobbleheadsFacade extends BaseFacade {
               .then((results) => results.map((r) => r.slug).filter((slug) => slug !== existing.slug));
 
             // ensure new slug is unique
-            const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-            updateData.slug = uniqueSlug;
+            updateData.slug = ensureUniqueSlug(baseSlug, existingSlugs);
           }
         }
 
