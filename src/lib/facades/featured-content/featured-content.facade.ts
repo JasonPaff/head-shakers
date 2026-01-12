@@ -1,11 +1,11 @@
+import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type {
   FeaturedBobblehead,
   FeaturedCollectionData,
   FeaturedContentRecord,
   FooterFeaturedContentData,
   TrendingBobblehead,
-} from '@/lib/queries/featured-content/featured-content-query';
-import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
+} from '@/lib/queries/featured-content/featured-content.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   InsertFeaturedContent,
@@ -16,8 +16,8 @@ import type {
 import { CACHE_ENTITY_TYPE, CACHE_KEYS, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
-import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
+import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';

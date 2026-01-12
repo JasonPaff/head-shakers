@@ -4,7 +4,7 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
 import type { SelectFeaturedContent } from '@/lib/validations/system.validation';
 

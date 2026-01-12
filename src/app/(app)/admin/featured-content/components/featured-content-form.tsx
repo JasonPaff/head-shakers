@@ -6,7 +6,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content.query';
 
 import { ContentSearch } from '@/app/(app)/admin/featured-content/components/content-search';
 import { featuredContentFormOptions } from '@/app/(app)/admin/featured-content/components/featured-content-form-options';

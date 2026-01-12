@@ -5,7 +5,7 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
-import type { TrendingBobblehead } from '@/lib/queries/featured-content/featured-content-query';
+import type { TrendingBobblehead } from '@/lib/queries/featured-content/featured-content.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';

@@ -15,7 +15,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 
-import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
+import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content.query';
 
 import { createTestBobblehead } from '../../../fixtures/bobblehead.factory';
 import { createTestCollection } from '../../../fixtures/collection.factory';

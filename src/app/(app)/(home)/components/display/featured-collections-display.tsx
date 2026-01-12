@@ -6,7 +6,7 @@ import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids/types';
 
 import { Badge } from '@/components/ui/badge';

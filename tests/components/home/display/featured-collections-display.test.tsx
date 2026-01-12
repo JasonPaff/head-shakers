@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedCollectionData } from '@/lib/queries/featured-content/featured-content.query';
 
 import { FeaturedCollectionsDisplay } from '@/app/(app)/(home)/components/display/featured-collections-display';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';

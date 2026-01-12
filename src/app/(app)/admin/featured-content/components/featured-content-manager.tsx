@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content.query';
 
 import { ContentSuggestions } from '@/app/(app)/admin/featured-content/components/content-suggestions';
 import { FeaturedContentAnalytics } from '@/app/(app)/admin/featured-content/components/featured-content-analytics';

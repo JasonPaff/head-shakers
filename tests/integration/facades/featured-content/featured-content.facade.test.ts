@@ -634,7 +634,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
   describe('Error context propagation with Sentry', () => {
     it('should propagate error context when database query fails', async () => {
       // Arrange - Mock database to throw an error
-      const { FeaturedContentQuery } = await import('@/lib/queries/featured-content/featured-content-query');
+      const { FeaturedContentQuery } = await import('@/lib/queries/featured-content/featured-content.query');
       const originalMethod = FeaturedContentQuery.getFeaturedBobbleheadAsync.bind(FeaturedContentQuery);
 
       FeaturedContentQuery.getFeaturedBobbleheadAsync = vi.fn(() => {

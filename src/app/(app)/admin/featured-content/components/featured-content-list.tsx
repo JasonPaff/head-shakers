@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content.query';
 
 import { FeaturedContentListItem } from '@/app/(app)/admin/featured-content/components/featured-content-list-item';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { FeaturedBobblehead } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedBobblehead } from '@/lib/queries/featured-content/featured-content.query';
 
 import { FeaturedBobbleheadDisplay } from '@/app/(app)/(home)/components/display/featured-bobblehead-display';
 

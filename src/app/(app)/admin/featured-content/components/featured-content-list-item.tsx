@@ -3,7 +3,7 @@
 import { EditIcon, EyeIcon, EyeOffIcon, MoreHorizontalIcon, Trash2Icon, TrendingUpIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content.query';
 
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Badge } from '@/components/ui/badge';
