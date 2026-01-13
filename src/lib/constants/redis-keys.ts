@@ -6,6 +6,12 @@ export const REDIS_KEYS = {
     DAILY_VIEWS: (date: string) => `analytics:views:${date}`,
     POPULAR_SEARCHES: (date: string) => `analytics:searches:${date}`,
   },
+  AUTH: {
+    /** Admin user lookup by Clerk ID - caches user data with role for admin middleware */
+    ADMIN_USER_BY_CLERK_ID: (clerkId: string) => `auth:admin:clerk:${clerkId}`,
+    /** User lookup by Clerk ID for auth middleware - caches minimal user data (id, email, username) */
+    USER_BY_CLERK_ID: (clerkId: string) => `auth:user:clerk:${clerkId}`,
+  },
   CACHE: {
     BOBBLEHEAD: (bobbleheadId: string) => `cache:bobblehead:${bobbleheadId}`,
     COLLECTION: (collectionId: string) => `cache:collection:${collectionId}`,
@@ -64,6 +70,8 @@ export const parseRedisKey = (key: string): Array<string> => {
 
 export const REDIS_TTL = {
   ANALYTICS: 604800, // 1 week
+  /** Auth middleware user lookup cache TTL - 5 minutes to balance freshness with performance */
+  AUTH: 300, // 5 minutes
   CACHE: {
     DAILY: 86400, // 24 hours
     LONG: 3600, // 1 hour

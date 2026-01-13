@@ -13,6 +13,7 @@ import {
   isCacheEnabled,
   isCacheLoggingEnabled,
 } from '@/lib/constants/cache';
+import { REDIS_KEYS } from '@/lib/constants/redis-keys';
 import { type CacheEntityType, CacheTagGenerators, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
 import { RedisOperations } from '@/lib/utils/redis-client';
 
@@ -711,9 +712,19 @@ export class CacheRevalidationService {
   static readonly users = {
     /**
      * revalidate after user profile update
+     * If clerkId is provided, also invalidates the auth middleware Redis cache
+     *
+     * @param userId - The internal user ID
+     * @param clerkId - Optional Clerk ID to also invalidate auth Redis cache
      */
-    onProfileUpdate: (userId: string): RevalidationResult => {
+    onProfileUpdate: (userId: string, clerkId?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onUserChange(userId);
+
+      // If clerkId is provided, also invalidate auth middleware Redis cache
+      if (clerkId) {
+        void CacheRevalidationService.invalidateAuthCache(clerkId);
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityType: 'user',
         operation: 'user:profile:update',
@@ -748,6 +759,28 @@ export class CacheRevalidationService {
    */
   static getStats(): RevalidationStats {
     return { ...this.stats };
+  }
+
+  /**
+   * Invalidate auth middleware Redis cache for a specific Clerk user ID.
+   * Should be called when user data (email, username, role) changes.
+   *
+   * @param clerkId - The Clerk user ID to invalidate
+   */
+  static async invalidateAuthCache(clerkId: string): Promise<void> {
+    try {
+      const authCacheKey = REDIS_KEYS.AUTH.USER_BY_CLERK_ID(clerkId);
+      const adminCacheKey = REDIS_KEYS.AUTH.ADMIN_USER_BY_CLERK_ID(clerkId);
+
+      await Promise.all([RedisOperations.del(authCacheKey), RedisOperations.del(adminCacheKey)]);
+
+      if (isCacheLoggingEnabled()) {
+        console.info('[CacheRevalidation] Auth cache invalidated:', { clerkId });
+      }
+    } catch (error) {
+      // Log but don't throw - cache invalidation errors should not break the flow
+      console.error('[CacheRevalidation] Failed to invalidate auth cache:', error);
+    }
   }
 
   /**
