@@ -5,7 +5,6 @@ import { BobbleheadsDashboardFacade } from '@/lib/facades/bobbleheads/bobblehead
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { collectionDashboardSearchParamsCache } from '../../route-type';
-import { EditBobbleheadFormDisplay } from '../display/edit-bobblehead-form-display';
 
 export async function EditBobbleheadFormAsync() {
   const userId = await getRequiredUserIdAsync();
@@ -37,5 +36,5 @@ export async function EditBobbleheadFormAsync() {
     );
   }
 
-  return <EditBobbleheadFormDisplay bobblehead={bobblehead} collections={userCollections} />;
+  return <></>;
 }

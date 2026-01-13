@@ -4,7 +4,6 @@ import { BobbleheadsDashboardFacade } from '@/lib/facades/bobbleheads/bobblehead
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { collectionDashboardSearchParamsCache } from '../../route-type';
-import { AddBobbleheadFormDisplay } from '../display/add-bobblehead-form-display';
 
 export async function AddBobbleheadFormAsync() {
   const userId = await getRequiredUserIdAsync();
@@ -14,7 +13,5 @@ export async function AddBobbleheadFormAsync() {
 
   const currentCollection = userCollections.find((c) => c.slug === collectionSlug);
 
-  return (
-    <AddBobbleheadFormDisplay collections={userCollections} initialCollectionId={currentCollection?.id} />
-  );
+  return <></>;
 }
