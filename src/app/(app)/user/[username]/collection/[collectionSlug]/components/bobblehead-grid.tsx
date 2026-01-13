@@ -20,7 +20,9 @@ import { SearchControls } from './search-controls';
 
 const LAYOUT_VALUES = ['grid', 'gallery', 'list'] as const;
 
-type BobbleheadGridProps = BobbleheadGridPropsFromTypes & ComponentProps<'div'> & ComponentTestIdProps;
+type BobbleheadGridProps = BobbleheadGridPropsFromTypes &
+  ComponentProps<'div'> &
+  ComponentTestIdProps & { initialSearch?: string };
 
 /**
  * BobbleheadGrid component with 3 layout variations:
@@ -34,6 +36,7 @@ export const BobbleheadGrid = ({
   bobbleheads,
   className,
   collectionSlug,
+  initialSearch,
   ownerUsername,
   testId,
   ...props
@@ -63,7 +66,7 @@ export const BobbleheadGrid = ({
   return (
     <div className={cn(className)} data-slot={'bobblehead-grid'} data-testid={gridTestId} {...props}>
       {/* Search and Sort Controls */}
-      <SearchControls className={'mb-6'} testId={`${gridTestId}-controls`} />
+      <SearchControls className={'mb-6'} initialSearch={initialSearch} testId={`${gridTestId}-controls`} />
 
       {/* Results Count */}
       <p className={'mb-4 text-sm text-muted-foreground'} data-slot={'bobblehead-grid-count'}>

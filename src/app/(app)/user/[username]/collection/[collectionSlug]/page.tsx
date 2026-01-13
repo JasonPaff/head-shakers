@@ -11,6 +11,7 @@
  * - Suspense streaming for progressive loading
  * - Type-safe routing with next-typesafe-url
  */
+import 'server-only';
 import type { Metadata } from 'next';
 
 import { $path } from 'next-typesafe-url';
@@ -176,22 +177,23 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
       {/* Page Content */}
       <div className={'container mx-auto max-w-7xl px-4 py-8'}>
         {/* Header Section with Suspense */}
-        <Suspense fallback={<CollectionHeaderSkeleton />}>
-          <CollectionHeaderAsync collectionId={collectionId} userId={user.id} />
-        </Suspense>
+        <ErrorBoundary name={'collection-header'}>
+          <Suspense fallback={<CollectionHeaderSkeleton />}>
+            <CollectionHeaderAsync collectionId={collectionId} userId={user.id} />
+          </Suspense>
+        </ErrorBoundary>
 
         {/* Bobbleheads Grid with Suspense */}
-        <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
-          <CollectionBobbleheadsAsync
-            collectionId={collectionId}
-            collectionSlug={collectionSlug}
-            ownerUsername={username}
-            searchParams={{
-              search: resolvedSearchParams.search,
-              sortBy: resolvedSearchParams.sort,
-            }}
-          />
-        </Suspense>
+        <ErrorBoundary name={'collection-bobbleheads'}>
+          <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
+            <CollectionBobbleheadsAsync
+              collectionId={collectionId}
+              collectionSlug={collectionSlug}
+              ownerUsername={username}
+              searchParams={resolvedSearchParams}
+            />
+          </Suspense>
+        </ErrorBoundary>
 
         {/* Comments Section */}
         <div className={'mt-8'}>

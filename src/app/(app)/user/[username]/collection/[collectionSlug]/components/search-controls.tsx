@@ -28,17 +28,17 @@ const sortOptions: Array<{ label: string; value: SortOption }> = [
   { label: 'Name Z-A', value: 'name_desc' },
 ];
 
-type SearchControlsProps = ComponentProps<'div'> & ComponentTestIdProps;
+type SearchControlsProps = ComponentProps<'div'> & ComponentTestIdProps & { initialSearch?: string };
 
-export const SearchControls = ({ className, testId, ...props }: SearchControlsProps) => {
-  const [searchInput, setSearchInput] = useState('');
+export const SearchControls = ({ className, initialSearch, testId, ...props }: SearchControlsProps) => {
+  const [searchInput, setSearchInput] = useState(initialSearch ?? '');
 
   const [isPending, startTransition] = useTransition();
   const [debouncedSearchInput] = useDebounce(searchInput, CONFIG.SEARCH.DEBOUNCE_MS);
 
   const [{ search, sort }, setParams] = useQueryStates(
     {
-      search: parseAsString.withDefault(''),
+      search: parseAsString.withDefault(initialSearch ?? ''),
       sort: parseAsStringEnum([...SORT_VALUES]).withDefault('newest'),
     },
     {

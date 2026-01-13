@@ -1,5 +1,7 @@
 import 'server-only';
 
+import type { CollectionSearchParams } from '@/app/(app)/user/[username]/collection/[collectionSlug]/route-type';
+
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
@@ -11,12 +13,7 @@ interface CollectionBobbleheadsAsyncProps {
   collectionId: string;
   collectionSlug: string;
   ownerUsername: string;
-  searchParams?: SearchParams;
-}
-
-interface SearchParams {
-  search?: string;
-  sortBy?: string;
+  searchParams?: CollectionSearchParams;
 }
 
 /**
@@ -37,7 +34,7 @@ export const CollectionBobbleheadsAsync = async ({
     currentUserId || undefined,
     {
       searchTerm: searchParams?.search,
-      sortBy: searchParams?.sortBy,
+      sortBy: searchParams?.sort,
     },
   );
 
@@ -68,6 +65,7 @@ export const CollectionBobbleheadsAsync = async ({
     <BobbleheadGrid
       bobbleheads={bobbleheadData}
       collectionSlug={collectionSlug}
+      initialSearch={searchParams?.search}
       ownerUsername={ownerUsername}
     />
   );
