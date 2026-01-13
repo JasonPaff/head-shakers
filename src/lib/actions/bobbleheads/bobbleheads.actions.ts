@@ -190,11 +190,11 @@ export const updateBobbleheadWithPhotosAction = authActionClient
           if (tags && tags.length > 0) {
             try {
               // remove existing tags and add new ones
-              await TagsFacade.removeAllFromBobblehead(updatedBobblehead.id, userId);
+              await TagsFacade.removeAllFromBobbleheadAsync(updatedBobblehead.id, userId);
 
               // create or get existing tags for the user
               const tagPromises = tags.map(async (tagName) => {
-                const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
+                const existingTag = await TagsFacade.getOrCreateByNameAsync(tagName, userId, ctx.db);
                 return existingTag;
               });
 
@@ -203,7 +203,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
 
               // attach tags to the bobblehead
               if (tagIds.length > 0) {
-                await TagsFacade.attachToBobblehead(updatedBobblehead.id, tagIds, userId, ctx.db);
+                await TagsFacade.attachToBobbleheadAsync(updatedBobblehead.id, tagIds, userId, ctx.db);
                 updatedTags = tagRecords.filter(Boolean);
               }
             } catch (tagError) {

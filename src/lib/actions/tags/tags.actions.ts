@@ -53,7 +53,7 @@ export const createTagAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, tagData);
 
     try {
-      const newTag = await TagsFacade.createTag(tagData, userId, ctx.db);
+      const newTag = await TagsFacade.createTagAsync(tagData, userId, ctx.db);
 
       if (!newTag) {
         throw new ActionError(
@@ -104,7 +104,7 @@ export const updateTagAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagId, ...updateData });
 
     try {
-      const updatedTag = await TagsFacade.updateTag(tagId, updateData, userId, ctx.db);
+      const updatedTag = await TagsFacade.updateTagAsync(tagId, updateData, userId, ctx.db);
 
       if (!updatedTag) {
         throw new ActionError(
@@ -155,7 +155,7 @@ export const deleteTagAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagId });
 
     try {
-      const deleted = await TagsFacade.deleteTag(tagId, userId, ctx.db);
+      const deleted = await TagsFacade.deleteTagAsync(tagId, userId, ctx.db);
 
       if (!deleted) {
         throw new ActionError(
@@ -215,7 +215,7 @@ export const attachTagsAction = authActionClient
       Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagIds });
 
       try {
-        const validation = await TagsFacade.validateTagsForBobblehead(
+        const validation = await TagsFacade.validateTagsForBobbleheadAsync(
           bobbleheadId,
           tagIds,
           userId,
@@ -233,7 +233,7 @@ export const attachTagsAction = authActionClient
           );
         }
 
-        const success = await TagsFacade.attachToBobblehead(bobbleheadId, tagIds, userId, dbInstance);
+        const success = await TagsFacade.attachToBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
 
         if (!success) {
           throw new ActionError(
@@ -294,7 +294,7 @@ export const detachTagsAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagIds });
 
     try {
-      const success = await TagsFacade.detachFromBobblehead(bobbleheadId, tagIds, userId, dbInstance);
+      const success = await TagsFacade.detachFromBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
 
       if (!success) {
         throw new ActionError(
@@ -352,7 +352,7 @@ export const getTagSuggestionsAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.SEARCH_DATA, { query });
 
     try {
-      const suggestions = await TagsFacade.getSuggestionsForUser(query, userId);
+      const suggestions = await TagsFacade.getSuggestionsForUserAsync(query, userId);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -398,7 +398,7 @@ export const bulkDeleteTagsAction = authActionClient
       Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { count: tagIds.length, tagIds });
 
       try {
-        const result = await TagsFacade.bulkDelete(tagIds, userId, ctx.db);
+        const result = await TagsFacade.bulkDeleteAsync(tagIds, userId, ctx.db);
 
         Sentry.addBreadcrumb({
           category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
