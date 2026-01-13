@@ -15,6 +15,7 @@ export type BatchUpdateBobbleheadFeature = z.infer<typeof batchUpdateBobbleheadF
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
 export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
+export type GetBobbleheadPhotos = z.infer<typeof getBobbleheadPhotosSchema>;
 export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
 export type InsertBobbleheadPhoto = z.infer<typeof insertBobbleheadPhotoSchema>;
 export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
@@ -148,6 +149,10 @@ export const updateBobbleheadWithPhotosSchema = updateBobbleheadSchema.extend({
 
 export const getBobbleheadByIdSchema = z.object({
   id: z.uuid(),
+});
+
+export const getBobbleheadPhotosSchema = z.object({
+  bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
 });
 
 export const getBobbleheadBySlugSchema = z.object({

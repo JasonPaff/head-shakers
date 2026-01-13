@@ -29,7 +29,7 @@ export const createCollectionAction = authActionClient
     return withActionErrorHandling(
       {
         actionName: ACTION_NAMES.COLLECTIONS.CREATE,
-        contextData: { parsedInput },
+        contextData: { name: collectionData.name },
         contextType: SENTRY_CONTEXTS.COLLECTION_DATA,
         input: parsedInput,
         operation: OPERATIONS.COLLECTIONS.CREATE,
@@ -64,6 +64,15 @@ export const createCollectionAction = authActionClient
 
         return actionSuccess(createdCollection, 'Collection created successfully!');
       },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ?
+            {
+              collectionId: result.data?.id,
+              collectionSlug: result.data?.slug,
+            }
+          : {},
+      },
     );
   });
 
@@ -79,7 +88,7 @@ export const updateCollectionAction = authActionClient
     return withActionErrorHandling(
       {
         actionName: ACTION_NAMES.COLLECTIONS.UPDATE,
-        contextData: { parsedInput },
+        contextData: { collectionId: collectionData.collectionId, name: collectionData.name },
         contextType: SENTRY_CONTEXTS.COLLECTION_DATA,
         input: parsedInput,
         operation: OPERATIONS.COLLECTIONS.UPDATE,
@@ -112,6 +121,15 @@ export const updateCollectionAction = authActionClient
 
         return actionSuccess(updatedCollection, 'Collection updated successfully!');
       },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ?
+            {
+              collectionId: result.data?.id,
+              collectionSlug: result.data?.slug,
+            }
+          : {},
+      },
     );
   });
 
@@ -127,7 +145,7 @@ export const deleteCollectionAction = authActionClient
     return withActionErrorHandling(
       {
         actionName: ACTION_NAMES.COLLECTIONS.DELETE,
-        contextData: { parsedInput },
+        contextData: { collectionId: collectionData.collectionId },
         contextType: SENTRY_CONTEXTS.COLLECTION_DATA,
         input: parsedInput,
         operation: OPERATIONS.COLLECTIONS.DELETE,
@@ -137,14 +155,23 @@ export const deleteCollectionAction = authActionClient
         const deletedCollection = await CollectionsFacade.deleteAsync(collectionData, ctx.userId, ctx.db);
 
         if (!deletedCollection) {
-          throw createInternalError(ERROR_MESSAGES.COLLECTION.DELETE_FAILED, {
+          throw createNotFoundError(ERROR_MESSAGES.COLLECTION.NOT_FOUND, collectionData.collectionId, {
             ctx,
-            errorCode: ERROR_CODES.COLLECTIONS.DELETE_FAILED,
+            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
             operation: OPERATIONS.COLLECTIONS.DELETE,
           });
         }
 
         return actionSuccess(deletedCollection, 'Collection deleted successfully!');
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ?
+            {
+              collectionId: result.data?.id,
+              collectionSlug: result.data?.slug,
+            }
+          : {},
       },
     );
   });

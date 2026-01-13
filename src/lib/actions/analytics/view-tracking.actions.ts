@@ -1,26 +1,20 @@
 'use server';
 
 import 'server-only';
-import * as Sentry from '@sentry/nextjs';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
-import {
-  ACTION_NAMES,
-  ERROR_CODES,
-  ERROR_MESSAGES,
-  OPERATIONS,
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_CONTEXTS,
-  SENTRY_LEVELS,
-} from '@/lib/constants';
+import { ACTION_NAMES, ERROR_MESSAGES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { AnalyticsFacade } from '@/lib/facades/analytics/analytics.facade';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
-import { handleActionError } from '@/lib/utils/action-error-handler';
-import { actionSuccess } from '@/lib/utils/action-response';
-import { ActionError, ErrorType } from '@/lib/utils/errors';
+import { actionFailure, actionSuccess } from '@/lib/utils/action-response';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import {
+  trackCacheInvalidation,
+  withActionBreadcrumbs,
+  withActionErrorHandling,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
   aggregateViewsSchema,
   batchRecordViewsSchema,
@@ -35,6 +29,7 @@ import {
 export const recordViewAction = publicActionClient
   .metadata({
     actionName: ACTION_NAMES.ANALYTICS.TRACK_VIEW,
+    isTransactionRequired: true,
   })
   .inputSchema(recordViewSchema)
   .action(
@@ -48,7 +43,7 @@ export const recordViewAction = publicActionClient
         viewId: string;
       }>
     > => {
-      const viewData = recordViewSchema.parse(ctx.sanitizedInput || parsedInput);
+      const viewData = recordViewSchema.parse(ctx.sanitizedInput);
 
       // convert Clerk ID to internal UUID if needed
       let resolvedViewerId: null | string = null;
@@ -68,70 +63,67 @@ export const recordViewAction = publicActionClient
         viewerId: resolvedViewerId ?? undefined,
       };
 
-      Sentry.setContext(SENTRY_CONTEXTS.VIEW_DATA, {
-        ipAddress: processedViewData.ipAddress,
-        sessionId: processedViewData.sessionId,
-        targetId: processedViewData.targetId,
-        targetType: processedViewData.targetType,
-        viewerId: processedViewData.viewerId,
-      });
-
-      try {
-        const result = await AnalyticsFacade.recordViewAsync(processedViewData, {
-          deduplicationWindow: 600,
-          shouldRespectPrivacySettings: true,
-        });
-
-        if (!result.isSuccessful) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.ANALYTICS.VIEW_RECORD_FAILED,
-            ERROR_MESSAGES.ANALYTICS.VIEW_RECORD_FAILED,
-            { ctx, operation: OPERATIONS.ANALYTICS.RECORD_VIEW },
-            true,
-            400,
-          );
-        }
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            isDuplicate: result.isDuplicate,
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.ANALYTICS.TRACK_VIEW,
+          contextData: {
+            ipAddress: processedViewData.ipAddress,
+            sessionId: processedViewData.sessionId,
             targetId: processedViewData.targetId,
             targetType: processedViewData.targetType,
             viewerId: processedViewData.viewerId,
-            viewId: result.viewId,
           },
-          level: SENTRY_LEVELS.INFO,
-          message: `View recorded for ${processedViewData.targetType} ${processedViewData.targetId}${result.isDuplicate ? ' (duplicate)' : ''}`,
-        });
-
-        if (processedViewData.targetType === 'bobblehead' || processedViewData.targetType === 'collection') {
-          CacheRevalidationService.analytics.onViewRecord(
-            processedViewData.targetType,
-            processedViewData.targetId,
-            processedViewData.viewerId ?? undefined,
-          );
-        }
-
-        return actionSuccess(
-          {
-            isDuplicate: result.isDuplicate,
-            totalViews: result.totalViews,
-            viewId: result.viewId,
-          },
-          result.isDuplicate ? 'View already recorded recently' : 'View recorded successfully',
-        );
-      } catch (error) {
-        return handleActionError(error, {
+          contextType: SENTRY_CONTEXTS.VIEW_DATA,
           input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.ANALYTICS.TRACK_VIEW,
-          },
           operation: OPERATIONS.ANALYTICS.RECORD_VIEW,
-          userId: processedViewData.viewerId ?? undefined,
-        });
-      }
+          userId: processedViewData.viewerId,
+        },
+        async () => {
+          const result = await AnalyticsFacade.recordViewAsync(processedViewData, {
+            deduplicationWindow: 600,
+            shouldRespectPrivacySettings: true,
+          });
+
+          if (!result.isSuccessful) {
+            return actionFailure(ERROR_MESSAGES.ANALYTICS.VIEW_RECORD_FAILED);
+          }
+
+          if (
+            processedViewData.targetType === 'bobblehead' ||
+            processedViewData.targetType === 'collection'
+          ) {
+            const cacheResult = CacheRevalidationService.analytics.onViewRecord(
+              processedViewData.targetType,
+              processedViewData.targetId,
+              processedViewData.viewerId ?? undefined,
+            );
+            trackCacheInvalidation(
+              {
+                entityId: processedViewData.targetId,
+                entityType: processedViewData.targetType,
+                operation: 'view-record',
+                userId: processedViewData.viewerId,
+              },
+              cacheResult,
+            );
+          }
+
+          return actionSuccess(
+            {
+              isDuplicate: result.isDuplicate,
+              totalViews: result.totalViews,
+              viewId: result.viewId,
+            },
+            result.isDuplicate ? 'View already recorded recently' : 'View recorded successfully',
+          );
+        },
+        {
+          includeResultSummary: (r) =>
+            r.wasSuccess ?
+              { isDuplicate: r.data.isDuplicate, targetId: processedViewData.targetId, viewId: r.data.viewId }
+            : {},
+        },
+      );
     },
   );
 
@@ -156,63 +148,53 @@ export const batchRecordViewsAction = authActionClient
         totalRequested: number;
       }>
     > => {
-      const batchData = batchRecordViewsSchema.parse(ctx.sanitizedInput || parsedInput);
+      const batchData = batchRecordViewsSchema.parse(ctx.sanitizedInput);
 
-      Sentry.setContext(SENTRY_CONTEXTS.BATCH_VIEW_DATA, {
-        batchId: batchData.batchId,
-        userId: ctx.userId,
-        viewCount: batchData.views.length,
-      });
-
-      try {
-        const result = await AnalyticsFacade.batchRecordViewsAsync(batchData.views, {
-          batchId: batchData.batchId,
-          deduplicationWindow: 600,
-          shouldRespectPrivacySettings: true,
-        });
-
-        if (!result.isSuccessful) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.ANALYTICS.BATCH_VIEW_RECORD_FAILED,
-            ERROR_MESSAGES.ANALYTICS.BATCH_VIEW_RECORD_FAILED,
-            { ctx, operation: OPERATIONS.ANALYTICS.BATCH_RECORD_VIEWS },
-            true,
-            400,
-          );
-        }
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.ANALYTICS.BATCH_RECORD_VIEWS,
+          contextData: {
             batchId: batchData.batchId,
-            duplicateViews: result.duplicateViews,
-            recordedViews: result.recordedViews,
-            requestedViews: batchData.views.length,
+            userId: ctx.userId,
+            viewCount: batchData.views.length,
           },
-          level: SENTRY_LEVELS.INFO,
-          message: `Batch recorded ${result.recordedViews}/${batchData.views.length} views`,
-        });
-
-        return actionSuccess(
-          {
-            batchId: result.batchId,
-            duplicateViews: result.duplicateViews,
-            recordedViews: result.recordedViews,
-            totalRequested: batchData.views.length,
-          },
-          `Successfully recorded ${result.recordedViews} views`,
-        );
-      } catch (error) {
-        return handleActionError(error, {
+          contextType: SENTRY_CONTEXTS.BATCH_VIEW_DATA,
           input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.ANALYTICS.BATCH_RECORD_VIEWS,
-          },
           operation: OPERATIONS.ANALYTICS.BATCH_RECORD_VIEWS,
           userId: ctx.userId,
-        });
-      }
+        },
+        async () => {
+          const result = await AnalyticsFacade.batchRecordViewsAsync(batchData.views, {
+            batchId: batchData.batchId,
+            deduplicationWindow: 600,
+            shouldRespectPrivacySettings: true,
+          });
+
+          if (!result.isSuccessful) {
+            return actionFailure(ERROR_MESSAGES.ANALYTICS.BATCH_VIEW_RECORD_FAILED);
+          }
+
+          return actionSuccess(
+            {
+              batchId: result.batchId,
+              duplicateViews: result.duplicateViews,
+              recordedViews: result.recordedViews,
+              totalRequested: batchData.views.length,
+            },
+            `Successfully recorded ${result.recordedViews} views`,
+          );
+        },
+        {
+          includeResultSummary: (r) =>
+            r.wasSuccess ?
+              {
+                batchId: r.data.batchId,
+                duplicateViews: r.data.duplicateViews,
+                recordedViews: r.data.recordedViews,
+              }
+            : {},
+        },
+      );
     },
   );
 
@@ -227,7 +209,6 @@ export const getViewStatsAction = publicActionClient
   .action(
     async ({
       ctx,
-      parsedInput,
     }): Promise<
       ActionResponse<{
         averageViewDuration?: number;
@@ -237,22 +218,22 @@ export const getViewStatsAction = publicActionClient
     > => {
       const statsData = viewStatsSchema.parse(ctx.sanitizedInput);
 
-      try {
-        const result = await AnalyticsFacade.getViewStatsAsync(statsData.targetId, statsData.targetType, {
-          shouldIncludeAnonymous: statsData.includeAnonymous,
-          timeframe: statsData.timeframe,
-        });
-
-        return actionSuccess(result);
-      } catch (error) {
-        return handleActionError(error, {
-          input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.ANALYTICS.GET_VIEW_STATS,
-          },
+      return withActionBreadcrumbs(
+        {
+          actionName: ACTION_NAMES.ANALYTICS.GET_VIEW_STATS,
+          contextData: { targetId: statsData.targetId, targetType: statsData.targetType },
+          contextType: SENTRY_CONTEXTS.VIEW_DATA,
           operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,
-        });
-      }
+        },
+        async () => {
+          const result = await AnalyticsFacade.getViewStatsAsync(statsData.targetId, statsData.targetType, {
+            shouldIncludeAnonymous: statsData.includeAnonymous,
+            timeframe: statsData.timeframe,
+          });
+
+          return actionSuccess(result);
+        },
+      );
     },
   );
 
@@ -267,7 +248,6 @@ export const getTrendingContentAction = publicActionClient
   .action(
     async ({
       ctx,
-      parsedInput,
     }): Promise<
       ActionResponse<
         Array<{
@@ -280,25 +260,25 @@ export const getTrendingContentAction = publicActionClient
         }>
       >
     > => {
-      const trendingData = trendingContentSchema.parse(ctx.sanitizedInput || parsedInput);
+      const trendingData = trendingContentSchema.parse(ctx.sanitizedInput);
 
-      try {
-        const result = await AnalyticsFacade.getTrendingContentAsync(trendingData.targetType, {
-          isIncludingAnonymous: trendingData.includeAnonymous,
-          limit: trendingData.limit,
-          timeframe: trendingData.timeframe,
-        });
-
-        return actionSuccess(result);
-      } catch (error) {
-        return handleActionError(error, {
-          input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.ANALYTICS.GET_TRENDING_CONTENT,
-          },
+      return withActionBreadcrumbs(
+        {
+          actionName: ACTION_NAMES.ANALYTICS.GET_TRENDING_CONTENT,
+          contextData: { limit: trendingData.limit, targetType: trendingData.targetType },
+          contextType: SENTRY_CONTEXTS.VIEW_DATA,
           operation: OPERATIONS.ANALYTICS.GET_TRENDING_CONTENT,
-        });
-      }
+        },
+        async () => {
+          const result = await AnalyticsFacade.getTrendingContentAsync(trendingData.targetType, {
+            isIncludingAnonymous: trendingData.includeAnonymous,
+            limit: trendingData.limit,
+            timeframe: trendingData.timeframe,
+          });
+
+          return actionSuccess(result);
+        },
+      );
     },
   );
 
@@ -323,73 +303,72 @@ export const aggregateViewsAction = authActionClient
         totalTargets: number;
       }>
     > => {
-      const aggregateData = aggregateViewsSchema.parse(ctx.sanitizedInput || parsedInput);
+      const aggregateData = aggregateViewsSchema.parse(ctx.sanitizedInput);
 
-      Sentry.setContext(SENTRY_CONTEXTS.AGGREGATE_DATA, {
-        force: aggregateData.force,
-        targetCount: aggregateData.targetIds.length,
-        targetType: aggregateData.targetType,
-        userId: ctx.userId,
-      });
-
-      try {
-        const result = await AnalyticsFacade.aggregateViewsAsync(
-          aggregateData.targetIds,
-          aggregateData.targetType,
-          {
-            batchSize: 100,
-            isForced: aggregateData.force,
-          },
-        );
-
-        if (!result.isSuccessful) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.ANALYTICS.VIEW_AGGREGATION_FAILED,
-            ERROR_MESSAGES.ANALYTICS.VIEW_AGGREGATION_FAILED,
-            { ctx, operation: OPERATIONS.ANALYTICS.AGGREGATE_VIEWS },
-            true,
-            500,
-          );
-        }
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            errors: result.errors,
-            processedTargets: result.processedTargets,
-            requestedTargets: aggregateData.targetIds.length,
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.ANALYTICS.AGGREGATE_VIEWS,
+          contextData: {
+            force: aggregateData.force,
+            targetCount: aggregateData.targetIds.length,
             targetType: aggregateData.targetType,
+            userId: ctx.userId,
           },
-          level: SENTRY_LEVELS.INFO,
-          message: `Aggregated views for ${result.processedTargets}/${aggregateData.targetIds.length} targets`,
-        });
-
-        if (aggregateData.targetType === 'bobblehead' || aggregateData.targetType === 'collection') {
-          CacheRevalidationService.analytics.onViewAggregation(
-            aggregateData.targetType,
-            result.processedTargets,
-          );
-        }
-
-        return actionSuccess(
-          {
-            duration: result.duration,
-            errors: result.errors,
-            processedTargets: result.processedTargets,
-            totalTargets: aggregateData.targetIds.length,
-          },
-          `Successfully aggregated views for ${result.processedTargets} items`,
-        );
-      } catch (error) {
-        return handleActionError(error, {
+          contextType: SENTRY_CONTEXTS.AGGREGATE_DATA,
           input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.ANALYTICS.AGGREGATE_VIEWS,
-          },
           operation: OPERATIONS.ANALYTICS.AGGREGATE_VIEWS,
           userId: ctx.userId,
-        });
-      }
+        },
+        async () => {
+          const result = await AnalyticsFacade.aggregateViewsAsync(
+            aggregateData.targetIds,
+            aggregateData.targetType,
+            {
+              batchSize: 100,
+              isForced: aggregateData.force,
+            },
+          );
+
+          if (!result.isSuccessful) {
+            return actionFailure(ERROR_MESSAGES.ANALYTICS.VIEW_AGGREGATION_FAILED);
+          }
+
+          if (aggregateData.targetType === 'bobblehead' || aggregateData.targetType === 'collection') {
+            const cacheResult = CacheRevalidationService.analytics.onViewAggregation(
+              aggregateData.targetType,
+              result.processedTargets,
+            );
+            trackCacheInvalidation(
+              {
+                entityId: aggregateData.targetIds.join(','),
+                entityType: aggregateData.targetType,
+                operation: 'view-aggregation',
+                userId: ctx.userId,
+              },
+              cacheResult,
+            );
+          }
+
+          return actionSuccess(
+            {
+              duration: result.duration,
+              errors: result.errors,
+              processedTargets: result.processedTargets,
+              totalTargets: aggregateData.targetIds.length,
+            },
+            `Successfully aggregated views for ${result.processedTargets} items`,
+          );
+        },
+        {
+          includeResultSummary: (r) =>
+            r.wasSuccess ?
+              {
+                duration: r.data.duration,
+                processedTargets: r.data.processedTargets,
+                totalTargets: r.data.totalTargets,
+              }
+            : {},
+        },
+      );
     },
   );
