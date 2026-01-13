@@ -118,6 +118,18 @@ vi.mock('@/lib/utils/redis-client', () => ({
     keys: vi.fn().mockResolvedValue([]),
     set: vi.fn(),
   })),
+  RedisOperations: {
+    del: vi.fn().mockResolvedValue(true),
+    delByPattern: vi.fn().mockResolvedValue(0),
+    exists: vi.fn().mockResolvedValue(false),
+    expire: vi.fn().mockResolvedValue(true),
+    get: vi.fn().mockResolvedValue(null),
+    hgetall: vi.fn().mockResolvedValue(null),
+    hincrby: vi.fn().mockResolvedValue(null),
+    hset: vi.fn().mockResolvedValue(true),
+    incr: vi.fn().mockResolvedValue(null),
+    set: vi.fn().mockResolvedValue(true),
+  },
   redis: {
     del: vi.fn(),
     get: vi.fn(),

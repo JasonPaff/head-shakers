@@ -2,6 +2,7 @@
 
 import 'server-only';
 
+import type { BobbleheadRecord } from '@/lib/queries/bobbleheads/bobbleheads.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
 
 import {
@@ -88,7 +89,7 @@ export const deleteBobbleheadAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteBobbleheadSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<null>> => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BobbleheadRecord | null>> => {
     const bobbleheadData = deleteBobbleheadSchema.parse(ctx.sanitizedInput);
 
     return withActionErrorHandling(
@@ -110,7 +111,7 @@ export const deleteBobbleheadAction = authActionClient
           });
         }
 
-        return actionSuccess(null, 'Bobblehead deleted successfully!');
+        return actionSuccess(deletedBobblehead, 'Bobblehead deleted successfully!');
       },
       {
         includeResultSummary: () => ({

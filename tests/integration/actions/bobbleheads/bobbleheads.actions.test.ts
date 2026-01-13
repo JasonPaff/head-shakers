@@ -129,6 +129,18 @@ vi.mock('@/lib/utils/redis-client', () => ({
     }),
     set: vi.fn(),
   },
+  RedisOperations: {
+    del: vi.fn().mockResolvedValue(true),
+    delByPattern: vi.fn().mockResolvedValue(0),
+    exists: vi.fn().mockResolvedValue(false),
+    expire: vi.fn().mockResolvedValue(true),
+    get: vi.fn().mockResolvedValue(null),
+    hgetall: vi.fn().mockResolvedValue(null),
+    hincrby: vi.fn().mockResolvedValue(null),
+    hset: vi.fn().mockResolvedValue(true),
+    incr: vi.fn().mockResolvedValue(null),
+    set: vi.fn().mockResolvedValue(true),
+  },
 }));
 
 // Mock tags facade
@@ -205,8 +217,9 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
 
-      // Verify success response structure
-      expect(result.data?.data).toBeNull();
+      // Verify success response structure - action returns the deleted bobblehead
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.id).toBe(bobblehead!.id);
     });
 
     it('should soft-delete (set deletedAt) rather than hard delete', async () => {
@@ -241,7 +254,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       expect(deletedBobblehead?.deletedAt !== undefined || allBobbleheads.length === 0).toBe(true);
     });
 
-    it('should return success response with null data', async () => {
+    it('should return success response with deleted bobblehead data', async () => {
       const collection = await createTestCollection({
         name: 'Test Collection',
         userId: testUser!.id,
@@ -259,9 +272,11 @@ describe('Bobblehead Actions Integration Tests', () => {
 
       const result = await deleteBobbleheadAction(input);
 
-      // Verify the response returns null data on success
+      // Verify the response returns the deleted bobblehead on success
       expect(result?.data?.wasSuccess).toBe(true);
-      expect(result.data?.data).toBeNull();
+      expect(result.data?.data).toBeDefined();
+      expect(result.data?.data?.id).toBe(bobblehead!.id);
+      expect(result.data?.data?.name).toBe('Test Bobblehead');
     });
 
     it('should return error when bobblehead not found', async () => {
