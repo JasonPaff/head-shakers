@@ -1,18 +1,18 @@
 'use server';
 
 import 'server-only';
-import * as Sentry from '@sentry/nextjs';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
-import { ACTION_NAMES, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { ACTION_NAMES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { LaunchNotificationFacade } from '@/lib/facades/launch-notifications/launch-notification.facade';
-import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
+import { withActionBreadcrumbs, withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 /**
- * get launch notification statistics (admin only)
+ * Get launch notification statistics (admin only).
+ * Fetches total, notified, and unnotified counts for the waitlist.
  */
 export const getLaunchNotificationStatsAction = adminActionClient
   .metadata({
@@ -23,67 +23,74 @@ export const getLaunchNotificationStatsAction = adminActionClient
     async ({
       ctx,
     }): Promise<ActionResponse<{ notifiedCount: number; totalCount: number; unnotifiedCount: number }>> => {
-      try {
-        const stats = await LaunchNotificationFacade.getStatisticsAsync(ctx.db);
+      return withActionBreadcrumbs(
+        {
+          actionName: ACTION_NAMES.ADMIN.GET_LAUNCH_NOTIFICATION_STATS,
+          operation: OPERATIONS.LAUNCH_NOTIFICATIONS.GET_STATISTICS,
+        },
+        async () => {
+          const stats = await LaunchNotificationFacade.getStatisticsAsync(ctx.db);
 
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            notifiedCount: stats.notifiedCount,
-            totalCount: stats.totalCount,
-            unnotifiedCount: stats.unnotifiedCount,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: 'Fetched launch notification statistics',
-        });
-
-        return actionSuccess(stats);
-      } catch (error) {
-        return handleActionError(error, {
-          metadata: { actionName: ACTION_NAMES.ADMIN.GET_LAUNCH_NOTIFICATION_STATS },
-          operation: OPERATIONS.ADMIN.GET_REPORTS_STATS,
-          userId: ctx.userId,
-        });
-      }
+          return actionSuccess(stats, 'Launch notification statistics retrieved successfully.');
+        },
+        {
+          includeResultSummary: (result) =>
+            result.wasSuccess ?
+              {
+                notifiedCount: result.data?.notifiedCount,
+                totalCount: result.data?.totalCount,
+                unnotifiedCount: result.data?.unnotifiedCount,
+              }
+            : {},
+        },
+      );
     },
   );
 
 /**
- * send launch notification emails to all unnotified subscribers (admin only)
+ * Send launch notification emails to all unnotified subscribers (admin only).
+ * Sends batch emails and marks them as notified in the database.
  */
 export const sendLaunchNotificationsAction = adminActionClient
   .metadata({
     actionName: ACTION_NAMES.ADMIN.SEND_LAUNCH_NOTIFICATIONS,
-    isTransactionRequired: false,
+    isTransactionRequired: true,
   })
   .action(
     async ({
       ctx,
     }): Promise<ActionResponse<{ failedCount: number; failedEmails: Array<string>; sentCount: number }>> => {
-      try {
-        const result = await LaunchNotificationFacade.sendLaunchNotificationsAsync(ctx.db);
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            failedCount: result.failedEmails.length,
-            sentCount: result.sentCount,
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.ADMIN.SEND_LAUNCH_NOTIFICATIONS,
+          contextData: {
+            userId: ctx.userId,
           },
-          level: SENTRY_LEVELS.INFO,
-          message: `Sent launch notification emails to ${result.sentCount} subscribers`,
-        });
-
-        return actionSuccess({
-          failedCount: result.failedEmails.length,
-          failedEmails: result.failedEmails,
-          sentCount: result.sentCount,
-        });
-      } catch (error) {
-        return handleActionError(error, {
-          metadata: { actionName: ACTION_NAMES.ADMIN.SEND_LAUNCH_NOTIFICATIONS },
-          operation: OPERATIONS.ADMIN.UPDATE_FEATURED_CONTENT,
+          contextType: SENTRY_CONTEXTS.LAUNCH_NOTIFICATION_DATA,
+          operation: OPERATIONS.LAUNCH_NOTIFICATIONS.SEND_NOTIFICATIONS,
           userId: ctx.userId,
-        });
-      }
+        },
+        async () => {
+          const result = await LaunchNotificationFacade.sendLaunchNotificationsAsync(ctx.db);
+
+          return actionSuccess(
+            {
+              failedCount: result.failedEmails.length,
+              failedEmails: result.failedEmails,
+              sentCount: result.sentCount,
+            },
+            `Successfully sent ${result.sentCount} launch notification emails.`,
+          );
+        },
+        {
+          includeResultSummary: (result) =>
+            result.wasSuccess ?
+              {
+                failedCount: result.data?.failedCount,
+                sentCount: result.data?.sentCount,
+              }
+            : {},
+        },
+      );
     },
   );

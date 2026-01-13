@@ -1,7 +1,6 @@
 'use server';
 
 import 'server-only';
-import * as Sentry from '@sentry/nextjs';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
@@ -11,16 +10,18 @@ import {
   ERROR_MESSAGES,
   OPERATIONS,
   REDIS_KEYS,
-  SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
-  SENTRY_LEVELS,
 } from '@/lib/constants';
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { handleActionError } from '@/lib/utils/action-error-handler';
-import { actionSuccess } from '@/lib/utils/action-response';
-import { ActionError, ErrorType } from '@/lib/utils/errors';
+import { actionFailure, actionSuccess } from '@/lib/utils/action-response';
+import { createBusinessRuleError, createNotFoundError } from '@/lib/utils/error-builders';
 import { authActionClient } from '@/lib/utils/next-safe-action';
+import {
+  actionBreadcrumb,
+  withActionBreadcrumbs,
+  withActionErrorHandling,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
   checkReportStatusSchema,
   createContentReportSchema,
@@ -40,89 +41,90 @@ export const createContentReportAction = rateLimitedAuthClient
     isTransactionRequired: true,
   })
   .inputSchema(createContentReportSchema)
-  .action(async ({ ctx }): Promise<ActionResponse<{ reportId: string; status: string }>> => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ reportId: string; status: string }>> => {
     const reportData = createContentReportSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.CONTENT_REPORT, {
-      input: reportData,
-      reason: reportData.reason,
-      targetId: reportData.targetId,
-      targetType: reportData.targetType,
-      userId,
-    });
-
-    try {
-      // Use facade to create report with all validation
-      const newReport = await ContentReportsFacade.createReportAsync(reportData, userId, ctx.db);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          reason: reportData.reason,
-          reportId: newReport.id,
-          targetId: reportData.targetId,
-          targetType: reportData.targetType,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Content report created for ${reportData.targetType} ${reportData.targetId}`,
-      });
-
-      return actionSuccess(
-        {
-          reportId: newReport.id,
-          status: newReport.status,
-        },
-        'Thank you for your report. We will review it shortly.',
-      );
-    } catch (error) {
-      // Handle specific facade errors
-      if (error instanceof Error) {
-        if (error.message.includes('already reported')) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.CONTENT_REPORTS.DUPLICATE_REPORT,
-            ERROR_MESSAGES.CONTENT_REPORTS.DUPLICATE_REPORT,
-            { ctx, operation: OPERATIONS.MODERATION.CHECK_EXISTING_REPORT },
-            true,
-            409,
-          );
-        }
-
-        if (error.message.includes('does not exist')) {
-          throw new ActionError(
-            ErrorType.NOT_FOUND,
-            ERROR_CODES.CONTENT_REPORTS.TARGET_NOT_FOUND,
-            ERROR_MESSAGES.CONTENT_REPORTS.TARGET_NOT_FOUND,
-            { ctx, operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET },
-            true,
-            404,
-          );
-        }
-
-        if (error.message.includes('your own content')) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.CONTENT_REPORTS.SELF_REPORT,
-            ERROR_MESSAGES.CONTENT_REPORTS.SELF_REPORT,
-            { ctx, operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET },
-            true,
-            400,
-          );
-        }
-      }
-
-      return handleActionError(error, {
-        input: reportData,
-        metadata: {
-          actionName: ACTION_NAMES.MODERATION.CREATE_REPORT,
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.MODERATION.CREATE_REPORT,
+        contextData: {
           reason: reportData.reason,
           targetId: reportData.targetId,
           targetType: reportData.targetType,
+          userId,
         },
+        contextType: SENTRY_CONTEXTS.CONTENT_REPORT,
+        input: parsedInput,
         operation: OPERATIONS.MODERATION.CREATE_REPORT,
-      });
-    }
+        userId,
+      },
+      async () => {
+        // First validate if the user can report this content
+        const validationResult = await ContentReportsFacade.validateReportTargetAsync(
+          reportData.targetId,
+          reportData.targetType,
+          userId,
+          ctx.db,
+        );
+
+        if (!validationResult.canReport) {
+          // Map validation reasons to appropriate error responses
+          if (validationResult.reason?.includes('does not exist')) {
+            throw createNotFoundError('Target content', reportData.targetId, {
+              errorCode: ERROR_CODES.CONTENT_REPORTS.TARGET_NOT_FOUND,
+              operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET,
+            });
+          }
+
+          if (validationResult.reason?.includes('your own content')) {
+            throw createBusinessRuleError(
+              ERROR_CODES.CONTENT_REPORTS.SELF_REPORT,
+              ERROR_MESSAGES.CONTENT_REPORTS.SELF_REPORT,
+              { operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET },
+            );
+          }
+
+          if (validationResult.reason?.includes('already reported')) {
+            actionBreadcrumb(
+              'Duplicate report attempt blocked',
+              {
+                operation: OPERATIONS.MODERATION.CHECK_EXISTING_REPORT,
+                targetId: reportData.targetId,
+                targetType: reportData.targetType,
+              },
+              'warning',
+            );
+
+            return actionFailure(ERROR_MESSAGES.CONTENT_REPORTS.DUPLICATE_REPORT);
+          }
+
+          // Generic validation failure
+          return actionFailure(validationResult.reason ?? 'Unable to submit report');
+        }
+
+        // Create the report using facade
+        const newReport = await ContentReportsFacade.createReportAsync(reportData, userId, ctx.db);
+
+        return actionSuccess(
+          {
+            reportId: newReport.id,
+            status: newReport.status,
+          },
+          'Thank you for your report. We will review it shortly.',
+        );
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ?
+            {
+              reportId: result.data?.reportId,
+              targetId: reportData.targetId,
+              targetType: reportData.targetType,
+            }
+          : {},
+      },
+    );
   });
 
 // Check if the user has already reported content
@@ -140,23 +142,33 @@ export const checkReportStatusAction = authActionClient
       const { targetId, targetType } = statusInput;
       const userId = ctx.userId;
 
-      try {
-        const reportStatus = await ContentReportsFacade.getReportStatusAsync(
-          userId,
-          targetId,
-          targetType,
-          ctx.db,
-        );
-
-        return actionSuccess(reportStatus);
-      } catch (error) {
-        return handleActionError(error, {
-          input: statusInput,
-          metadata: {
-            actionName: ACTION_NAMES.MODERATION.CHECK_REPORT_STATUS,
+      return withActionBreadcrumbs(
+        {
+          actionName: ACTION_NAMES.MODERATION.CHECK_REPORT_STATUS,
+          contextData: {
+            targetId,
+            targetType,
+            userId,
           },
+          contextType: SENTRY_CONTEXTS.CONTENT_REPORT,
           operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
-        });
-      }
+          userId,
+        },
+        async () => {
+          const reportStatus = await ContentReportsFacade.getReportStatusAsync(
+            userId,
+            targetId,
+            targetType,
+            ctx.db,
+          );
+
+          return actionSuccess(reportStatus);
+        },
+        {
+          includeResultSummary: (result) => ({
+            hasReported: result.data?.hasReported,
+          }),
+        },
+      );
     },
   );
