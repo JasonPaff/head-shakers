@@ -35,7 +35,6 @@ import { BasicInformation } from '../add-form/basic-information';
 import { CollectionAssignment } from '../add-form/collection-assignment';
 import { CustomFields } from '../add-form/custom-fields';
 import { ItemSettings } from '../add-form/item-settings';
-import { ItemTags } from '../add-form/item-tags';
 import { PhysicalAttributes } from '../add-form/physical-attributes';
 import { EditItemHeader } from '../edit-form/edit-item-header';
 import { ItemPhotosEdit } from '../edit-form/item-photos-edit';
@@ -371,7 +370,6 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
           </ErrorBoundary>
           <AcquisitionDetails form={form as never} />
           <PhysicalAttributes form={form as never} />
-          <ItemTags form={form as never} />
           <CustomFields form={form as never} />
           <ItemSettings form={form as never} />
 
@@ -384,7 +382,7 @@ export const EditBobbleheadFormDisplay = withFocusManagement(
               <div className={'flex items-center justify-end'}>
                 <div className={'flex items-center gap-4'}>
                   <Button
-                    className={'min-w-[100px]'}
+                    className={'min-w-25'}
                     disabled={isExecuting}
                     onClick={handleClose}
                     type={'button'}

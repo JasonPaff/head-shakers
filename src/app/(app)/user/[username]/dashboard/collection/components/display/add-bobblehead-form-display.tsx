@@ -26,7 +26,6 @@ import { CollectionAssignment } from '../add-form/collection-assignment';
 import { CustomFields } from '../add-form/custom-fields';
 import { ItemPhotos } from '../add-form/item-photos';
 import { ItemSettings } from '../add-form/item-settings';
-import { ItemTags } from '../add-form/item-tags';
 import { PhysicalAttributes } from '../add-form/physical-attributes';
 
 interface AddBobbleheadFormDisplayProps {
@@ -92,7 +91,6 @@ export const AddBobbleheadFormDisplay = withFocusManagement(
             <ItemPhotos form={formContext as never} />
             <AcquisitionDetails form={formContext as never} />
             <PhysicalAttributes form={formContext as never} />
-            <ItemTags form={formContext as never} />
             <CustomFields form={formContext as never} />
             <ItemSettings form={formContext as never} />
 
