@@ -89,6 +89,7 @@ vi.mock('@/lib/services/cache-revalidation.service', () => ({
       onCreate: vi.fn(),
       onDelete: vi.fn(),
       onPhotoChange: vi.fn(),
+      onTagChange: vi.fn(),
       onUpdate: vi.fn(),
     },
   },
@@ -146,9 +147,9 @@ vi.mock('@/lib/utils/redis-client', () => ({
 // Mock tags facade
 vi.mock('@/lib/facades/tags/tags.facade', () => ({
   TagsFacade: {
-    attachToBobblehead: vi.fn(),
-    getOrCreateByName: vi.fn(),
-    removeAllFromBobblehead: vi.fn(),
+    attachToBobbleheadAsync: vi.fn().mockResolvedValue(true),
+    getOrCreateByNameAsync: vi.fn().mockResolvedValue(null),
+    removeAllFromBobbleheadAsync: vi.fn().mockResolvedValue(true),
   },
 }));
 

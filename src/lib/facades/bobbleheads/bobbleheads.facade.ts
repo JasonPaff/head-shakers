@@ -471,7 +471,11 @@ export class BobbleheadsFacade extends BaseFacade {
         }
 
         // remove tag associations
-        const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobbleheadAsync(bobblehead.id, userId);
+        const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobbleheadAsync(
+          bobblehead.id,
+          userId,
+          dbInstance,
+        );
 
         if (!wasTagRemovalSuccessful) {
           trackFacadeWarning(facadeName, 'deleteAsync', 'Failed to remove tags during bobblehead deletion', {
