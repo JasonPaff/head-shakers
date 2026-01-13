@@ -1,27 +1,21 @@
 'use server';
 
 import 'server-only';
-import * as Sentry from '@sentry/nextjs';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
-import {
-  ACTION_NAMES,
-  CONFIG,
-  ERROR_CODES,
-  ERROR_MESSAGES,
-  OPERATIONS,
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_CONTEXTS,
-  SENTRY_LEVELS,
-} from '@/lib/constants';
+import { ACTION_NAMES, CONFIG, ERROR_MESSAGES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { TagsFacade, type TagSuggestion } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
-import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
-import { ActionError, ErrorType } from '@/lib/utils/errors';
+import { createInternalError, createValidationError } from '@/lib/utils/error-builders';
 import { authActionClient } from '@/lib/utils/next-safe-action';
+import {
+  trackCacheInvalidation,
+  withActionBreadcrumbs,
+  withActionErrorHandling,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
   attachTagsSchema,
   bulkDeleteTagsSchema,
@@ -49,45 +43,44 @@ export const createTagAction = authActionClient
     const tagData = insertTagSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-    Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, tagData);
-
-    try {
-      const newTag = await TagsFacade.createTagAsync(tagData, userId, ctx.db);
-
-      if (!newTag) {
-        throw new ActionError(
-          ErrorType.BUSINESS_RULE,
-          ERROR_CODES.TAGS.CREATE_FAILED,
-          ERROR_MESSAGES.TAG.CREATE_FAILED,
-          { ctx, operation: OPERATIONS.TAGS.CREATE },
-          false,
-          400,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          tag: newTag,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Created tag: ${newTag.name}`,
-      });
-
-      CacheRevalidationService.admin.onSystemChange('Tag created - invalidating search and user tag caches');
-
-      return actionSuccess(newTag);
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.TAGS.CREATE,
+        contextData: { name: tagData.name },
+        contextType: SENTRY_CONTEXTS.TAG_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.TAGS.CREATE,
-        },
         operation: OPERATIONS.TAGS.CREATE,
-        userId: ctx.userId,
-      });
-    }
+        userId,
+      },
+      async () => {
+        const newTag = await TagsFacade.createTagAsync(tagData, userId, ctx.db);
+
+        if (!newTag) {
+          throw createInternalError(ERROR_MESSAGES.TAG.CREATE_FAILED, {
+            operation: OPERATIONS.TAGS.CREATE,
+            userId,
+          });
+        }
+
+        trackCacheInvalidation(
+          {
+            entityId: newTag.id,
+            entityType: 'tag',
+            operation: 'create',
+            userId,
+          },
+          CacheRevalidationService.admin.onSystemChange(
+            'Tag created - invalidating search and user tag caches',
+          ),
+        );
+
+        return actionSuccess(newTag, 'Tag created successfully');
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ? { tagId: result.data?.id, tagName: result.data?.name } : {},
+      },
+    );
   });
 
 export const updateTagAction = authActionClient
@@ -100,45 +93,45 @@ export const updateTagAction = authActionClient
     const { tagId, ...updateData } = updateTagActionSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-    Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagId, ...updateData });
-
-    try {
-      const updatedTag = await TagsFacade.updateTagAsync(tagId, updateData, userId, ctx.db);
-
-      if (!updatedTag) {
-        throw new ActionError(
-          ErrorType.BUSINESS_RULE,
-          ERROR_CODES.TAGS.UPDATE_FAILED,
-          ERROR_MESSAGES.TAG.UPDATE_FAILED,
-          { ctx, operation: OPERATIONS.TAGS.UPDATE },
-          false,
-          400,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          tag: updatedTag,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Updated tag: ${updatedTag.name}`,
-      });
-
-      CacheRevalidationService.admin.onSystemChange('Tag updated - invalidating search and user tag caches');
-
-      return actionSuccess(updatedTag);
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.TAGS.UPDATE,
+        contextData: { tagId, ...updateData },
+        contextType: SENTRY_CONTEXTS.TAG_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.TAGS.UPDATE,
-        },
         operation: OPERATIONS.TAGS.UPDATE,
-        userId: ctx.userId,
-      });
-    }
+        userId,
+      },
+      async () => {
+        const updatedTag = await TagsFacade.updateTagAsync(tagId, updateData, userId, ctx.db);
+
+        if (!updatedTag) {
+          throw createInternalError(ERROR_MESSAGES.TAG.UPDATE_FAILED, {
+            operation: OPERATIONS.TAGS.UPDATE,
+            tagId,
+            userId,
+          });
+        }
+
+        trackCacheInvalidation(
+          {
+            entityId: updatedTag.id,
+            entityType: 'tag',
+            operation: 'update',
+            userId,
+          },
+          CacheRevalidationService.admin.onSystemChange(
+            'Tag updated - invalidating search and user tag caches',
+          ),
+        );
+
+        return actionSuccess(updatedTag, 'Tag updated successfully');
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ? { tagId: result.data?.id, tagName: result.data?.name } : {},
+      },
+    );
   });
 
 export const deleteTagAction = authActionClient
@@ -151,45 +144,44 @@ export const deleteTagAction = authActionClient
     const { tagId } = deleteTagSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-    Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagId });
-
-    try {
-      const deleted = await TagsFacade.deleteTagAsync(tagId, userId, ctx.db);
-
-      if (!deleted) {
-        throw new ActionError(
-          ErrorType.BUSINESS_RULE,
-          ERROR_CODES.TAGS.DELETE_FAILED,
-          ERROR_MESSAGES.TAG.DELETE_FAILED,
-          { ctx, operation: OPERATIONS.TAGS.DELETE },
-          false,
-          400,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          tagId,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Deleted tag: ${tagId}`,
-      });
-
-      CacheRevalidationService.admin.onSystemChange('Tag deleted - invalidating search and user tag caches');
-
-      return actionSuccess({ deleted: true });
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.TAGS.DELETE,
+        contextData: { tagId },
+        contextType: SENTRY_CONTEXTS.TAG_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.TAGS.DELETE,
-        },
         operation: OPERATIONS.TAGS.DELETE,
-        userId: ctx.userId,
-      });
-    }
+        userId,
+      },
+      async () => {
+        const deleted = await TagsFacade.deleteTagAsync(tagId, userId, ctx.db);
+
+        if (!deleted) {
+          throw createInternalError(ERROR_MESSAGES.TAG.DELETE_FAILED, {
+            operation: OPERATIONS.TAGS.DELETE,
+            tagId,
+            userId,
+          });
+        }
+
+        trackCacheInvalidation(
+          {
+            entityId: tagId,
+            entityType: 'tag',
+            operation: 'delete',
+            userId,
+          },
+          CacheRevalidationService.admin.onSystemChange(
+            'Tag deleted - invalidating search and user tag caches',
+          ),
+        );
+
+        return actionSuccess({ deleted: true }, 'Tag deleted successfully');
+      },
+      {
+        includeResultSummary: (result) => (result.wasSuccess ? { deleted: result.data?.deleted, tagId } : {}),
+      },
+    );
   });
 
 export const attachTagsAction = authActionClient
@@ -210,65 +202,67 @@ export const attachTagsAction = authActionClient
       const userId = ctx.userId;
       const dbInstance = ctx.db;
 
-      Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-      Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { bobbleheadId });
-      Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagIds });
-
-      try {
-        const validation = await TagsFacade.validateTagsForBobbleheadAsync(
-          bobbleheadId,
-          tagIds,
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.TAGS.ATTACH_TO_BOBBLEHEAD,
+          contextData: { bobbleheadId, tagCount: tagIds.length },
+          contextType: SENTRY_CONTEXTS.BOBBLEHEAD_DATA,
+          input: parsedInput,
+          operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD,
           userId,
-          dbInstance,
-        );
-
-        if (!validation.canCreate) {
-          throw new ActionError(
-            ErrorType.VALIDATION,
-            ERROR_CODES.TAGS.ATTACH_FAILED,
-            validation.errors.join(', '),
-            { ctx, operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD },
-            false,
-            400,
-          );
-        }
-
-        const success = await TagsFacade.attachToBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
-
-        if (!success) {
-          throw new ActionError(
-            ErrorType.INTERNAL,
-            ERROR_CODES.TAGS.ATTACH_FAILED,
-            ERROR_MESSAGES.TAG.ATTACH_FAILED,
-            { ctx, operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD },
-            false,
-            500,
-          );
-        }
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
+        },
+        async () => {
+          const validation = await TagsFacade.validateTagsForBobbleheadAsync(
             bobbleheadId,
             tagIds,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: `Attached ${tagIds.length} tags to bobblehead`,
-        });
+            userId,
+            dbInstance,
+          );
 
-        CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'add');
+          if (!validation.canCreate) {
+            throw createValidationError('TAG_VALIDATION_FAILED', validation.errors.join(', '), {
+              bobbleheadId,
+              operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD,
+              tagIds,
+            });
+          }
 
-        return actionSuccess({ attached: tagIds.length, warnings: validation.warnings });
-      } catch (error) {
-        return handleActionError(error, {
-          input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.TAGS.ATTACH_TO_BOBBLEHEAD,
-          },
-          operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD,
-          userId: ctx.userId,
-        });
-      }
+          const success = await TagsFacade.attachToBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
+
+          if (!success) {
+            throw createInternalError(ERROR_MESSAGES.TAG.ATTACH_FAILED, {
+              bobbleheadId,
+              operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD,
+              tagIds,
+            });
+          }
+
+          trackCacheInvalidation(
+            {
+              entityId: bobbleheadId,
+              entityType: 'bobblehead',
+              operation: 'tagAttach',
+              userId,
+            },
+            CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'add'),
+          );
+
+          return actionSuccess(
+            { attached: tagIds.length, warnings: validation.warnings },
+            `${tagIds.length} tag(s) attached successfully`,
+          );
+        },
+        {
+          includeResultSummary: (result) =>
+            result.wasSuccess ?
+              {
+                attachedCount: result.data?.attached,
+                bobbleheadId,
+                warningCount: result.data?.warnings.length,
+              }
+            : {},
+        },
+      );
     },
   );
 
@@ -289,47 +283,43 @@ export const detachTagsAction = authActionClient
     const userId = ctx.userId;
     const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { bobbleheadId });
-    Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagIds });
-
-    try {
-      const success = await TagsFacade.detachFromBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
-
-      if (!success) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.TAGS.DETACH_FAILED,
-          ERROR_MESSAGES.TAG.DETACH_FAILED,
-          { ctx, operation: OPERATIONS.TAGS.DETACH_FROM_BOBBLEHEAD },
-          false,
-          500,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          bobbleheadId,
-          tagIds,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Detached ${tagIds.length} tags from bobblehead`,
-      });
-
-      CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'remove');
-
-      return actionSuccess({ detached: tagIds.length });
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.TAGS.DETACH_FROM_BOBBLEHEAD,
+        contextData: { bobbleheadId, tagCount: tagIds.length },
+        contextType: SENTRY_CONTEXTS.BOBBLEHEAD_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.TAGS.DETACH_FROM_BOBBLEHEAD,
-        },
         operation: OPERATIONS.TAGS.DETACH_FROM_BOBBLEHEAD,
-        userId: ctx.userId,
-      });
-    }
+        userId,
+      },
+      async () => {
+        const success = await TagsFacade.detachFromBobbleheadAsync(bobbleheadId, tagIds, userId, dbInstance);
+
+        if (!success) {
+          throw createInternalError(ERROR_MESSAGES.TAG.DETACH_FAILED, {
+            bobbleheadId,
+            operation: OPERATIONS.TAGS.DETACH_FROM_BOBBLEHEAD,
+            tagIds,
+          });
+        }
+
+        trackCacheInvalidation(
+          {
+            entityId: bobbleheadId,
+            entityType: 'bobblehead',
+            operation: 'tagDetach',
+            userId,
+          },
+          CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'remove'),
+        );
+
+        return actionSuccess({ detached: tagIds.length }, `${tagIds.length} tag(s) detached successfully`);
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ? { bobbleheadId, detachedCount: result.data?.detached } : {},
+      },
+    );
   });
 
 export const getTagSuggestionsAction = authActionClient
@@ -344,37 +334,28 @@ export const getTagSuggestionsAction = authActionClient
     ),
   )
   .inputSchema(getTagSuggestionsSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ suggestions: Array<TagSuggestion> }>> => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ suggestions: Array<TagSuggestion> }>> => {
     const { query } = getTagSuggestionsSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-    Sentry.setContext(SENTRY_CONTEXTS.SEARCH_DATA, { query });
-
-    try {
-      const suggestions = await TagsFacade.getSuggestionsForUserAsync(query, userId);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          query,
-          resultCount: suggestions.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Retrieved ${suggestions.length} tag suggestions`,
-      });
-
-      return actionSuccess({ suggestions });
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.TAGS.GET_SUGGESTIONS,
-        },
+    return withActionBreadcrumbs(
+      {
+        actionName: ACTION_NAMES.TAGS.GET_SUGGESTIONS,
+        contextData: { query },
+        contextType: SENTRY_CONTEXTS.SEARCH_DATA,
         operation: OPERATIONS.TAGS.SEARCH,
-        userId: ctx.userId,
-      });
-    }
+        userId,
+      },
+      async () => {
+        const suggestions = await TagsFacade.getSuggestionsForUserAsync(query, userId);
+
+        return actionSuccess({ suggestions });
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ? { query, suggestionCount: result.data?.suggestions.length } : {},
+      },
+    );
   });
 
 export const bulkDeleteTagsAction = authActionClient
@@ -394,37 +375,42 @@ export const bulkDeleteTagsAction = authActionClient
       const { tagIds } = bulkDeleteTagsSchema.parse(ctx.sanitizedInput);
       const userId = ctx.userId;
 
-      Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
-      Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { count: tagIds.length, tagIds });
-
-      try {
-        const result = await TagsFacade.bulkDeleteAsync(tagIds, userId, ctx.db);
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            deletedCount: result.deletedCount,
-            skippedCount: result.skippedCount,
-            tagIds,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: `Bulk deleted ${result.deletedCount} tags`,
-        });
-
-        CacheRevalidationService.admin.onSystemChange(
-          'Tags bulk deleted - invalidating search and user tag caches',
-        );
-
-        return actionSuccess(result);
-      } catch (error) {
-        return handleActionError(error, {
+      return withActionErrorHandling(
+        {
+          actionName: ACTION_NAMES.TAGS.BULK_DELETE,
+          contextData: { count: tagIds.length, tagIds },
+          contextType: SENTRY_CONTEXTS.TAG_DATA,
           input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.TAGS.BULK_DELETE,
-          },
           operation: OPERATIONS.TAGS.BULK_DELETE,
-          userId: ctx.userId,
-        });
-      }
+          userId,
+        },
+        async () => {
+          const result = await TagsFacade.bulkDeleteAsync(tagIds, userId, ctx.db);
+
+          trackCacheInvalidation(
+            {
+              entityId: `bulk-${tagIds.length}`,
+              entityType: 'tag',
+              operation: 'bulkDelete',
+              userId,
+            },
+            CacheRevalidationService.admin.onSystemChange(
+              'Tags bulk deleted - invalidating search and user tag caches',
+            ),
+          );
+
+          return actionSuccess(result, `Deleted ${result.deletedCount} tag(s)`);
+        },
+        {
+          includeResultSummary: (result) =>
+            result.wasSuccess ?
+              {
+                deletedCount: result.data?.deletedCount,
+                errorCount: result.data?.errors.length,
+                skippedCount: result.data?.skippedCount,
+              }
+            : {},
+        },
+      );
     },
   );
