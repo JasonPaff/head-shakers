@@ -1,5 +1,6 @@
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
+  CommentRecord,
   CommentTargetType,
   CommentWithDepth,
   CommentWithUser,
@@ -12,6 +13,8 @@ import { ENUMS, type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } fro
 import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads.query';
+import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { SocialQuery } from '@/lib/queries/social/social.query';
 import { UsersQuery } from '@/lib/queries/users/users.query';
 import { CacheService } from '@/lib/services/cache.service';
@@ -19,7 +22,7 @@ import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
-import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { captureFacadeWarning, facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 export interface CommentData {
   comment: CommentWithUser;
@@ -75,6 +78,12 @@ export interface TrendingContent {
   likeCount: number;
   recentLikeCount: number;
   targetId: string;
+}
+
+interface CommentReplyValidationResult {
+  error?: string;
+  isValid: boolean;
+  parentComment?: CommentRecord;
 }
 
 const facadeName = 'SOCIAL_FACADE';
@@ -170,71 +179,35 @@ export class SocialFacade extends BaseFacade {
         return dbInstance.transaction(async (tx) => {
           const context = this.getProtectedContext(userId, tx);
 
-          // Validation 1: Verify parent comment exists and is not deleted
-          const parentComment = await SocialQuery.getCommentByIdAsync(data.parentCommentId, context);
+          // Validate parent comment for reply creation
+          const validation = await this.validateCommentReplyParentAsync(
+            data.parentCommentId,
+            data,
+            userId,
+            context,
+          );
 
-          if (!parentComment) {
-            return {
-              comment: null,
-              error: 'Parent comment not found or has been deleted',
-              isSuccessful: false,
-            };
+          if (!validation.isValid) {
+            return { comment: null, error: validation.error, isSuccessful: false };
           }
 
-          // Validation 2: Ensure parent comment belongs to the same target entity
-          if (parentComment.targetId !== data.targetId || parentComment.targetType !== data.targetType) {
-            return {
-              comment: null,
-              error: 'Parent comment must belong to the same target entity',
-              isSuccessful: false,
-            };
-          }
-
-          // Validation 3: Check if the replying user is blocked by the parent comment author
-          const isBlocked = await SocialQuery.isUserBlockedByAsync(userId, parentComment.userId, context);
-
-          if (isBlocked) {
-            return {
-              comment: null,
-              error: 'You cannot reply to this comment',
-              isSuccessful: false,
-            };
-          }
-
-          // Validation 4: Enforce depth does not exceed MAX_COMMENT_NESTING_DEPTH
-          const currentDepth = await this.calculateCommentDepthAsync(data.parentCommentId, context);
-
-          if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
-            return {
-              comment: null,
-              error: `Maximum nesting depth of ${MAX_COMMENT_NESTING_DEPTH} exceeded`,
-              isSuccessful: false,
-            };
-          }
-
-          // create the reply comment
+          // Create the reply comment
           const newComment = await SocialQuery.createCommentAsync(data, userId, context);
 
           if (newComment) {
-            // increment comment count on the target entity (only for bobblehead targets)
-            // collections use dynamic counts calculated from comment table
+            // Increment comment count on the target entity (only for bobblehead targets)
+            // Collections use dynamic counts calculated from comment table
             if (data.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
               await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
             }
 
-            // fetch the comment with user data using efficient method
+            // Fetch the comment with user data using efficient method
             const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
 
-            return {
-              comment: commentWithUser,
-              isSuccessful: !!commentWithUser,
-            };
+            return { comment: commentWithUser, isSuccessful: !!commentWithUser };
           }
 
-          return {
-            comment: null,
-            isSuccessful: false,
-          };
+          return { comment: null, isSuccessful: false };
         });
       },
       {
@@ -448,7 +421,7 @@ export class SocialFacade extends BaseFacade {
       async () => {
         return CacheService.cached(
           async () => {
-            const context = this.getUserContext(userId, dbInstance ?? db);
+            const context = this.getViewerContext(userId, dbInstance);
 
             // fetch the comment with user data using efficient method
             const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(commentId, context);
@@ -685,6 +658,62 @@ export class SocialFacade extends BaseFacade {
             ttl: CACHE_CONFIG.TTL.SHORT,
           },
         );
+      },
+    );
+  }
+
+  /**
+   * Fetch the slug for an entity based on its type and ID.
+   * Used for cache path-based revalidation after comment operations.
+   *
+   * Cache behavior: No caching (utility lookup method).
+   *
+   * @param targetType - The type of entity ('bobblehead' | 'collection')
+   * @param targetId - The ID of the entity
+   * @param dbInstance - Database instance to use for the query
+   * @returns The entity slug if found, undefined otherwise
+   */
+  static async getEntitySlugByTypeAsync(
+    targetType: 'bobblehead' | 'collection',
+    targetId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<string | undefined> {
+    return executeFacadeOperation(
+      {
+        data: { targetId, targetType },
+        facade: facadeName,
+        method: 'getEntitySlugByTypeAsync',
+        operation: 'get_entity_slug',
+      },
+      async () => {
+        const context = this.getPublicContext(dbInstance);
+
+        try {
+          switch (targetType) {
+            case 'bobblehead': {
+              const bobblehead = await BobbleheadsQuery.findByIdAsync(targetId, context);
+              return bobblehead?.slug;
+            }
+            case 'collection': {
+              const collection = await CollectionsQuery.getByIdAsync(targetId, context);
+              return collection?.slug;
+            }
+            default:
+              return undefined;
+          }
+        } catch (error) {
+          // Log warning but don't fail the main operation - slug lookup is for cache invalidation only
+          captureFacadeWarning(error, facadeName, 'getEntitySlugByTypeAsync', {
+            targetId,
+            targetType,
+          });
+          return undefined;
+        }
+      },
+      {
+        includeResultSummary: (slug) => ({
+          found: !!slug,
+        }),
       },
     );
   }
@@ -964,7 +993,7 @@ export class SocialFacade extends BaseFacade {
 
         return CacheService.cached(
           async () => {
-            const context = this.getUserContext(userId, dbInstance ?? db);
+            const context = this.getViewerContext(userId, dbInstance);
             return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
           },
           cacheKey,
@@ -1169,7 +1198,10 @@ export class SocialFacade extends BaseFacade {
   /**
    * Calculate the current nesting depth of a comment
    * Traverses up the comment tree to find the depth level
-   * Returns 0 for root comments (no parent)
+   *
+   * @param commentId - ID of the comment to calculate depth for
+   * @param context - Query context for database operations
+   * @returns The depth level (0 for root comments with no parent)
    */
   private static async calculateCommentDepthAsync(commentId: string, context: QueryContext): Promise<number> {
     const commentThread = await SocialQuery.getCommentThreadWithRepliesAsync(commentId, 0, context);
@@ -1185,6 +1217,10 @@ export class SocialFacade extends BaseFacade {
   /**
    * Recursively delete all replies for a comment
    * Used during cascade deletion to remove entire comment threads
+   *
+   * @param commentId - ID of the parent comment whose replies should be deleted
+   * @param context - Query context for database operations
+   * @returns Promise that resolves when all replies are deleted
    */
   private static async deleteCommentRepliesRecursiveAsync(
     commentId: string,
@@ -1216,5 +1252,50 @@ export class SocialFacade extends BaseFacade {
         }
       }
     }
+  }
+
+  /**
+   * Validate a parent comment for reply creation
+   * Checks existence, target consistency, blocking status, and nesting depth
+   *
+   * @param parentCommentId - ID of the parent comment to validate
+   * @param data - Reply data containing target info for consistency check
+   * @param userId - ID of the user creating the reply (for block check)
+   * @param context - Query context for database operations
+   * @returns Validation result with parent comment if valid, error message if invalid
+   */
+  private static async validateCommentReplyParentAsync(
+    parentCommentId: string,
+    data: InsertComment,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CommentReplyValidationResult> {
+    // Validation 1: Verify parent comment exists and is not deleted
+    const parentComment = await SocialQuery.getCommentByIdAsync(parentCommentId, context);
+
+    if (!parentComment) {
+      return { error: 'Parent comment not found or has been deleted', isValid: false };
+    }
+
+    // Validation 2: Ensure parent comment belongs to the same target entity
+    if (parentComment.targetId !== data.targetId || parentComment.targetType !== data.targetType) {
+      return { error: 'Parent comment must belong to the same target entity', isValid: false };
+    }
+
+    // Validation 3: Check if the replying user is blocked by the parent comment author
+    const isBlocked = await SocialQuery.isUserBlockedByAsync(userId, parentComment.userId, context);
+
+    if (isBlocked) {
+      return { error: 'You cannot reply to this comment', isValid: false };
+    }
+
+    // Validation 4: Enforce depth does not exceed MAX_COMMENT_NESTING_DEPTH
+    const currentDepth = await this.calculateCommentDepthAsync(parentCommentId, context);
+
+    if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
+      return { error: `Maximum nesting depth of ${MAX_COMMENT_NESTING_DEPTH} exceeded`, isValid: false };
+    }
+
+    return { isValid: true, parentComment };
   }
 }

@@ -7,17 +7,17 @@ import type { ActionResponse } from '@/lib/utils/action-response';
 import { ACTION_NAMES, CONFIG, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
 import { createPublicRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { actionSuccess } from '@/lib/utils/action-response';
-import { actionFailure } from '@/lib/utils/action-response';
+import { actionFailure, actionSuccess } from '@/lib/utils/action-response';
 import { maskEmail } from '@/lib/utils/email-utils';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
-import { actionBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
-import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
-import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
-import { unsubscribeFromNewsletterSchema } from '@/lib/validations/newsletter.validation';
+import { actionBreadcrumb, withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import {
+  insertNewsletterSignupSchema,
+  unsubscribeFromNewsletterSchema,
+} from '@/lib/validations/newsletter.validation';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
-type SubscribeToNewsLetterResponse = { isAlreadySubscribed: boolean; signupId: string | undefined };
+type SubscribeToNewsletterResponse = { isAlreadySubscribed: boolean; signupId: string | undefined };
 
 const rateLimitedPublicClient = publicActionClient.use(
   createPublicRateLimitMiddleware(
@@ -33,7 +33,7 @@ export const subscribeToNewsletterAction = rateLimitedPublicClient
     isTransactionRequired: true,
   })
   .inputSchema(insertNewsletterSignupSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SubscribeToNewsLetterResponse>> => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SubscribeToNewsletterResponse>> => {
     const input = insertNewsletterSignupSchema.parse(ctx.sanitizedInput);
     const userId = await getUserIdAsync();
     const maskedEmail = maskEmail(input.email);

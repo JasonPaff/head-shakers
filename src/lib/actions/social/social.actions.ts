@@ -7,12 +7,9 @@ import type { ActionResponse } from '@/lib/utils/action-response';
 
 import { ACTION_NAMES, ERROR_MESSAGES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { createPublicQueryContext } from '@/lib/queries/base/query-context';
-import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads.query';
-import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { actionFailure, actionSuccess } from '@/lib/utils/action-response';
-import { authActionClient, type DatabaseExecutor, publicActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   actionBreadcrumb,
   withActionBreadcrumbs,
@@ -27,38 +24,28 @@ import {
 import { toggleLikeSchema } from '@/lib/validations/like.validation';
 
 /**
- * Fetch the slug for an entity based on its type and ID.
- * Used for cache path-based revalidation after comment operations.
- *
- * @param targetType - The type of entity ('bobblehead' | 'collection')
- * @param targetId - The ID of the entity
- * @param dbInstance - Database instance to use for the query
- * @returns The entity slug if found, undefined otherwise
+ * Maps facade error messages to user-friendly error messages for comment creation.
+ * Extracts error message mapping logic for cleaner action code.
  */
-async function getEntitySlugByTypeAndId(
-  targetType: 'bobblehead' | 'collection',
-  targetId: string,
-  dbInstance: DatabaseExecutor,
-): Promise<string | undefined> {
-  const publicContext = createPublicQueryContext({ dbInstance });
-
-  try {
-    switch (targetType) {
-      case 'bobblehead': {
-        const bobblehead = await BobbleheadsQuery.findByIdAsync(targetId, publicContext);
-        return bobblehead?.slug;
-      }
-      case 'collection': {
-        const collection = await CollectionsQuery.getByIdAsync(targetId, publicContext);
-        return collection?.slug;
-      }
-      default:
-        return undefined;
-    }
-  } catch {
-    // Silently fail - slug lookup failure should not block the main operation
-    return undefined;
+function mapCommentCreationError(facadeError: string | undefined): string {
+  if (!facadeError || typeof facadeError !== 'string') {
+    return ERROR_MESSAGES.COMMENTS.COMMENT_FAILED;
   }
+
+  if (facadeError.includes('Parent comment not found')) {
+    return 'The comment you are replying to no longer exists.';
+  }
+  if (facadeError.includes('deleted')) {
+    return 'Cannot reply to a deleted comment.';
+  }
+  if (facadeError.includes('same target')) {
+    return 'Cannot reply to this comment. Please refresh and try again.';
+  }
+  if (facadeError.includes('Maximum nesting depth')) {
+    return 'Cannot reply to this comment. The conversation thread has reached its maximum depth.';
+  }
+
+  return ERROR_MESSAGES.COMMENTS.COMMENT_FAILED;
 }
 
 export const toggleLikeAction = authActionClient
@@ -144,9 +131,13 @@ export const createCommentAction = authActionClient
   .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CommentWithUser | null>> => {
     const commentData = createCommentSchema.parse(ctx.sanitizedInput);
 
-    // Fetch entity slug BEFORE the mutation using base db connection (not transaction)
-    // This ensures we have the slug for cache path revalidation even if transaction-scoped queries fail
-    const entitySlug = await getEntitySlugByTypeAndId(commentData.targetType, commentData.targetId, ctx.db);
+    // Fetch entity slug BEFORE the mutation for cache path revalidation
+    // ctx.db is the transaction when isTransactionRequired: true
+    const entitySlug = await SocialFacade.getEntitySlugByTypeAsync(
+      commentData.targetType,
+      commentData.targetId,
+      ctx.db,
+    );
 
     return withActionErrorHandling(
       {
@@ -186,22 +177,7 @@ export const createCommentAction = authActionClient
             );
 
         if (!result.isSuccessful) {
-          // Map facade error messages to user-friendly messages
-          let errorMessage: string = ERROR_MESSAGES.COMMENTS.COMMENT_FAILED;
-
-          if (result.error && typeof result.error === 'string') {
-            if (result.error.includes('Parent comment not found')) {
-              errorMessage = 'The comment you are replying to no longer exists.';
-            } else if (result.error.includes('deleted')) {
-              errorMessage = 'Cannot reply to a deleted comment.';
-            } else if (result.error.includes('same target')) {
-              errorMessage = 'Cannot reply to this comment. Please refresh and try again.';
-            } else if (result.error.includes('Maximum nesting depth')) {
-              errorMessage =
-                'Cannot reply to this comment. The conversation thread has reached its maximum depth.';
-            }
-          }
-
+          const errorMessage = mapCommentCreationError(result.error);
           actionBreadcrumb('Comment creation failed', { error: result.error }, 'warning');
           return actionFailure(errorMessage);
         }
@@ -247,11 +223,11 @@ export const updateCommentAction = authActionClient
     const updateData = updateCommentSchema.parse(ctx.sanitizedInput);
 
     // Fetch comment details BEFORE the mutation to get targetType/targetId for slug lookup
-    // Use base db connection (not transaction) to ensure we can get the slug for cache invalidation
+    // ctx.db is the transaction when isTransactionRequired: true
     const existingComment = await SocialFacade.getCommentByIdAsync(updateData.commentId, ctx.userId, ctx.db);
     const entitySlug =
       existingComment?.comment ?
-        await getEntitySlugByTypeAndId(
+        await SocialFacade.getEntitySlugByTypeAsync(
           existingComment.comment.targetType,
           existingComment.comment.targetId,
           ctx.db,
@@ -320,12 +296,12 @@ export const deleteCommentAction = authActionClient
   .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ success: boolean }>> => {
     const deleteData = deleteCommentSchema.parse(ctx.sanitizedInput);
 
-    // Get comment details BEFORE deletion using base db connection (not transaction)
-    // This ensures we have the data needed for cache invalidation
+    // Get comment details BEFORE deletion for cache invalidation
+    // ctx.db is the transaction when isTransactionRequired: true
     const commentResult = await SocialFacade.getCommentByIdAsync(deleteData.commentId, ctx.userId, ctx.db);
     const entitySlug =
       commentResult?.comment ?
-        await getEntitySlugByTypeAndId(
+        await SocialFacade.getEntitySlugByTypeAsync(
           commentResult.comment.targetType,
           commentResult.comment.targetId,
           ctx.db,

@@ -27,6 +27,7 @@ export const SENTRY_CONTEXTS = {
   EXTERNAL_SERVICE: 'external_service',
   FEATURED_CONTENT_DATA: 'featured_content_data',
   INPUT_INFO: 'input_info',
+  LAUNCH_NOTIFICATION_DATA: 'launch_notification_data',
   LIKE_DATA: 'like_data',
   NEWSLETTER_DATA: 'newsletter_data',
   PERFORMANCE: 'performance',
