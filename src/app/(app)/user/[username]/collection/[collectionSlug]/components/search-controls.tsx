@@ -31,10 +31,8 @@ const sortOptions: Array<{ label: string; value: SortOption }> = [
 type SearchControlsProps = ComponentProps<'div'> & ComponentTestIdProps;
 
 export const SearchControls = ({ className, testId, ...props }: SearchControlsProps) => {
-  // useState hooks
   const [searchInput, setSearchInput] = useState('');
 
-  // Other hooks
   const [isPending, startTransition] = useTransition();
   const [debouncedSearchInput] = useDebounce(searchInput, CONFIG.SEARCH.DEBOUNCE_MS);
 
@@ -48,7 +46,6 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
     },
   );
 
-  // useEffect hooks
   useEffect(() => {
     setSearchInput(search);
   }, [search]);
@@ -61,17 +58,9 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
     }
   }, [debouncedSearchInput, search, setParams]);
 
-  // Event handlers
   const handleSearchInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
   }, []);
-
-  const handleSearchClear = useCallback(() => {
-    setSearchInput('');
-    startTransition(() => {
-      void setParams({ search: null });
-    });
-  }, [setParams]);
 
   const handleSortChange = useCallback(
     (value: string) => {
@@ -82,7 +71,6 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
     [setParams],
   );
 
-  // Derived variables for conditional rendering
   const _isInputDisabled = isPending;
 
   const componentTestId = testId || generateTestId('feature', 'search-results', 'controls');
@@ -104,7 +92,6 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
           isClearable
           leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
           onChange={handleSearchInputChange}
-          onClear={handleSearchClear}
           placeholder={'Search bobbleheads...'}
           value={searchInput}
         />
@@ -115,7 +102,7 @@ export const SearchControls = ({ className, testId, ...props }: SearchControlsPr
         {/* Sort Dropdown */}
         <Select disabled={isPending} onValueChange={handleSortChange} value={sort}>
           <SelectTrigger
-            className={'w-full sm:w-[220px]'}
+            className={'w-full sm:w-55'}
             data-slot={'search-controls-sort-trigger'}
             data-testid={`${componentTestId}-sort-trigger`}
           >

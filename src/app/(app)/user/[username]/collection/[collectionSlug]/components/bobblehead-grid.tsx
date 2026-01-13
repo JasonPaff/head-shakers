@@ -20,8 +20,6 @@ import { SearchControls } from './search-controls';
 
 const LAYOUT_VALUES = ['grid', 'gallery', 'list'] as const;
 
-export type LayoutVariant = (typeof LAYOUT_VALUES)[number];
-
 type BobbleheadGridProps = BobbleheadGridPropsFromTypes & ComponentProps<'div'> & ComponentTestIdProps;
 
 /**
@@ -40,10 +38,8 @@ export const BobbleheadGrid = ({
   testId,
   ...props
 }: BobbleheadGridProps) => {
-  // Other hooks - Only layout from URL state (filtering/sorting handled server-side)
   const [layout] = useQueryState('layout', parseAsStringEnum([...LAYOUT_VALUES]).withDefault('grid'));
 
-  // useMemo hooks - Grid layout classes based on variant
   const gridClasses = useMemo(() => {
     switch (layout) {
       case 'gallery':
@@ -59,7 +55,6 @@ export const BobbleheadGrid = ({
     }
   }, [layout]);
 
-  // Derived variables for conditional rendering
   const _isGalleryLayout = layout === 'gallery';
   const _hasNoBobbleheads = bobbleheads.length === 0;
 
