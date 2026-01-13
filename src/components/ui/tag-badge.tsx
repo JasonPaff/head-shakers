@@ -2,7 +2,7 @@
 
 import type { ComponentProps, CSSProperties } from 'react';
 
-import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';

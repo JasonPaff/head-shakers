@@ -1,4 +1,4 @@
-import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertTag, UpdateTag } from '@/lib/validations/tags.validation';
@@ -10,7 +10,7 @@ import {
   createPublicQueryContext,
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
-import { TagsQuery } from '@/lib/queries/tags/tags-query';
+import { TagsQuery } from '@/lib/queries/tags/tags.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';

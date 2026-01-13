@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { TagSuggestion } from '@/lib/facades/tags/tags.facade';
-import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags.query';
 import type { ContentType } from '@/lib/validations/system.validation';
 
 import { TagFilter } from '@/app/(app)/admin/featured-content/components/tag-filter';

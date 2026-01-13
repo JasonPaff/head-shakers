@@ -8,7 +8,7 @@ import type {
   PublicSearchFilterOptions,
   UserSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
-import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { PublicSearchInput } from '@/lib/validations/public-search.validation';
 

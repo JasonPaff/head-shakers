@@ -1,7 +1,7 @@
 import { count, eq, gte, ilike, inArray, isNull, lte, not, or, sql, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
-import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags.query';
 
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
