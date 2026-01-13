@@ -36,21 +36,6 @@ export interface TagValidationResult {
 }
 
 /**
- * user tag statistics
- */
-export interface UserTagStats {
-  averageUsagePerTag: number;
-  leastUsedTags: Array<TagRecord>;
-  mostUsedTags: Array<TagRecord>;
-  recentActivity: Array<{
-    lastUsed: Date | null;
-    tagId: string;
-    tagName: string;
-  }>;
-  totalCustomTags: number;
-}
-
-/**
  * handles all business logic and orchestration for tags
  */
 export class TagsFacade {
