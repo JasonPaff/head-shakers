@@ -27,7 +27,8 @@ import { incrementFeaturedViewCountAction } from '@/lib/actions/featured-content
 import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentItem {
-  collectionSlug?: null | string;
+  /** Parent collection slug for bobbleheads (used in URL routing) */
+  collectionSlug: null | string;
   comments: number;
   contentId: string;
   contentSlug: string;
@@ -41,7 +42,8 @@ export interface FeaturedContentItem {
   likes: number;
   owner: string;
   ownerDisplayName: string;
-  ownerUsername?: null | string;
+  /** Owner username for URL routing */
+  ownerUsername: null | string;
   priority: number;
   startDate: string;
   title: string;
@@ -111,22 +113,28 @@ export const FeaturedTabbedContentDisplay = ({ tabbedData }: FeaturedTabbedConte
     const hasImage = content.imageUrl && content.imageUrl !== '/placeholder.jpg';
 
     // Generate proper slug-based URL for content type
+    // Only generate URLs when all required route params are available
     const contentUrl =
-      content.contentType === 'collection' ?
+      content.contentType === 'collection' && content.ownerUsername && content.contentSlug ?
         $path({
           route: '/user/[username]/collection/[collectionSlug]',
           routeParams: {
             collectionSlug: content.contentSlug,
-            username: content.ownerUsername ?? '',
+            username: content.ownerUsername,
           },
         })
-      : content.contentType === 'bobblehead' ?
+      : (
+        content.contentType === 'bobblehead' &&
+        content.ownerUsername &&
+        content.collectionSlug &&
+        content.contentSlug
+      ) ?
         $path({
           route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
           routeParams: {
             bobbleheadSlug: content.contentSlug,
-            collectionSlug: content.collectionSlug ?? '',
-            username: content.ownerUsername ?? '',
+            collectionSlug: content.collectionSlug,
+            username: content.ownerUsername,
           },
           searchParams: {},
         })

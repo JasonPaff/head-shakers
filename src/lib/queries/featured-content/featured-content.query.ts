@@ -316,9 +316,12 @@ export class FeaturedContentQuery extends BaseQuery {
     // create aliases for users table to get owner display names
     const bobbleheadOwnerUsers = alias(users, 'bobbleheadOwnerUsers');
     const collectionOwnerUsers = alias(users, 'collectionOwnerUsers');
+    // create alias for bobblehead's parent collection (separate from featured collections)
+    const bobbleheadCollections = alias(collections, 'bobbleheadCollections');
 
     return dbInstance
       .select({
+        bobbleheadCollectionSlug: bobbleheadCollections.slug,
         bobbleheadLikes: bobbleheads.likeCount,
         bobbleheadName: bobbleheads.name,
         bobbleheadOwner: bobbleheads.userId,
@@ -360,6 +363,13 @@ export class FeaturedContentQuery extends BaseQuery {
         ),
       )
       .leftJoin(bobbleheadOwnerUsers, eq(bobbleheads.userId, bobbleheadOwnerUsers.id))
+      .leftJoin(
+        bobbleheadCollections,
+        this.combineFilters(
+          eq(bobbleheads.collectionId, bobbleheadCollections.id),
+          isNull(bobbleheadCollections.deletedAt),
+        ),
+      )
       .leftJoin(
         collections,
         this.combineFilters(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),

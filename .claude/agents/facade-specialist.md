@@ -25,7 +25,6 @@ Before writing ANY code, you MUST invoke these skills in order:
 1. **facade-layer** - Load `references/Facade-Layer-Conventions.md`
 2. **caching** - Load `references/Caching-Conventions.md`
 3. **sentry-server** - Load `references/Sentry-Server-Conventions.md`
-4. **drizzle-orm** - Load `references/Drizzle-ORM-Conventions.md`
 
 To load a skill, read its reference file from the `.claude/skills/{skill-name}/references/` directory.
 

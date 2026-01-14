@@ -11,6 +11,7 @@ export interface FeaturedTabbedContentAsyncProps {
 export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabbedContentAsyncProps) {
   let transformedData: {
     editor_pick: Array<{
+      collectionSlug: null | string;
       comments: number;
       contentId: string;
       contentSlug: string;
@@ -24,12 +25,14 @@ export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabb
       likes: number;
       owner: string;
       ownerDisplayName: string;
+      ownerUsername: null | string;
       priority: number;
       startDate: string;
       title: string;
       viewCount: number;
     }>;
     trending: Array<{
+      collectionSlug: null | string;
       comments: number;
       contentId: string;
       contentSlug: string;
@@ -43,6 +46,7 @@ export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabb
       likes: number;
       owner: string;
       ownerDisplayName: string;
+      ownerUsername: null | string;
       priority: number;
       startDate: string;
       title: string;
@@ -96,6 +100,7 @@ export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabb
       const likeData = likeDataMap.get(likeKey);
 
       return {
+        collectionSlug: content.collectionSlug || null,
         comments: content.comments || 0,
         contentId: content.contentId,
         contentSlug: content.contentSlug || content.contentId,
@@ -109,6 +114,7 @@ export async function FeaturedTabbedContentAsync({ currentUserId }: FeaturedTabb
         likes: likeData?.likeCount ?? (content.likes || 0),
         owner: content.owner || 'Unknown',
         ownerDisplayName: content.ownerDisplayName || content.owner || 'Unknown',
+        ownerUsername: content.ownerUsername || null,
         priority: content.priority,
         startDate: (content.startDate || new Date()).toISOString().split('T')[0]!,
         title: content.title || '',

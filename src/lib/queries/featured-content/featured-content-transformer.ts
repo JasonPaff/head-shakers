@@ -4,6 +4,8 @@
  */
 
 export interface FeaturedContentData {
+  /** Parent collection slug for bobbleheads (used in URL routing) */
+  collectionSlug?: null | string;
   comments?: number;
   contentId: string;
   /** the name of the content (bobblehead name, collection name, etc.) */
@@ -22,6 +24,8 @@ export interface FeaturedContentData {
   // joined content data
   owner?: null | string;
   ownerDisplayName?: null | string;
+  /** Owner username for URL routing */
+  ownerUsername?: null | string;
   priority: number;
   startDate: Date | null;
   title: null | string;
@@ -30,6 +34,7 @@ export interface FeaturedContentData {
 }
 
 export interface RawFeaturedContentData {
+  bobbleheadCollectionSlug: null | string;
   bobbleheadLikes: null | number;
   bobbleheadName: null | string;
   bobbleheadOwner: null | string;
@@ -104,6 +109,7 @@ export class FeaturedContentTransformer {
    */
   static transformFeaturedContent(rawData: Array<RawFeaturedContentData>): Array<FeaturedContentData> {
     return rawData.map((row) => ({
+      collectionSlug: this.determineCollectionSlug(row),
       comments: 0, // TODO: implement comments count
       contentId: row.contentId,
       contentName: this.determineContentName(row),
@@ -120,12 +126,25 @@ export class FeaturedContentTransformer {
       likes: row.bobbleheadLikes || 0,
       owner: this.determineContentOwner(row),
       ownerDisplayName: this.determineOwnerDisplayName(row),
+      ownerUsername: this.determineOwnerUsername(row),
       priority: row.priority,
       startDate: row.startDate,
       title: row.title,
       updatedAt: row.updatedAt,
       viewCount: row.viewCount,
     }));
+  }
+
+  /**
+   * business logic for determining the collection slug for URL routing
+   * For bobbleheads, this returns the parent collection's slug
+   * For collections, this returns null (collection slug is in contentSlug)
+   */
+  private static determineCollectionSlug(row: RawFeaturedContentData): null | string {
+    if (row.contentType === 'bobblehead') {
+      return row.bobbleheadCollectionSlug;
+    }
+    return null;
   }
 
   /**
@@ -194,6 +213,19 @@ export class FeaturedContentTransformer {
       return row.collectionOwnerUsername;
     }
     // for featured users, userUsername is the user's own username
+    return row.userUsername;
+  }
+
+  /**
+   * business logic for determining the owner username for URL routing
+   */
+  private static determineOwnerUsername(row: RawFeaturedContentData): null | string {
+    if (row.contentType === 'bobblehead') {
+      return row.bobbleheadOwnerUsername;
+    }
+    if (row.contentType === 'collection') {
+      return row.collectionOwnerUsername;
+    }
     return row.userUsername;
   }
 }

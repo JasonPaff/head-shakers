@@ -16,6 +16,7 @@ describe('FeaturedContentTransformer', () => {
     it('should transform complete bobblehead record correctly', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: 'my-collection',
           bobbleheadLikes: 42,
           bobbleheadName: 'Yankees Derek Jeter',
           bobbleheadOwner: 'user-123',
@@ -50,6 +51,7 @@ describe('FeaturedContentTransformer', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
+        collectionSlug: 'my-collection',
         comments: 0,
         contentId: 'bobblehead-id-123',
         contentName: 'Yankees Derek Jeter',
@@ -66,6 +68,7 @@ describe('FeaturedContentTransformer', () => {
         likes: 42,
         owner: 'user-123',
         ownerDisplayName: 'bobblefan',
+        ownerUsername: 'bobblefan',
         priority: 1,
         startDate: new Date('2024-01-01T00:00:00Z'),
         title: 'Featured Pick of the Day',
@@ -77,6 +80,7 @@ describe('FeaturedContentTransformer', () => {
     it('should transform complete collection record correctly', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -111,6 +115,7 @@ describe('FeaturedContentTransformer', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
+        collectionSlug: null,
         comments: 0,
         contentId: 'collection-id-456',
         contentName: null,
@@ -127,6 +132,7 @@ describe('FeaturedContentTransformer', () => {
         likes: 0,
         owner: 'user-456',
         ownerDisplayName: 'collector123',
+        ownerUsername: 'collector123',
         priority: 10,
         startDate: new Date('2024-02-01T00:00:00Z'),
         title: 'Collection of the Week',
@@ -138,6 +144,7 @@ describe('FeaturedContentTransformer', () => {
     it('should transform complete user record correctly', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -172,6 +179,7 @@ describe('FeaturedContentTransformer', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
+        collectionSlug: null,
         comments: 0,
         contentId: 'user-id-789',
         contentName: 'topuser',
@@ -188,6 +196,7 @@ describe('FeaturedContentTransformer', () => {
         likes: 0,
         owner: 'user-id-789',
         ownerDisplayName: 'topuser',
+        ownerUsername: 'topuser',
         priority: 5,
         startDate: new Date('2024-03-01T00:00:00Z'),
         title: 'Collector of the Month',
@@ -199,6 +208,7 @@ describe('FeaturedContentTransformer', () => {
     it('should handle null optional fields', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -233,6 +243,7 @@ describe('FeaturedContentTransformer', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
+        collectionSlug: null,
         comments: 0,
         contentId: 'content-123',
         contentName: null,
@@ -249,6 +260,7 @@ describe('FeaturedContentTransformer', () => {
         likes: 0,
         owner: null,
         ownerDisplayName: null,
+        ownerUsername: null,
         priority: 0,
         startDate: null,
         title: null,
@@ -260,6 +272,7 @@ describe('FeaturedContentTransformer', () => {
     it('should prioritize explicit imageUrl over content-specific images', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: 'test-collection',
           bobbleheadLikes: null,
           bobbleheadName: 'Test Bobblehead',
           bobbleheadOwner: 'user-1',
@@ -298,6 +311,7 @@ describe('FeaturedContentTransformer', () => {
     it('should fallback to bobblehead primary photo when no explicit imageUrl', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: 'test-collection',
           bobbleheadLikes: null,
           bobbleheadName: 'Test Bobblehead',
           bobbleheadOwner: 'user-1',
@@ -336,6 +350,7 @@ describe('FeaturedContentTransformer', () => {
     it('should fallback to collection cover image when no explicit imageUrl', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -374,6 +389,7 @@ describe('FeaturedContentTransformer', () => {
     it('should prioritize bobblehead owner over collection owner', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: 'test-collection',
           bobbleheadLikes: null,
           bobbleheadName: 'Test Bobblehead',
           bobbleheadOwner: 'bobblehead-owner',
@@ -413,6 +429,7 @@ describe('FeaturedContentTransformer', () => {
     it('should use collection owner when no bobblehead owner', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -452,6 +469,7 @@ describe('FeaturedContentTransformer', () => {
     it('should use userId when no bobblehead or collection owner', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -491,6 +509,7 @@ describe('FeaturedContentTransformer', () => {
     it('should transform multiple records correctly', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: 'collection-1',
           bobbleheadLikes: 10,
           bobbleheadName: 'Bobblehead 1',
           bobbleheadOwner: 'user-1',
@@ -520,6 +539,7 @@ describe('FeaturedContentTransformer', () => {
           viewCount: 100,
         },
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,
@@ -562,6 +582,7 @@ describe('FeaturedContentTransformer', () => {
     it('should default likes to 0 when bobbleheadLikes is null', () => {
       const rawData: Array<RawFeaturedContentData> = [
         {
+          bobbleheadCollectionSlug: null,
           bobbleheadLikes: null,
           bobbleheadName: null,
           bobbleheadOwner: null,

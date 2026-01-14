@@ -932,7 +932,12 @@ export class CollectionsQuery extends BaseQuery {
     return await dbInstance
       .select({ count: count() })
       .from(collections)
-      .where(and(buildSoftDeleteFilter(collections.deletedAt, context), eq(collections.isPublic, true)))
+      .where(
+        this.combineFilters(
+          buildSoftDeleteFilter(collections.deletedAt, context),
+          eq(collections.isPublic, true),
+        ),
+      )
       .then((result) => result[0]?.count || 0);
   }
 

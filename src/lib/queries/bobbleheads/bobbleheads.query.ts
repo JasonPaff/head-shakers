@@ -598,7 +598,12 @@ export class BobbleheadsQuery extends BaseQuery {
     return await dbInstance
       .select({ count: count() })
       .from(bobbleheads)
-      .where(and(buildSoftDeleteFilter(bobbleheads.deletedAt, context), eq(bobbleheads.isPublic, true)))
+      .where(
+        this.combineFilters(
+          buildSoftDeleteFilter(bobbleheads.deletedAt, context),
+          eq(bobbleheads.isPublic, true),
+        ),
+      )
       .then((result) => result[0]?.count || 0);
   }
 
@@ -942,7 +947,7 @@ export class BobbleheadsQuery extends BaseQuery {
     id: string,
     isFeatured: boolean,
     context: UserQueryContext,
-  ): Promise<(BobbleheadRecord & { collectionSlug: string | null }) | null> {
+  ): Promise<(BobbleheadRecord & { collectionSlug: null | string }) | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
