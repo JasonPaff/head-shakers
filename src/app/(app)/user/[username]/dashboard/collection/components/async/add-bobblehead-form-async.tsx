@@ -11,7 +11,7 @@ export async function AddBobbleheadFormAsync() {
 
   const userCollections = await BobbleheadsDashboardFacade.getUserCollectionSelectorsAsync(userId);
 
-  const currentCollection = userCollections.find((c) => c.slug === collectionSlug);
+  // const currentCollection = userCollections.find((c) => c.slug === collectionSlug);
 
   return <></>;
 }

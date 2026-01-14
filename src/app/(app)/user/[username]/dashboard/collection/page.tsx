@@ -16,7 +16,6 @@ import { sortCollections } from '@/lib/utils/collection.utils';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 import { getUserPreferences } from '@/utils/server-cookies';
 
-import { AddItemFormSkeleton } from './components/add-form/skeletons/add-item-form-skeleton';
 import { AddBobbleheadFormAsync } from './components/async/add-bobblehead-form-async';
 import { BobbleheadGridAsync } from './components/async/bobblehead-grid-async';
 import { CollectionHeaderAsync } from './components/async/collection-header-async';
@@ -155,7 +154,7 @@ const MainContent = ({ collectionSlug, filterParams, mode }: MainContentProps) =
   if (mode === 'add') {
     return (
       <ErrorBoundary name={'add-bobblehead-form'}>
-        <Suspense fallback={<AddItemFormSkeleton />}>
+        <Suspense fallback={<></>}>
           <AddBobbleheadFormAsync />
         </Suspense>
       </ErrorBoundary>
@@ -165,7 +164,7 @@ const MainContent = ({ collectionSlug, filterParams, mode }: MainContentProps) =
   if (mode === 'edit') {
     return (
       <ErrorBoundary name={'edit-bobblehead-form'}>
-        <Suspense fallback={<AddItemFormSkeleton />}>
+        <Suspense fallback={<></>}>
           <EditBobbleheadFormAsync />
         </Suspense>
       </ErrorBoundary>
