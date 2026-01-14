@@ -1588,11 +1588,12 @@ export class BobbleheadsFacade extends BaseFacade {
 
         if (result) {
           // Pass the collection slug directly for cache invalidation
-          await this.invalidateOnUpdateAsync(result, userId, result.collectionSlug ?? undefined);
+          const collectionSlug = result.collectionSlug;
+          await this.invalidateOnUpdateAsync(result, userId, collectionSlug ?? undefined);
 
           // Return without the collectionSlug property
-          const { collectionSlug: _, ...bobblehead } = result;
-          return bobblehead;
+          delete (result as { collectionSlug?: null | string }).collectionSlug;
+          return result;
         }
 
         return null;
