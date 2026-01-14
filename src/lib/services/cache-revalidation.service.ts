@@ -319,6 +319,12 @@ export class CacheRevalidationService {
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
 
+      // Invalidate collection-slug based cache tag
+      // Dashboard cache uses collectionSlug as identifier, not collectionId
+      if (collectionSlug) {
+        tags.push(CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionSlug));
+      }
+
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {

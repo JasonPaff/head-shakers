@@ -225,7 +225,7 @@ export class BobbleheadsFacade extends BaseFacade {
    * Batch update the featured status of multiple bobbleheads.
    * Requires ownership verification for all bobbleheads.
    *
-   * Cache invalidation: Calls invalidateOnUpdate for each successfully updated bobblehead.
+   * Cache invalidation: Calls invalidateOnUpdateAsync for each successfully updated bobblehead.
    *
    * @param ids - Array of bobblehead IDs to update
    * @param isFeatured - New featured status (true or false)
@@ -251,9 +251,7 @@ export class BobbleheadsFacade extends BaseFacade {
         const results = await BobbleheadsQuery.batchUpdateFeaturedAsync(ids, isFeatured, context);
 
         // Invalidate cache for each updated bobblehead
-        results.forEach((bobblehead) => {
-          this.invalidateOnUpdate(bobblehead, userId);
-        });
+        await Promise.all(results.map((bobblehead) => this.invalidateOnUpdateAsync(bobblehead, userId)));
 
         return results;
       },
@@ -1493,7 +1491,7 @@ export class BobbleheadsFacade extends BaseFacade {
    * Update a bobblehead with new data.
    * Regenerates slug if name is changed.
    *
-   * Cache invalidation: Calls invalidateOnUpdate after successful update.
+   * Cache invalidation: Calls invalidateOnUpdateAsync after successful update.
    *
    * @param data - Update data including bobblehead ID and fields to update
    * @param userId - User ID for ownership verification
@@ -1544,7 +1542,7 @@ export class BobbleheadsFacade extends BaseFacade {
         const updatedBobblehead = await BobbleheadsQuery.updateAsync(updateData, userId, context);
 
         if (updatedBobblehead) {
-          this.invalidateOnUpdate(updatedBobblehead, userId);
+          await this.invalidateOnUpdateAsync(updatedBobblehead, userId);
         }
 
         return updatedBobblehead;
@@ -1563,7 +1561,7 @@ export class BobbleheadsFacade extends BaseFacade {
    * Update the featured status of a single bobblehead.
    * Requires ownership verification.
    *
-   * Cache invalidation: Calls invalidateOnUpdate after successful update.
+   * Cache invalidation: Calls invalidateOnUpdateAsync after successful update.
    *
    * @param id - ID of the bobblehead to update
    * @param isFeatured - New featured status (true or false)
@@ -1589,7 +1587,7 @@ export class BobbleheadsFacade extends BaseFacade {
         const result = await BobbleheadsQuery.updateFeaturedAsync(id, isFeatured, context);
 
         if (result) {
-          this.invalidateOnUpdate(result, userId);
+          await this.invalidateOnUpdateAsync(result, userId);
         }
 
         return result;
@@ -1718,14 +1716,25 @@ export class BobbleheadsFacade extends BaseFacade {
   /**
    * Invalidate caches after bobblehead update.
    * Triggers both metadata cache and tag-based cache invalidation.
+   * Looks up collection slug for proper dashboard cache invalidation.
    */
-  private static invalidateOnUpdate(bobblehead: BobbleheadRecord, userId: string): void {
+  private static async invalidateOnUpdateAsync(bobblehead: BobbleheadRecord, userId: string): Promise<void> {
     invalidateMetadataCache('bobblehead', bobblehead.id);
+
+    // Look up collection slug for cache invalidation
+    // Dashboard cache uses collectionSlug as identifier, not collectionId
+    let collectionSlug: string | undefined;
+    if (bobblehead.collectionId) {
+      const collection = await CollectionsFacade.getByIdAsync(bobblehead.collectionId, userId);
+      collectionSlug = collection?.slug;
+    }
+
     CacheRevalidationService.bobbleheads.onUpdate(
       bobblehead.id,
       userId,
       bobblehead.collectionId,
       bobblehead.slug,
+      collectionSlug,
     );
   }
 
