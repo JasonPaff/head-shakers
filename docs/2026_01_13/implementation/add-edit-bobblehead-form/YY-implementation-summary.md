@@ -14,17 +14,17 @@
 
 ## Specialist Routing Summary
 
-| Step | Specialist | Status |
-|------|------------|--------|
-| 1. Types | form-specialist | Completed |
-| 2. Hook | form-specialist | Completed |
-| 3. Form Fields | form-specialist | Completed |
-| 4. Custom Fields | form-specialist | Merged into Step 3 |
-| 5. Main Form | form-specialist | Completed |
-| 6. Add Async | server-component-specialist | Completed |
-| 7. Edit Async | server-component-specialist | Completed |
-| 8. Tests | component-test-specialist | Completed |
-| 9. Verification | general-purpose | Completed |
+| Step             | Specialist                  | Status             |
+| ---------------- | --------------------------- | ------------------ |
+| 1. Types         | form-specialist             | Completed          |
+| 2. Hook          | form-specialist             | Completed          |
+| 3. Form Fields   | form-specialist             | Completed          |
+| 4. Custom Fields | form-specialist             | Merged into Step 3 |
+| 5. Main Form     | form-specialist             | Completed          |
+| 6. Add Async     | server-component-specialist | Completed          |
+| 7. Edit Async    | server-component-specialist | Completed          |
+| 8. Tests         | component-test-specialist   | Completed          |
+| 9. Verification  | general-purpose             | Completed          |
 
 ## Files Created
 

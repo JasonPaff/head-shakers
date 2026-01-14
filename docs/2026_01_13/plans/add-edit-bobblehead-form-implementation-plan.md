@@ -18,6 +18,7 @@
 ## File Discovery Results
 
 ### Files to CREATE:
+
 1. `src/components/feature/bobblehead/bobblehead-upsert-form.types.ts` - Type definitions
 2. `src/components/feature/bobblehead/hooks/use-bobblehead-upsert-form.ts` - Form state hook
 3. `src/components/feature/bobblehead/bobblehead-form-fields.tsx` - Form fields component
@@ -25,10 +26,12 @@
 5. `src/components/feature/bobblehead/bobblehead-upsert-form.tsx` - Main form component
 
 ### Files to MODIFY:
+
 1. `src/app/(app)/user/[username]/dashboard/collection/components/async/add-bobblehead-form-async.tsx`
 2. `src/app/(app)/user/[username]/dashboard/collection/components/async/edit-bobblehead-form-async.tsx`
 
 ### Existing Infrastructure (NO changes):
+
 - Validation schemas, server actions, facades are complete
 
 ---

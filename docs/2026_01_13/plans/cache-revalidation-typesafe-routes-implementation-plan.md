@@ -27,17 +27,21 @@ This refactoring systematically replaces all hardcoded path strings in the cache
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on lines 157-159
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}` with `$path()` call using route `/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]` and routeParams `{ username, collectionSlug, bobbleheadSlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username, collectionSlug, and bobbleheadSlug
 - [ ] All validation commands pass
@@ -51,17 +55,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on lines 199-201
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}` with `$path()` call using same pattern as Step 1
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username, collectionSlug, and bobbleheadSlug
 - [ ] All validation commands pass
@@ -75,17 +83,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on lines 257-260
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}` with `$path()` call
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username, collectionSlug, and bobbleheadSlug
 - [ ] All validation commands pass
@@ -99,17 +111,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on lines 291-294
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}` with `$path()` call
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username, collectionSlug, and bobbleheadSlug
 - [ ] All validation commands pass
@@ -123,17 +139,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on lines 331-334
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}` with `$path()` call
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username, collectionSlug, and bobbleheadSlug
 - [ ] All validation commands pass
@@ -147,18 +167,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded paths on lines 381 and 384-386
 
 **Changes:**
+
 - Replace collection path template literal on line 381 with `$path()` call using route `/user/[username]/collection/[collectionSlug]` and routeParams `{ username, collectionSlug }`
 - Replace bobblehead path template literal on lines 384-386 with `$path()` call using route `/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]` and routeParams `{ username, collectionSlug, bobbleheadSlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both template literal paths replaced with $path() calls
 - [ ] Collection path uses username and collectionSlug params
 - [ ] Bobblehead path uses username, collectionSlug, and bobbleheadSlug params
@@ -173,17 +197,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on line 455
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}` with `$path()` call using route `/user/[username]/collection/[collectionSlug]` and routeParams `{ username, collectionSlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username and collectionSlug
 - [ ] All validation commands pass
@@ -197,17 +225,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded path on line 484
 
 **Changes:**
+
 - Replace template literal `/user/${username}/collection/${collectionSlug}` with `$path()` call using route `/user/[username]/collection/[collectionSlug]` and routeParams `{ username, collectionSlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Template literal path replaced with $path() call
 - [ ] Route params include username and collectionSlug
 - [ ] All validation commands pass
@@ -221,18 +253,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded paths on lines 628-631 and 635
 
 **Changes:**
+
 - Replace bobblehead path template literal (lines 628-631, in 'bobblehead' case) with `$path()` call using route `/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]` and routeParams `{ username, collectionSlug, bobbleheadSlug: entitySlug }`
 - Replace collection path template literal (line 635, in 'collection' case) with `$path()` call using route `/user/[username]/collection/[collectionSlug]` and routeParams `{ username, collectionSlug: entitySlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both template literal paths replaced with $path() calls
 - [ ] Bobblehead case uses entitySlug as bobbleheadSlug param
 - [ ] Collection case uses entitySlug as collectionSlug param
@@ -247,18 +283,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Replace hardcoded paths on lines 690-693 and 697
 
 **Changes:**
+
 - Replace bobblehead path template literal (lines 690-693, in 'bobblehead' case) with `$path()` call using route `/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]` and routeParams `{ username, collectionSlug, bobbleheadSlug: entitySlug }`
 - Replace collection path template literal (line 697, in 'collection' case) with `$path()` call using route `/user/[username]/collection/[collectionSlug]` and routeParams `{ username, collectionSlug: entitySlug }`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both template literal paths replaced with $path() calls
 - [ ] Bobblehead case uses entitySlug as bobbleheadSlug param
 - [ ] Collection case uses entitySlug as collectionSlug param
@@ -273,18 +313,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Final review only, no modifications expected
 
 **Changes:**
+
 - Verify no remaining hardcoded path strings exist (search for template literals containing `/user/${` pattern)
 - Verify all $path() calls follow the same structure as the reference pattern in collections.onCreate (lines 417-425)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All 15 hardcoded path instances have been replaced with $path() calls
 - [ ] No template literals containing `/user/${` remain in the file (except as part of route strings in $path)
 - [ ] All validation commands pass

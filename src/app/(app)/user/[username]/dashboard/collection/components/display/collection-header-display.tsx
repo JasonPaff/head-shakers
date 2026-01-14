@@ -4,6 +4,7 @@ import { useQueryStates } from 'nuqs';
 import { Fragment, useState } from 'react';
 
 import type { CollectionForUpsert } from '@/components/feature/collections/collection-upsert-dialog.types';
+import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { CollectionDashboardHeaderRecord } from '@/lib/queries/collections/collections-dashboard.query';
 
 import { collectionDashboardParsers } from '@/app/(app)/user/[username]/dashboard/collection/route-type';
@@ -54,6 +55,10 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
     setEditingCollection(null);
   };
 
+  const handleEditSuccess = (result: CollectionCreatedResult) => {
+    void setParams({ collectionSlug: result.slug });
+  };
+
   const handleDelete = () => {
     setIsConfirmDeleteDialogOpen.on();
   };
@@ -83,6 +88,7 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
           collection={editingCollection!}
           isOpen={isEditDialogOpen}
           onClose={handleEditDialogClose}
+          onSuccess={handleEditSuccess}
         />
       </Conditional>
     </Fragment>
