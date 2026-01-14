@@ -1,7 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
-import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
   // homepage - anyone can view
@@ -80,23 +79,6 @@ const middleware = clerkMiddleware(async (auth, req) => {
     url: req.url,
     userAgent: req.headers.get('user-agent'),
   });
-
-  // production gate: only allow authorized admins to access the site
-  // only apply in production environment
-  // skip the production gate for webhooks (external services)
-  if (process.env.NODE_ENV === 'production') {
-    const isWebhook = req.nextUrl.pathname.startsWith('/api/webhooks');
-    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
-
-    if (!isComingSoonPage && !isWebhook) {
-      const isAuthorized =
-        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_35zTGtvaOMrBLqrLeax2e3oA4YN';
-      if (!isAuthorized) {
-        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
-        return NextResponse.redirect(comingSoonUrl);
-      }
-    }
-  }
 
   // construct absolute URL for homepage
   const homeUrl = new URL($path({ route: '/' }), req.url).toString();
