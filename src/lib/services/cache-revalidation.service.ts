@@ -155,7 +155,15 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {
           revalidatePath(
-            `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+              routeParams: {
+                bobbleheadSlug,
+                collectionSlug,
+                username,
+              },
+              searchParams: {},
+            }),
             'page',
           );
         } catch (error) {
@@ -197,7 +205,15 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {
           revalidatePath(
-            `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+              routeParams: {
+                bobbleheadSlug,
+                collectionSlug,
+                username,
+              },
+              searchParams: {},
+            }),
             'page',
           );
         } catch (error) {
@@ -255,7 +271,15 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {
           revalidatePath(
-            `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+              routeParams: {
+                bobbleheadSlug,
+                collectionSlug,
+                username,
+              },
+              searchParams: {},
+            }),
             'page',
           );
         } catch (error) {
@@ -289,7 +313,15 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {
           revalidatePath(
-            `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+              routeParams: {
+                bobbleheadSlug,
+                collectionSlug,
+                username,
+              },
+              searchParams: {},
+            }),
             'page',
           );
         } catch (error) {
@@ -329,7 +361,15 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && bobbleheadSlug && collectionSlug && username) {
         try {
           revalidatePath(
-            `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+              routeParams: {
+                bobbleheadSlug,
+                collectionSlug,
+                username,
+              },
+              searchParams: {},
+            }),
             'page',
           );
         } catch (error) {
@@ -378,11 +418,28 @@ export class CacheRevalidationService {
       if (isCacheEnabled() && username) {
         try {
           if (collectionSlug) {
-            revalidatePath(`/user/${username}/collection/${collectionSlug}`, 'page');
+            revalidatePath(
+              $path({
+                route: '/user/[username]/collection/[collectionSlug]',
+                routeParams: {
+                  collectionSlug,
+                  username,
+                },
+              }),
+              'page',
+            );
           }
           if (bobbleheadSlug && collectionSlug) {
             revalidatePath(
-              `/user/${username}/collection/${collectionSlug}/bobbleheads/${bobbleheadSlug}`,
+              $path({
+                route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+                routeParams: {
+                  bobbleheadSlug,
+                  collectionSlug,
+                  username,
+                },
+                searchParams: {},
+              }),
               'page',
             );
           }
@@ -452,7 +509,16 @@ export class CacheRevalidationService {
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && collectionSlug && username) {
         try {
-          revalidatePath(`/user/${username}/collection/${collectionSlug}`, 'page');
+          revalidatePath(
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]',
+              routeParams: {
+                collectionSlug,
+                username,
+              },
+            }),
+            'page',
+          );
         } catch (error) {
           console.error('[CacheRevalidation] Path revalidation error on delete:', error);
         }
@@ -481,7 +547,16 @@ export class CacheRevalidationService {
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && collectionSlug && username) {
         try {
-          revalidatePath(`/user/${username}/collection/${collectionSlug}`, 'page');
+          revalidatePath(
+            $path({
+              route: '/user/[username]/collection/[collectionSlug]',
+              routeParams: {
+                collectionSlug,
+                username,
+              },
+            }),
+            'page',
+          );
         } catch (error) {
           console.error('[CacheRevalidation] Path revalidation error on update:', error);
         }
@@ -626,13 +701,30 @@ export class CacheRevalidationService {
             case 'bobblehead':
               if (collectionSlug) {
                 revalidatePath(
-                  `/user/${username}/collection/${collectionSlug}/bobbleheads/${entitySlug}`,
+                  $path({
+                    route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+                    routeParams: {
+                      bobbleheadSlug: entitySlug,
+                      collectionSlug,
+                      username,
+                    },
+                    searchParams: {},
+                  }),
                   'page',
                 );
               }
               break;
             case 'collection':
-              revalidatePath(`/user/${username}/collection/${entitySlug}`, 'page');
+              revalidatePath(
+                $path({
+                  route: '/user/[username]/collection/[collectionSlug]',
+                  routeParams: {
+                    collectionSlug: entitySlug,
+                    username,
+                  },
+                }),
+                'page',
+              );
               break;
           }
         } catch (error) {
@@ -688,13 +780,30 @@ export class CacheRevalidationService {
             case 'bobblehead':
               if (collectionSlug) {
                 revalidatePath(
-                  `/user/${username}/collection/${collectionSlug}/bobbleheads/${entitySlug}`,
+                  $path({
+                    route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+                    routeParams: {
+                      bobbleheadSlug: entitySlug,
+                      collectionSlug,
+                      username,
+                    },
+                    searchParams: {},
+                  }),
                   'page',
                 );
               }
               break;
             case 'collection':
-              revalidatePath(`/user/${username}/collection/${entitySlug}`, 'page');
+              revalidatePath(
+                $path({
+                  route: '/user/[username]/collection/[collectionSlug]',
+                  routeParams: {
+                    collectionSlug: entitySlug,
+                    username,
+                  },
+                }),
+                'page',
+              );
               break;
           }
         } catch (error) {
