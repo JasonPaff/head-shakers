@@ -598,7 +598,7 @@ export class BobbleheadsQuery extends BaseQuery {
     return await dbInstance
       .select({ count: count() })
       .from(bobbleheads)
-      .where(buildSoftDeleteFilter(bobbleheads.deletedAt, context))
+      .where(and(buildSoftDeleteFilter(bobbleheads.deletedAt, context), eq(bobbleheads.isPublic, true)))
       .then((result) => result[0]?.count || 0);
   }
 
