@@ -154,7 +154,7 @@ const MainContent = ({ collectionSlug, filterParams, mode }: MainContentProps) =
   if (mode === 'add') {
     return (
       <ErrorBoundary name={'add-bobblehead-form'}>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<Fragment></Fragment>}>
           <AddBobbleheadFormAsync />
         </Suspense>
       </ErrorBoundary>
@@ -164,7 +164,7 @@ const MainContent = ({ collectionSlug, filterParams, mode }: MainContentProps) =
   if (mode === 'edit') {
     return (
       <ErrorBoundary name={'edit-bobblehead-form'}>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<Fragment></Fragment>}>
           <EditBobbleheadFormAsync />
         </Suspense>
       </ErrorBoundary>

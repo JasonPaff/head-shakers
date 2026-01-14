@@ -1,9 +1,9 @@
 import type { VariantProps } from 'class-variance-authority';
 
 import { cva } from 'class-variance-authority';
-import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
+import { EditIcon, EyeIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import type { BobbleheadDashboardListRecord } from '@/lib/queries/bobbleheads/bobbleheads-dashboard.query';
 
@@ -63,8 +63,6 @@ export const BobbleheadCard = ({
   onSelectionChange,
   username,
 }: BobbleheadCardProps) => {
-  const router = useRouter();
-
   const handleCheckboxChange = (checked: boolean) => {
     onSelectionChange(bobblehead.id, checked);
   };
@@ -84,18 +82,6 @@ export const BobbleheadCard = ({
   const handleCardClick = () => {
     if (isSelectionMode) {
       onSelectionChange(bobblehead.id, !isSelected);
-    } else {
-      router.push(
-        $path({
-          route: '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
-          routeParams: {
-            bobbleheadSlug: bobblehead.slug,
-            collectionSlug: bobblehead.collectionSlug,
-            username,
-          },
-          searchParams: {},
-        }),
-      );
     }
   };
 
@@ -113,14 +99,18 @@ export const BobbleheadCard = ({
         <HoverCardTrigger asChild>
           <div
             aria-checked={isSelectionMode ? isSelected : undefined}
-            className={'cursor-pointer'}
-            onClick={handleCardClick}
-            onKeyDown={(e) => {
-              if (isSelectionMode && (e.key === 'Enter' || e.key === ' ')) {
-                e.preventDefault();
-                handleCardClick();
-              }
-            }}
+            className={isSelectionMode ? 'cursor-pointer' : undefined}
+            onClick={isSelectionMode ? handleCardClick : undefined}
+            onKeyDown={
+              isSelectionMode ?
+                (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick();
+                  }
+                }
+              : undefined
+            }
             role={isSelectionMode ? 'checkbox' : undefined}
             tabIndex={isSelectionMode ? 0 : undefined}
           >
@@ -186,6 +176,24 @@ export const BobbleheadCard = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={'end'}>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={$path({
+                            route:
+                              '/user/[username]/collection/[collectionSlug]/bobbleheads/[bobbleheadSlug]',
+                            routeParams: {
+                              bobbleheadSlug: bobblehead.slug,
+                              collectionSlug: bobblehead.collectionSlug,
+                              username,
+                            },
+                            searchParams: {},
+                          })}
+                        >
+                          <EyeIcon aria-hidden className={'size-4'} />
+                          View Details
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleFeatureToggle}>
                         <StarIcon aria-hidden className={'size-4'} />
                         {bobblehead.isFeatured ? 'Un-feature' : 'Feature'}
