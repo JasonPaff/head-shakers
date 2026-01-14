@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
 import { Fragment, useMemo, useState } from 'react';
 
 import { UsernameSetupDialog } from '@/components/feature/users/username-setup-dialog';
@@ -17,15 +18,18 @@ export const UsernameOnboardingProvider = ({
   currentUsername,
   shouldShow,
 }: UsernameOnboardingProviderProps) => {
+  const { userId } = useAuth();
+
   // Calculate initial state based on props and localStorage
   const initialIsOpen = useMemo(() => {
     // Check if user has already dismissed the dialog
     const _isDismissed =
-      typeof window !== 'undefined' && localStorage.getItem('username-setup-dialog-dismissed') === 'true';
+      typeof window !== 'undefined' &&
+      localStorage.getItem(`${userId}-username-setup-dialog-dismissed`) === 'true';
 
     // Show dialog only if server says we should and not dismissed
     return shouldShow && !_isDismissed;
-  }, [shouldShow]);
+  }, [shouldShow, userId]);
 
   // State
   const [isOpen, setIsOpen] = useState(initialIsOpen);

@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
 import { Fragment } from 'react';
 
 import { UsernameEditForm } from '@/components/feature/users/username-edit-form';
@@ -24,6 +25,7 @@ interface UsernameSetupDialogProps {
 
 export const UsernameSetupDialog = ({ currentUsername, isOpen, onClose }: UsernameSetupDialogProps) => {
   const [isCustomizing, setIsCustomizing] = useToggle();
+  const { userId } = useAuth();
 
   // Server action to skip username setup (keeps current username, sets timestamp)
   const { executeAsync: skipSetup, isExecuting: isSkipping } = useServerAction(updateUsernameAction, {
@@ -41,7 +43,7 @@ export const UsernameSetupDialog = ({ currentUsername, isOpen, onClose }: Userna
   const handleClose = () => {
     // Store dismissal in localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('username-setup-dialog-dismissed', 'true');
+      localStorage.setItem(`${userId}-username-setup-dialog-dismissed`, 'true');
     }
 
     // Wait for dialog close animation
