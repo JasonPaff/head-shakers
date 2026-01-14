@@ -1587,10 +1587,15 @@ export class BobbleheadsFacade extends BaseFacade {
         const result = await BobbleheadsQuery.updateFeaturedAsync(id, isFeatured, context);
 
         if (result) {
-          await this.invalidateOnUpdateAsync(result, userId);
+          // Pass the collection slug directly for cache invalidation
+          await this.invalidateOnUpdateAsync(result, userId, result.collectionSlug ?? undefined);
+
+          // Return without the collectionSlug property
+          const { collectionSlug: _, ...bobblehead } = result;
+          return bobblehead;
         }
 
-        return result;
+        return null;
       },
       {
         includeResultSummary: (result) => ({
@@ -1716,17 +1721,24 @@ export class BobbleheadsFacade extends BaseFacade {
   /**
    * Invalidate caches after bobblehead update.
    * Triggers both metadata cache and tag-based cache invalidation.
-   * Looks up collection slug for proper dashboard cache invalidation.
+   *
+   * @param bobblehead - The updated bobblehead record
+   * @param userId - User ID for cache context
+   * @param collectionSlug - Optional collection slug for dashboard cache invalidation.
+   *                         If not provided, falls back to looking up the collection.
    */
-  private static async invalidateOnUpdateAsync(bobblehead: BobbleheadRecord, userId: string): Promise<void> {
+  private static async invalidateOnUpdateAsync(
+    bobblehead: BobbleheadRecord,
+    userId: string,
+    collectionSlug?: string,
+  ): Promise<void> {
     invalidateMetadataCache('bobblehead', bobblehead.id);
 
-    // Look up collection slug for cache invalidation
-    // Dashboard cache uses collectionSlug as identifier, not collectionId
-    let collectionSlug: string | undefined;
-    if (bobblehead.collectionId) {
+    // Use provided slug or fall back to lookup for backward compatibility
+    let slug = collectionSlug;
+    if (!slug && bobblehead.collectionId) {
       const collection = await CollectionsFacade.getByIdAsync(bobblehead.collectionId, userId);
-      collectionSlug = collection?.slug;
+      slug = collection?.slug;
     }
 
     CacheRevalidationService.bobbleheads.onUpdate(
@@ -1734,7 +1746,7 @@ export class BobbleheadsFacade extends BaseFacade {
       userId,
       bobblehead.collectionId,
       bobblehead.slug,
-      collectionSlug,
+      slug,
     );
   }
 

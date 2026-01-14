@@ -936,12 +936,13 @@ export class BobbleheadsQuery extends BaseQuery {
 
   /**
    * update isFeatured status for a single bobblehead with ownership verification
+   * Returns the bobblehead record with collection slug for cache invalidation
    */
   static async updateFeaturedAsync(
     id: string,
     isFeatured: boolean,
     context: UserQueryContext,
-  ): Promise<BobbleheadRecord | null> {
+  ): Promise<(BobbleheadRecord & { collectionSlug: string | null }) | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -950,7 +951,20 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, context.userId)))
       .returning();
 
-    return result?.[0] || null;
+    const bobblehead = result?.[0];
+    if (!bobblehead) return null;
+
+    // Fetch collection slug for cache invalidation
+    const collection = await dbInstance
+      .select({ slug: collections.slug })
+      .from(collections)
+      .where(eq(collections.id, bobblehead.collectionId))
+      .limit(1);
+
+    return {
+      ...bobblehead,
+      collectionSlug: collection[0]?.slug ?? null,
+    };
   }
 
   /**
