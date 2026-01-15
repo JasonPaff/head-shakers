@@ -39,10 +39,11 @@ type CollectionForEdit = {
 
 type SidebarDisplayProps = {
   collections: Array<CollectionDashboardListRecord>;
+  username: string;
   userPreferences: UserPreferences;
 };
 
-export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayProps) => {
+export const SidebarDisplay = ({ collections, username, userPreferences }: SidebarDisplayProps) => {
   const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(
     userPreferences?.collectionSidebarView ?? 'compact',
   );
@@ -204,6 +205,7 @@ export const SidebarDisplay = ({ collections, userPreferences }: SidebarDisplayP
               onDeleteCollection={handleDeleteCollection}
               onEditCollection={handleEditCollection}
               selectedCollectionSlug={selectedCollectionSlug}
+              username={username}
             />
           ))
         : hasAnyCollections ?
@@ -253,6 +255,7 @@ interface CollectionCardMapperProps {
   onDeleteCollection: (id: string) => void;
   onEditCollection: (id: string) => void;
   selectedCollectionSlug?: string;
+  username: string;
 }
 
 const CollectionCardMapper = ({
@@ -263,6 +266,7 @@ const CollectionCardMapper = ({
   onDeleteCollection,
   onEditCollection,
   selectedCollectionSlug,
+  username,
 }: CollectionCardMapperProps) => {
   const isActive = collection.slug === selectedCollectionSlug;
 
@@ -275,6 +279,7 @@ const CollectionCardMapper = ({
         onClick={onCollectionSelect}
         onDelete={onDeleteCollection}
         onEdit={onEditCollection}
+        username={username}
       />
     );
   }
@@ -288,6 +293,7 @@ const CollectionCardMapper = ({
         onClick={onCollectionSelect}
         onDelete={onDeleteCollection}
         onEdit={onEditCollection}
+        username={username}
       />
     );
   }
@@ -299,6 +305,7 @@ const CollectionCardMapper = ({
       onClick={onCollectionSelect}
       onDelete={onDeleteCollection}
       onEdit={onEditCollection}
+      username={username}
     />
   );
 };

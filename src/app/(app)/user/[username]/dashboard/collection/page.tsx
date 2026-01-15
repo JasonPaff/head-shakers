@@ -82,7 +82,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
           sidebar={
             <ErrorBoundary name={'collection-sidebar'}>
               <Suspense fallback={<SidebarSkeleton />}>
-                <SidebarAsync />
+                <SidebarAsync username={username} />
               </Suspense>
             </ErrorBoundary>
           }
@@ -140,7 +140,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
       sidebar={
         <ErrorBoundary name={'collection-sidebar'}>
           <Suspense fallback={<SidebarSkeleton />}>
-            <SidebarAsync />
+            <SidebarAsync username={username} />
           </Suspense>
         </ErrorBoundary>
       }

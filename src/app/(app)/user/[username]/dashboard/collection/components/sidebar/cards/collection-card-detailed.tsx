@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react';
 
 import {
   EditIcon,
+  EyeIcon,
   GlobeIcon,
   HeartIcon,
   LockIcon,
@@ -9,6 +10,8 @@ import {
   StarIcon,
   TrashIcon,
 } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
@@ -19,6 +22,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -34,6 +38,7 @@ export type CollectionCardDetailedProps = {
   onClick: (slug: string) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  username: string;
 };
 
 export const CollectionCardDetailed = ({
@@ -43,6 +48,7 @@ export const CollectionCardDetailed = ({
   onClick,
   onDelete,
   onEdit,
+  username,
 }: CollectionCardDetailedProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
@@ -131,6 +137,22 @@ export const CollectionCardDetailed = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={'end'}>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={$path({
+                        route: '/user/[username]/collection/[collectionSlug]',
+                        routeParams: {
+                          collectionSlug: collection.slug,
+                          username,
+                        },
+                        searchParams: {},
+                      })}
+                    >
+                      <EyeIcon aria-hidden className={'size-4'} />
+                      View Collection
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleEdit}>
                     <EditIcon aria-hidden className={'size-4'} />
                     Edit Collection

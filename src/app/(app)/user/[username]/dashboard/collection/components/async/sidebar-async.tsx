@@ -6,11 +6,15 @@ import { getUserPreferences } from '@/utils/server-cookies';
 
 import { SidebarDisplay } from '../display/sidebar-display';
 
+type SidebarAsyncProps = {
+  username: string;
+};
+
 /**
  * Server component that fetches the collection data
  * and passes it to the client display component.
  */
-export async function SidebarAsync() {
+export async function SidebarAsync({ username }: SidebarAsyncProps) {
   const userId = await getRequiredUserIdAsync();
 
   const [collections, preferences] = await Promise.all([
@@ -18,5 +22,5 @@ export async function SidebarAsync() {
     getUserPreferences(),
   ]);
 
-  return <SidebarDisplay collections={collections} userPreferences={preferences} />;
+  return <SidebarDisplay collections={collections} username={username} userPreferences={preferences} />;
 }

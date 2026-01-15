@@ -1,6 +1,8 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, GlobeIcon, HeartIcon, LockIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
+import { EditIcon, EyeIcon, GlobeIcon, HeartIcon, LockIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import type { CollectionDashboardListRecord } from '@/lib/queries/collections/collections.query';
 
@@ -10,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -25,6 +28,7 @@ export type CollectionCardCoverProps = {
   onClick: (slug: string) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  username: string;
 };
 
 export const CollectionCardCover = ({
@@ -34,6 +38,7 @@ export const CollectionCardCover = ({
   onClick,
   onDelete,
   onEdit,
+  username,
 }: CollectionCardCoverProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
@@ -119,6 +124,22 @@ export const CollectionCardCover = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={'end'}>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={$path({
+                        route: '/user/[username]/collection/[collectionSlug]',
+                        routeParams: {
+                          collectionSlug: collection.slug,
+                          username,
+                        },
+                        searchParams: {},
+                      })}
+                    >
+                      <EyeIcon aria-hidden className={'size-4'} />
+                      View Collection
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleEdit}>
                     <EditIcon aria-hidden className={'size-4'} />
                     Edit Collection

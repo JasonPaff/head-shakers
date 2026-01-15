@@ -19,6 +19,7 @@ describe('CollectionCardDetailed', () => {
     onClick: vi.fn(),
     onDelete: vi.fn(),
     onEdit: vi.fn(),
+    username: 'testuser',
   };
 
   afterEach(() => {

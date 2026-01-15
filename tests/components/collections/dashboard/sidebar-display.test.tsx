@@ -205,6 +205,7 @@ describe('SidebarDisplay', () => {
       render(
         <SidebarDisplay
           collections={[mockCollectionDashboardRecord]}
+          username={'testuser'}
           userPreferences={defaultUserPreferences}
         />,
       );
@@ -217,6 +218,7 @@ describe('SidebarDisplay', () => {
       render(
         <SidebarDisplay
           collections={[mockCollectionDashboardRecord]}
+          username={'testuser'}
           userPreferences={defaultUserPreferences}
         />,
       );
@@ -229,7 +231,13 @@ describe('SidebarDisplay', () => {
     it('should render collection list with provided collections', () => {
       const collections = createMockCollectionDashboardRecords(3);
 
-      render(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByTestId('sidebar-collection-list')).toBeInTheDocument();
       collections.forEach((collection) => {
@@ -240,7 +248,13 @@ describe('SidebarDisplay', () => {
     it('should render sidebar footer with stats', () => {
       const collections = createMockCollectionDashboardRecords(5);
 
-      render(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByTestId('sidebar-footer')).toBeInTheDocument();
       expect(screen.getByText('5 collections')).toBeInTheDocument();
@@ -249,7 +263,13 @@ describe('SidebarDisplay', () => {
     it('should integrate all child components correctly', () => {
       const collections = createMockCollectionDashboardRecords(2);
 
-      render(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByTestId('sidebar-header')).toBeInTheDocument();
       expect(screen.getByTestId('sidebar-search')).toBeInTheDocument();
@@ -260,7 +280,9 @@ describe('SidebarDisplay', () => {
 
   describe('empty states', () => {
     it('should render no-collections empty state when list is empty', () => {
-      render(<SidebarDisplay collections={[]} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay collections={[]} username={'testuser'} userPreferences={defaultUserPreferences} />,
+      );
 
       expect(screen.getByTestId('no-collections-empty-state')).toBeInTheDocument();
       expect(screen.getByText('No collections yet')).toBeInTheDocument();
@@ -270,7 +292,11 @@ describe('SidebarDisplay', () => {
       const collections = [createMockCollectionDashboardRecord({ name: 'Sports Collection' })];
 
       const { user } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const searchInput = screen.getByTestId('search-input');
@@ -285,7 +311,11 @@ describe('SidebarDisplay', () => {
       const collections = [createMockCollectionDashboardRecord({ name: 'Sports Collection' })];
 
       const { user } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const searchInput = screen.getByTestId('search-input');
@@ -311,7 +341,11 @@ describe('SidebarDisplay', () => {
       ];
 
       const { user } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const searchInput = screen.getByTestId('search-input');
@@ -327,13 +361,23 @@ describe('SidebarDisplay', () => {
       const collections = createMockCollectionDashboardRecords(3);
 
       const { rerender } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const searchInput = screen.getByTestId<HTMLInputElement>('search-input');
       expect(searchInput.value).toBe('');
 
-      rerender(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      rerender(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(searchInput.value).toBe('');
     });
@@ -348,7 +392,11 @@ describe('SidebarDisplay', () => {
       ];
 
       const { user } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const sortSelect = screen.getByTestId('sort-select');
@@ -366,13 +414,23 @@ describe('SidebarDisplay', () => {
       const collections = createMockCollectionDashboardRecords(3);
 
       const { rerender } = render(
-        <SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const sortSelect = screen.getByTestId<HTMLSelectElement>('sort-select');
       expect(sortSelect.value).toBe('name-asc');
 
-      rerender(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      rerender(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(sortSelect.value).toBe('name-asc');
     });
@@ -385,6 +443,7 @@ describe('SidebarDisplay', () => {
       render(
         <SidebarDisplay
           collections={collections}
+          username={'testuser'}
           userPreferences={{
             ...defaultUserPreferences,
             collectionSidebarView: 'compact',
@@ -403,6 +462,7 @@ describe('SidebarDisplay', () => {
       render(
         <SidebarDisplay
           collections={collections}
+          username={'testuser'}
           userPreferences={{
             ...defaultUserPreferences,
             collectionSidebarView: 'cover',
@@ -421,6 +481,7 @@ describe('SidebarDisplay', () => {
       render(
         <SidebarDisplay
           collections={collections}
+          username={'testuser'}
           userPreferences={{
             ...defaultUserPreferences,
             collectionSidebarView: 'detailed',
@@ -440,12 +501,22 @@ describe('SidebarDisplay', () => {
       const updatedCollections = createMockCollectionDashboardRecords(3);
 
       const { rerender } = render(
-        <SidebarDisplay collections={initialCollections} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={initialCollections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       expect(screen.getByText('2 collections')).toBeInTheDocument();
 
-      rerender(<SidebarDisplay collections={updatedCollections} userPreferences={defaultUserPreferences} />);
+      rerender(
+        <SidebarDisplay
+          collections={updatedCollections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByText('3 collections')).toBeInTheDocument();
     });
@@ -455,13 +526,21 @@ describe('SidebarDisplay', () => {
     it('should show correct collection count in footer', () => {
       const collections = createMockCollectionDashboardRecords(7);
 
-      render(<SidebarDisplay collections={collections} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay
+          collections={collections}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByText('7 collections')).toBeInTheDocument();
     });
 
     it('should show 0 collections when list is empty', () => {
-      render(<SidebarDisplay collections={[]} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay collections={[]} username={'testuser'} userPreferences={defaultUserPreferences} />,
+      );
 
       expect(screen.getByText('0 collections')).toBeInTheDocument();
     });
@@ -471,7 +550,13 @@ describe('SidebarDisplay', () => {
     it('should handle very large collection lists', () => {
       const largeCollectionList = createMockCollectionDashboardRecords(100);
 
-      render(<SidebarDisplay collections={largeCollectionList} userPreferences={defaultUserPreferences} />);
+      render(
+        <SidebarDisplay
+          collections={largeCollectionList}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
+      );
 
       expect(screen.getByText('100 collections')).toBeInTheDocument();
       // Verify all collections are rendered by checking a sample
@@ -486,7 +571,11 @@ describe('SidebarDisplay', () => {
       ];
 
       const { user } = render(
-        <SidebarDisplay collections={largeCollectionList} userPreferences={defaultUserPreferences} />,
+        <SidebarDisplay
+          collections={largeCollectionList}
+          username={'testuser'}
+          userPreferences={defaultUserPreferences}
+        />,
       );
 
       const searchInput = screen.getByTestId('search-input');

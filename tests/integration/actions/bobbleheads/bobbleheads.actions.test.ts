@@ -71,6 +71,20 @@ vi.mock('@/lib/services/cache.service', () => ({
       categoriesByCollection: <T>(_key: unknown, callback: () => T): T => callback(),
       countByCollection: <T>(_key: unknown, callback: () => T): T => callback(),
     },
+    collections: {
+      browseResults: <T>(_key: unknown, callback: () => T): T => callback(),
+      byId: <T>(_key: unknown, callback: () => T): T => callback(),
+      byUser: <T>(_key: unknown, callback: () => T): T => callback(),
+      dashboard: <T>(_key: unknown, callback: () => T): T => callback(),
+      list: <T>(_key: unknown, callback: () => T): T => callback(),
+      public: <T>(_key: unknown, callback: () => T): T => callback(),
+      user: <T>(_key: unknown, callback: () => T): T => callback(),
+      withRelations: <T>(_key: unknown, callback: () => T): T => callback(),
+    },
+    users: {
+      profile: <T>(_key: unknown, callback: () => T): T => callback(),
+      stats: <T>(_key: unknown, callback: () => T): T => callback(),
+    },
   },
 }));
 
@@ -153,6 +167,13 @@ vi.mock('@/lib/facades/tags/tags.facade', () => ({
   },
 }));
 
+// Mock collections facade for cache invalidation lookups
+vi.mock('@/lib/facades/collections/collections.facade', () => ({
+  CollectionsFacade: {
+    getByIdAsync: vi.fn().mockResolvedValue({ slug: 'test-collection-slug' }),
+  },
+}));
+
 // Mock Clerk authentication
 const mockAuth = vi.fn();
 const mockCurrentUser = vi.fn();
@@ -196,7 +217,7 @@ describe('Bobblehead Actions Integration Tests', () => {
   });
 
   describe('deleteBobbleheadAction', () => {
-    it('should delete bobblehead successfully', async () => {
+    it('should delete bobblehead successfully and return deleted data', async () => {
       const collection = await createTestCollection({
         name: 'Test Collection',
         userId: testUser!.id,
@@ -217,13 +238,15 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Bobblehead deleted successfully!');
 
       // Verify success response structure - action returns the deleted bobblehead
       expect(result.data?.data).toBeDefined();
       expect(result.data?.data?.id).toBe(bobblehead!.id);
+      expect(result.data?.data?.name).toBe('Test Bobblehead');
     });
 
-    it('should soft-delete (set deletedAt) rather than hard delete', async () => {
+    it('should remove bobblehead from database after delete', async () => {
       const db = getTestDb();
       const collection = await createTestCollection({
         name: 'Test Collection',
@@ -242,42 +265,14 @@ describe('Bobblehead Actions Integration Tests', () => {
 
       await deleteBobbleheadAction(input);
 
-      // Verify the bobblehead still exists in database but has deletedAt set
-      // Query without the default where filter to see soft-deleted records
-      const allBobbleheads = await db.select().from(bobbleheads).where(eq(bobbleheads.id, bobblehead!.id));
+      // Verify the bobblehead no longer exists in database (hard delete)
+      const remainingBobbleheads = await db
+        .select()
+        .from(bobbleheads)
+        .where(eq(bobbleheads.id, bobblehead!.id));
 
-      // The query layer may filter out soft-deleted records by default
-      // So we check if the record exists or not based on the facade implementation
-      // Either the record exists with deletedAt set, or it was filtered out
-      expect(allBobbleheads.length).toBeGreaterThanOrEqual(0);
-      const [deletedBobblehead] = allBobbleheads;
-      // If record exists, verify soft delete fields
-      expect(deletedBobblehead?.deletedAt !== undefined || allBobbleheads.length === 0).toBe(true);
-    });
-
-    it('should return success response with deleted bobblehead data', async () => {
-      const collection = await createTestCollection({
-        name: 'Test Collection',
-        userId: testUser!.id,
-      });
-
-      const bobblehead = await createTestBobblehead({
-        collectionId: collection!.id,
-        name: 'Test Bobblehead',
-        userId: testUser!.id,
-      });
-
-      const input = {
-        bobbleheadId: bobblehead!.id,
-      };
-
-      const result = await deleteBobbleheadAction(input);
-
-      // Verify the response returns the deleted bobblehead on success
-      expect(result?.data?.wasSuccess).toBe(true);
-      expect(result.data?.data).toBeDefined();
-      expect(result.data?.data?.id).toBe(bobblehead!.id);
-      expect(result.data?.data?.name).toBe('Test Bobblehead');
+      // Record should be removed from database
+      expect(remainingBobbleheads).toHaveLength(0);
     });
 
     it('should return error when bobblehead not found', async () => {
@@ -344,6 +339,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Bobblehead featured successfully!');
 
       // Verify success response structure
       expect(result.data?.data).toBeDefined();
@@ -372,32 +368,9 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Bobblehead unfeatured successfully!');
 
       // Verify success response structure
-      expect(result.data?.data).toBeDefined();
-    });
-
-    it('should return success response', async () => {
-      const collection = await createTestCollection({
-        name: 'Test Collection',
-        userId: testUser!.id,
-      });
-
-      const bobblehead = await createTestBobblehead({
-        collectionId: collection!.id,
-        name: 'Test Bobblehead',
-        userId: testUser!.id,
-      });
-
-      const input = {
-        id: bobblehead!.id,
-        isFeatured: true,
-      };
-
-      const result = await updateBobbleheadFeatureAction(input);
-
-      // Verify the response contains bobblehead data
-      expect(result?.data?.wasSuccess).toBe(true);
       expect(result.data?.data).toBeDefined();
     });
 
@@ -478,6 +451,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Deleted 3 bobbleheads successfully!');
 
       // Verify success response structure
       expect(result.data?.data).toBeDefined();
@@ -588,6 +562,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Batch featured 3 bobbleheads successfully!');
 
       // Verify success response structure
       expect(result.data?.data).toBeDefined();
@@ -622,6 +597,7 @@ describe('Bobblehead Actions Integration Tests', () => {
       // Verify ActionResponse success format
       expect(result?.data).toBeDefined();
       expect(result?.data?.wasSuccess).toBe(true);
+      expect(result.data?.message).toBe('Batch unfeatured 2 bobbleheads successfully!');
 
       // Verify success response structure
       expect(result.data?.data).toBeDefined();
