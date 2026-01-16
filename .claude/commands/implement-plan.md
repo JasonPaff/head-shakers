@@ -9,7 +9,6 @@ implementation plans by delegating each step to **specialized subagents**. Your 
 tracking, routing to the correct specialist, and logging - NOT direct implementation.
 
 @CLAUDE.MD
-@package.json
 
 ## Command Usage
 
