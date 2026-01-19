@@ -147,6 +147,5 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **Requirements/Specs**: Save in `docs/{YYYY_MM_DD}/specs/` (e.g., `docs/2025_08_08/specs/AuthModuleRequirements.md`).
 - **Design Docs**: Save in `docs/{YYYY_MM_DD}/design/` (e.g., `docs/2025_08_08/design/ArchitectureOverview.md`).
 - **Code Files:** Follow the project structure (place new code in the appropriate src/module folder as discussed).
-- **Tests:** Put new test files under the `tests/` directory, mirroring the code structure.
 
 > **Important:** When creating a new file, ensure the directory exists or create it. Never default to the root directory for these files.
