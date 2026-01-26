@@ -18,7 +18,7 @@ describe('users validation schemas', () => {
     });
 
     it('should reject username shorter than minimum length', () => {
-      const input = { username: 'ab' }; // min is 3
+      const input = { username: 'ab' }; // min is 4
       const result = checkUsernameAvailabilitySchema.safeParse(input);
 
       expect(result.success).toBe(false);
