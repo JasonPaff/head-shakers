@@ -84,7 +84,7 @@ export const SCHEMA_LIMITS = {
     CLERK_ID: { MAX: 255 },
     EMAIL: { MAX: 255 },
     LOCATION: { MAX: 100 },
-    USERNAME: { MAX: 50, MIN: 3 },
+    USERNAME: { MAX: 50, MIN: 4 },
     USERNAME_CHANGE_COOLDOWN_DAYS: 90,
   },
   USER_BLOCK: {
