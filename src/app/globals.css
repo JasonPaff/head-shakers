@@ -316,6 +316,40 @@
   background-size: 200% 100%;
 }
 
+/* Gentle floating animation for decorative elements */
+@keyframes float-gentle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--float-rotate, 0deg));
+  }
+  50% {
+    transform: translateY(-8px) rotate(var(--float-rotate, 0deg));
+  }
+}
+
+@utility animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
+/* Subtle pulse glow for emphasis */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(249, 115, 22, 0),
+      0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px 2px rgba(249, 115, 22, 0.15),
+      0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@utility animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
 /* ============================================
    Reduced Motion Support
    ============================================ */
@@ -335,6 +369,19 @@
 
   .animate-carousel-scale-in {
     animation: none;
+  }
+
+  .animate-float-gentle {
+    animation: none;
+  }
+
+  .animate-pulse-glow {
+    animation: none;
+  }
+
+  /* Also disable inline style animations for reduced motion */
+  [style*='animation: float-gentle'] {
+    animation: none !important;
   }
 }
 

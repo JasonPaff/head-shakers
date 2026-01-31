@@ -30,51 +30,60 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0
-        bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))]
+          bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))]
           from-orange-200/40 via-transparent to-transparent dark:from-orange-900/20`}
       />
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0
-         bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)]
-          bg-size-[24px_24px]
+          bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)]
+          bg-[size:24px_24px]
           dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]`}
       />
       <div
         aria-hidden
         className={`pointer-events-none absolute top-20 left-1/4 size-96 rounded-full bg-linear-to-r
-          from-orange-300/40 to-amber-300/40 blur-3xl dark:from-orange-500/30 dark:to-amber-500/30`}
+          from-orange-300/40 to-amber-300/40 blur-3xl
+          dark:from-orange-500/30 dark:to-amber-500/30`}
       />
       <div
         aria-hidden
         className={`pointer-events-none absolute top-60 right-1/4 size-96 rounded-full bg-linear-to-l
-          from-amber-300/30 to-orange-300/30 blur-3xl dark:from-amber-500/20 dark:to-orange-500/20`}
+          from-amber-300/30 to-orange-300/30 blur-3xl
+          dark:from-amber-500/20 dark:to-orange-500/20`}
       />
 
-      <div className={'relative container mx-auto px-6 py-20 lg:py-32'}>
-        <div className={'grid items-center gap-12 lg:grid-cols-2 lg:gap-16'}>
+      <div className={'relative container mx-auto px-4 py-16 sm:px-6 lg:py-28 xl:py-32'}>
+        <div className={'grid items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16'}>
           {/* Left Content */}
-          <div className={'space-y-8'}>
+          <div className={'space-y-6 sm:space-y-8'}>
             {/* Badge */}
             <div
-              className={`inline-flex items-center gap-2 rounded-full border border-orange-300 bg-orange-100/80
-                px-4 py-2 backdrop-blur-sm dark:border-orange-500/30 dark:bg-orange-500/10`}
+              className={`inline-flex items-center gap-2 rounded-full border border-orange-300/80
+                bg-orange-100/90 px-3.5 py-1.5 shadow-sm backdrop-blur-sm
+                transition-all duration-300 hover:border-orange-400 hover:shadow-md
+                sm:px-4 sm:py-2
+                dark:border-orange-500/30 dark:bg-orange-500/10 dark:hover:border-orange-500/50`}
             >
-              <SparklesIcon aria-hidden className={'size-4 text-orange-600 dark:text-orange-400'} />
-              <span className={'text-sm font-medium text-orange-700 dark:text-orange-300'}>
+              <SparklesIcon
+                aria-hidden
+                className={'size-3.5 text-orange-600 sm:size-4 dark:text-orange-400'}
+              />
+              <span className={'text-xs font-medium text-orange-700 sm:text-sm dark:text-orange-300'}>
                 The Premier Bobblehead Community
               </span>
             </div>
 
             {/* Main Heading */}
             <h1
-              className={`text-5xl leading-tight font-extrabold tracking-tight
-                text-foreground md:text-6xl lg:text-7xl`}
+              className={`text-4xl leading-[1.1] font-extrabold tracking-tight text-foreground
+                sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl`}
             >
               Collect, Share, and{' '}
               <span
                 className={`bg-linear-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text
-                  text-transparent dark:from-orange-400 dark:via-amber-400 dark:to-yellow-400`}
+                  text-transparent
+                  dark:from-orange-400 dark:via-amber-400 dark:to-yellow-400`}
               >
                 Discover
               </span>
@@ -83,33 +92,39 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
             </h1>
 
             {/* Description */}
-            <p className={'max-w-xl text-lg text-muted-foreground md:text-xl'}>
+            <p className={'max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl'}>
               Build your digital bobblehead collection, connect with other collectors, and discover rare finds
               from around the world.
             </p>
 
             {/* CTA Buttons */}
-            <div className={'flex flex-wrap gap-4'}>
+            <div className={'flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4'}>
               <AuthContent
                 fallback={
                   <Button
                     asChild
-                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-8
-                      text-lg font-semibold text-primary-foreground shadow-lg shadow-primary/25
-                      hover:from-orange-600 hover:to-amber-600`}
+                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-6 text-base
+                      font-semibold text-primary-foreground shadow-lg shadow-primary/25
+                      transition-all duration-300
+                      hover:scale-[1.02] hover:from-orange-600 hover:to-amber-600 hover:shadow-xl hover:shadow-primary/30
+                      active:scale-[0.98]
+                      sm:px-8 sm:text-lg`}
                     size={'lg'}
                   >
                     <SignUpButton mode={'modal'}>Start Your Collection</SignUpButton>
                   </Button>
                 }
-                loadingSkeleton={<Skeleton className={'h-11 w-52 rounded-md'} />}
+                loadingSkeleton={<Skeleton className={'h-11 w-full rounded-md sm:w-52'} />}
               >
                 {username && (
                   <Button
                     asChild
-                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-8 text-lg
+                    className={`group bg-linear-to-r from-gradient-from to-gradient-to px-6 text-base
                       font-semibold text-primary-foreground shadow-lg shadow-primary/25
-                      hover:from-orange-600 hover:to-amber-600`}
+                      transition-all duration-300
+                      hover:scale-[1.02] hover:from-orange-600 hover:to-amber-600 hover:shadow-xl hover:shadow-primary/30
+                      active:scale-[0.98]
+                      sm:px-8 sm:text-lg`}
                     size={'lg'}
                   >
                     <Link
@@ -120,7 +135,9 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
                     >
                       <span>My Collection</span>
                       <ArrowRightIcon
-                        className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+                        className={
+                          'ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1 sm:size-5'
+                        }
                       />
                     </Link>
                   </Button>
@@ -129,23 +146,29 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
 
               <Button
                 asChild
-                className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
-                  backdrop-blur-sm hover:bg-accent dark:border-border
-                  dark:bg-secondary/50 dark:hover:bg-secondary`}
+                className={`border-primary/30 bg-card/80 px-6 text-base text-foreground
+                  shadow-sm backdrop-blur-sm
+                  transition-all duration-300 hover:border-primary/50 hover:bg-accent hover:shadow-md
+                  active:scale-[0.98]
+                  sm:px-8 sm:text-lg
+                  dark:border-border dark:bg-secondary/50 dark:hover:bg-secondary`}
                 size={'lg'}
                 variant={'outline'}
               >
                 <Link href={$path({ route: '/browse' })}>
-                  <SearchIcon aria-hidden className={'mr-2 size-5'} />
+                  <SearchIcon aria-hidden className={'mr-2 size-4 sm:size-5'} />
                   Browse Collections
                 </Link>
               </Button>
 
               <Button
                 asChild
-                className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
-                  backdrop-blur-sm hover:bg-accent dark:border-border
-                  dark:bg-secondary/50 dark:hover:bg-secondary`}
+                className={`border-primary/30 bg-card/80 px-6 text-base text-foreground
+                  shadow-sm backdrop-blur-sm
+                  transition-all duration-300 hover:border-primary/50 hover:bg-accent hover:shadow-md
+                  active:scale-[0.98]
+                  sm:px-8 sm:text-lg
+                  dark:border-border dark:bg-secondary/50 dark:hover:bg-secondary`}
                 size={'lg'}
                 variant={'outline'}
               >
@@ -172,7 +195,14 @@ export const HeroSection = ({ username }: HeroSectionProps) => {
 
       {/* Wave Divider */}
       <div className={'absolute right-0 bottom-0 left-0'}>
-        <svg className={'w-full'} fill={'none'} viewBox={'0 0 1440 120'} xmlns={'http://www.w3.org/2000/svg'}>
+        <svg
+          aria-hidden
+          className={'h-16 w-full sm:h-20 lg:h-auto'}
+          fill={'none'}
+          preserveAspectRatio={'none'}
+          viewBox={'0 0 1440 120'}
+          xmlns={'http://www.w3.org/2000/svg'}
+        >
           <path
             className={'fill-card dark:fill-background'}
             d={`M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960

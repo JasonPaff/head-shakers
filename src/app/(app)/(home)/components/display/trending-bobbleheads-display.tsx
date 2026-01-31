@@ -40,7 +40,10 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobb
 
   return (
     <div
-      className={'grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-6'}
+      className={`grid grid-cols-2 gap-3
+        sm:grid-cols-3 sm:gap-4
+        md:gap-5
+        lg:grid-cols-6 lg:gap-6`}
       data-slot={'trending-bobbleheads-grid'}
       data-testid={displayTestId}
     >
@@ -73,9 +76,12 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
   return (
     <Link
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-border/50 bg-card shadow-md',
-        'transition-all duration-300 hover:-translate-y-2 hover:shadow-xl',
-        'dark:border-border/50 dark:bg-secondary',
+        'group relative overflow-hidden rounded-xl border border-border/40 bg-card',
+        'shadow-sm transition-all duration-300 ease-out',
+        'hover:-translate-y-1 hover:border-border/60 hover:shadow-lg',
+        'active:scale-[0.98]',
+        'sm:rounded-2xl sm:hover:-translate-y-2 sm:hover:shadow-xl',
+        'dark:border-border/50 dark:bg-secondary dark:hover:border-border/70',
       )}
       data-slot={'trending-bobblehead-card'}
       data-testid={cardTestId}
@@ -151,19 +157,25 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       </div>
 
       {/* Footer Section */}
-      <div className={'p-3'} data-slot={'trending-bobblehead-footer'}>
+      <div className={'p-2.5 sm:p-3'} data-slot={'trending-bobblehead-footer'}>
         <h3
-          className={'line-clamp-1 text-sm font-semibold text-foreground'}
+          className={'line-clamp-1 text-xs font-semibold text-foreground sm:text-sm'}
           data-slot={'trending-bobblehead-name'}
         >
           {bobblehead.title ?? bobblehead.name ?? 'Bobblehead'}
         </h3>
         <div
-          className={'mt-1 flex items-center justify-between text-xs text-muted-foreground'}
+          className={
+            'mt-0.5 flex items-center justify-between text-[10px] text-muted-foreground sm:mt-1 sm:text-xs'
+          }
           data-slot={'trending-bobblehead-meta'}
         >
-          <span data-slot={'trending-bobblehead-category'}>{bobblehead.category ?? 'Bobblehead'}</span>
-          <span data-slot={'trending-bobblehead-year'}>{bobblehead.year ?? new Date().getFullYear()}</span>
+          <span className={'truncate'} data-slot={'trending-bobblehead-category'}>
+            {bobblehead.category ?? 'Bobblehead'}
+          </span>
+          <span className={'shrink-0 tabular-nums'} data-slot={'trending-bobblehead-year'}>
+            {bobblehead.year ?? new Date().getFullYear()}
+          </span>
         </div>
       </div>
     </Link>

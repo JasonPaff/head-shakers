@@ -124,19 +124,25 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
           </div>
         </Link>
 
-        {/* Floating Cards */}
+        {/* Floating Cards - Hidden on mobile to prevent overflow */}
         {/* Top Rated This Week Card */}
         <div
           aria-hidden
-          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
-            border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
-            dark:border-border/50 dark:bg-secondary/90`}
+          className={`absolute top-8 -left-8 -rotate-12 transform rounded-2xl border
+            border-primary/20 bg-card/95 p-3 shadow-xl backdrop-blur-md
+            transition-all duration-500 ease-out
+            hover:scale-105 hover:shadow-2xl
+            motion-reduce:transform-none
+            hidden lg:block
+            dark:border-border/50 dark:bg-secondary/95`}
           data-slot={'hero-floating-card'}
           data-testid={topRatedCardTestId}
-          style={{ animationDuration: '3s' }}
+          style={{
+            animation: 'float-gentle 6s ease-in-out infinite',
+          }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-linear-to-br from-gradient-from to-gradient-to p-2'}>
+            <div className={'rounded-xl bg-linear-to-br from-gradient-from to-gradient-to p-2 shadow-sm'}>
               <TrophyIcon aria-hidden className={'size-5 text-primary-foreground'} />
             </div>
             <div>
@@ -149,15 +155,22 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         {/* Value Growth Card */}
         <div
           aria-hidden
-          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
-            border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
-            dark:border-border/50 dark:bg-secondary/90`}
+          className={`absolute -right-4 bottom-20 rotate-6 transform rounded-2xl border
+            border-primary/20 bg-card/95 p-3 shadow-xl backdrop-blur-md
+            transition-all duration-500 ease-out
+            hover:scale-105 hover:shadow-2xl
+            motion-reduce:transform-none
+            hidden lg:block
+            dark:border-border/50 dark:bg-secondary/95`}
           data-slot={'hero-floating-card'}
           data-testid={valueGrowthCardTestId}
-          style={{ animationDelay: '1s', animationDuration: '4s' }}
+          style={{
+            animation: 'float-gentle 6s ease-in-out infinite',
+            animationDelay: '3s',
+          }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-linear-to-br from-success to-new p-2'}>
+            <div className={'rounded-xl bg-linear-to-br from-success to-new p-2 shadow-sm'}>
               <TrendingUpIcon aria-hidden className={'size-5 text-success-foreground'} />
             </div>
             <div>

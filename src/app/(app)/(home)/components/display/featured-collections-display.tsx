@@ -40,13 +40,13 @@ export const FeaturedCollectionsDisplay = ({ collections, testId }: FeaturedColl
 
   return (
     <div
-      className={'grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'}
+      className={'grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8'}
       data-slot={'featured-collections-grid'}
       data-testid={testId ?? generateTestId('feature', 'collection-grid')}
     >
       {collections.map((collection, index) => (
         <FeaturedCollectionCard
-          className={index >= 3 ? 'hidden md:block' : undefined}
+          className={index >= 3 ? 'hidden lg:block' : undefined}
           collection={collection}
           key={collection.id}
         />
@@ -74,9 +74,12 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
   return (
     <Link
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg',
-        'transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl',
-        'dark:border-border dark:bg-card',
+        'group relative overflow-hidden rounded-2xl border border-border/60 bg-card',
+        'shadow-md transition-all duration-300 ease-out',
+        'hover:-translate-y-1.5 hover:border-border hover:shadow-xl',
+        'active:scale-[0.99]',
+        'sm:hover:-translate-y-2 sm:hover:shadow-2xl',
+        'dark:border-border/50 dark:bg-card dark:hover:border-border',
         className,
       )}
       data-slot={'featured-collection-card'}
@@ -88,7 +91,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
     >
       {/* Image Section */}
       <div
-        className={'relative aspect-4/3 overflow-hidden'}
+        className={'relative aspect-[4/3] overflow-hidden'}
         data-slot={'featured-collection-image-container'}
       >
         <Conditional isCondition={_hasImage}>
@@ -167,24 +170,31 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
       </div>
 
       {/* Footer Section */}
-      <div className={'p-5'} data-slot={'featured-collection-footer'}>
+      <div className={'p-4 sm:p-5'} data-slot={'featured-collection-footer'}>
         {/* Owner Section */}
-        <div className={'flex items-center justify-between'} data-slot={'featured-collection-owner-section'}>
-          <div className={'flex items-center gap-3'}>
+        <div
+          className={'flex items-center justify-between gap-3'}
+          data-slot={'featured-collection-owner-section'}
+        >
+          <div className={'flex min-w-0 items-center gap-2.5 sm:gap-3'}>
             <Image
               alt={collection.ownerDisplayName ?? 'image'}
-              className={'size-9 rounded-full object-cover ring-2 ring-primary/20'}
+              className={`size-8 shrink-0 rounded-full object-cover ring-2 ring-primary/20
+                transition-all duration-300 group-hover:ring-primary/40
+                sm:size-9`}
               height={36}
               src={avatarUrl}
               width={36}
             />
-            <div>
-              <div className={'text-sm font-medium text-foreground'}>@{collection.ownerDisplayName}</div>
+            <div className={'min-w-0'}>
+              <div className={'truncate text-sm font-medium text-foreground'}>
+                @{collection.ownerDisplayName}
+              </div>
               <div className={'text-xs text-muted-foreground'}>{collection.totalItems || 0} items</div>
             </div>
           </div>
-          <div className={'text-right'}>
-            <div className={'text-sm font-semibold text-primary'}>
+          <div className={'shrink-0 text-right'}>
+            <div className={'text-sm font-semibold tabular-nums text-primary'}>
               ${(collection.totalValue || 0).toLocaleString()}
             </div>
             <div className={'text-xs text-muted-foreground'}>Est. Value</div>
@@ -194,22 +204,23 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
         {/* Stats Row */}
         <div
           className={cn(
-            'mt-4 flex items-center gap-4 border-t border-border pt-4',
-            'text-sm text-muted-foreground',
+            'mt-3 flex items-center gap-3 border-t border-border/60 pt-3',
+            'text-xs text-muted-foreground',
+            'sm:mt-4 sm:gap-4 sm:pt-4 sm:text-sm',
           )}
           data-slot={'featured-collection-stats'}
         >
           <span className={'flex items-center gap-1'}>
-            <HeartIcon aria-hidden className={'size-4 text-trending'} />
-            {collection.likes.toLocaleString()}
+            <HeartIcon aria-hidden className={'size-3.5 text-trending sm:size-4'} />
+            <span className={'tabular-nums'}>{collection.likes.toLocaleString()}</span>
           </span>
           <span className={'flex items-center gap-1'}>
-            <EyeIcon aria-hidden className={'size-4'} />
-            {collection.viewCount.toLocaleString()}
+            <EyeIcon aria-hidden className={'size-3.5 sm:size-4'} />
+            <span className={'tabular-nums'}>{collection.viewCount.toLocaleString()}</span>
           </span>
           <span className={'flex items-center gap-1'}>
-            <MessageCircleIcon aria-hidden className={'size-4'} />
-            {collection.comments}
+            <MessageCircleIcon aria-hidden className={'size-3.5 sm:size-4'} />
+            <span className={'tabular-nums'}>{collection.comments}</span>
           </span>
         </div>
       </div>
