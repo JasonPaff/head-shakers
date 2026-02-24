@@ -16,8 +16,8 @@
       "args": ["/c", "npx", "-y", "mcp-remote@latest", "https://mcp.neon.tech/mcp"]
     },
     "chrome-devtools": {
-      "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"]
     }
   }
 }

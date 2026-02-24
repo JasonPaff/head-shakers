@@ -179,3 +179,266 @@ Input:
   "content": "---\npaths:\n  - \"**/*.tsx\"\n---\n\n# Do not use forwardRef\n\nThis project uses React 19, where `forwardRef` is deprecated and no longer needed. In React 19, `ref` is a regular prop that can be passed directly to function components.\n\n## Instead of this:\n\n```tsx\nimport { forwardRef } from 'react';\n\nconst MyInput = forwardRef(function MyInput(props, ref) {\n  return <input {...props} ref={ref} />;\n});\n```\n\n## Do this:\n\n```tsx\nfunction MyInput({ ref, ...props }) {\n  return <input {...props} ref={ref} />;\n}\n```\n\nAlways accept `ref` as a destructured prop and pass it directly to the underlying element. Never wrap components with `forwardRef`.\n"
 }
 ================================================================================
+
+================================================================================
+2026-02-24T18:35:10.722Z
+Tool: Task
+Input:
+{
+  "description": "MCP server global settings guide",
+  "prompt": "The user wants to know how to add an MCP server to their global/user-level Claude Code settings. Explain the process clearly, including:\n1. Where the global settings file is located\n2. The format/syntax for adding MCP servers\n3. Examples of adding different types of MCP servers (stdio, sse, etc.)\n4. The difference between project-level and user-level MCP server configuration",
+  "subagent_type": "claude-code-guide"
+}
+================================================================================
+
+================================================================================
+2026-02-24T18:35:13.670Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs/en/claude_code_docs_map.md",
+  "prompt": "Find documentation about MCP server configuration in Claude Code, including global settings and user-level configuration"
+}
+================================================================================
+
+================================================================================
+2026-02-24T18:35:16.814Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs/en/mcp.md",
+  "prompt": "How to add MCP servers globally to Claude Code settings, including configuration scopes and syntax examples"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:18:33.089Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Base UI React component library documentation"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:19:07.948Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "Base UI",
+  "query": "Base UI React component library documentation"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:22:00.181Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "Base UI",
+  "query": "Base UI React component library documentation"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:31:35.015Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Accordion component usage and API"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:31:51.873Z
+Tool: Task
+Input:
+{
+  "description": "Research Base-UI Accordion docs",
+  "prompt": "Research the latest Base-UI (formerly Radix UI's unstyled counterpart, now from MUI) Accordion component documentation. \n\n1. First, resolve the library ID for \"base-ui\" or \"@base-ui-components/react\" \n2. Then query the docs specifically for the Accordion component - how it works, its API, its parts/subcomponents, usage patterns, and any examples.\n\nGive me a comprehensive summary covering:\n- Component structure (what sub-components make up the Accordion)\n- Props/API for each sub-component\n- Usage examples\n- Any important patterns or gotchas\n- How styling works with Base-UI's unstyled approach",
+  "subagent_type": "context7-researcher"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:31:53.792Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Base-UI Accordion component unstyled MUI"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:31:54.033Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "@base-ui-components/react",
+  "query": "Accordion component API subcomponents"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:03.886Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion component structure subcomponents API props usage examples"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:10.304Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/llmstxt/base-ui_llms_txt",
+  "query": "Accordion component structure subcomponents API props usage examples styling"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:27.212Z
+Tool: Task
+Input:
+{
+  "description": "Research Base-UI Accordion docs",
+  "prompt": "Research the latest Base-UI library documentation for the Accordion component. I need a comprehensive summary of:\n\n1. How to use the Accordion component (basic usage)\n2. What subcomponents/parts it has (Root, Item, Trigger, Panel, etc.)\n3. Available props and configuration options\n4. How to control open/close state (controlled vs uncontrolled)\n5. Animation/transition support\n6. Accessibility features\n7. Any code examples showing typical usage patterns\n\nFirst resolve the library ID for \"base-ui\" (it may be under \"@base-ui-components/react\" or \"base-ui\" or similar), then query the docs specifically about the Accordion component.",
+  "subagent_type": "context7-researcher"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:28.998Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Accordion component documentation"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:33.156Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion component basic usage subcomponents parts Root Item Trigger Panel props controlled uncontrolled state"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:36.512Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Accordion component documentation subcomponents props state control"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:37.485Z
+Tool: TaskOutput
+Input:
+{
+  "task_id": "a21fecdd8970c5e5a",
+  "block": true,
+  "timeout": 60000
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:39.880Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion component basic usage subcomponents Root Item Trigger Panel props state control"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:32:40.252Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion controlled uncontrolled state defaultValue onChange animation transitions accessibility"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:37.409Z
+Tool: Task
+Input:
+{
+  "description": "User-level subagent configuration",
+  "prompt": "How do I configure a custom subagent at the user level (not project level) in Claude Code? I want to know:\n1. Where user-level agent configurations are stored (file path and format)\n2. The full schema/format for defining custom agents\n3. How to make a project-level agent available globally at the user level instead\n\nPlease provide the exact file path and configuration format needed.",
+  "subagent_type": "claude-code-guide"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:37.909Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/.claude/agents/*.md"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:43.378Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs/en/claude_code_docs_map.md",
+  "prompt": "user-level agent configuration, global subagent configuration, user configuration"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:43.686Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs",
+  "prompt": "custom subagent configuration schema format"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:46.525Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs/en/sub-agents.md",
+  "prompt": "user-level subagent configuration, global subagent, .claude directory, agent scope"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:36:46.884Z
+Tool: WebFetch
+Input:
+{
+  "url": "https://code.claude.com/docs/en/settings.md",
+  "prompt": "user-level configuration, subagent configuration file path"
+}
+================================================================================
+
+================================================================================
+2026-02-24T19:37:08.633Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\jasonpaff\\dev\\head-shakers\\.claude\\agents\\context7-researcher.md"
+}
+================================================================================
