@@ -1,6 +1,7 @@
 ---
 name: facade-layer
 description: Enforces project facade layer coding conventions when creating or modifying business logic facades. This skill ensures consistent patterns for transaction handling, error management, cache integration, query coordination, and cross-service orchestration.
+user-invocable: false
 ---
 
 # Facade Layer Skill

@@ -1,6 +1,7 @@
 ---
 name: server-components
 description: Enforces project server component conventions for async data fetching, caching integration, streaming with Suspense, and SEO metadata generation. Extends react-coding-conventions with server-specific patterns.
+user-invocable: false
 ---
 
 # Server Components Skill

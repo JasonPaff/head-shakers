@@ -1,6 +1,7 @@
 ---
 name: ui-components
 description: Enforces project UI component conventions when creating or modifying React components, forms, dialogs, and other UI elements. This skill ensures consistent patterns for Radix UI integration, form handling with TanStack Form, test IDs, accessibility, and component composition.
+user-invocable: false
 ---
 
 # UI Components Skill

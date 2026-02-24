@@ -1,6 +1,7 @@
 ---
 name: testing-base
 description: Enforces project shared testing conventions for test structure, file naming, description patterns, assertions, and anti-patterns. This base skill is loaded by all test-type specialists.
+user-invocable: false
 ---
 
 # Testing Base Skill

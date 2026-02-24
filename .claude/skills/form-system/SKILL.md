@@ -1,6 +1,7 @@
 ---
 name: form-system
 description: Enforces project form system conventions when creating or modifying forms using the custom TanStack Form integration. This skill covers useAppForm hook usage, field components, focus management, validation patterns, and accessibility requirements.
+user-invocable: false
 ---
 
 # Form System Skill

@@ -1,6 +1,7 @@
 ---
 name: server-actions
 description: Enforces project server actions coding conventions when creating or modifying server actions using next-safe-action, and ensures consistent client-side consumption patterns using the project's useServerAction hook. This skill covers both server-side action implementation and frontend integration patterns.
+user-invocable: false
 ---
 
 # Server Actions Skill

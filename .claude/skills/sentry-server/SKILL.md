@@ -1,6 +1,7 @@
 ---
 name: sentry-server
 description: Enforces project server-side Sentry monitoring conventions when implementing error tracking, performance monitoring, and breadcrumb logging in server actions, facades, middleware, and API routes. This skill ensures consistent patterns for context setting, breadcrumb categories, error capture, and performance spans.
+user-invocable: false
 ---
 
 # Sentry Server Monitoring Skill

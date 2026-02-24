@@ -1,6 +1,7 @@
 ---
 name: component-testing
 description: Enforces project React component testing conventions using Testing Library with proper rendering, user interactions, and accessibility testing.
+user-invocable: false
 ---
 
 # Component Testing Skill

@@ -1,6 +1,7 @@
 ---
 name: cloudinary-media
 description: Enforces project Cloudinary media conventions when working with image uploads, URL generation, transformations, social sharing images, and photo management components. This skill covers the complete media workflow including CloudinaryService operations, URL utilities, CldImage/CldUploadWidget components, path organization, type definitions, and Sentry integration.
+user-invocable: false
 ---
 
 # Cloudinary Media Skill

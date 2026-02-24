@@ -1,6 +1,7 @@
 ---
 name: database-schema
 description: Enforces project database schema conventions when creating or modifying Drizzle ORM table definitions, including constraints, indexes, relations, and column patterns. This skill should be used proactively whenever working with schema files to ensure consistent schema design for PostgreSQL with Neon serverless.
+user-invocable: false
 ---
 
 # Database Schema Conventions Enforcer

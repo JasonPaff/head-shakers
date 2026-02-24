@@ -1,6 +1,7 @@
 ---
 name: e2e-testing
 description: Enforces project E2E testing conventions using Playwright with custom fixtures, Page Object Model, and authentication contexts.
+user-invocable: false
 ---
 
 # E2E Testing Skill

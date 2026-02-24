@@ -1,6 +1,7 @@
 ---
 name: sentry-client
 description: Enforces project client-side Sentry monitoring conventions when implementing error boundaries, route-level error pages, user interaction tracking, and client component error handling. This skill ensures consistent patterns for global error handling, breadcrumbs, and front-end error capture.
+user-invocable: false
 ---
 
 # Sentry Client Monitoring Skill

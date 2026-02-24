@@ -1,6 +1,7 @@
 ---
 name: drizzle-orm
 description: Enforces project Drizzle ORM coding conventions when creating or modifying database queries, schemas, and migrations. This skill ensures consistent patterns for query structure, type safety, permission filtering, pagination, resilience, and database operations.
+user-invocable: false
 ---
 
 # Drizzle ORM Skill

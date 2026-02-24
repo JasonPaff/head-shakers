@@ -1,6 +1,7 @@
 ---
 name: ui-ux-polish
 description: "Iterative UI/UX polishing workflow for web applications. The exact prompt and methodology for achieving Stripe-level visual polish through multiple passes."
+user-invocable: false
 ---
 
 # UI/UX Polish — Iterative Enhancement Workflow

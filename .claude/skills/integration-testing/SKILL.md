@@ -1,6 +1,7 @@
 ---
 name: integration-testing
 description: Enforces project integration testing conventions for facades, server actions, and database operations using Testcontainers with real PostgreSQL.
+user-invocable: false
 ---
 
 # Integration Testing Skill

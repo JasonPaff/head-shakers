@@ -1,6 +1,7 @@
 ---
 name: test-infrastructure
 description: Enforces project test infrastructure conventions for factories, MSW handlers, mock data, Page Objects, and shared test utilities.
+user-invocable: false
 ---
 
 # Test Infrastructure Skill

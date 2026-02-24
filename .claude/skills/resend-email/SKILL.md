@@ -1,6 +1,7 @@
 ---
 name: resend-email
 description: Enforces project Resend email conventions when implementing email sending, templates, batch operations, and newsletter broadcasts. This skill ensures consistent patterns for email service methods, error handling, retry logic, and Sentry integration.
+user-invocable: false
 ---
 
 # Resend Email Skill

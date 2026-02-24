@@ -1,6 +1,7 @@
 ---
 name: caching
 description: Enforces project caching conventions when implementing cache layers using React cache(), Next.js unstable_cache, Upstash Redis, and Cloudinary. This skill ensures consistent patterns for cache keys, tags, TTL configuration, cache invalidation, and domain-specific CacheService helpers.
+user-invocable: false
 ---
 
 # Caching Skill
