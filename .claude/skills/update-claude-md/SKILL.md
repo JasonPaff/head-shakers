@@ -1,6 +1,6 @@
 ---
 name: update-claude-md
-description: Updates the projects CLAUDE.md file with a comprehensive project overview.
+description: Updates the projects CLAUDE.md file with up-to-date information about the project structure, tech stack, features, and development commands.
 disable-model-invocation: true
 ---
 
