@@ -1,7 +1,7 @@
 ---
 paths:
   - "**/*.tsx"
----
+--- 
 
 # Do not use forwardRef
 
