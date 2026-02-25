@@ -3,17 +3,6 @@
   "enabledMcpjsonServers": ["shared-server"],
   "model": "opus",
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun ./.claude/hooks/pre-tool-use/logger.ts"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|MultiEdit|Write",
@@ -21,6 +10,15 @@
           {
             "type": "command",
             "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ./.claude/hooks/pre-tool-use/logger.ts"
           }
         ]
       }
