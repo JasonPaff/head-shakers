@@ -1438,3 +1438,74 @@ Input:
   "query": "Accordion component usage and API"
 }
 ================================================================================
+
+================================================================================
+2026-02-25T17:46:33.710Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "@base-ui-components/react",
+  "query": "Accordion component API subcomponents props"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:46:33.784Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Base UI Accordion component documentation subcomponents props usage"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:46:39.579Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion component subcomponents props API usage examples accessibility animation behavior"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:46:51.134Z
+Tool: Task
+Input:
+{
+  "description": "Research Base UI Accordion docs",
+  "prompt": "Research the latest Base UI library documentation for the Accordion component. \n\n1. First, resolve the library ID for \"base-ui\" (it may be under \"@base-ui-components/react\" or \"base-ui\" or similar from the MUI/Base UI project).\n2. Then query the documentation specifically about the Accordion component - how it works, its API, subcomponents, props, usage patterns, and any code examples.\n\nProvide a comprehensive summary of the Accordion component including:\n- What subcomponents it consists of\n- Key props and their purposes\n- How to use it (with code examples if available)\n- Any important behavior notes (animations, accessibility, etc.)",
+  "subagent_type": "context7-researcher"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:47:32.357Z
+Tool: mcp__context7__resolve-library-id
+Input:
+{
+  "libraryName": "base-ui",
+  "query": "Accordion component documentation"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:47:39.129Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion component API usage examples how it works"
+}
+================================================================================
+
+================================================================================
+2026-02-25T17:47:44.814Z
+Tool: mcp__context7__query-docs
+Input:
+{
+  "libraryId": "/websites/base-ui_react",
+  "query": "Accordion Root props API controlled uncontrolled defaultValue openItems multiple"
+}
+================================================================================
