@@ -1,10 +1,10 @@
 {
-  "outputStyle": "default",
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "Ref",
     "Playwright",
     "Neon",
     "chrome-devtools"
   ],
-  "enableAllProjectMcpServers": true
+  "outputStyle": "default"
 }
